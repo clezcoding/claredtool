@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: tauri-desktop-mockup-first-ui
 status: executing
-stopped_at: Completed 01-02-PLAN.md
-last_updated: "2026-08-19T13:41:05.742Z"
+stopped_at: Completed 01-03-PLAN.md
+last_updated: "2026-08-19T13:59:24.820Z"
 last_activity: 2026-08-19
 last_activity_desc: "new-project-from-ingest: PROJECT, REQUIREMENTS, ROADMAP, STATE written"
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 4
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 01 (tauri-desktop-mockup-first-ui) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-08-19 — Phase 01 execution started
 
-Progress: [█████░░░░░] 50%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [█████░░░░░] 50%
 |------|----------|-------|-------|
 | Phase 01 P01 | 17 min | 3 tasks | 57 files |
 | Phase 01 P02 | 8min | 3 tasks | 8 files |
+| Phase 01-tauri-desktop-mockup-first-ui P03 | 14 | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Empty-state return CTA is Beispielrechnung anzeigen (not in Copywriting Contract)
 - [Phase 01]: Tax rail and Vorschau hide while empty state is showing (UI-SPEC empty E6)
 - [Phase 01]: PdfPaper uses inline #fff/#111 so dark theme tokens cannot invert paper content
+- [Phase 01]: Added a minimal @clared/ui Button so CreateDisabledButton matches the plan; Rechnung still uses native buttons
+- [Phase 01]: Entity/Kunden detail is a panel below the list after click, not a permanent split inspector (D-29)
+- [Phase 01]: /tax shows all nine StagedTaxDecision fields; the invoice rail still shows four
 
 ### Pending Todos
 
@@ -97,6 +101,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-19T13:41:05.734Z
-Stopped at: Completed 01-02-PLAN.md
+Last session: 2026-08-19T13:59:24.812Z
+Stopped at: Completed 01-03-PLAN.md
 Resume file: None
