@@ -4,16 +4,16 @@ milestone: v1.0
 milestone_name: milestone
 current_phase: 01
 current_phase_name: tauri-desktop-mockup-first-ui
-status: executing
-stopped_at: Completed 01-03-PLAN.md
-last_updated: "2026-08-19T13:59:24.820Z"
+status: verifying
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-08-19T14:09:28.982Z"
 last_activity: 2026-08-19
 last_activity_desc: "new-project-from-ingest: PROJECT, REQUIREMENTS, ROADMAP, STATE written"
 progress:
   total_phases: 1
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -29,10 +29,10 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 Phase: 01 (tauri-desktop-mockup-first-ui) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-08-19 — Phase 01 execution started
 
-Progress: [████████░░] 75%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Progress: [████████░░] 75%
 | Phase 01 P01 | 17 min | 3 tasks | 57 files |
 | Phase 01 P02 | 8min | 3 tasks | 8 files |
 | Phase 01-tauri-desktop-mockup-first-ui P03 | 14 | 3 tasks | 8 files |
+| Phase 01-tauri-desktop-mockup-first-ui P04 | 6 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Added a minimal @clared/ui Button so CreateDisabledButton matches the plan; Rechnung still uses native buttons
 - [Phase 01]: Entity/Kunden detail is a panel below the list after click, not a permanent split inspector (D-29)
 - [Phase 01]: /tax shows all nine StagedTaxDecision fields; the invoice rail still shows four
+- [Phase 01]: Empty-state hero is GPT Image 2 16:9 2k (2688×1520), not the 1×1 placeholder
+- [Phase 01]: CI uses explicit pnpm tauri build + upload-artifact, not tauri-action (no signing/secrets this phase)
+- [Phase 01]: Matrix windows-latest + macos-latest with fail-fast false so a macOS miss cannot cancel the Windows evidence job
 
 ### Pending Todos
 
@@ -101,6 +105,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-19T13:59:24.812Z
-Stopped at: Completed 01-03-PLAN.md
+Last session: 2026-08-19T14:09:28.974Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None
