@@ -1,0 +1,81 @@
+# Clared
+
+## What This Is
+
+Clared is a native-like desktop app for macOS and Windows that lets operators create B2B invoices, see live tax evaluation, and get a PDF. The client is Tauri (Rust + Web-UI). It talks to a self-hosted Coolify backend (Postgres, Redis, Authentik, API) over HTTPS and OIDC.
+
+## Core Value
+
+Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
+
+## Business Context
+
+- **Customer**: Operators who invoice global B2B (entities such as US LLC / EU-GmbH, customers/mandants)
+- **Revenue model**: Not specified in ingest
+- **Success metric**: Beautiful desktop app — create invoice, see live tax, get PDF — under 2 minutes
+- **Strategy notes**: `.planning/intel/` (PRD + tax-engine SPECs); `.planning/INGEST-CONFLICTS.md`
+
+## Requirements
+
+### Validated
+
+(None yet — ship to validate)
+
+### Active
+
+- [ ] **UI-01**: Mockup-first UI — interactive mockups / UI-SPEC before implementation on every UI-bearing phase
+- [ ] **DESK-01**: Tauri desktop client on macOS and Windows
+- [ ] **BACK-01**: Self-hosted Coolify backend (API, Postgres, Redis, Authentik)
+- [ ] **AUTH-01**: Authentik SSO / OIDC with RBAC (owner, accountant, viewer)
+- [ ] **ENT-01**: Entity- and customer management
+- [ ] **INV-01**: Invoice create / persist / retrieve with line items
+- [ ] **TAX-01**: Live tax evaluation of TransactionFacts
+- [ ] **TAX-02**: Modular tax engine as library `evaluate(facts): decision`
+- [ ] **PDF-01**: PDF from invoice + TaxDecision text blocks (DE/EN)
+- [ ] **OFFL-01**: Offline local store + sync when online
+- [ ] **AUDT-01**: Application logs, tax-decision audit trail, Coolify monitoring
+
+### Out of Scope
+
+- Electron desktop runtime — user locked Tauri
+- Supabase self-hosted BaaS as v1 default — PRD optional alternative; custom backend is the primary path
+- Tax-engine as a separate microservice in v1 — PRD: start integrated; extract later
+- Collision / priority-tie algorithm — SPEC says PRD would describe it; PRD is silent; do not invent
+
+## Context
+
+Greenfield from ingest: PRD `docs/clared-app-prd.md` plus tax SPECs (architecture, VAT/USt decision matrix, Tax Rule JSON Schema). No ADR-classified docs. No DOC-classified context topics. GSD agent runtime: claude (Cursor).
+
+Tax-engine contract: TransactionFacts in, TaxDecision out; RuleStore versioned; engine stateless. JSON Schema for TaxRule is SSOT. Decision-matrix in Markdown is the human/AI spec for test cases and rule classes.
+
+Open gap (INFO, not a blocker): ExecutionEngine step 4 expects collision logic in the PRD; PRD has none.
+
+## Constraints
+
+- **Runtime**: Tauri (Rust + Web-UI) — user lock; not Electron
+- **Platforms**: macOS and Windows desktop
+- **UI**: Mockup-first — ALWAYS build interactive mockups / UI-SPEC before implementation on every UI-bearing phase
+- **Deploy**: Coolify self-hosted — Postgres (`clared` / `clared_app`), Redis, Authentik, backend app; HTTPS
+- **Auth protocol**: Authentik OIDC; backend OAuth2 client; scopes `openid profile email`; roles owner / accountant / viewer
+- **Tax contract**: Library `evaluate(facts): decision`; TaxRule JSON Schema is SSOT; types from schema
+- **API (v1)**: `POST /api/invoices`, `GET /api/invoices/:id`, `POST /api/tax/evaluate`, `GET /api/entities`
+- **Data**: Tables entities, customers, invoices, invoice_items, tax_rules (optional besides file-DSL), audit_logs
+- **PDF**: Backend-rendered (templates in DB or filesystem); multilingual DE/EN; Redis queue for heavy jobs
+- **Open**: Collision logic unspecified — do not invent an algorithm
+
+## Key Decisions
+
+| Decision | Rationale | Outcome |
+|----------|-----------|---------|
+| Tauri desktop client (not Electron) | User lock; native-like macOS + Windows | ✓ Locked |
+| Coolify: Postgres, Redis, Authentik, backend app | PRD primary self-hosted path | ✓ Locked |
+| Tax engine as library `evaluate(facts): decision`; JSON Schema is TaxRule SSOT | SPEC AI-Kodier-Contract + PRD Variante 1 for start | ✓ Locked |
+| HTTPS + OIDC from desktop to backend | PRD Authentik OIDC flow | ✓ Locked |
+| UI framework: React/TypeScript vs Vue/TypeScript | PRD alternatives; no ADR | — Pending |
+| Backend: NestJS/Express vs FastAPI vs Axum | PRD recommends Node.js NestJS/Express; no ADR | — Pending |
+| Tax-engine integrated module vs later microservice | PRD: start integrated; extract later | — Pending |
+| Collision logic (priority ties) | SPEC says PRD describes it; PRD silent | — Pending |
+| Supabase self-hosted BaaS | Optional PRD alternative; not v1 default | — Pending |
+
+---
+*Last updated: 2026-08-19 after new-project-from-ingest*

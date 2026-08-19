@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/puzzless/Desktop/claredtool/docs/clared-app-prd.md",
+  "type": "PRD",
+  "confidence": "medium",
+  "manifest_override": false,
+  "title": "Clared – Desktop-App PRD (macOS & Windows)",
+  "summary": "Architecture of Clared as a desktop app with self-hosted backend, database, caching, and authentication via Coolify.",
+  "scope": ["Desktop-Client", "Backend-API", "Tax-Engine", "PostgreSQL", "Redis", "Authentik", "Coolify", "PDF-Generation"],
+  "cross_refs": ["clared-tax-rule-matrix.md", "clared-tax-rule-dsl-schema.json", "clared-tax-engine-architecture.md"],
+  "locked": false,
+  "precedence": null,
+  "notes": "Orchestrator override: classifier tagged SPEC (low) via architecture-heavy body; H1+filename are PRD. Extract product requirements AND stack/deployment constraints from this file."
+}
