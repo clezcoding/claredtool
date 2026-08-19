@@ -17,7 +17,7 @@ affects: [01-02-invoice-canvas, 01-03-entities-kunden-tax, 01-04-higgsfield-wind
 actuals:
   tokens: 79824
   tasks: 3
-  commits: 6
+  commits: 7
 
 tech-stack:
   added:
@@ -125,7 +125,7 @@ Each task was committed atomically:
 4. **Task 2c: Cargo.lock from first compile** - `a0288e9` (chore)
 5. **Task 3: Human verify — Tauri window launches on macOS** - approved (no code commit; visual checkpoint)
 
-**Plan metadata:** pending docs(01-01) complete-plan commit (this close-out)
+**Plan metadata:** `7c11890` (docs: complete foundation tracer plan)
 
 _Note: TDD tasks may have multiple commits (test → feat → refactor)_
 
