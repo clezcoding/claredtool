@@ -13,6 +13,7 @@ import {
 } from "react-router";
 import { useMemo } from "react";
 import { EntitiesScreen } from "./routes/entities";
+import { KundenScreen } from "./routes/kunden";
 import { PdfScreen } from "./routes/pdf";
 import { RechnungScreen } from "./routes/rechnung";
 
@@ -71,7 +72,7 @@ export default function App() {
           children: [
             { index: true, element: <RechnungScreen /> },
             { path: "entities", element: <EntitiesScreen /> },
-            { path: "kunden", element: <PlaceholderScreen title="Kunden" /> },
+            { path: "kunden", element: <KundenScreen /> },
             { path: "tax", element: <PlaceholderScreen title="Tax" /> },
             { path: "pdf", element: <PdfScreen /> },
           ],
