@@ -1,51 +1,82 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import {
+  Building2,
+  Calculator,
+  FileImage,
+  FileText,
+  Users,
+} from "lucide-react";
+import {
+  NavLink,
+  Outlet,
+  RouterProvider,
+  createHashRouter,
+} from "react-router";
+import { useMemo } from "react";
+import { RechnungScreen } from "./routes/rechnung";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+const NAV_ITEMS = [
+  { to: "/", label: "Rechnung", icon: FileText },
+  { to: "/entities", label: "Entities", icon: Building2 },
+  { to: "/kunden", label: "Kunden", icon: Users },
+  { to: "/tax", label: "Tax", icon: Calculator },
+  { to: "/pdf", label: "PDF", icon: FileImage },
+] as const;
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
-
+function PlaceholderScreen({ title }: { title: string }) {
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    <div className="p-6">
+      <h1 className="text-xl font-semibold">{title}</h1>
+    </div>
   );
 }
 
-export default App;
+export function AppShell() {
+  return (
+    <div className="flex h-screen bg-background text-foreground">
+      <nav className="flex w-48 shrink-0 flex-col gap-1 border-r border-border p-2">
+        {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={to === "/"}
+            className={({ isActive }) =>
+              `flex items-center gap-2 rounded-md px-3 py-2 text-sm ${
+                isActive
+                  ? "bg-accent text-accent-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`
+            }
+          >
+            <Icon size={16} />
+            {label}
+          </NavLink>
+        ))}
+      </nav>
+      <main className="flex-1 overflow-auto">
+        <Outlet />
+      </main>
+    </div>
+  );
+}
+
+export default function App() {
+  const router = useMemo(
+    () =>
+      createHashRouter([
+        {
+          path: "/",
+          element: <AppShell />,
+          children: [
+            { index: true, element: <RechnungScreen /> },
+            { path: "entities", element: <PlaceholderScreen title="Entities" /> },
+            { path: "kunden", element: <PlaceholderScreen title="Kunden" /> },
+            { path: "tax", element: <PlaceholderScreen title="Tax" /> },
+            { path: "pdf", element: <PlaceholderScreen title="PDF" /> },
+          ],
+        },
+      ]),
+    [],
+  );
+
+  return <RouterProvider router={router} />;
+}
