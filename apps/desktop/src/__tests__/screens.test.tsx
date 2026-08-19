@@ -63,3 +63,27 @@ describe("kunden screen", () => {
     expect(screen.getByText("Wird in Phase 3 aktiviert")).toBeTruthy();
   });
 });
+
+describe("tax screen", () => {
+  it("renders staged TaxDecision canonical fields including applied_rule_id", async () => {
+    await openScreen("Tax", "Tax");
+    const panel = within(screen.getByTestId("tax-decision"));
+    const tax = SAMPLE_INVOICE.taxDecision;
+
+    expect(panel.getByText("applied_rule_id")).toBeTruthy();
+    expect(panel.getByText(tax.applied_rule_id)).toBeTruthy();
+    expect(panel.getByText("legal_reference")).toBeTruthy();
+    expect(panel.getByText(tax.legal_reference)).toBeTruthy();
+    expect(panel.getByText("place_of_supply_country")).toBeTruthy();
+    expect(panel.getByText("tax_liability_party")).toBeTruthy();
+    expect(panel.getByText("invoice_tax_rate")).toBeTruthy();
+    expect(panel.getByText("invoice_tax_shown")).toBeTruthy();
+    expect(panel.getByText("reverse_charge_flag")).toBeTruthy();
+    expect(panel.getByText("invoice_text_block_id")).toBeTruthy();
+    expect(panel.getByText("applied_rule_version")).toBeTruthy();
+
+    expect(panel.queryByText("rate", { exact: true })).toBeNull();
+    expect(panel.queryByText("reverse_charge", { exact: true })).toBeNull();
+    expect(panel.queryByText("legal_text", { exact: true })).toBeNull();
+  });
+});

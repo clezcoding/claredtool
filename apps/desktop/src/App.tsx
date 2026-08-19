@@ -16,6 +16,7 @@ import { EntitiesScreen } from "./routes/entities";
 import { KundenScreen } from "./routes/kunden";
 import { PdfScreen } from "./routes/pdf";
 import { RechnungScreen } from "./routes/rechnung";
+import { TaxScreen } from "./routes/tax";
 
 const NAV_ITEMS = [
   { to: "/", label: "Rechnung", icon: FileText },
@@ -24,14 +25,6 @@ const NAV_ITEMS = [
   { to: "/tax", label: "Tax", icon: Calculator },
   { to: "/pdf", label: "PDF", icon: FileImage },
 ] as const;
-
-function PlaceholderScreen({ title }: { title: string }) {
-  return (
-    <div className="p-6">
-      <h1 className="text-xl font-semibold">{title}</h1>
-    </div>
-  );
-}
 
 export function AppShell() {
   return (
@@ -73,7 +66,7 @@ export default function App() {
             { index: true, element: <RechnungScreen /> },
             { path: "entities", element: <EntitiesScreen /> },
             { path: "kunden", element: <KundenScreen /> },
-            { path: "tax", element: <PlaceholderScreen title="Tax" /> },
+            { path: "tax", element: <TaxScreen /> },
             { path: "pdf", element: <PdfScreen /> },
           ],
         },
