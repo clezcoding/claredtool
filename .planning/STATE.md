@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: tauri-desktop-mockup-first-ui
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-08-19T13:28:18.861Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-08-19T13:41:05.742Z"
 last_activity: 2026-08-19
 last_activity_desc: "new-project-from-ingest: PROJECT, REQUIREMENTS, ROADMAP, STATE written"
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -28,11 +28,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 01 (tauri-desktop-mockup-first-ui) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-08-19 — Phase 01 execution started
 
-Progress: [███░░░░░░░] 25%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: [███░░░░░░░] 25%
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 01 P01 | 17 min | 3 tasks | 57 files |
+| Phase 01 P02 | 8min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,9 @@ Recent decisions affecting current work:
 - [Phase 01]: createHashRouter from react-router so sub-routes survive tauri://localhost
 - [Phase 01]: Vite/Tauri bound to 5174 because 5173 was occupied by BILLIT Vite
 - [Phase 01]: StagedTaxDecision uses canonical tax-engine fields (invoice_tax_rate, reverse_charge_flag, legal_reference) not RESEARCH aliases
+- [Phase 01]: Empty-state return CTA is Beispielrechnung anzeigen (not in Copywriting Contract)
+- [Phase 01]: Tax rail and Vorschau hide while empty state is showing (UI-SPEC empty E6)
+- [Phase 01]: PdfPaper uses inline #fff/#111 so dark theme tokens cannot invert paper content
 
 ### Pending Todos
 
@@ -93,6 +97,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-19T13:28:07.620Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-08-19T13:41:05.734Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None

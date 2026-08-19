@@ -31,14 +31,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Interactive mockups / UI-SPEC for the invoice → live-tax → PDF loop exist before app implementation
   3. User can navigate the mockuped desktop shell (Rechnungs-UI, Entities, Kunden, Tax-Vorschau, PDF)
 
-**Plans**: 1/4 plans executed
+**Plans**: 2/4 plans executed
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Foundation, Tauri 2 monorepo + shadcn dark shell, end-to-end tracer, macOS launch
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md — Invoice canvas: split form/rail, line-item cards, staged tax rail, PDF paper, empty state
+- [x] 01-02-PLAN.md — Invoice canvas: split form/rail, line-item cards, staged tax rail, PDF paper, empty state
 - [ ] 01-03-PLAN.md — Entities, Kunden, and Tax mock screens
 - [ ] 01-04-PLAN.md — Higgsfield empty-state illustration + windows-latest CI build (DESK-01 Windows gate)
 
@@ -97,7 +97,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Tauri Desktop & Mockup-First UI | 1/4 | In Progress|  |
+| 1. Tauri Desktop & Mockup-First UI | 2/4 | In Progress|  |
 | 2. Self-Hosted Backend & Authentik SSO | 0/? | Not started | - |
 | 3. Entities, Invoices & Live Tax | 0/? | Not started | - |
 | 4. PDF, Audit & Offline Sync | 0/? | Not started | - |
