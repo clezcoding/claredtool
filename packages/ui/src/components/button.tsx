@@ -1,0 +1,17 @@
+import * as React from "react";
+import { cn } from "../lib/utils";
+
+function Button({ className, ...props }: React.ComponentProps<"button">) {
+  return (
+    <button
+      data-slot="button"
+      className={cn(
+        "inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground disabled:pointer-events-none disabled:opacity-50",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export { Button };

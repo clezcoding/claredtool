@@ -12,6 +12,7 @@ import {
   createHashRouter,
 } from "react-router";
 import { useMemo } from "react";
+import { EntitiesScreen } from "./routes/entities";
 import { PdfScreen } from "./routes/pdf";
 import { RechnungScreen } from "./routes/rechnung";
 
@@ -69,7 +70,7 @@ export default function App() {
           element: <AppShell />,
           children: [
             { index: true, element: <RechnungScreen /> },
-            { path: "entities", element: <PlaceholderScreen title="Entities" /> },
+            { path: "entities", element: <EntitiesScreen /> },
             { path: "kunden", element: <PlaceholderScreen title="Kunden" /> },
             { path: "tax", element: <PlaceholderScreen title="Tax" /> },
             { path: "pdf", element: <PdfScreen /> },
