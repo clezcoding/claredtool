@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import App from "../App";
 import { SAMPLE_INVOICE } from "../data/sample-invoice";
@@ -53,5 +53,30 @@ describe("invoice canvas", () => {
     expect(screen.getAllByTestId("line-item-card")).toHaveLength(
       SAMPLE_INVOICE.lineItems.length,
     );
+  });
+
+  it("shows staged Live Steuerberechnung fields and Vorschau navigates to /pdf", async () => {
+    renderRechnung();
+    const rail = within(screen.getByTestId("tax-rail"));
+    const tax = SAMPLE_INVOICE.taxDecision;
+
+    expect(rail.getByRole("heading", { name: "Live Steuerberechnung" })).toBeTruthy();
+    expect(rail.getByText("invoice_tax_rate")).toBeTruthy();
+    expect(rail.getByText(String(tax.invoice_tax_rate))).toBeTruthy();
+    expect(rail.getByText("reverse_charge_flag")).toBeTruthy();
+    expect(rail.getByText(String(tax.reverse_charge_flag))).toBeTruthy();
+    expect(rail.getByText("legal_reference")).toBeTruthy();
+    expect(rail.getByText(tax.legal_reference)).toBeTruthy();
+    expect(rail.getByText("applied_rule_id")).toBeTruthy();
+    expect(rail.getByText(tax.applied_rule_id)).toBeTruthy();
+
+    const peek = screen.getByRole("link", { name: "Vorschau" });
+    expect(peek.getAttribute("href")).toBe("#/pdf");
+    fireEvent.click(peek);
+    await waitFor(() => {
+      expect(
+        within(screen.getByRole("main")).getByRole("heading", { name: "PDF" }),
+      ).toBeTruthy();
+    });
   });
 });
