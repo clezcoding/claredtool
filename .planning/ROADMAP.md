@@ -31,7 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Interactive mockups / UI-SPEC for the invoice → live-tax → PDF loop exist before app implementation
   3. User can navigate the mockuped desktop shell (Rechnungs-UI, Entities, Kunden, Tax-Vorschau, PDF)
 
-**Plans**: 4/4 plans executed
+**Plans**: 4/5 plans executed
 **Wave 1**
 
 - [x] 01-01-PLAN.md — Foundation, Tauri 2 monorepo + shadcn dark shell, end-to-end tracer, macOS launch
@@ -41,6 +41,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 01-02-PLAN.md — Invoice canvas: split form/rail, line-item cards, staged tax rail, PDF paper, empty state
 - [x] 01-03-PLAN.md — Entities, Kunden, and Tax mock screens
 - [x] 01-04-PLAN.md — Higgsfield empty-state illustration + windows-latest CI build (DESK-01 Windows gate)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 01-05-PLAN.md — Gap closure: demo loading (skeleton/spinner) + demo error copy with retry on Rechnung
 
 **UI hint**: yes
 
