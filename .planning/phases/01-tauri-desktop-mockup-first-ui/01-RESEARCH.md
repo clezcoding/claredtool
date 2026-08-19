@@ -633,22 +633,25 @@ SKIPPED — greenfield phase. No existing running services, stored data, OS regi
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **TaxDecision field names**
    - What we know: CONTEXT.md says fields are `rate, reverse charge, legal text, applied_rule_id` (D-15)
    - What's unclear: Exact TypeScript field names in `docs/clared-tax-engine-architecture.md` (camelCase vs snake_case?)
    - Recommendation: Planner reads `docs/clared-tax-engine-architecture.md` before writing the sample data shape; use whatever names appear in the spec.
+   - RESOLVED: canonical names from clared-tax-engine-architecture.md
 
 2. **Windows build verification**
    - What we know: DESK-01 requires macOS AND Windows; dev machine is macOS only
    - What's unclear: Is a Windows CI job (GitHub Actions `windows-latest`) in scope for this phase, or is it documented as a manual-verify step?
    - Recommendation: Plan includes a "Windows launch verified" success gate; if no Windows machine, add a GH Actions workflow as a task.
+   - RESOLVED: GitHub Actions windows-latest in 01-04
 
 3. **Higgsfield auth state**
    - What we know: Higgsfield CLI is installed at `/opt/homebrew/bin/higgsfield`
    - What's unclear: Whether the current session is authenticated (`higgsfield account status`)
    - Recommendation: Planner adds a `higgsfield auth login` check as a Wave 0 prerequisite before the illustration generation task.
+   - RESOLVED: precondition + placeholder fallback in 01-04 Task 1
 
 ---
 
