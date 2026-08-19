@@ -79,4 +79,15 @@ describe("invoice canvas", () => {
       ).toBeTruthy();
     });
   });
+
+  it("renders SAMPLE_INVOICE number, parties, and totals on the /pdf paper", () => {
+    window.location.hash = "#/pdf";
+    render(<App />);
+    const paper = within(screen.getByTestId("pdf-paper"));
+    expect(paper.getByText(SAMPLE_INVOICE.rechnungsnummer)).toBeTruthy();
+    expect(paper.getByText(SAMPLE_INVOICE.seller.name)).toBeTruthy();
+    expect(paper.getByText(SAMPLE_INVOICE.buyer.name)).toBeTruthy();
+    expect(paper.getByText(`Netto ${SAMPLE_INVOICE.nettoGesamt.toFixed(2)}`)).toBeTruthy();
+    expect(paper.getByText(`Brutto ${SAMPLE_INVOICE.bruttoGesamt.toFixed(2)}`)).toBeTruthy();
+  });
 });

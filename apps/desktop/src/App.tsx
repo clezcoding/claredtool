@@ -12,6 +12,7 @@ import {
   createHashRouter,
 } from "react-router";
 import { useMemo } from "react";
+import { PdfScreen } from "./routes/pdf";
 import { RechnungScreen } from "./routes/rechnung";
 
 const NAV_ITEMS = [
@@ -71,7 +72,7 @@ export default function App() {
             { path: "entities", element: <PlaceholderScreen title="Entities" /> },
             { path: "kunden", element: <PlaceholderScreen title="Kunden" /> },
             { path: "tax", element: <PlaceholderScreen title="Tax" /> },
-            { path: "pdf", element: <PlaceholderScreen title="PDF" /> },
+            { path: "pdf", element: <PdfScreen /> },
           ],
         },
       ]),
