@@ -2,6 +2,7 @@ import { Card, CardContent } from "@clared/ui";
 import { useState } from "react";
 import { InvoiceEmptyState } from "../components/invoice-empty-state";
 import { LineItemCard } from "../components/line-item-card";
+import { TaxRail } from "../components/tax-rail";
 import { SAMPLE_INVOICE, type LineItem } from "../data/sample-invoice";
 
 const BLANK_LINE: LineItem = {
@@ -98,6 +99,7 @@ export function RechnungScreen() {
           </div>
         )}
       </section>
+      {!empty ? <TaxRail /> : null}
     </div>
   );
 }
