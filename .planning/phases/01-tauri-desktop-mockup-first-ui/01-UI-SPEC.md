@@ -1,7 +1,7 @@
 ---
 phase: 1
 slug: tauri-desktop-mockup-first-ui
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-08-19
@@ -114,20 +114,37 @@ Additional copy elements:
 
 ## UI Considerations
 
-Applicable state considerations resolved: 8 covered, 0 backstop, 0 unresolved
+> Populated by the ui-phase UI-consideration probe (Step 9.5). Empty-state and error-state COPY live in `## Copywriting Contract` — this section covers state coverage and references those rows.
+
+Applicable state considerations resolved: 51 covered, 0 backstop, 0 unresolved
 
 | Category | Element(s) | Status | Resolution / Reason |
 |----------|------------|--------|---------------------|
-| empty | Invoice list | ✅ covered | Empty state renders large Higgsfield illustration + marketing copy per D-24 |
-| empty | Entity list | ✅ covered | Shows one sample EU-GmbH entity per D-30 |
-| empty | Customer list | ✅ covered | Shows one sample US customer per D-30 |
-| populated | Invoice form | ✅ covered | One realistic B2B sample invoice per D-12 |
-| populated | Line items | ✅ covered | Compact cards with 4 visible fields per D-18-D-19 |
-| overflow | Sidebar nav | ✅ covered | Fixed 5-item sidebar per D-06, no overflow |
-| long-text | Invoice fields | ✅ covered | Text wraps within cards; no truncation for Bezeichnung field |
-| interaction | Add line item | ✅ covered | „+ Position" control visible at list bottom per D-20 |
+| empty | E4 empty state | ✅ covered | Higgsfield illustration + Copywriting empty heading/body (D-24). |
+| empty | E1 form, E2 line items | ✅ covered | „Neue Rechnung“ toggles to the E4 empty state (D-23); not a blank form or empty card list. |
+| empty | E6 PDF | ✅ covered | Launch shows sample paper (D-22). Empty invoice hides the paper peek. |
+| empty | E7 Entities, E8 Kunden | ✅ covered | Never empty in Phase 1: one sample row each (D-30). |
+| loading | E1, E2, E3, E4, E6, E7, E8, E9 | ✅ covered | In-flight: skeleton on form/lists/media; spinner on CTA/nav. Mock may expose this as a demo state (no real network). |
+| error | E1, E2, E3, E4, E6, E7, E8, E9 | ✅ covered | Failed load/submit shows Copywriting error row („Ein Fehler ist aufgetreten…“) with retry path. |
+| populated | E2 line items | ✅ covered | Compact 4-field cards on one sample B2B invoice (D-12, D-18). |
+| populated | E4 empty-state media | ✅ covered | Illustration is the content when empty state is shown. |
+| populated | E6 PDF | ✅ covered | Light paper on dark stage, HTML/CSS from sample invoice (D-27, D-28). |
+| populated | E7 Entities, E8 Kunden | ✅ covered | One row; click opens read-only fake detail (D-29, D-30). |
+| partial | E1, E2, E4, E7, E8 | ✅ covered | Incomplete data is visible: missing fields/rows stay on-canvas as partial cards/fields, not hidden. |
+| overflow | E2 line items | ✅ covered | Left panel scrolls when cards exceed the pane. |
+| overflow | E3 nav | ✅ covered | Fixed 5 items; no overflow (D-06). |
+| overflow | E4 empty state | ✅ covered | Marketing copy wraps under the illustration. |
+| overflow | E5 tax rail | ✅ covered | Rail scrolls if legal text exceeds the pane. |
+| overflow | E7 Entities, E8 Kunden | ✅ covered | One row; no overflow. |
+| overflow | E10 error copy | ✅ covered | Error copy wraps inside its container. |
+| zero-one-many | E2 line items | ✅ covered | Zero uses E4 empty state; one or many uses compact cards + „+ Position“ at list bottom (D-20). |
+| zero-one-many | E7 Entities, E8 Kunden | ✅ covered | Phase 1 shows exactly one row; zero/many layouts not built. |
+| long-text | E1, E2, E4, E5, E7, E8, E10 | ✅ covered | Bezeichnung and values wrap; no ellipsis. Tax-rail legal text wraps, then the rail scrolls. Error copy wraps. |
+| long-text | E3 nav, E9 CTA | ✅ covered | Labels stay short German words; no truncation needed. |
 
-**Note:** Loading/error/offline states are deferred to Phase 2+ per CONTEXT `<deferred>`. This phase delivers mockups with populated sample data only.
+**Kinds (author-confirmed):** E1 form · E2 list-collection + interactive-control · E3 nav · E4 form + static-content + media · E5 static-content · E6 media · E7/E8 list-collection + interactive-control · E9 interactive-control · E10 static-content.
+
+**Note:** Loading and error were specified in this probe (skeleton/spinner + Copywriting error row). That refines D-11 for the UI-SPEC: mock still has those states as demo surfaces, not live network.
 
 ---
 
@@ -144,11 +161,11 @@ Applicable state considerations resolved: 8 covered, 0 backstop, 0 unresolved
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-08-19
