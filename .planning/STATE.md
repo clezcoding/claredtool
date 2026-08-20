@@ -3,12 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 2
 current_phase_name: Self-Hosted Backend & Authentik SSO
-status: planning
+status: "Phase 01 shipped — PR #1"
 stopped_at: Phase 01 complete, ready to plan Phase 2
-last_updated: "2026-08-20T14:08:25.439Z"
+last_updated: "2026-08-20T14:21:48.883Z"
 last_activity: 2026-08-20
-last_activity_desc: Phase 01 complete, transitioned to Phase 2
-state_head: 59b3e237c94713abf0e31d1d1aee9ae4b7f271d7
+state_head: 6f649ae22f02476dc68de6144fa946a4139b21ad
 progress:
   total_phases: 4
   completed_phases: 1
@@ -30,8 +29,8 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 Phase: 2 — Self-Hosted Backend & Authentik SSO
 Plan: Not started
-Status: Ready to plan
-Last activity: 2026-08-20 — Phase 01 complete, transitioned to Phase 2
+Status: Phase 01 shipped — PR #1
+Last activity: 2026-08-20
 
 Progress: [██░░░░░░░░] 25%
 
