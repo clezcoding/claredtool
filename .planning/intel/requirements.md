@@ -8,7 +8,7 @@
 
 ## REQ-self-hosted-backend
 - source: docs/clared-app-prd.md
-- description: Desktop-App communicates with a self-hosted backend (Coolify) with database, Redis, and Authentik as Identity Provider. All server components run on the Coolify cluster.
+- description: Desktop-App communicates with the vendor Coolify backend (founder's cluster) with database, Redis, and Authentik as Identity Provider. Not customer self-host. Not OSS.
 - acceptance: Desktop-Client verbindet sich über HTTPS und OAuth2 mit dem Backend. Coolify-Services: Backend-App, Postgres, Redis, Authentik, optional Supabase.
 - scope: Backend-API, Coolify
 
@@ -39,7 +39,7 @@
 ## REQ-authentik-sso-rbac
 - source: docs/clared-app-prd.md
 - description: Authentik as self-hosted Identity Provider for user management, SSO, MFA, roles and permissions.
-- acceptance: Authentik as OIDC Provider. Backend as OAuth2 Client. Redirect URIs: https://clared-backend.yourdomain.com/auth/callback. Scopes: openid profile email. Flow: Desktop-App opens Browser-Window or embedded WebView for login; user authenticates against Authentik; Authentik returns ID-Token/Access-Token; Backend validates token and creates Session/API-Key. Roles: owner, accountant, viewer. Nur owner darf Entities anlegen. accountant darf Rechnungen sehen und exportieren.
+- acceptance: Authentik as OIDC Provider. Backend as OAuth2 Client. Redirect URIs: https://clared-backend.yourdomain.com/auth/callback. Scopes: openid profile email. Flow: Desktop-App opens a dedicated Tauri login window; user authenticates against Authentik; Authentik returns ID-Token/Access-Token; Backend validates token and creates Session/API-Key. Groups: AUTH-01 owner/accountant/viewer plus catalog (`clared-admin`, `clared-tax`, `clared-clerk`, `clared-auditor`, `clared-platform`). Nur `clared-owner` (and `clared-platform`) darf Entities anlegen. accountant darf Rechnungen sehen und exportieren.
 - scope: Authentik, Auth/SSO
 
 ## REQ-offline-capability

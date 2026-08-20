@@ -1,0 +1,10 @@
+UNLICENSED — All Rights Reserved.
+
+Copyright (c) 2026 Clared.
+
+This software is proprietary. It is not open source and is not free to use,
+copy, modify, or distribute. Access is provided only to paying subscribers
+and to people the copyright holder explicitly authorizes.
+
+The backend (API, Postgres, Redis, Authentik) runs on the vendor's Coolify
+cluster. Customers do not self-host Clared server components.

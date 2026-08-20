@@ -2,7 +2,7 @@
 
 ## Overview
 
-Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to a Coolify-hosted API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 closes the loop with PDF, tax-decision audit, and offline sync.
+Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. It is **paid subscription SaaS**: backend, Postgres, Redis, and Authentik run on the **founder's Coolify**, not on the customer's machine, not as open source, not for free. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to the vendor Coolify API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 closes the loop with PDF, tax-decision audit, and offline sync. Stripe/seats (`SAAS-01`) stay v2.
 
 ## Phases
 
@@ -14,7 +14,7 @@ Clared ships as a stunning Tauri desktop app whose core loop is create invoice �
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Tauri Desktop & Mockup-First UI** - Launch Clared in a Tauri window; invoice+tax+PDF mockups exist before implementation (completed 2026-08-20)
-- [ ] **Phase 2: Self-Hosted Backend & Authentik SSO** - Sign in via Authentik; desktop talks HTTPS+OIDC to Coolify
+- [ ] **Phase 2: Self-Hosted Backend & Authentik SSO** - Sign in via Authentik; desktop talks HTTPS+OIDC to vendor Coolify (founder's cluster)
 - [ ] **Phase 3: Entities, Invoices & Live Tax** - Create invoice, see live tax from modular engine
 - [ ] **Phase 4: PDF, Audit & Offline Sync** - Download PDF, inspect tax audit trail, work offline and sync
 
@@ -50,15 +50,15 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 ### Phase 2: Self-Hosted Backend & Authentik SSO
 
-**Goal**: User signs in through Authentik and the desktop talks to a self-hosted Coolify backend over HTTPS and OIDC
+**Goal**: User signs in through Authentik and the desktop talks to the vendor Coolify backend (founder's cluster) over HTTPS and OIDC
 **Depends on**: Phase 1
 **Requirements**: BACK-01, AUTH-01
 **Success Criteria** (what must be TRUE):
 
   1. Interactive mockups / UI-SPEC for login and session UI exist before implementation
-  2. User can authenticate via Authentik OIDC (browser window or embedded WebView; scopes openid profile email)
-  3. Desktop reaches the Coolify backend over HTTPS with a backend-validated session or API key; unauthenticated calls are rejected
-  4. Tokens carry roles owner, accountant, viewer; Postgres, Redis, Authentik, and the backend app run on Coolify
+  2. User can authenticate via Authentik OIDC (extra Tauri login window; scopes openid profile email)
+  3. Desktop reaches the vendor Coolify backend over HTTPS with a backend-validated session or API key; unauthenticated calls are rejected
+  4. Tokens carry RBAC groups (AUTH-01: owner, accountant, viewer, plus catalog including `clared-platform`); Postgres, Redis, Authentik, and the backend app run on the founder's Coolify
 
 **Plans**: TBD
 **UI hint**: yes
