@@ -1,101 +1,97 @@
 # Source of truth for repo labels. Synced by .github/workflows/sync-labels.yml
-# Kodiak / Dependabot names must match .kodiak.toml and dependabot.yml exactly.
+# Names must match .kodiak.toml and dependabot.yml exactly.
+# Format: https://github.com/crazy-max/ghaction-github-labeler#yaml-configuration
 
-bug:
+- name: bug
   color: "d73a4a"
   description: Something isn't working
-enhancement:
+- name: enhancement
   color: "a2eeef"
   description: New feature or request
-documentation:
+- name: documentation
   color: "0075ca"
   description: Improvements or additions to documentation
-duplicate:
+- name: duplicate
   color: "cfd3d7"
   description: This issue or pull request already exists
-good first issue:
+- name: good first issue
   color: "7057ff"
   description: Good for newcomers
-help wanted:
+- name: help wanted
   color: "008672"
   description: Extra attention is needed
-invalid:
+- name: invalid
   color: "e4e669"
   description: This doesn't seem right
-question:
+- name: question
   color: "d876e3"
   description: Further information is requested
-wontfix:
+- name: wontfix
   color: "ffffff"
   description: This will not be worked on
-accessibility:
+- name: accessibility
   color: "f143ab"
   description: Barrier affecting people with disabilities
-
-automerge:
+- name: automerge
   color: "0e8a16"
   description: "Kodiak: merge when required checks are green"
-autoupdate:
+- name: autoupdate
   color: "1d76db"
   description: "Kodiak: keep this branch up to date with main"
-do-not-merge:
+- name: do-not-merge
   color: "b60205"
   description: Block Kodiak and human merge
-wip:
+- name: wip
   color: "fbca04"
   description: Work in progress — not ready to merge
-
-dependencies:
+- name: dependencies
   color: "0366d6"
   description: Dependency update
-npm:
+- name: npm
   color: "cb3837"
   description: npm / pnpm ecosystem
-cargo:
+- name: cargo
   color: "dea584"
   description: Rust / Cargo ecosystem
-github-actions:
+- name: github-actions
   color: "000000"
   description: GitHub Actions ecosystem
-security:
+- name: security
   color: "ee0701"
   description: Security vulnerability or hardening
-
-major:
+- name: major
   color: "b60205"
   description: SemVer major (Dependabot applies this automatically)
-minor:
+- name: minor
   color: "fbca04"
   description: SemVer minor (Dependabot applies this automatically)
-patch:
+- name: patch
   color: "0e8a16"
   description: SemVer patch (Dependabot applies this automatically)
-
-desktop:
+- name: desktop
   color: "5319e7"
   description: apps/desktop (Tauri client)
-ui:
+- name: ui
   color: "d4c5f9"
   description: packages/ui design system
-ci:
+- name: ci
   color: "ededed"
   description: CI workflows and GitHub automation
-planning:
+- name: planning
   color: "c2e0c6"
   description: ".planning GSD artifacts"
-
-architect:
+- name: architect
   color: "6f42c1"
   description: "Triage role: architect"
-implementer:
+- name: implementer
   color: "0052cc"
   description: "Triage role: implementer"
-reviewer:
+- name: reviewer
   color: "1d76db"
   description: "Triage role: reviewer"
-documenter:
+- name: documenter
   color: "0075ca"
   description: "Triage role: documenter"
-tester:
+- name: tester
   color: "0e8a16"
   description: "Triage role: tester"
