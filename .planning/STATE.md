@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: tauri-desktop-mockup-first-ui
 status: executing
-stopped_at: Phase 01 UAT partial — Windows CI blocked
-last_updated: "2026-08-19T19:55:00Z"
-last_activity: 2026-08-19
-last_activity_desc: "verify-work 01: Orca UAT — visual pass, Windows CI blocked (no remote)"
+stopped_at: Phase 01 UAT complete — Windows CI green
+last_updated: "2026-08-20T12:42:00Z"
+last_activity: 2026-08-20
+last_activity_desc: "git push master + desktop-build CI green (windows-bundle artifact)"
 progress:
   total_phases: 1
   completed_phases: 1
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 ## Current Position
 
-Phase: 01 (tauri-desktop-mockup-first-ui) — UAT PARTIAL
-Plan: 5 of 5 executed; UAT 1/2 pass (Windows CI blocked)
-Status: Blocked on Windows MSI/NSIS CI — no git remote
-Last activity: 2026-08-19 — Orca automated visual UAT passed
+Phase: 01 (tauri-desktop-mockup-first-ui) — UAT COMPLETE
+Plan: 5 of 5 executed; UAT 2/2 pass
+Status: Windows + macOS CI green on master
+Last activity: 2026-08-20 — git push + Actions run 32369930429 success
 
 Progress: [██████████] 100%
 
