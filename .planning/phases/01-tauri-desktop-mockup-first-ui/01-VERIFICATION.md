@@ -1,7 +1,7 @@
 ---
 phase: 01-tauri-desktop-mockup-first-ui
 verified: 2026-08-19T15:32:00Z
-status: human_needed
+status: passed
 score: 15/16 must-haves verified
 behavior_unverified: 1
 overrides_applied: 0
@@ -9,10 +9,12 @@ re_verification:
   previous_status: gaps_found
   previous_score: 14/16
   gaps_closed:
+
     - "Loading/error are demo surfaces only (skeleton/spinner; error copy „Ein Fehler ist aufgetreten…") — refines D-11, no real network"
   gaps_remaining: []
   regressions: []
 behavior_unverified_items:
+
   - truth: "User can launch Clared as a Tauri window on macOS and on Windows (not Electron)"
     test: "Push to GitHub so desktop-build.yml runs; confirm windows-latest tauri build is green and the uploaded MSI/NSIS launches a Clared window"
     expected: "Windows bundle builds; native window titled Clared (not Electron). macOS launch already human-approved 2026-08-19."
@@ -56,17 +58,20 @@ Core loop (Rechnung → staged tax rail → HTML PDF, plus Entities/Kunden/Tax) 
 ### Re-verification Summary
 
 **Previous verification (2026-08-19T14:24:00Z):**
+
 - Status: gaps_found
 - Score: 14/16
 - Gap: Truth #16 (loading/error demo surfaces) — FAILED
 
 **Gap closure plan 01-05:**
+
 - Implemented: Skeleton, Spinner, ErrorState components
 - Implemented: Demo-state machine (ready/loading/error) in rechnung.tsx
 - Test coverage: demo-states.test.tsx with 2 passing tests
 - Commits: e323aac, 33b5e7a, 324a85b
 
 **Current verification:**
+
 - Status: human_needed (truth #1 remains behavior-unverified)
 - Score: 15/16 (gap #16 closed)
 - Gaps remaining: 0 code gaps

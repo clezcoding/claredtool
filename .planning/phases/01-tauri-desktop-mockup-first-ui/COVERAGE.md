@@ -1,1 +1,1 @@
-No external API integration: Phase 1 is a local Tauri desktop mockup with no IPC commands, no network calls, and no runtime SDK/API. All screen data is hardcoded (SAMPLE_INVOICE); the tax rail and PDF are staged (no `evaluate()`, no PDF service). The only external tool used is the Higgsfield CLI (D-25), which runs once at build time to write a static PNG into `public/` — it is not an integrated application API, so no capability-coverage matrix applies.
+No external API integration: local Tauri mockup; no IPC, network, or runtime SDK. Higgsfield CLI is build-time only.
