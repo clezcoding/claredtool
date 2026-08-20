@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: tauri-desktop-mockup-first-ui
 status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-08-19T15:29:28.303Z"
+stopped_at: Phase 01 UAT partial — Windows CI blocked
+last_updated: "2026-08-19T19:55:00Z"
 last_activity: 2026-08-19
-last_activity_desc: "new-project-from-ingest: PROJECT, REQUIREMENTS, ROADMAP, STATE written"
+last_activity_desc: "verify-work 01: Orca UAT — visual pass, Windows CI blocked (no remote)"
 progress:
   total_phases: 1
   completed_phases: 1
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 ## Current Position
 
-Phase: 01 (tauri-desktop-mockup-first-ui) — EXECUTING
-Plan: 2 of 5
-Status: Ready to execute
-Last activity: 2026-08-19 — Phase 01 execution started
+Phase: 01 (tauri-desktop-mockup-first-ui) — UAT PARTIAL
+Plan: 5 of 5 executed; UAT 1/2 pass (Windows CI blocked)
+Status: Blocked on Windows MSI/NSIS CI — no git remote
+Last activity: 2026-08-19 — Orca automated visual UAT passed
 
 Progress: [██████████] 100%
 
