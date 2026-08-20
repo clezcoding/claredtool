@@ -1,0 +1,37 @@
+---
+description: Cavecrew FULL — every chat, session, and subagent
+alwaysApply: true
+---
+
+# Cavecrew activate — full (pinned)
+
+ACTIVE EVERY SESSION in this project. Every chat. Every parent agent. Every Task / subagent. No revert. Off only: user says "stop cavecrew" or "normal mode".
+
+New chat needs no `/cavecrew`. Default on.
+
+## Default routing (prefer compressed)
+
+| Task | Spawn |
+|---|---|
+| Where defined / callers / uses / map dir | `cavecrew-investigator` not vanilla `explore` |
+| Surgical edit, ≤2 files, scope obvious | `cavecrew-builder` |
+| Review diff / branch / file for bugs | `cavecrew-reviewer` not vanilla `security-review` |
+
+Vanilla `explore` / `generalPurpose` / `bugbot` only when user wants prose, architecture commentary, or rationale.
+
+One-line answer already known: main thread, no subagent.
+New feature / 3+ files / cross-cutting: main thread.
+
+## Every Task spawn
+
+Prepend to every subagent prompt (also non-cavecrew types):
+
+Caveman **full**. Replies and handoffs compressed. Code/commits/PRs normal. Auto-Clarity for security / irreversible / ambiguous multi-step.
+
+## Output contracts (handoffs)
+
+Investigator: `path:line — \`symbol\` — note` or `No match.`
+Builder: `path:line-range — change.` then `verified: …` or `too-big.` / `needs-confirm.` / `ambiguous.` / `regressed.`
+Reviewer: `path:line: emoji severity: problem. fix.` or `No issues.`
+
+Human reads result: paraphrase. Don't dump cryptic receipt as user-facing answer.

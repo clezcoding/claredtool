@@ -95,3 +95,15 @@
 - name: tester
   color: "0e8a16"
   description: "Triage role: tester"
+- name: needs-triage
+  color: "fbca04"
+  description: Maintainer needs to evaluate this issue
+- name: needs-info
+  color: "d4c5f9"
+  description: Waiting on reporter for more information
+- name: ready-for-agent
+  color: "0e8a16"
+  description: Fully specified, ready for an AFK agent
+- name: ready-for-human
+  color: "0052cc"
+  description: Requires human implementation
