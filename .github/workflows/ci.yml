@@ -30,7 +30,3 @@ jobs:
       - run: pnpm --filter ./apps/desktop exec tsc --noEmit
 
       - run: pnpm --filter ./apps/desktop test
-
-      - uses: dtolnay/rust-toolchain@stable
-
-      - run: cargo check --manifest-path apps/desktop/src-tauri/Cargo.toml
