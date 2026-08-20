@@ -1,0 +1,32 @@
+# Path/branch labels for pull requests. Names must exist in labels.yml.
+# sync-labels stays off so automerge / do-not-merge are never stripped.
+
+desktop:
+  - changed-files:
+      - any-glob-to-any-file: apps/desktop/**
+
+ui:
+  - changed-files:
+      - any-glob-to-any-file: packages/ui/**
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/workflows/**
+          - .github/dependabot.yml
+          - .github/labeler.yml
+          - .github/labels.yml
+          - .kodiak.toml
+
+planning:
+  - changed-files:
+      - any-glob-to-any-file: .planning/**
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.md"
+          - docs/**
+
+dependencies:
+  - head-branch: ['^dependabot/']
