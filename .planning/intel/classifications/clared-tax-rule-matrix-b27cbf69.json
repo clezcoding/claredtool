@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/puzzless/Desktop/claredtool/docs/clared-tax-rule-matrix.md",
+  "type": "SPEC",
+  "confidence": "medium",
+  "manifest_override": false,
+  "title": "Clared – Globale VAT-/USt-Decision-Matrix",
+  "summary": "Maps VAT/USt transaction archetypes to place of supply, tax liability, invoice rate, and reverse-charge for Clared's tax engine.",
+  "scope": ["VAT/USt", "tax engine", "Decision-Matrix", "place of supply", "Reverse Charge", "EU VAT", "UAE VAT", "US sales tax"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": "Path not under spec/; no frontmatter type. Dominant signals are column schema plus deterministic rule-class matrix."
+}

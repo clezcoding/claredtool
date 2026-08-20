@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/puzzless/Desktop/claredtool/docs/clared-tax-rule-dsl-schema.json",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "Clared Tax Rule",
+  "summary": "JSON Schema contract for Clared Tax Rule objects: conditions, effect, jurisdiction, and required fields.",
+  "scope": ["Clared Tax Rule", "conditions", "effect", "jurisdiction_scope", "place_of_supply_country", "tax_liability_party"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}
