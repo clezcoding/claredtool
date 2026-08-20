@@ -4,7 +4,7 @@ version = 1
 [merge]
 automerge_label = "automerge"
 require_automerge_label = true
-blocking_labels = ["do-not-merge", "wip"]
+blocking_labels = ["do-not-merge", "wip", "major"]
 blocking_title_regex = "^(WIP|wip|Draft):"
 method = "squash"
 delete_branch_on_merge = true
