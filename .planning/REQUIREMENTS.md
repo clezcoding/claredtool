@@ -9,8 +9,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Desktop & UI
 
-- [ ] **UI-01**: Every UI-bearing phase has interactive mockups / UI-SPEC before implementation (ALWAYS build mockups)
-- [ ] **DESK-01**: User can run Clared as a Tauri desktop app (Rust + Web-UI) on macOS and Windows
+- [x] **UI-01**: Every UI-bearing phase has interactive mockups / UI-SPEC before implementation (ALWAYS build mockups)
+- [x] **DESK-01**: User can run Clared as a Tauri desktop app (Rust + Web-UI) on macOS and Windows
 
 ### Backend & Identity
 
@@ -82,8 +82,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| UI-01 | Phase 1 | Gaps Found |
-| DESK-01 | Phase 1 | Gaps Found |
+| UI-01 | Phase 1 | Complete |
+| DESK-01 | Phase 1 | Complete |
 | BACK-01 | Phase 2 | Pending |
 | AUTH-01 | Phase 2 | Pending |
 | ENT-01 | Phase 3 | Pending |

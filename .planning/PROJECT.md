@@ -19,12 +19,12 @@ Beautiful interactive invoice + live-tax + PDF loop on the desktop — create in
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ **DESK-01**: Tauri desktop client on macOS and Windows — Phase 1 (Orca UAT + Windows CI)
+- ✓ **UI-01** (Phase 1): Mockup-first invoice → tax → PDF shell shipped — still required on later UI-bearing phases
 
 ### Active
 
-- [ ] **UI-01**: Mockup-first UI — interactive mockups / UI-SPEC before implementation on every UI-bearing phase
-- [ ] **DESK-01**: Tauri desktop client on macOS and Windows
+- [ ] **UI-01**: Mockup-first UI — interactive mockups / UI-SPEC before implementation on every remaining UI-bearing phase
 - [ ] **BACK-01**: Self-hosted Coolify backend (API, Postgres, Redis, Authentik)
 - [ ] **AUTH-01**: Authentik SSO / OIDC with RBAC (owner, accountant, viewer)
 - [ ] **ENT-01**: Entity- and customer management
@@ -71,11 +71,11 @@ Open gap (INFO, not a blocker): ExecutionEngine step 4 expects collision logic i
 | Coolify: Postgres, Redis, Authentik, backend app | PRD primary self-hosted path | ✓ Locked |
 | Tax engine as library `evaluate(facts): decision`; JSON Schema is TaxRule SSOT | SPEC AI-Kodier-Contract + PRD Variante 1 for start | ✓ Locked |
 | HTTPS + OIDC from desktop to backend | PRD Authentik OIDC flow | ✓ Locked |
-| UI framework: React/TypeScript vs Vue/TypeScript | PRD alternatives; no ADR | — Pending |
+| UI framework: React 19 + Vite + Tauri 2 | Phase 1 stack lock (not Vue) | ✓ Phase 1 |
 | Backend: NestJS/Express vs FastAPI vs Axum | PRD recommends Node.js NestJS/Express; no ADR | — Pending |
 | Tax-engine integrated module vs later microservice | PRD: start integrated; extract later | — Pending |
 | Collision logic (priority ties) | SPEC says PRD describes it; PRD silent | — Pending |
 | Supabase self-hosted BaaS | Optional PRD alternative; not v1 default | — Pending |
 
 ---
-*Last updated: 2026-08-19 after new-project-from-ingest*
+*Last updated: 2026-08-20 after Phase 1*
