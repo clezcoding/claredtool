@@ -13,3 +13,8 @@ pnpm-debug.log*
 # Rust / Tauri
 target
 apps/desktop/src-tauri/gen/schemas
+
+# Local agent/runtime (never commit secrets or GSD scratch)
+.cursor/mcp.json
+.planning/tmp/
+.gsd/

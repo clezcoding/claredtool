@@ -41,6 +41,10 @@ updates:
     commit-message:
       prefix: "chore"
       include: scope
+    # gtk-rs 0.18 (Tauri 2 Linux) requires glib ^0.18. GHSA-wrw7-89jp-8q8g
+    # is fixed in glib 0.20, which cannot resolve until Tauri moves gtk-rs.
+    ignore:
+      - dependency-name: glib
     groups:
       cargo-patch-minor:
         update-types:

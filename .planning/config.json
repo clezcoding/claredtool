@@ -19,7 +19,9 @@
     "cross_ai_execution": false,
     "cross_ai_command": "",
     "cross_ai_timeout": 300,
-    "test_gate_timeout": 600
+    "test_gate_timeout": 600,
+    "_auto_chain_active": false,
+    "response_language": "de-DE"
   },
   "ship": {
     "pr_body_sections": []
@@ -30,7 +32,8 @@
     "sub_repos": []
   },
   "git": {
-    "create_tag": true
+    "create_tag": true,
+    "branching_strategy": "phase"
   },
   "parallelization": {
     "enabled": true,
@@ -59,5 +62,7 @@
   },
   "project_code": null,
   "agent_skills": {},
-  "claude_md_path": "./.claude/CLAUDE.md"
+  "claude_md_path": "./.claude/CLAUDE.md",
+  "response_language": "de-DE",
+  "model_profile": "inherit"
 }
