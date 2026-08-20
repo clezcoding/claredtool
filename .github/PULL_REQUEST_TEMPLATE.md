@@ -14,5 +14,5 @@
 - Path labels are applied by the Labeler workflow.
 - Add `automerge` after review if Kodiak should land this PR (squash).
 - Dependabot **patch/minor** PRs automerge without that label once `ci` is green.
-- Dependabot **major** PRs need a human + `automerge`.
-- `wip` / `do-not-merge` block Kodiak.
+- The `major` label blocks Kodiak (even with `automerge`). Merge majors in the GitHub UI after review.
+- `wip` / `do-not-merge` also block Kodiak.
