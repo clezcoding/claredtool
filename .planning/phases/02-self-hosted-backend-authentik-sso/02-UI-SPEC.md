@@ -1,11 +1,12 @@
 ---
 phase: 2
 slug: self-hosted-backend-authentik-sso
-status: draft
+status: approved
 shadcn_initialized: true
 preset: radix-nova
 created: 2026-08-20
 updated: 2026-08-21
+reviewed_at: 2026-08-21T23:34:00+02:00
 ---
 
 # Phase 2 — UI Design Contract
@@ -140,7 +141,8 @@ When a keychain token exists **or** the process launched from a still-valid `cla
 | 200 | `AppShell` on the filled sample invoice (Phase 1 D-22). Chip populated from `/me`. |
 | 401 | Gate (no banner unless the user just cancelled). |
 | Network / 5xx / timeout | Phase 1 `ErrorState` on the same dominant surface (no shell, no gate, no login window). „Erneut versuchen“ re-calls `/me` or re-redeems. |
-| Ticket expired / invalid / missing (cold start) | Gate + cancel banner „Anmeldung abgebrochen“. |
+| Missing ticket / no `clared://` (normal cold start) | Gate only. No banner. |
+| Ticket expired / invalid after `clared://`, or cancel / window close / 60s timeout | Gate + cancel banner „Anmeldung abgebrochen“. |
 
 `prefers-reduced-motion: reduce`: spinner is a static 16×16 ring (no `animate-spin`). No other motion on boot or gate (hero is a static PNG).
 
@@ -274,41 +276,42 @@ Prompt (locked): Dark navy B2B login-gate illustration: a sealed invoice folio a
 
 > Populated by the ui-phase UI-consideration probe (Step 9.5). Empty-state and error-state COPY live in `## Copywriting Contract` — this section covers state coverage and references those rows.
 
-Applicable state considerations resolved: 31 covered, 0 backstop, 0 unresolved
+Applicable state considerations resolved: 32 covered (explicit), 0 backstop, 0 unresolved
 
 | Category | Element(s) | Status | Resolution / Reason |
 |----------|------------|--------|---------------------|
-| empty | E11 gate media | ✅ covered | Missing/broken hero: keep title, body, and „Anmelden“; do not swap in invoice empty-state art. |
-| empty | E13 chip name | ✅ covered | Empty `name` falls back to `email`; chip still renders with badge. |
-| empty | E14 menu | ✅ covered | Menu always has Rolle row + Abmelden; never an empty list. |
-| empty | E12 WebView | ✅ covered | Authentik not painted yet is the loading spinner, not an empty-product screen. |
-| loading | E11 gate CTA | ✅ covered | Opening the login window does not replace the gate with a spinner; the login window shows Spinner until Authentik paints. |
-| loading | E12 login window | ✅ covered | Dark stage + centered Spinner while WebView navigates. Native close always available (no infinite spinner). |
-| loading | E13 chip / E17 boot | ✅ covered | Keychain or valid `clared://` ticket: silent-boot Spinner, no shell. `/me` OK then chip is populated. |
-| loading | E15 banner CTA | ✅ covered | Button stays label „Anmelden“; Spinner may sit inside the button while the login window opens. |
-| loading | E14 menu | ✅ covered | Menu is local from `/me` already on screen; no menu-level spinner. |
-| error | E11/E15 401 | ✅ covered | Copywriting error row + „Anmelden“; shell stays if already signed-in (`role="alert"`). |
-| error | E15 cancel | ✅ covered | „Anmeldung abgebrochen“ + „Anmelden“; no auto-loop. |
-| error | E12 login window | ✅ covered | Allowlist/network failure in WebView: close/cancel path to the cancel banner; do not trap the user in a blank WebView without a way out (native close). |
-| error | network (Phase 1 E10) | ✅ covered | `ErrorState` + „Erneut versuchen“; not login. |
-| error | E17 silent boot | ✅ covered | `/me` network/5xx/timeout: `ErrorState` on dominant surface; retry re-calls `/me`. Not gate, not invoice empty. |
-| populated | E11 gate media | ✅ covered | Higgsfield 16:9 2k hero in `max-w-xl`. |
-| populated | E12 login window | ✅ covered | Authentik/MFA paints the WebView; Clared chrome is only the native titlebar. |
-| populated | E13 chip | ✅ covered | One name line + one `primaryRole` badge. |
-| populated | E14 menu | ✅ covered | Two rows: read-only Rolle + Abmelden. |
-| partial | E13 chip | ✅ covered | Name XOR email; badge always from `primaryRole`. Permissions/groups omitted. |
+| empty | E11 gate | ✅ covered | Missing/broken hero: keep title, body, and „Anmelden“ (Copywriting empty rows); do not swap in invoice empty-state art. |
+| loading | E11 gate | ✅ covered | Opening the login window does not replace the gate with a spinner; the login window shows Spinner until Authentik paints. |
+| error | E11 gate | ✅ covered | 401 uses Copywriting error row + „Anmelden“. Cancel uses „Anmeldung abgebrochen“ + „Anmelden“. Network is `ErrorState`, not gate marketing. |
+| populated | E11 gate | ✅ covered | Higgsfield 16:9 2k hero in `max-w-xl`, then Display title, muted body, accent „Anmelden“. |
 | overflow | E11 gate | ✅ covered | Body wraps; column scrolls if the viewport is shorter than hero+copy+CTA. |
-| overflow | E12 login window | ✅ covered | Authentik owns in-WebView scroll; Clared does not add a second scroller. |
-| overflow | E13 chip | ✅ covered | Name truncates with ellipsis; badge does not shrink below Label 12px (wraps to next line in the chip if needed). |
+| long-text | E11 gate | ✅ covered | One-sentence body wraps; no ellipsis. |
+| empty | E12 login | ✅ covered | Authentik not painted yet is the loading spinner, not an empty-product screen. |
+| loading | E12 login | ✅ covered | Dark stage + centered Spinner while WebView navigates. Native close always available (no infinite spinner). |
+| error | E12 login | ✅ covered | Allowlist/network failure in WebView: native close → cancel banner. Do not trap the user in a blank WebView. |
+| populated | E12 login | ✅ covered | Authentik/MFA paints the WebView; Clared chrome is only the native titlebar. Authentik owns in-WebView scroll. |
+| long-text | E12 login | ✅ covered | Title is the short word „Anmelden“. |
+| loading | E13 chip | ✅ covered | Keychain or valid `clared://` ticket: silent-boot Spinner, no shell. `/me` OK then chip is populated from `/me`. |
+| error | E13 chip | ✅ covered | 401: chip gone with session; 401 banner or gate. Network: `ErrorState`, no chip. Empty `name` falls back to `email`; never `sub`/groups/permissions. |
+| overflow | E13 chip | ✅ covered | Name truncates with ellipsis; badge does not shrink below Label 12px (wraps to next line in the chip if needed). Nav does not scroll; chip stays pinned to sidebar footer. |
+| long-text | E13 chip | ✅ covered | Ellipsis + native `title` tooltip for the full name/email. |
+| empty | E14 menu | ✅ covered | Menu always has Rolle row + Abmelden; never an empty list. |
+| loading | E14 menu | ✅ covered | Menu is local from `/me` already on screen; no menu-level spinner. |
+| error | E14 menu | ✅ covered | Menu is not fetched separately; 401/network handled by banners/`ErrorState`/gate. |
+| populated | E14 menu | ✅ covered | Two rows: read-only Rolle + Abmelden. |
+| partial | E14 menu | ✅ covered | Always both rows. Rolle label from `primaryRole` only; permissions/groups omitted. |
 | overflow | E14 menu | ✅ covered | Two short German rows; no overflow. |
-| overflow | E15 banners | ✅ covered | Message wraps inside the banner card. |
-| overflow | E3 nav inherit | ✅ covered | Phase 1: five items + new footer chip; nav does not scroll; chip stays pinned to footer. |
 | zero-one-many | E14 menu | ✅ covered | Always exactly two items. |
-| long-text | E11 gate body | ✅ covered | One sentence wraps; no ellipsis. |
-| long-text | E13 chip name | ✅ covered | Ellipsis + native `title` tooltip for the full name/email. |
+| long-text | E14 menu | ✅ covered | Rolle uses German badge label; unknown raw `primaryRole` wraps in the Rolle row. |
+| loading | E15 banners | ✅ covered | Button stays label „Anmelden“; Spinner may sit inside the button while the login window opens. |
+| error | E15 banners | ✅ covered | This is the error chrome: Copywriting 401 vs cancel rows. No auto-loop. `role="alert"` on 401; `role="status"` on cancel. |
+| overflow | E15 banners | ✅ covered | Message wraps inside the banner card. Never overlay the sidebar. |
 | long-text | E15 banners | ✅ covered | Wrap. |
+| overflow | E16 badge | ✅ covered | Badge does not shrink below Label 12px; wraps inside the badge. |
 | long-text | E16 badge | ✅ covered | Fixed German labels; unknown raw value wraps inside the badge. |
-| long-text | E12 titlebar | ✅ covered | Title is the short word „Anmelden“. |
+| loading | E17 silent boot | ✅ covered | Full-viewport Spinner + `sr-only` „Wird geladen“. No gate flash. `prefers-reduced-motion: reduce`: static 16×16 ring. |
+| error | E17 silent boot | ✅ covered | `/me` 401 → gate (no banner unless the user just cancelled). Network/5xx/timeout → `ErrorState` + „Erneut versuchen“. Missing ticket / no `clared://` (normal cold start) → gate, no banner. Expired/invalid ticket after `clared://`, or cancel / window close / 60s timeout → gate + cancel banner. |
+| long-text | E17 silent boot | ✅ covered | `sr-only` copy is the short string „Wird geladen“. |
 
 **Kinds (author-confirmed):** E11 gate = static-content + media + interactive-control · E12 login window = media + interactive-control · E13 chip = interactive-control + static-content · E14 menu = list-collection + interactive-control · E15 banners = static-content + interactive-control · E16 badge = static-content · E17 silent boot = interactive-control (spinner).
 
@@ -341,11 +344,11 @@ Phase 1 E1–E10 remain in force on signed-in screens. This contract does not re
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: FLAG applied (silent-boot: missing ticket = gate only, no cancel banner)
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-08-21T23:34:00+02:00
