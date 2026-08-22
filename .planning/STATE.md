@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 02
 current_phase_name: Self-Hosted Backend & Authentik SSO
-status: verifying
-stopped_at: Completed 02-05-PLAN.md
-last_updated: "2026-08-22T02:28:38.432Z"
+status: executing
+stopped_at: Completed 02-06-PLAN.md
+last_updated: "2026-08-22T04:15:32.092Z"
 last_activity: 2026-08-22
 last_activity_desc: Phase 02 execution started
-state_head: c1c406e71ac68723a91171748e7a59f7c4a583b8
+state_head: 4df88cb6ea0df1583d667a5eb0ad957813316e66
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 12
+  completed_plans: 11
 milestone_name: milestone
 ---
 
@@ -29,8 +29,8 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 02 (Self-Hosted Backend & Authentik SSO) — EXECUTING
-Plan: 5 of 5
-Status: Phase complete — ready for verification
+Plan: 2 of 7
+Status: Ready to execute
 Last activity: 2026-08-22 — Phase 02 execution started
 
 Progress: [██░░░░░░░░] 25%
@@ -68,6 +68,7 @@ Progress: [██░░░░░░░░] 25%
 | Phase 02-self-hosted-backend-authentik-sso P03 | 8 min | 2 tasks | 14 files |
 | Phase 02-self-hosted-backend-authentik-sso P04 | 17 min | 3 tasks | 22 files |
 | Phase 02-self-hosted-backend-authentik-sso P05 | 7 min | 3 tasks | 7 files |
+| Phase 02-self-hosted-backend-authentik-sso P06 | 2 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,8 @@ Recent decisions affecting current work:
 - [Phase 02-self-hosted-backend-authentik-sso]: Keep dynamic import of openid-client; static ESM import breaks Jest CJS (AUTH_TEST_MODE never loads the package)
 - [Phase 02-self-hosted-backend-authentik-sso]: Blueprint sets client_id clared and does not set client_secret (copy generated SECRET into env; prod only in Coolify)
 - [Phase 02-self-hosted-backend-authentik-sso]: wget official compose.yml verbatim — postgresql service is Authentik's DB, no redis, no /etc/localtime
+- [Phase 02-self-hosted-backend-authentik-sso]: Enable only webview-data-url on tauri; keep login_init_url() as data:text/html and WebviewUrl::External (no Vite public/ move, no asset-protocol fallback) — Plan 02-06: crate feature is sufficient; document location stays src-tauri include_str per D-16 / 02-03.
+- [Phase 02-self-hosted-backend-authentik-sso]: Human Anmelden window check deferred to end-of-phase UAT (human_verify_mode); Task 2 is Vitest-only — Orchestrator: do not halt; live OS window is harvested into 02-UAT.md.
 
 ### Pending Todos
 
@@ -125,6 +128,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-22T02:28:38.406Z
-Stopped at: Completed 02-05-PLAN.md
+Last session: 2026-08-22T04:14:51.309Z
+Stopped at: Completed 02-06-PLAN.md
 Resume file: None
