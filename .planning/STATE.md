@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 02
 current_phase_name: Self-Hosted Backend & Authentik SSO
 status: executing
-stopped_at: Completed 02-06-PLAN.md
-last_updated: "2026-08-22T04:15:32.092Z"
+stopped_at: Completed 02-07-PLAN.md
+last_updated: "2026-08-22T04:30:52.539Z"
 last_activity: 2026-08-22
 last_activity_desc: Phase 02 execution started
-state_head: 4df88cb6ea0df1583d667a5eb0ad957813316e66
+state_head: bacf429054ae6eb096dcdca620b844668b6befa5
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 12
-  completed_plans: 11
+  completed_plans: 12
 milestone_name: milestone
 ---
 
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 02 (Self-Hosted Backend & Authentik SSO) — EXECUTING
-Plan: 2 of 7
-Status: Ready to execute
-Last activity: 2026-08-22 — Phase 02 execution started
+Plan: 7 of 7
+Status: Phase execution complete — ready for /gsd-verify-work 02
+Last activity: 2026-08-22 — Completed 02-07-PLAN.md
 
 Progress: [██░░░░░░░░] 25%
 
@@ -69,6 +69,7 @@ Progress: [██░░░░░░░░] 25%
 | Phase 02-self-hosted-backend-authentik-sso P04 | 17 min | 3 tasks | 22 files |
 | Phase 02-self-hosted-backend-authentik-sso P05 | 7 min | 3 tasks | 7 files |
 | Phase 02-self-hosted-backend-authentik-sso P06 | 2 min | 2 tasks | 2 files |
+| Phase 02-self-hosted-backend-authentik-sso P07 | 12 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,9 @@ Recent decisions affecting current work:
 - [Phase 02-self-hosted-backend-authentik-sso]: wget official compose.yml verbatim — postgresql service is Authentik's DB, no redis, no /etc/localtime
 - [Phase 02-self-hosted-backend-authentik-sso]: Enable only webview-data-url on tauri; keep login_init_url() as data:text/html and WebviewUrl::External (no Vite public/ move, no asset-protocol fallback) — Plan 02-06: crate feature is sufficient; document location stays src-tauri include_str per D-16 / 02-03.
 - [Phase 02-self-hosted-backend-authentik-sso]: Human Anmelden window check deferred to end-of-phase UAT (human_verify_mode); Task 2 is Vitest-only — Orchestrator: do not halt; live OS window is harvested into 02-UAT.md.
+- [Phase 02-self-hosted-backend-authentik-sso]: Fix emit path to dist/main.js; do not paper over with a nested CMD (G-02-2) — prisma.config.ts at package root made tsc rootDir . and emit dist/src/main.js
+- [Phase 02-self-hosted-backend-authentik-sso]: apt-get install curl so Coolify Dockerfile HTTP healthcheck can probe /health — node:22-bookworm-slim has neither curl nor wget; first deploy rolled back a running Nest
+- [Phase 02-self-hosted-backend-authentik-sso]: Local Authentik GHCR 2026.8.0 denial stays environmental; compose.yml unchanged (G-02-5) — Plan prohibition: do not add GHCR credentials or compose tag fallback
 
 ### Pending Todos
 
@@ -128,6 +132,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-22T04:14:51.309Z
-Stopped at: Completed 02-06-PLAN.md
+Last session: 2026-08-22T04:30:52.483Z
+Stopped at: Completed 02-07-PLAN.md
 Resume file: None

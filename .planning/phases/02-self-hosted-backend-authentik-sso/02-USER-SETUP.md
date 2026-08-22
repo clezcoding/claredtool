@@ -17,7 +17,7 @@ Claude shipped Nest OIDC, vendor `compose.yml`, and `blueprints/clared.yaml`. Ap
 | [ ] | `SECRET` | Authentik provider `clared` client secret. **Local-only on the laptop. Production SECRET lives only in Coolify (D-13).** | `apps/backend/.env` (local placeholder `local-only`) / Coolify env (prod) |
 | [ ] | `BACKEND_URL` | Local Nest `http://localhost:3000`. Prod: Coolify API URL (blueprint instance context `backend_callback`) | `apps/backend/.env` / Coolify + Authentik blueprint context |
 | [ ] | `CORS_ORIGINS` | `tauri://localhost,https://tauri.localhost,http://localhost:5174` | `apps/backend/.env` / Coolify env |
-| [ ] | `AUTH_TEST_MODE` | `1` for mocked e2e only. Unset (or `0`) for live Authentik login | `apps/backend/.env` |
+| [ ] | `AUTH_TEST_MODE` | `1` for mocked e2e only. Unset (or `0`) for live Authentik login. **MUST NOT set on Coolify clared-api (CR-03).** | `apps/backend/.env` (local only) |
 
 ## Dashboard Configuration
 
@@ -34,9 +34,10 @@ Claude shipped Nest OIDC, vendor `compose.yml`, and `blueprints/clared.yaml`. Ap
   - Location: Authentik provider `clared`
   - Notes: Never paste the production SECRET onto the laptop.
 
-- [ ] **Coolify Dockerfile build of `apps/backend` (not Nixpacks)**
-  - Location: Coolify application + one-click Authentik
-  - Notes: Same Authentik image tag as `compose.yml` (`ghcr.io/goauthentik/server:2026.8.0` or the downloaded compose tag). Pin the Coolify image field if one-click lags.
+- [x] **Coolify Dockerfile build of `apps/backend` (not Nixpacks)**
+  - Location: Coolify application `clared-api` (uuid `yzmje7zsrp1qwtvsd7izjhaf`)
+  - Set to: build pack Dockerfile; `dockerfile_location` `/apps/backend/Dockerfile`; git branch `gsd/phase-02-self-hosted-backend-authentik-sso`
+  - Notes: Image installs openssl + curl (Coolify HTTP healthcheck needs curl/wget in a Dockerfile pack). Do not switch to Nixpacks (D-08). Do not set `AUTH_TEST_MODE` on this app (CR-03). Vendor HTTPS `https://clared-api.puzzlessdev.online/health` is live after 02-07.
 
 - [ ] **Coolify env for prod API**
   - Location: Coolify application environment
@@ -60,6 +61,8 @@ pnpm --filter ./apps/backend start
 docker compose -f compose.yml -f compose.clared.yml ps
 curl -sS http://localhost:3000/health
 curl -sS http://localhost:3000/health/ready
+curl -sfS -o /dev/null -w '%{http_code}' https://clared-api.puzzlessdev.online/health
+curl -sfS -o /dev/null -w '%{http_code}' https://clared-api.puzzlessdev.online/health/ready
 ```
 
 Expected results:
