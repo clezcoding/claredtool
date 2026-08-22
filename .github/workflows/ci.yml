@@ -33,4 +33,4 @@ jobs:
 
       - run: pnpm --filter ./apps/backend test:e2e
 
-      - run: pnpm --filter ./apps/backend test -- rbac
+      - run: pnpm --filter ./apps/backend test
