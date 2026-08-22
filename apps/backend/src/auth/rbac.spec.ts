@@ -77,6 +77,14 @@ describe("projectRbac", () => {
     expect(mixed.permissions).toEqual(known.permissions);
   });
 
+  it("ignores prototype keys so they do not throw during catalog lookup", () => {
+    expect(() =>
+      projectRbac(["constructor", "__proto__", "toString"]),
+    ).not.toThrow();
+    expect(projectRbac(["constructor"]).permissions).toEqual([]);
+    expect(projectRbac(["constructor"]).primaryRole).toBe("");
+  });
+
   it("gives entity.create only to clared-owner among tenant groups", () => {
     expect(projectRbac(["clared-owner"]).permissions).toContain("entity.create");
     for (const group of TENANT_GROUPS_WITHOUT_ENTITY_CREATE) {

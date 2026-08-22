@@ -111,7 +111,7 @@ export function projectRbac(groups: string[]): {
 } {
   const roles = new Set<(typeof PRECEDENCE)[number]>();
   for (const group of groups) {
-    if (!(group in CATALOG)) {
+    if (!Object.hasOwn(CATALOG, group)) {
       continue;
     }
     roles.add(group.slice("clared-".length) as (typeof PRECEDENCE)[number]);
