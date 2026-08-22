@@ -21,12 +21,12 @@ Beautiful interactive invoice + live-tax + PDF loop on the desktop — create in
 
 - ✓ **DESK-01**: Tauri desktop client on macOS and Windows — Phase 1 (Orca UAT + Windows CI)
 - ✓ **UI-01** (Phase 1): Mockup-first invoice → tax → PDF shell shipped — still required on later UI-bearing phases
+- ✓ **BACK-01**: Vendor Coolify backend (API, Postgres, Redis, Authentik) — Phase 2
+- ✓ **AUTH-01**: Authentik SSO / OIDC with RBAC (Mandant: owner…viewer; Plattform: `clared-platform`) — Phase 2
 
 ### Active
 
 - [ ] **UI-01**: Mockup-first UI — interactive mockups / UI-SPEC before implementation on every remaining UI-bearing phase
-- [ ] **BACK-01**: Vendor Coolify backend (API, Postgres, Redis, Authentik) — operator's cluster
-- [ ] **AUTH-01**: Authentik SSO / OIDC with RBAC (Mandant: owner…viewer; Plattform: `clared-platform`)
 - [ ] **ENT-01**: Entity- and customer management
 - [ ] **INV-01**: Invoice create / persist / retrieve with line items
 - [ ] **TAX-01**: Live tax evaluation of TransactionFacts
@@ -60,7 +60,7 @@ Open gap (INFO, not a blocker): ExecutionEngine step 4 expects collision logic i
 - **UI**: Mockup-first — ALWAYS build interactive mockups / UI-SPEC before implementation on every UI-bearing phase
 - **Deploy**: Vendor Coolify only — Postgres (`clared` / `clared_app`), Redis, Authentik, backend app; HTTPS. Local OrbStack mirrors that stack for development.
 - **License**: Proprietary. Not OSS. Not free.
-- **Auth protocol**: Authentik OIDC; backend OAuth2 client; scopes `openid profile email`; roles owner / accountant / viewer
+- **Auth protocol**: Authentik OIDC; backend OAuth2 client; scopes `openid profile email groups`; roles owner / accountant / viewer plus `clared-platform`
 - **Tax contract**: Library `evaluate(facts): decision`; TaxRule JSON Schema is SSOT; types from schema
 - **API (v1)**: `POST /api/invoices`, `GET /api/invoices/:id`, `POST /api/tax/evaluate`, `GET /api/entities`
 - **Data**: Tables entities, customers, invoices, invoice_items, tax_rules (optional besides file-DSL), audit_logs
@@ -83,4 +83,4 @@ Open gap (INFO, not a blocker): ExecutionEngine step 4 expects collision logic i
 | Supabase self-hosted BaaS | Optional PRD alternative; not v1; vendor Nest+Postgres instead | ✓ Locked (out) |
 
 ---
-*Last updated: 2026-08-20 — SaaS / vendor Coolify / proprietary lock*
+*Last updated: 2026-08-22 after Phase 2*
