@@ -6,7 +6,7 @@ current_phase_name: PDF, Audit & Offline Sync
 status: "Phase 03 shipped — PR #10"
 stopped_at: Phase 3 complete — UAT + verification 13/13; Phase 4 unblocked
 last_updated: "2026-08-22T19:41:10.090Z"
-last_activity: 2026-08-22
+last_activity: 2026-08-22 - Completed quick task 260822-u6p: Räume das Projektverzeichniss auf.
 state_head: cb4422e41c4c125c44be8bcde132886c202fe450
 progress:
   total_phases: 4
@@ -31,7 +31,7 @@ Status: Phase 03 shipped — PR #10
 Total Plans in Phase: 6
 Phase: 03 (Entities, Invoices & Live Tax) — **COMPLETE**
 Phase 04 (PDF, Audit & Offline Sync) — **NEXT**
-Last activity: 2026-08-22
+Last activity: 2026-08-22 - Completed quick task 260822-u6p: Räume das Projektverzeichniss auf.
 
 Progress: [███████░░░] 75%
 
@@ -122,6 +122,12 @@ None yet.
 
 - Collision logic unspecified (SPEC → PRD; PRD silent) — do not invent
 - Backend stack still Pending — Phase 1 UI locked to React; Phase 2/3 implementation still needs backend pick
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260822-u6p | Räume das Projektverzeichniss auf. | 2026-08-22 | 7c30d5e | [260822-u6p-r-ume-das-projektverzeichniss-auf](./quick/260822-u6p-r-ume-das-projektverzeichniss-auf/) |
 
 ## Deferred Items
 
