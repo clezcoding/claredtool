@@ -1,7 +1,17 @@
 import * as React from "react";
 import { cn } from "../lib/utils";
 
-function Button({ className, ...props }: React.ComponentProps<"button">) {
+function Button({
+  className,
+  variant: _variant,
+  size: _size,
+  asChild: _asChild,
+  ...props
+}: React.ComponentProps<"button"> & {
+  variant?: string;
+  size?: string;
+  asChild?: boolean;
+}) {
   return (
     <button
       data-slot="button"

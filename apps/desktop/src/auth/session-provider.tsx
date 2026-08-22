@@ -12,7 +12,14 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { fetchMe, logoutSession, redeemTicket, replayLastRequest, setOnUnauthorized } from "./api";
+import {
+  fetchMe,
+  logoutSession,
+  redeemTicket,
+  replayLastRequest,
+  setOnUnauthorized,
+  setSessionToken,
+} from "./api";
 import type { MeResponse } from "./types";
 
 export type SessionState = "boot" | "unsigned" | "signed" | "boot-error";
@@ -82,6 +89,7 @@ export function SessionProvider({
   const applySession = useCallback((nextToken: string, nextMe: MeResponse) => {
     tokenRef.current = nextToken;
     setToken(nextToken);
+    setSessionToken(nextToken);
     setMe(nextMe);
     setState("signed");
     setBannerKind(null);
@@ -102,6 +110,7 @@ export function SessionProvider({
       } catch {
         setBannerKind("cancel");
         if (tokenRef.current) return;
+        setSessionToken(null);
         setToken(null);
         setMe(null);
         setState("unsigned");
@@ -114,6 +123,7 @@ export function SessionProvider({
     const stored = await invoke<string | null>("keychain_get_session");
     if (!stored) {
       tokenRef.current = null;
+      setSessionToken(null);
       setToken(null);
       setMe(null);
       setState("unsigned");
@@ -127,6 +137,7 @@ export function SessionProvider({
       if (isUnauthorized(err)) {
         await invoke("keychain_delete_session").catch(() => undefined);
         tokenRef.current = null;
+        setSessionToken(null);
         setToken(null);
         setMe(null);
         setState("unsigned");
@@ -182,6 +193,7 @@ export function SessionProvider({
 
   useEffect(() => {
     if (state !== "signed") {
+      setSessionToken(null);
       setOnUnauthorized(undefined);
       return;
     }
@@ -190,6 +202,7 @@ export function SessionProvider({
       void (async () => {
         await invoke("keychain_delete_session").catch(() => undefined);
         tokenRef.current = null;
+        setSessionToken(null);
         setToken(null);
         expectLoginCancel.current = true;
         await invoke("open_login_window");
@@ -219,6 +232,7 @@ export function SessionProvider({
         const { endSessionUrl } = await logoutSession(current);
         await invoke("keychain_delete_session");
         tokenRef.current = null;
+        setSessionToken(null);
         setToken(null);
         setMe(null);
         setState("unsigned");
@@ -229,6 +243,7 @@ export function SessionProvider({
     } catch {
       await invoke("keychain_delete_session").catch(() => undefined);
       tokenRef.current = null;
+      setSessionToken(null);
       setToken(null);
       setMe(null);
       setState("unsigned");
@@ -238,6 +253,7 @@ export function SessionProvider({
     }
     await invoke("keychain_delete_session").catch(() => undefined);
     tokenRef.current = null;
+    setSessionToken(null);
     setToken(null);
     setMe(null);
     setState("unsigned");

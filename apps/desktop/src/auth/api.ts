@@ -10,9 +10,14 @@ export type LastRequest = { path: string; init?: RequestInit };
 
 let onUnauthorized: OnUnauthorized | undefined;
 let lastRequest: LastRequest | undefined;
+let sessionToken: string | null = null;
 
 export function setOnUnauthorized(cb: OnUnauthorized | undefined): void {
   onUnauthorized = cb;
+}
+
+export function setSessionToken(token: string | null): void {
+  sessionToken = token;
 }
 
 export function getLastRequest(): LastRequest | undefined {
@@ -40,7 +45,11 @@ export async function apiFetch(
   init?: RequestInit,
 ): Promise<Response> {
   lastRequest = { path, init };
-  const res = await fetch(`${BASE}${path}`, init);
+  const headers = new Headers(init?.headers);
+  if (sessionToken) {
+    headers.set("Authorization", `Bearer ${sessionToken}`);
+  }
+  const res = await fetch(`${BASE}${path}`, { ...init, headers });
   if (res.status === 401) {
     onUnauthorized?.();
   }
