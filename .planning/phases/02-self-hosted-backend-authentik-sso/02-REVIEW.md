@@ -1,8 +1,8 @@
 ---
 phase: 02-self-hosted-backend-authentik-sso
-reviewed: 2026-08-22T02:35:00Z
+reviewed: 2026-08-22T04:40:00Z
 depth: standard
-files_reviewed: 19
+files_reviewed: 24
 files_reviewed_list:
   - apps/backend/src/main.ts
   - apps/backend/src/app.module.ts
@@ -23,26 +23,37 @@ files_reviewed_list:
   - apps/desktop/src-tauri/capabilities/login.json
   - compose.yml
   - blueprints/clared.yaml
+  - apps/desktop/src-tauri/Cargo.toml
+  - apps/desktop/src-tauri/Cargo.lock
+  - apps/backend/Dockerfile
+  - apps/backend/nest-cli.json
+  - apps/backend/tsconfig.build.json
 findings:
   critical: 3
-  warning: 6
-  info: 4
-  total: 13
+  warning: 9
+  info: 6
+  total: 18
 status: issues_found
 ---
 
 # Phase 02: Code Review Report
 
-**Reviewed:** 2026-08-22T02:35:00Z
+**Reviewed:** 2026-08-22T04:40:00Z
 **Depth:** standard
-**Files Reviewed:** 19
+**Files Reviewed:** 24
 **Status:** issues_found
 
 ## Summary
 
-Adversarial review of the Authentik SSO / opaque Redis Bearer path (Nest confidential client, ticket GETDEL, Tauri login WebView, OS keychain IPC ACL).
+Adversarial review of the Authentik SSO / opaque Redis Bearer path (Nest confidential client, ticket GETDEL, Tauri login WebView, OS keychain IPC ACL), plus gap closure 02-06 (`webview-data-url`) and 02-07 (Coolify `dist/main.js` emit + openssl/curl image).
 
 GETDEL on `oauth:{state}` and `ticket:{id}`, session `EX 86400`, blueprint `client_type: confidential` without `client_secret`, `login.json` navigation-only, and no JWT / WebView storage of the Bearer are in place. Three defects still break the login-WebView isolation, the production auth guarantee, or a successful sign-in.
+
+Gap files: `tauri` feature `webview-data-url` is on and resolved (`Cargo.lock` → tauri 2.11.5 depends on `data-url`). `nest-cli.json` `tsConfigPath` + `tsconfig.build.json` `include: ["src"]` correctly emit `dist/main.js` (G-02-2). Dockerfile asserts that file, installs openssl/curl, CMD stays `prisma migrate deploy && node dist/main.js`. New warnings are image secrets/root/COPY context — not a revert of the emit-path fix.
+
+Prior CR-01, CR-02, CR-03, WR-01..WR-06, IN-01..IN-04 re-verified against current sources; kept.
+
+## Narrative Findings (AI reviewer)
 
 ## Critical Issues
 
@@ -77,7 +88,7 @@ Pass `origin_key` of the configured `BACKEND_URL` / `AUTHENTIK_URL` into `allow_
 ### CR-02: `AUTH_TEST_MODE=1` mints `clared-owner` with no production guard
 
 **File:** `apps/backend/src/auth/oidc.ts:56-64`, `90-92`
-**Issue:** When `AUTH_TEST_MODE === "1"`, `beginAuthorization` redirects to `/auth/callback` and `authorizationCodeGrant` returns hardcoded `TEST_CLAIMS` (`groups: ["clared-owner"]`) with no Authentik, no client secret, and no `NODE_ENV` check. `/auth/login` and `/auth/callback` are `@Public()`. Coolify or a copied `.env.example` (`AUTH_TEST_MODE=1`) makes every reachable client an owner. Dockerfile sets `NODE_ENV=production` but does not refuse this flag.
+**Issue:** When `AUTH_TEST_MODE === "1"`, `beginAuthorization` redirects to `/auth/callback` and `authorizationCodeGrant` returns hardcoded `TEST_CLAIMS` (`groups: ["clared-owner"]`) with no Authentik, no client secret, and no `NODE_ENV` check. `/auth/login` and `/auth/callback` are `@Public()`. Coolify or a copied `.env.example` (`AUTH_TEST_MODE=1`) makes every reachable client an owner. Dockerfile sets `NODE_ENV=production` (line 25) but does not refuse this flag.
 **Fix:** Fail closed in production; keep the mock for `NODE_ENV=test` only.
 
 ```ts
@@ -140,8 +151,10 @@ app.enableCors({ origin: origins });
 
 ### WR-02: `blob:` / unrestricted `data:` bypass the host allowlist
 
-**File:** `apps/desktop/src-tauri/src/lib.rs:95`
+**File:** `apps/desktop/src-tauri/src/lib.rs:95`; `apps/desktop/src-tauri/Cargo.toml:16`
 **Issue:** After Authentik HTML is loaded, XSS can `location = URL.createObjectURL(...)` (`blob:`) or a `data:` document. `allow_navigation` returns true without checking backend/Authentik. Login capability still blocks keychain IPC, but the WebView can then paint an arbitrary phishing page inside the trusted "Anmelden" window.
+
+02-06 enables crate feature `webview-data-url`, so `data:` documents now actually load (G-02-1 was that Tauri rejected them). `on_page_load` then navigates **every** finished `data:` load to `/auth/login`, which bounces a later phishing `data:` page — `blob:` still paints and is not bounced.
 **Fix:** Covered by CR-01: allow `data:` only for `login_init_url()`; deny `blob:`.
 
 ### WR-03: Login CSP is not origin-scoped and likely not enforced after navigation
@@ -189,6 +202,43 @@ if (!Object.hasOwn(CATALOG, group)) {
 }
 ```
 
+### WR-07: Production image ENV keeps `DATABASE_URL` from a build ARG with default credentials
+
+**File:** `apps/backend/Dockerfile:20-21`
+**Issue:** `ARG DATABASE_URL=postgresql://clared_app:clared_app_dev@127.0.0.1:5432/clared` then `ENV DATABASE_URL=$DATABASE_URL` bakes that value into the image config and layer history. Prisma generate does not need a live database. If Coolify (or `docker build --build-arg`) passes the real `DATABASE_URL`, the production secret is in `docker history`. If runtime env is omitted, Nest/migrate use the committed dev password against `127.0.0.1` inside the container.
+**Fix:** Dummy URL only for the generate `RUN`; do not persist `ENV DATABASE_URL` from ARG. Unset after generate. Require runtime `DATABASE_URL` (fail CMD if empty). Use BuildKit secret mounts if generate ever needs a real URL.
+
+```dockerfile
+ARG DATABASE_URL=postgresql://build:build@127.0.0.1:5432/clared
+RUN pnpm exec prisma generate && pnpm exec nest build && test -f dist/main.js
+ENV DATABASE_URL=
+```
+
+Or omit `ENV DATABASE_URL` entirely and let the orchestrator inject it at run.
+
+### WR-08: Image has no `USER`; Nest, Prisma migrate, and curl run as root
+
+**File:** `apps/backend/Dockerfile:1-27`
+**Issue:** No `USER` after apt/pnpm. Compromise of Nest (or a Coolify healthcheck using `curl`) is root in the container. Default `node:22-bookworm-slim` is root. ASVS L1 container hardening expects a non-root user.
+**Fix:** After install/build, `useradd -r -u 1001 nest` (or `USER node` if the base image provides it), `chown` `/app`, then `USER nest` before `CMD`. Confirm Prisma migrate deploy still works with filesystem perms on the image (read-only app dir is fine; migrate talks to Postgres, not local writes beyond tmp).
+
+### WR-09: `COPY apps/backend` without `.dockerignore` can overwrite the Linux install
+
+**File:** `apps/backend/Dockerfile:16`
+**Issue:** There is no `.dockerignore` in the repo. Docker send-context does **not** honor `.gitignore`. A local `docker build -f apps/backend/Dockerfile` from a laptop with `apps/backend/node_modules` or `apps/backend/.env` copies those into `/app/apps/backend` on top of the earlier `pnpm install` (darwin binaries, secrets). Coolify git clone is usually clean so vendor `/health` 200 does not prove local builds are safe.
+**Fix:** Add a root `.dockerignore` (or `apps/backend/.dockerignore` if the context is narrowed):
+
+```
+node_modules
+**/node_modules
+**/.env
+**/dist
+.git
+.planning
+```
+
+Keep `COPY apps/backend/package.json` + `pnpm install` before the full `COPY`, then generate/build.
+
 ## Info
 
 ### IN-01: Session Bearer is on React context
@@ -215,8 +265,20 @@ if (!Object.hasOwn(CATALOG, group)) {
 **Issue:** Matches upstream Authentik compose (outposts). Compromised worker is host-root. Fine for laptop OrbStack; do not copy this mount onto a shared Coolify host without reviewing outpost need.
 **Fix:** Drop `user: root` and the docker.sock volume when outposts are unused.
 
+### IN-05: `tsconfig.build.json` does not pin `rootDir`
+
+**File:** `apps/backend/tsconfig.build.json:1-5`
+**Issue:** `include: ["src"]` is the G-02-2 fix (stops `prisma.config.ts` from widening `rootDir` to `.` and emitting `dist/src/main.js`). `nest-cli.json` `tsConfigPath` is correct. A later extra `include` entry at the package root would recreate the Coolify `MODULE_NOT_FOUND` without the Dockerfile `test -f dist/main.js` catching a *wrong* `dist/main.js` if one is also emitted.
+**Fix:** Set `"rootDir": "./src"` next to `include`. Keep the Dockerfile `test -f dist/main.js` assert.
+
+### IN-06: `webview-data-url` is process-wide
+
+**File:** `apps/desktop/src-tauri/Cargo.toml:16`
+**Issue:** Feature is on the `tauri` crate, not the login window. Default Cargo features stay on (`default-features` not false). Lock records `data-url` under tauri 2.11.5. Only `open_login_window` uses a data URL today; main window has `csp: null` and no `on_navigation`. Future `WebviewWindowBuilder` can pass `data:` without a second Cargo change.
+**Fix:** Keep login as the only data-URL window. Pair with CR-01 / WR-02 so `allow_navigation` allows only `login_init_url()`.
+
 ---
 
-_Reviewed: 2026-08-22T02:35:00Z_
+_Reviewed: 2026-08-22T04:40:00Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_

@@ -1,29 +1,31 @@
 ---
-status: diagnosed
+status: testing
 phase: 02-self-hosted-backend-authentik-sso
-source: [02-01-SUMMARY.md, 02-02-SUMMARY.md, 02-03-SUMMARY.md, 02-04-SUMMARY.md, 02-05-SUMMARY.md]
+source: [02-VERIFICATION.md, 02-06-SUMMARY.md, 02-07-SUMMARY.md]
 started: 2026-08-22T02:44:00Z
-updated: 2026-08-22T03:10:00Z
-tester: orchestrator (Orca + Coolify MCP/CLI; user-override: run tests, report leftovers)
+updated: 2026-08-22T04:48:00Z
+tester: human (gap-closure 02-06/02-07 done; vendor /health live)
 ---
 
 ## Current Test
 
-[testing complete]
+number: 1
+name: Desktop gate / Anmelden window (G-02-1 retest)
+expected: |
+  Launch Tauri signed-out. Dark gate. Click Anmelden: second window title Anmelden 480×640, no Vite data-URL error. Close: banner Anmeldung abgebrochen.
+awaiting: user response
 
 ## Tests
 
 ### 1. Desktop gate / window / chip
-expected: Launch Tauri signed-out. Dark gate (h1 Clared, body Anmelden, um Rechnungen zu stellen., one Anmelden, no sidebar). Click Anmelden: second window title Anmelden 480×640. Close/cancel: banner Anmeldung abgebrochen. After login: chip + sample invoice RE-2026-001. Keyboard: Tab/Enter on gate, chip menu Abmelden.
-result: issue
-reported: "Gate visual matches 02-UI-SPEC (dark navy, hero folio/keyhole PNG, h1 Clared, German body, one Anmelden, no AppShell). Anmelden does not open a second window. Vite: Unknown Error: invalid window url: data URLs are not supported without the `webview-data-url` feature. Cancel banner, signed-in chip, and Abmelden not reachable."
-severity: blocker
+expected: Launch Tauri signed-out. Dark gate (h1 Clared, body Anmelden, um Rechnungen zu stellen., one Anmelden, no sidebar). Click Anmelden: second window title Anmelden 480×640, no Vite data-URL error. Close/cancel: banner Anmeldung abgebrochen. After login: chip + sample invoice RE-2026-001. Keyboard: Tab/Enter on gate, chip menu Abmelden.
+result: pending
+reported: "Pre-02-06: gate visual matched; Anmelden failed (data URLs need webview-data-url). 02-06 enabled the crate feature. Retest the native window."
 
 ### 2. Live Authentik + founder Coolify
-expected: OrbStack `docker compose -f compose.yml -f compose.clared.yml up -d`. Apply `blueprints/clared.yaml`. Local CLIENT_ID/SECRET in `apps/backend/.env`; unset AUTH_TEST_MODE. Nest start. Desktop Anmelden completes Authentik MFA. Coolify Dockerfile (not Nixpacks); curl `/health` and `/health/ready` on the vendor HTTPS URL. Chip primaryRole; GET /me has groups. Prod ready-check hits clared/clared_app, not Authentik's database. Prod SECRET never on the laptop.
-result: issue
-reported: "Coolify project Clared created on velvet (puzzlessdev.online). Postgres clared/clared_app healthy, Redis healthy, Authentik one-click pinned ghcr.io/goauthentik/server:2026.8.0 healthy. Blueprint applied via API (status successful, 8 clared-* groups, OAuth provider clared, callback https://clared-api.puzzlessdev.online/auth/callback). Authentik HTTPS Let's Encrypt + 302 to default-authentication-flow. clared-api build_pack=dockerfile, dockerfile_location=/apps/backend/Dockerfile, AUTH_TEST_MODE absent, SECRET runtime-only from Authentik client_secret. Deploy failed: container unhealthy — Cannot find module '/app/apps/backend/dist/main.js' after prisma migrate. GET https://clared-api.puzzlessdev.online/health 503. Local compose: postgres+redis up; Authentik image pull denied on this Mac (GHCR). Desktop MFA not reachable (test 1)."
-severity: blocker
+expected: Desktop with VITE_BACKEND_URL=https://clared-api.puzzlessdev.online. Anmelden completes Authentik MFA at https://clared-auth.puzzlessdev.online. Chip primaryRole; GET /me has groups. Coolify Dockerfile pack; curl /health and /health/ready 200. Prod SECRET never on the laptop. Local GHCR Authentik pull not required.
+result: pending
+reported: "02-07 closed vendor health: GET https://clared-api.puzzlessdev.online/health and /health/ready both HTTP 200. Coolify clared-api running:healthy, build_pack=dockerfile, AUTH_TEST_MODE absent. Desktop MFA against the live IdP still needs a human Tauri session (blocked on test 1 window paint)."
 
 ### 3. REVIEW CR-01 / CR-02 / CR-03 on a real login
 expected: After successful login, a second clared:// / ticket-received for the same ticket does not sign the user out. Login WebView cannot open http://localhost:<other-port>. Coolify does not have AUTH_TEST_MODE=1.
@@ -37,9 +39,8 @@ result: pass
 
 ### 5. Cold Start Smoke Test
 expected: Kill any running server/service. Clear ephemeral state (temp DBs, caches, lock files). Start the application from scratch. Server boots without errors, any seed/migration completes, and a primary query (health check, homepage load, or basic API call) returns live data.
-result: issue
-reported: "Local postgres was already running (not killed). Redis started fresh. Local Authentik 2026.8.0 pull denied. Coolify API image built then crashed on missing dist/main.js. Authentik on Coolify did cold-start to a working login flow after Traefik port 9000 FQDN."
-severity: blocker
+result: pass
+reported: "Vendor API cold start after 02-07: Coolify rebuild finished; /health 200 {status:ok}; /health/ready 200 postgres.up. Local Authentik GHCR 2026.8.0 denial on this Mac remains environmental (G-02-5 leftover, not a vendor gap)."
 
 ### 6. Nest apps/backend package with scripts.test and scripts.test:e2e
 expected: Nest apps/backend package with scripts.test and scripts.test:e2e
@@ -164,9 +165,9 @@ coverage_id: D4
 ## Summary
 
 total: 25
-passed: 21
-issues: 3
-pending: 0
+passed: 22
+issues: 0
+pending: 2
 skipped: 0
 blocked: 1
 
@@ -175,7 +176,7 @@ blocked: 1
 - gap_id: G-02-1
   truth: "Click Anmelden opens a second window titled Anmelden at 480×640; cancel shows banner Anmeldung abgebrochen"
   status: failed
-  reason: "User reported: Gate visual matches 02-UI-SPEC. Anmelden does not open a second window. Vite: Unknown Error: invalid window url: data URLs are not supported without the `webview-data-url` feature."
+  reason: "Code-side closed in 02-06 (webview-data-url). Native window paint still unverified — retest in Current Test 1."
   severity: blocker
   test: 1
   root_cause: "open_login_window builds WebviewUrl::External from a data:text/html URL (login_init_url). Tauri 2 rejects data URLs unless the `webview-data-url` feature is enabled; apps/desktop/src-tauri/Cargo.toml has tauri = { version = \"2\", features = [] }."
@@ -190,7 +191,7 @@ blocked: 1
 
 - gap_id: G-02-2
   truth: "Coolify Dockerfile deploy of apps/backend serves GET /health and /health/ready 200 on the vendor HTTPS URL"
-  status: failed
+  status: resolved
   reason: "User reported: Dockerfile build pack used; image built; container unhealthy — Cannot find module '/app/apps/backend/dist/main.js' after prisma migrate deploy. curl /health 503."
   severity: blocker
   test: 2
@@ -207,7 +208,7 @@ blocked: 1
 
 - gap_id: G-02-5
   truth: "Fresh start: services boot and a primary health query returns live data"
-  status: failed
+  status: resolved
   reason: "User reported: Local Authentik 2026.8.0 pull denied on GHCR from this Mac. Coolify API crashed on missing dist/main.js. Local postgres was already up."
   severity: blocker
   test: 5
