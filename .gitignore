@@ -25,3 +25,5 @@ apps/desktop/src-tauri/gen/schemas
 # Nest / Prisma
 apps/backend/.env
 apps/backend/src/generated/
+# TypeScript incremental build info
+*.tsbuildinfo
