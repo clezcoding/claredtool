@@ -19,6 +19,9 @@ apps/desktop/src-tauri/gen/schemas
 .planning/tmp/
 .gsd/
 
+.env
+!.env.example
+
 # Nest / Prisma
 apps/backend/.env
 apps/backend/src/generated/
