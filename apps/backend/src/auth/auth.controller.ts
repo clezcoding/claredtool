@@ -63,19 +63,17 @@ export class AuthController {
     @Query("state") state: string | undefined,
     @Res() res: Response,
   ): Promise<void> {
-    if (!state) {
+    if (!state || !code) {
       throw new UnauthorizedException();
     }
     const raw = await this.redis.getdel(`oauth:${state}`);
     if (!raw) {
       throw new UnauthorizedException();
     }
-    const { code_verifier } = JSON.parse(raw) as { code_verifier: string };
+    const { code_verifier } = parseOauthPayload(raw);
     const backend = process.env.BACKEND_URL ?? "http://localhost:3000";
     const currentUrl = new URL("/auth/callback", backend);
-    if (code) {
-      currentUrl.searchParams.set("code", code);
-    }
+    currentUrl.searchParams.set("code", code);
     currentUrl.searchParams.set("state", state);
     const claims = await authorizationCodeGrant(
       currentUrl,
@@ -101,12 +99,10 @@ export class AuthController {
     if (!raw) {
       throw new UnauthorizedException();
     }
-    const claims = JSON.parse(raw) as {
-      sub: string;
-      email: string;
-      name: string;
-      groups: string[];
-    };
+    const claims = parseTicketClaims(raw);
+    if (!claims.sub) {
+      throw new UnauthorizedException();
+    }
     const rbac = projectRbac(claims.groups ?? []);
     const token = randomBytes(32).toString("base64url");
     const session = {
@@ -138,4 +134,58 @@ export class AuthController {
     }
     return { endSessionUrl: endSessionUrl() };
   }
+}
+
+function parseOauthPayload(raw: string): { code_verifier: string } {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      "code_verifier" in parsed &&
+      typeof (parsed as { code_verifier: unknown }).code_verifier === "string" &&
+      (parsed as { code_verifier: string }).code_verifier.length > 0
+    ) {
+      return parsed as { code_verifier: string };
+    }
+  } catch {
+    /* fall through */
+  }
+  throw new UnauthorizedException();
+}
+
+function parseTicketClaims(raw: string): {
+  sub: string;
+  email: string;
+  name: string;
+  groups: string[];
+} {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      "sub" in parsed &&
+      typeof (parsed as { sub: unknown }).sub === "string" &&
+      (parsed as { sub: string }).sub.length > 0
+    ) {
+      const record = parsed as {
+        sub: string;
+        email?: unknown;
+        name?: unknown;
+        groups?: unknown;
+      };
+      return {
+        sub: record.sub,
+        email: typeof record.email === "string" ? record.email : "",
+        name: typeof record.name === "string" ? record.name : "",
+        groups: Array.isArray(record.groups)
+          ? record.groups.filter((g): g is string => typeof g === "string")
+          : [],
+      };
+    }
+  } catch {
+    /* fall through */
+  }
+  throw new UnauthorizedException();
 }

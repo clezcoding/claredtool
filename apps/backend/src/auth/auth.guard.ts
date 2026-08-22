@@ -39,7 +39,25 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     request.sessionToken = token;
-    request.user = JSON.parse(raw) as SessionUser;
+    request.user = parseSessionUser(raw);
     return true;
   }
+}
+
+function parseSessionUser(raw: string): SessionUser {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (
+      parsed &&
+      typeof parsed === "object" &&
+      "sub" in parsed &&
+      typeof (parsed as { sub: unknown }).sub === "string" &&
+      (parsed as { sub: string }).sub.length > 0
+    ) {
+      return parsed as SessionUser;
+    }
+  } catch {
+    /* fall through */
+  }
+  throw new UnauthorizedException();
 }
