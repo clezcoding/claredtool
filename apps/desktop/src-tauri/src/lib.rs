@@ -82,6 +82,10 @@ fn login_init_url() -> Url {
 }
 
 fn login_csp(backend: &str, authentik: &str) -> String {
+    // Meta CSP is defense-in-depth only; Chromium/WebKit may ignore script-injected
+    // meta tags after parse. Origin allowlist in allow_navigation is the real control.
+    let backend = origin_of(backend).unwrap_or_default();
+    let authentik = origin_of(authentik).unwrap_or_default();
     format!(
         "default-src 'self' {backend} {authentik}; img-src 'self' data: {backend} {authentik}; style-src 'self' 'unsafe-inline' {backend} {authentik}; script-src 'self' {backend} {authentik}; connect-src 'self' {backend} {authentik}; form-action {backend} {authentik}; frame-src {backend} {authentik}"
     )
