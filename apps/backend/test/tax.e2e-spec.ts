@@ -6,7 +6,7 @@ import { RedisService } from "../src/redis/redis.service";
 
 process.env.AUTH_TEST_MODE = "1";
 process.env.DATABASE_URL ??=
-  "postgresql://prisma-test:unused@127.0.0.1:5432/clared";
+  "postgresql://clared_app:clared_app_dev@127.0.0.1:5432/clared";
 
 const OWNER_TICKET = "tax-owner-ticket";
 
@@ -45,7 +45,7 @@ const CANONICAL_TAX_KEYS = [
   "applied_rule_version",
 ] as const;
 
-describe.skip("phase03-product", () => {
+describe("phase03-product", () => {
   describe("Tax evaluate (e2e)", () => {
     let app: INestApplication;
     let ownerToken: string;
@@ -91,7 +91,7 @@ describe.skip("phase03-product", () => {
       expect(res.body.invoice_tax_rate).toEqual(expect.any(Number));
       expect(res.body.reverse_charge_flag).toEqual(expect.any(Boolean));
       expect(res.body.legal_reference).toEqual(expect.any(String));
-      expect(res.body.applied_rule_id).toEqual(expect.any(String));
+      expect(res.body.applied_rule_id).toBe("EU_INTRACOMM_B2B_SERVICE");
     });
 
     it("POST /api/tax/evaluate with unclassifiable body returns 422 (no priority pick)", async () => {

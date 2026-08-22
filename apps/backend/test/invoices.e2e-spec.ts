@@ -6,7 +6,7 @@ import { RedisService } from "../src/redis/redis.service";
 
 process.env.AUTH_TEST_MODE = "1";
 process.env.DATABASE_URL ??=
-  "postgresql://prisma-test:unused@127.0.0.1:5432/clared";
+  "postgresql://clared_app:clared_app_dev@127.0.0.1:5432/clared";
 
 const OWNER_TICKET = "invoices-owner-ticket";
 
@@ -22,7 +22,7 @@ const LINE_ITEMS = [
   { bezeichnung: "Reisekosten", menge: 1, einzelpreis: 80 },
 ];
 
-describe.skip("phase03-product", () => {
+describe("phase03-product", () => {
   describe("Invoices (e2e)", () => {
     let app: INestApplication;
     let ownerToken: string;
@@ -102,7 +102,8 @@ describe.skip("phase03-product", () => {
 
       expect(fetched.body.items).toHaveLength(LINE_ITEMS.length);
       expect(fetched.body.items[0].bezeichnung).toBe(LINE_ITEMS[0].bezeichnung);
-      expect(fetched.body.items[1].menge).toBe(LINE_ITEMS[1].menge);
+      expect(Number(fetched.body.items[1].menge)).toBe(LINE_ITEMS[1].menge);
+      expect(fetched.body.number).toMatch(/^RE-\d{4}-\d{3}$/);
     });
 
     it("owner POST /api/invoices with empty items array still returns 201", async () => {

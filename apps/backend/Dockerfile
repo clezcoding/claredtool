@@ -10,10 +10,17 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY apps/backend/package.json apps/backend/package.json
+COPY packages/tax-engine/package.json packages/tax-engine/package.json
 
 RUN pnpm install --frozen-lockfile --filter ./apps/backend...
 
+COPY packages/tax-engine packages/tax-engine
+COPY docs/clared-tax-rule-dsl-schema.json docs/clared-tax-rule-dsl-schema.json
 COPY apps/backend apps/backend
+
+WORKDIR /app
+
+RUN pnpm --filter @clared/tax-engine build
 
 WORKDIR /app/apps/backend
 
