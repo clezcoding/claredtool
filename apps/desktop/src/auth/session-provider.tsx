@@ -182,8 +182,6 @@ export function SessionProvider({
         await invoke("keychain_delete_session").catch(() => undefined);
         tokenRef.current = null;
         setToken(null);
-        setMe(null);
-        setState("unsigned");
         await invoke("open_login_window");
       })();
     });
