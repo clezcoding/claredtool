@@ -17,11 +17,11 @@ COPY apps/backend apps/backend
 
 WORKDIR /app/apps/backend
 
-ARG DATABASE_URL=postgresql://clared_app:clared_app_dev@127.0.0.1:5432/clared
-ENV DATABASE_URL=$DATABASE_URL
+ARG DATABASE_URL=postgresql://build:build@127.0.0.1:5432/clared
 
 RUN pnpm exec prisma generate && pnpm exec nest build && test -f dist/main.js
 
+ENV DATABASE_URL=
 ENV NODE_ENV=production
 
 CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/main.js"]

@@ -5,9 +5,10 @@ import { PrismaClient } from "../generated/prisma/client";
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleDestroy {
   constructor() {
-    const connectionString =
-      process.env.DATABASE_URL ??
-      "postgresql://clared_app:clared_app_dev@127.0.0.1:5432/clared";
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error("DATABASE_URL is required");
+    }
     super({
       adapter: new PrismaPg({
         connectionString,

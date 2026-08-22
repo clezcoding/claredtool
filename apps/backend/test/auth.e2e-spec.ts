@@ -7,6 +7,8 @@ import { MemoryStore } from "../src/auth/memory-store";
 import { RedisService } from "../src/redis/redis.service";
 
 process.env.AUTH_TEST_MODE = "1";
+process.env.DATABASE_URL ??=
+  "postgresql://prisma-test:unused@127.0.0.1:5432/clared";
 
 const TICKET_CLAIMS = JSON.stringify({
   sub: "auth0|owner",

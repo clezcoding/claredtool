@@ -3,6 +3,9 @@ import { Test, TestingModule } from "@nestjs/testing";
 import request from "supertest";
 import { AppModule } from "../src/app.module";
 
+process.env.DATABASE_URL ??=
+  "postgresql://prisma-test:unused@127.0.0.1:5432/clared";
+
 describe("Health (e2e)", () => {
   let app: INestApplication;
 
