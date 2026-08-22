@@ -53,6 +53,12 @@ function testModeEnabled(): boolean {
   if (process.env.NODE_ENV === "production") {
     throw new Error("AUTH_TEST_MODE=1 is forbidden when NODE_ENV=production");
   }
+  if (process.env.NODE_ENV !== "test") {
+    if (process.env.SECRET) {
+      throw new Error("AUTH_TEST_MODE=1 is forbidden when SECRET is set");
+    }
+    throw new Error("AUTH_TEST_MODE=1 is only allowed when NODE_ENV=test");
+  }
   return true;
 }
 

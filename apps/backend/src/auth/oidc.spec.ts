@@ -47,6 +47,24 @@ describe("AUTH_TEST_MODE", () => {
     ).rejects.toThrow("AUTH_TEST_MODE=1 is forbidden when NODE_ENV=production");
   });
 
+  it("throws when AUTH_TEST_MODE=1 and SECRET is set outside test", async () => {
+    process.env.AUTH_TEST_MODE = "1";
+    process.env.NODE_ENV = "development";
+    process.env.SECRET = "local-only";
+    await expect(
+      beginAuthorization("http://localhost:3000/auth/callback"),
+    ).rejects.toThrow("AUTH_TEST_MODE=1 is forbidden when SECRET is set");
+  });
+
+  it("throws when AUTH_TEST_MODE=1 and NODE_ENV is not test", async () => {
+    process.env.AUTH_TEST_MODE = "1";
+    process.env.NODE_ENV = "development";
+    delete process.env.SECRET;
+    await expect(
+      beginAuthorization("http://localhost:3000/auth/callback"),
+    ).rejects.toThrow("AUTH_TEST_MODE=1 is only allowed when NODE_ENV=test");
+  });
+
   it("throws when SECRET is missing outside test mode", async () => {
     delete process.env.AUTH_TEST_MODE;
     delete process.env.SECRET;
