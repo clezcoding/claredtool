@@ -63,7 +63,7 @@ export async function redeemTicket(
 }
 
 export async function fetchMe(token: string): Promise<MeResponse> {
-  const res = await apiFetch("/me", {
+  const res = await fetch(`${BASE}/me`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) {
