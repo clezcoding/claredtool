@@ -38,15 +38,15 @@ const PLATFORM_PERMISSIONS = [
   "platform.support",
 ] as const;
 
-const CATALOG: Record<(typeof PRECEDENCE)[number], readonly string[]> = {
-  viewer: [
+const CATALOG: Record<`clared-${(typeof PRECEDENCE)[number]}`, readonly string[]> = {
+  "clared-viewer": [
     "entity.read",
     "kunde.read",
     "invoice.read",
     "tax.evaluate",
     "pdf.download",
   ],
-  auditor: [
+  "clared-auditor": [
     "entity.read",
     "kunde.read",
     "invoice.read",
@@ -54,7 +54,7 @@ const CATALOG: Record<(typeof PRECEDENCE)[number], readonly string[]> = {
     "pdf.download",
     "audit.read",
   ],
-  clerk: [
+  "clared-clerk": [
     "entity.read",
     "kunde.read",
     "kunde.write",
@@ -64,7 +64,7 @@ const CATALOG: Record<(typeof PRECEDENCE)[number], readonly string[]> = {
     "pdf.generate",
     "pdf.download",
   ],
-  tax: [
+  "clared-tax": [
     "entity.read",
     "kunde.read",
     "invoice.read",
@@ -74,7 +74,7 @@ const CATALOG: Record<(typeof PRECEDENCE)[number], readonly string[]> = {
     "pdf.download",
     "audit.read",
   ],
-  accountant: [
+  "clared-accountant": [
     "entity.read",
     "kunde.read",
     "kunde.write",
@@ -88,7 +88,7 @@ const CATALOG: Record<(typeof PRECEDENCE)[number], readonly string[]> = {
     "pdf.download",
     "audit.read",
   ],
-  admin: [
+  "clared-admin": [
     "entity.read",
     "entity.update",
     "kunde.read",
@@ -101,8 +101,8 @@ const CATALOG: Record<(typeof PRECEDENCE)[number], readonly string[]> = {
     "audit.read",
     "org.settings",
   ],
-  owner: TENANT_PERMISSIONS,
-  platform: [...TENANT_PERMISSIONS, ...PLATFORM_PERMISSIONS],
+  "clared-owner": TENANT_PERMISSIONS,
+  "clared-platform": [...TENANT_PERMISSIONS, ...PLATFORM_PERMISSIONS],
 };
 
 export function projectRbac(groups: string[]): {
@@ -111,15 +111,16 @@ export function projectRbac(groups: string[]): {
 } {
   const roles = new Set<(typeof PRECEDENCE)[number]>();
   for (const group of groups) {
-    if (!group.startsWith("clared-")) {
+    if (!(group in CATALOG)) {
       continue;
     }
-    const suffix = group.slice("clared-".length);
-    if (suffix in CATALOG) {
-      roles.add(suffix as (typeof PRECEDENCE)[number]);
-    }
+    roles.add(group.slice("clared-".length) as (typeof PRECEDENCE)[number]);
   }
-  const permissions = [...new Set([...roles].flatMap((role) => [...CATALOG[role]]))];
+  const permissions = [
+    ...new Set(
+      [...roles].flatMap((role) => [...CATALOG[`clared-${role}`]]),
+    ),
+  ];
   const primaryRole = PRECEDENCE.find((role) => roles.has(role)) ?? "";
   return { permissions, primaryRole };
 }
