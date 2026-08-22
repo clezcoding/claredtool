@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  InternalServerErrorException,
   Post,
   Query,
   Req,
@@ -81,13 +82,16 @@ export class AuthController {
       code_verifier,
     );
     const ticket = randomBytes(32).toString("base64url");
-    await this.redis.set(
+    const created = await this.redis.set(
       `ticket:${ticket}`,
       JSON.stringify(claims),
       "EX",
       TICKET_TTL_SECONDS,
       "NX",
     );
+    if (created !== "OK") {
+      throw new InternalServerErrorException();
+    }
     res.redirect(`clared://auth?ticket=${ticket}`);
   }
 
