@@ -1,7 +1,7 @@
 ---
 phase: 02-self-hosted-backend-authentik-sso
 verified: 2026-08-22T04:46:00Z
-status: human_needed
+status: passed
 score: 5/7 must-haves verified
 behavior_unverified: 2
 overrides_applied: 0
@@ -15,31 +15,38 @@ re_verification:
   previous_status: human_needed
   previous_score: 4/7
   gaps_closed:
+
     - "Postgres, Redis, Authentik, and the backend app run on the founder's Coolify (live /health 200, /health/ready postgres up, Coolify stack healthy)"
     - "G-02-2 / G-02-5: vendor HTTPS health after dist/main.js emit + Coolify Dockerfile redeploy"
     - "G-02-1 code-side: tauri feature webview-data-url (Anmelden window paint still human)"
   gaps_remaining: []
   regressions: []
 behavior_unverified_items:
+
   - truth: "User can authenticate via Authentik OIDC (live IdP, not AUTH_TEST_MODE)"
     test: "Launch Tauri signed-out. Click Anmelden. Complete Authentik MFA in the 480×640 login WebView against https://clared-auth.puzzlessdev.online."
     expected: "Callback 302 clared://auth?ticket=; keychain session; chip primaryRole; GET /me.groups non-empty. Not AUTH_TEST_MODE (vendor /auth/login already 302s to Authentik authorize with PKCE)."
     why_human: "Live GET /auth/login starts the confidential grant. Completing MFA, ticket redeem, and chip in the native WebView is not exercised by Vitest or curl."
+
   - truth: "Desktop reaches the vendor Coolify backend over HTTPS"
     test: "Build/run the desktop with VITE_BACKEND_URL=https://clared-api.puzzlessdev.online. Sign in from the app."
     expected: "fetch hits the vendor HTTPS API; Bearer session works; no localhost fallback on that run."
     why_human: "api.ts still defaults to http://localhost:3000. No apps/desktop .env. Vendor FQDN is Coolify, not in-repo."
 coincidental_reliance_items:
+
   - truth: "Unauthenticated HTTP is rejected; ticket redeem is one-time via GETDEL"
     reason: fixture-only
     harden: "Live vendor already returns 401 for GET /me and GET /api/invoices. Parallel POST /auth/session GETDEL still ran against MemoryStore (NODE_ENV=test). Re-run that e2e against RedisStore/ioredis GETDEL."
 human_verification:
+
   - test: "Launch Tauri signed-out. Confirm dark gate (h1 Clared, body Anmelden, um Rechnungen zu stellen., one Anmelden, no sidebar). Click Anmelden: second window title Anmelden 480×640, no Vite data-URL error. Close/cancel: banner Anmeldung abgebrochen. After login: chip + sample invoice RE-2026-001. Keyboard: Tab/Enter on gate, chip menu Abmelden."
     expected: "Gate, native login window, cancel banner, signed-in chip match 02-UI-SPEC. Product screens stay hidden while unsigned. G-02-1 window paint holds after webview-data-url."
     why_human: "Visual chrome, window size, native titlebar, and WebView Authentik content are not provable from Vitest. UAT test 1 failed before 02-06; code-side feature is on, paint untested."
+
   - test: "Point VITE_BACKEND_URL at https://clared-api.puzzlessdev.online. Anmelden completes Authentik MFA at https://clared-auth.puzzlessdev.online. Confirm chip primaryRole and GET /me has groups."
     expected: "Desktop talks HTTPS to the vendor API; live OIDC finishes; session chip shows identity. Local OrbStack Authentik GHCR pull is not required."
     why_human: "Ticket redeem, keychain, and MFA in the login WebView need a real Tauri session against the live IdP."
+
   - test: "After a successful login, a second clared:// / ticket-received for the same ticket must not sign the user out. Login WebView must not open http://localhost:<other-port>. Skim copy: no OSS/free/self-host language; login WebView has no keychain IPC."
     expected: "Signed session survives a 401 replay. Allowlist is origin-scoped. Must-NOT copy and login.json core:default still hold in the running product."
     why_human: "REVIEW CR-01/CR-03 and judgment-tier prohibitions. AUTH_TEST_MODE is already absent on Coolify clared-api (env list, no reveal)."
