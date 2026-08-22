@@ -60,7 +60,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Desktop reaches the vendor Coolify backend over HTTPS with a backend-validated session or API key; unauthenticated calls are rejected
   4. Tokens carry RBAC groups (AUTH-01: owner, accountant, viewer, plus catalog including `clared-platform`); Postgres, Redis, Authentik, and the backend app run on the founder's Coolify
 
-**Plans**: 2/5 plans executed
+**Plans**: 3/5 plans executed
 
 **Wave 1**
 
@@ -69,7 +69,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 02-02-PLAN.md — Tracer ticket→Bearer→/me, RBAC catalog, [BLOCKING] schema push, Dockerfile
-- [ ] 02-03-PLAN.md — Tauri login window, clared://, OS keychain, split capabilities
+- [x] 02-03-PLAN.md — Tauri login window, clared://, OS keychain, split capabilities
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -120,6 +120,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Tauri Desktop & Mockup-First UI | 5/5 | Complete    | 2026-08-20 |
-| 2. Self-Hosted Backend & Authentik SSO | 2/5 | In Progress|  |
+| 2. Self-Hosted Backend & Authentik SSO | 3/5 | In Progress|  |
 | 3. Entities, Invoices & Live Tax | 0/? | Not started | - |
 | 4. PDF, Audit & Offline Sync | 0/? | Not started | - |
