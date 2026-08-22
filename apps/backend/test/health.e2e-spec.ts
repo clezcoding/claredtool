@@ -25,9 +25,11 @@ describe("Health (e2e)", () => {
     return request(app.getHttpServer()).get("/health").expect(200);
   });
 
-  it("GET /health/ready returns 200 or 503 with postgres in the body", async () => {
+  it("GET /health/ready returns 200 or 503 with postgres and redis in the body", async () => {
     const res = await request(app.getHttpServer()).get("/health/ready");
     expect([200, 503]).toContain(res.status);
-    expect(JSON.stringify(res.body).toLowerCase()).toMatch(/postgres/);
+    const body = JSON.stringify(res.body).toLowerCase();
+    expect(body).toMatch(/postgres/);
+    expect(body).toMatch(/redis/);
   });
 });
