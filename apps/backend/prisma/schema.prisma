@@ -45,6 +45,8 @@ model Invoice {
   entityId   String        @map("entity_id")
   customerId String?       @map("customer_id")
   number     String
+  date       DateTime?     @db.Date @map("date")
+  dueDate    DateTime?     @db.Date @map("due_date")
   currency   String        @default("EUR")
   supplyType String        @default("service") @map("supply_type")
   status     String        @default("draft")
