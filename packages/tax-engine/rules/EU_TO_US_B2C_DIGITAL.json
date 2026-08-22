@@ -1,0 +1,28 @@
+{
+  "rule_id": "EU_TO_US_B2C_DIGITAL",
+  "version": "1.0.0",
+  "description": "Matrix class EU_TO_US_B2C_DIGITAL (phase 03-04 exemplar)",
+  "conditions": {
+    "supplier_country": "AT",
+    "customer_country": "US",
+    "supplier_is_business": true,
+    "customer_is_business": false,
+    "supplier_vat_registered": true,
+    "customer_vat_registered": false,
+    "supply_type": "digital_service",
+    "channel": "direct"
+  },
+  "effect": {
+    "place_of_supply_country": "{{customer_country}}",
+    "tax_liability_party": "supplier",
+    "invoice_tax_rate": 0,
+    "invoice_tax_shown": false,
+    "reverse_charge_flag": false,
+    "legal_reference": "US digital tax rules (state-level)",
+    "invoice_text_block_id": "US_B2C_DIGITAL_FROM_EU"
+  },
+  "source_citation": [],
+  "tags": [
+    "digital_service"
+  ]
+}

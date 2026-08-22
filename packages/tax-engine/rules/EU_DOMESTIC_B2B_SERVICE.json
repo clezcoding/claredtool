@@ -1,0 +1,28 @@
+{
+  "rule_id": "EU_DOMESTIC_B2B_SERVICE",
+  "version": "1.0.0",
+  "description": "Matrix class EU_DOMESTIC_B2B_SERVICE (phase 03-04 exemplar)",
+  "conditions": {
+    "supplier_country": "AT",
+    "customer_country": "AT",
+    "supplier_is_business": true,
+    "customer_is_business": true,
+    "supplier_vat_registered": true,
+    "customer_vat_registered": true,
+    "supply_type": "service",
+    "channel": "direct"
+  },
+  "effect": {
+    "place_of_supply_country": "{{customer_country}}",
+    "tax_liability_party": "supplier",
+    "invoice_tax_rate": 20,
+    "invoice_tax_shown": true,
+    "reverse_charge_flag": false,
+    "legal_reference": "MS_A national VAT law (e.g. local UStG)",
+    "invoice_text_block_id": "EU_DOMESTIC_SERVICE_STANDARD"
+  },
+  "source_citation": [],
+  "tags": [
+    "service"
+  ]
+}

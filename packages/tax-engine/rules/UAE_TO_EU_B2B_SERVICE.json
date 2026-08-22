@@ -1,9 +1,9 @@
 {
-  "rule_id": "EU_INTRACOMM_B2B_SERVICE",
+  "rule_id": "UAE_TO_EU_B2B_SERVICE",
   "version": "1.0.0",
-  "description": "Matrix class EU_INTRACOMM_B2B_SERVICE (phase 03-04 exemplar)",
+  "description": "Matrix class UAE_TO_EU_B2B_SERVICE (phase 03-04 exemplar)",
   "conditions": {
-    "supplier_country": "AT",
+    "supplier_country": "AE",
     "customer_country": "DE",
     "supplier_is_business": true,
     "customer_is_business": true,
@@ -18,8 +18,8 @@
     "invoice_tax_rate": 0,
     "invoice_tax_shown": false,
     "reverse_charge_flag": true,
-    "legal_reference": "EU VAT Directive Art. 44, 196",
-    "invoice_text_block_id": "EU_RC_B2B_SERVICE"
+    "legal_reference": "EU VAT Directive; UAE VAT export rules",
+    "invoice_text_block_id": "EU_RC_UAE_TO_EU_B2B"
   },
   "source_citation": [],
   "tags": [

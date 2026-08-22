@@ -1,10 +1,10 @@
 {
-  "rule_id": "EU_INTRACOMM_B2B_SERVICE",
+  "rule_id": "EU_EXPORT_SERVICE_TO_THIRD",
   "version": "1.0.0",
-  "description": "Matrix class EU_INTRACOMM_B2B_SERVICE (phase 03-04 exemplar)",
+  "description": "Matrix class EU_EXPORT_SERVICE_TO_THIRD (phase 03-04 exemplar)",
   "conditions": {
     "supplier_country": "AT",
-    "customer_country": "DE",
+    "customer_country": "JP",
     "supplier_is_business": true,
     "customer_is_business": true,
     "supplier_vat_registered": true,
@@ -14,12 +14,12 @@
   },
   "effect": {
     "place_of_supply_country": "{{customer_country}}",
-    "tax_liability_party": "customer",
+    "tax_liability_party": "supplier",
     "invoice_tax_rate": 0,
     "invoice_tax_shown": false,
-    "reverse_charge_flag": true,
-    "legal_reference": "EU VAT Directive Art. 44, 196",
-    "invoice_text_block_id": "EU_RC_B2B_SERVICE"
+    "reverse_charge_flag": false,
+    "legal_reference": "EU VAT export rules, national law",
+    "invoice_text_block_id": "EU_EXPORT_SERVICE_B2B"
   },
   "source_citation": [],
   "tags": [

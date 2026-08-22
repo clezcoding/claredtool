@@ -1,0 +1,28 @@
+{
+  "rule_id": "EU_TO_UAE_B2C_DIGITAL",
+  "version": "1.0.0",
+  "description": "Matrix class EU_TO_UAE_B2C_DIGITAL (phase 03-04 exemplar)",
+  "conditions": {
+    "supplier_country": "AT",
+    "customer_country": "AE",
+    "supplier_is_business": true,
+    "customer_is_business": false,
+    "supplier_vat_registered": true,
+    "customer_vat_registered": false,
+    "supply_type": "digital_service",
+    "channel": "direct"
+  },
+  "effect": {
+    "place_of_supply_country": "{{customer_country}}",
+    "tax_liability_party": "supplier",
+    "invoice_tax_rate": 5,
+    "invoice_tax_shown": true,
+    "reverse_charge_flag": false,
+    "legal_reference": "UAE VAT for non-resident digital suppliers",
+    "invoice_text_block_id": "UAE_DIGITAL_EU_TO_UAE_B2C"
+  },
+  "source_citation": [],
+  "tags": [
+    "digital_service"
+  ]
+}
