@@ -57,10 +57,14 @@ fn authentik_url() -> String {
     )
 }
 
-fn host_of(raw: &str) -> Option<String> {
-    Url::parse(raw)
-        .ok()
-        .and_then(|url| url.host_str().map(|host| host.to_ascii_lowercase()))
+fn origin_key(url: &Url) -> Option<String> {
+    let host = url.host_str()?.to_ascii_lowercase();
+    let port = url.port_or_known_default()?;
+    Some(format!("{}://{}:{}", url.scheme(), host, port))
+}
+
+fn origin_of(raw: &str) -> Option<String> {
+    Url::parse(raw).ok().and_then(|url| origin_key(&url))
 }
 
 fn login_init_url() -> Url {
@@ -90,12 +94,13 @@ fn csp_init_script(backend: &str, authentik: &str) -> String {
     )
 }
 
-fn allow_navigation(url: &Url, backend_host: Option<&str>, authentik_host: Option<&str>) -> bool {
+fn allow_navigation(url: &Url, backend: Option<&str>, authentik: Option<&str>) -> bool {
     match url.scheme() {
-        "data" | "about" | "blob" => true,
+        "about" => true,
+        "data" => url.as_str() == login_init_url().as_str(),
         "http" | "https" => {
-            let host = url.host_str().map(|h| h.to_ascii_lowercase());
-            host.as_deref() == backend_host || host.as_deref() == authentik_host
+            let origin = origin_key(url);
+            origin.as_deref() == backend || origin.as_deref() == authentik
         }
         _ => false,
     }
@@ -105,23 +110,29 @@ fn allow_navigation(url: &Url, backend_host: Option<&str>, authentik_host: Optio
 async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result<(), String> {
     let backend = backend_url();
     let authentik = authentik_url();
-    let backend_host = host_of(&backend);
-    let authentik_host = host_of(&authentik);
+    let backend_origin = origin_of(&backend);
+    let authentik_origin = origin_of(&authentik);
     let auth_login = url.unwrap_or_else(|| {
         format!("{}/auth/login", backend.trim_end_matches('/'))
     });
+    let parsed_login = Url::parse(&auth_login).map_err(|e| e.to_string())?;
+    if !allow_navigation(
+        &parsed_login,
+        backend_origin.as_deref(),
+        authentik_origin.as_deref(),
+    ) {
+        return Err("login url is not an allowed origin".into());
+    }
 
     if let Some(existing) = app.get_webview_window(LOGIN_LABEL) {
-        if let Ok(parsed) = Url::parse(&auth_login) {
-            let _ = existing.navigate(parsed);
-        }
+        let _ = existing.navigate(parsed_login);
         existing.set_focus().map_err(|e| e.to_string())?;
         return Ok(());
     }
     let csp_script = csp_init_script(&backend, &authentik);
 
     let nav_app = app.clone();
-    let load_auth_login = auth_login.clone();
+    let load_login = parsed_login;
 
     let window = WebviewWindowBuilder::new(
         &app,
@@ -150,13 +161,11 @@ async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result
             }
             return false;
         }
-        allow_navigation(url, backend_host.as_deref(), authentik_host.as_deref())
+        allow_navigation(url, backend_origin.as_deref(), authentik_origin.as_deref())
     })
     .on_page_load(move |window, payload| {
         if payload.event() == PageLoadEvent::Finished && payload.url().scheme() == "data" {
-            if let Ok(url) = Url::parse(&load_auth_login) {
-                let _ = window.navigate(url);
-            }
+            let _ = window.navigate(load_login.clone());
         }
     })
     .build()
