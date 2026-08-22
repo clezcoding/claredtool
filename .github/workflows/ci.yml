@@ -38,3 +38,5 @@ jobs:
       - run: pnpm --filter ./apps/backend test
         env:
           DATABASE_URL: postgresql://prisma-test:unused@127.0.0.1:5432/clared
+
+      - run: pnpm --filter @clared/tax-engine test
