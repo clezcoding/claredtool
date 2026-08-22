@@ -7,14 +7,17 @@ afterEach(() => {
   cleanup();
 });
 
-function renderRechnung() {
+async function renderRechnung() {
   window.location.hash = "#/";
   render(<App />);
+  await waitFor(() => {
+    expect(screen.getByRole("navigation")).toBeTruthy();
+  });
 }
 
 describe("invoice canvas", () => {
-  it("renders one line-item card per sample line with Bezeichnung, Menge, Einzelpreis, Netto", () => {
-    renderRechnung();
+  it("renders one line-item card per sample line with Bezeichnung, Menge, Einzelpreis, Netto", async () => {
+    await renderRechnung();
     const cards = screen.getAllByTestId("line-item-card");
     expect(cards).toHaveLength(SAMPLE_INVOICE.lineItems.length);
 
@@ -31,16 +34,16 @@ describe("invoice canvas", () => {
     });
   });
 
-  it("exposes + Position at the list bottom and a hover-delete control on each card", () => {
-    renderRechnung();
+  it("exposes + Position at the list bottom and a hover-delete control on each card", async () => {
+    await renderRechnung();
     expect(screen.getByRole("button", { name: "+ Position" })).toBeTruthy();
     expect(screen.getAllByRole("button", { name: "Position löschen" })).toHaveLength(
       SAMPLE_INVOICE.lineItems.length,
     );
   });
 
-  it("toggles to the empty-state heading on Neue Rechnung and restores the sample cards", () => {
-    renderRechnung();
+  it("toggles to the empty-state heading on Neue Rechnung and restores the sample cards", async () => {
+    await renderRechnung();
     fireEvent.click(screen.getByRole("button", { name: "Neue Rechnung" }));
 
     expect(
@@ -56,7 +59,7 @@ describe("invoice canvas", () => {
   });
 
   it("shows staged Live Steuerberechnung fields and Vorschau navigates to /pdf", async () => {
-    renderRechnung();
+    await renderRechnung();
     const rail = within(screen.getByTestId("tax-rail"));
     const tax = SAMPLE_INVOICE.taxDecision;
 
@@ -80,9 +83,12 @@ describe("invoice canvas", () => {
     });
   });
 
-  it("renders SAMPLE_INVOICE number, parties, and totals on the /pdf paper", () => {
+  it("renders SAMPLE_INVOICE number, parties, and totals on the /pdf paper", async () => {
     window.location.hash = "#/pdf";
     render(<App />);
+    await waitFor(() => {
+      expect(screen.getByTestId("pdf-paper")).toBeTruthy();
+    });
     const paper = within(screen.getByTestId("pdf-paper"));
     expect(paper.getByText(SAMPLE_INVOICE.rechnungsnummer)).toBeTruthy();
     expect(paper.getByText(SAMPLE_INVOICE.seller.name)).toBeTruthy();

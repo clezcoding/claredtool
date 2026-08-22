@@ -8,7 +8,7 @@
 ## Backend-API stack and Coolify deployment
 - source: docs/clared-app-prd.md
 - type: nfr
-- content: Technologie: Node.js (NestJS/Express), FastAPI, oder Rust (Axum) – wählbar. Empfohlener Stack: Node.js mit NestJS oder Express, Dockerisiert. Deployment: als Application in Coolify mit Git-Repo, Auto-Deploy und Environment-Variablen. Empfohlene Ordner: apps/backend/ (API + Tax-Engine), packages/tax-engine/ (Shared Library).
+- content: Technologie: NestJS (TypeScript) + Prisma 7, dockerisiert. Deployment: Application auf dem Coolify-Cluster des Anbieters mit Git-Repo, Auto-Deploy und Environment-Variablen. Lokal: OrbStack. Empfohlene Ordner: apps/backend/ (API); packages/tax-engine/ erst Phase 3.
 
 ## Backend REST API endpoints
 - source: docs/clared-app-prd.md
@@ -53,7 +53,7 @@
 ## Coolify service set
 - source: docs/clared-app-prd.md
 - type: nfr
-- content: Alle Serverkomponenten auf Coolify-Cluster. Projektstart: Services Backend-App, Postgres, Redis, Authentik, optional Supabase. Logging/Monitoring: zusätzliche self-hosted Services auf Coolify (Grafana, Prometheus etc.).
+- content: Alle Serverkomponenten auf dem Coolify-Cluster des Anbieters (nicht Kunden-Self-Host). Projektstart: Services Backend-App, Postgres, Redis, Authentik. Logging/Monitoring: zusätzliche Services auf demselben Cluster (Grafana, Prometheus etc.). Produkt: bezahltes SaaS, proprietary.
 
 ## TransactionFacts schema
 - source: docs/clared-tax-engine-architecture.md

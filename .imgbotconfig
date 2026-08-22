@@ -1,0 +1,5 @@
+{
+  "ignoredFiles": [
+    "apps/desktop/src-tauri/icons/**"
+  ]
+}

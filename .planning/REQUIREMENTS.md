@@ -14,8 +14,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Backend & Identity
 
-- [ ] **BACK-01**: Desktop connects over HTTPS and OIDC/OAuth2 to a self-hosted Coolify backend (Backend-App, Postgres, Redis, Authentik)
-- [ ] **AUTH-01**: User authenticates via Authentik OIDC (SSO/MFA); backend validates token and creates session/API-key; roles owner, accountant, viewer
+- [x] **BACK-01**: Desktop connects over HTTPS and OIDC/OAuth2 to the **vendor Coolify** backend (Backend-App, Postgres, Redis, Authentik on the founder's cluster — not customer self-host)
+- [x] **AUTH-01**: User authenticates via Authentik OIDC (SSO/MFA); backend validates token and creates session/API-key; Mandant-Gruppen plus `clared-platform`; AUTH-01 minimum roles owner, accountant, viewer remain on the token
 
 ### Entities & Invoices
 
@@ -47,6 +47,10 @@ Deferred to future release. Tracked but not in current roadmap.
 - **REAL-01**: Optional WebSockets for live updates of background jobs
 - **MAIL-01**: Emailversand queued with PDF generation
 
+### SaaS
+
+- **SAAS-01**: Paid subscription (seats/plans), vendor-hosted only. Stripe (or equivalent) billing, tenant isolation, no free product. Tokens already carry `clared-platform`; this requirement is checkout + enforcement, not the group itself.
+
 ## Out of Scope
 
 Explicitly excluded. Documented to prevent scope creep.
@@ -54,6 +58,7 @@ Explicitly excluded. Documented to prevent scope creep.
 | Feature | Reason |
 |---------|--------|
 | Electron desktop runtime | User locked Tauri |
+| Open source / free Clared / customer self-host of the backend | Paid SaaS on vendor Coolify |
 | Supabase as v1 default BaaS | PRD optional alternative; custom backend is the primary path |
 | Tax-engine microservice in v1 | PRD: start integrated (Variante 1) |
 | Collision / priority-tie algorithm | SPEC points at PRD; PRD silent — do not invent |
@@ -84,8 +89,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | UI-01 | Phase 1 | Complete |
 | DESK-01 | Phase 1 | Complete |
-| BACK-01 | Phase 2 | Pending |
-| AUTH-01 | Phase 2 | Pending |
+| BACK-01 | Phase 2 | Complete |
+| AUTH-01 | Phase 2 | Complete |
 | ENT-01 | Phase 3 | Pending |
 | INV-01 | Phase 3 | Pending |
 | TAX-01 | Phase 3 | Pending |
@@ -102,4 +107,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-08-19*
-*Last updated: 2026-08-19 after new-project-from-ingest roadmap*
+*Last updated: 2026-08-20 — SaaS vendor Coolify, SAAS-01 v2, BACK-01/AUTH-01 wording*

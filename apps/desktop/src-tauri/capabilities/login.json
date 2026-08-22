@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "login-window",
+  "description": "Navigation-only capability for the login WebView",
+  "windows": ["login"],
+  "permissions": ["core:default"]
+}

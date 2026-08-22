@@ -3,6 +3,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import App from "../App";
@@ -12,14 +13,17 @@ afterEach(() => {
   cleanup();
 });
 
-function renderRechnung() {
+async function renderRechnung() {
   window.location.hash = "#/";
   render(<App />);
+  await waitFor(() => {
+    expect(screen.getByRole("navigation")).toBeTruthy();
+  });
 }
 
 describe("demo states", () => {
-  it("loading demo shows skeleton + spinner and hides line-item cards", () => {
-    renderRechnung();
+  it("loading demo shows skeleton + spinner and hides line-item cards", async () => {
+    await renderRechnung();
     fireEvent.click(screen.getByRole("button", { name: "Demo: Laden" }));
 
     expect(screen.getByTestId("invoice-skeleton")).toBeTruthy();
@@ -27,8 +31,8 @@ describe("demo states", () => {
     expect(screen.queryAllByTestId("line-item-card")).toHaveLength(0);
   });
 
-  it("error demo shows exact copy and retry restores cards", () => {
-    renderRechnung();
+  it("error demo shows exact copy and retry restores cards", async () => {
+    await renderRechnung();
     fireEvent.click(screen.getByRole("button", { name: "Demo: Fehler" }));
 
     const errorText = screen.getByText(

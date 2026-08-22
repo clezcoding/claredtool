@@ -12,6 +12,12 @@ import {
   createHashRouter,
 } from "react-router";
 import { useMemo } from "react";
+import { LoginGate } from "./auth/login-gate";
+import { SessionProvider, useSession } from "./auth/session-provider";
+import { ErrorState } from "./components/error-state";
+import { SessionBanner } from "./components/session-banner";
+import { SessionChip } from "./components/session-chip";
+import { Spinner } from "./components/spinner";
 import { EntitiesScreen } from "./routes/entities";
 import { KundenScreen } from "./routes/kunden";
 import { PdfScreen } from "./routes/pdf";
@@ -27,6 +33,8 @@ const NAV_ITEMS = [
 ] as const;
 
 export function AppShell() {
+  const { me, bannerKind, login, logout, openingLogin } = useSession();
+
   return (
     <div className="flex h-screen bg-background text-foreground">
       <nav className="flex w-48 shrink-0 flex-col gap-1 border-r border-border p-2">
@@ -47,15 +55,28 @@ export function AppShell() {
             {label}
           </NavLink>
         ))}
+        {me ? (
+          <div className="mt-auto">
+            <SessionChip me={me} onLogout={() => void logout()} />
+          </div>
+        ) : null}
       </nav>
       <main className="flex-1 overflow-auto">
+        {bannerKind ? (
+          <SessionBanner
+            kind={bannerKind}
+            onLogin={() => void login()}
+            opening={openingLogin}
+          />
+        ) : null}
         <Outlet />
       </main>
     </div>
   );
 }
 
-export default function App() {
+function AuthenticatedApp() {
+  const { state, retryMe } = useSession();
   const router = useMemo(
     () =>
       createHashRouter([
@@ -74,5 +95,33 @@ export default function App() {
     [],
   );
 
+  if (state === "boot") {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (state === "boot-error") {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <ErrorState onRetry={() => void retryMe()} />
+      </div>
+    );
+  }
+
+  if (state === "unsigned") {
+    return <LoginGate />;
+  }
+
   return <RouterProvider router={router} />;
+}
+
+export default function App() {
+  return (
+    <SessionProvider>
+      <AuthenticatedApp />
+    </SessionProvider>
+  );
 }

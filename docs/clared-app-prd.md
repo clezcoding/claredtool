@@ -1,6 +1,6 @@
 # Clared – Desktop-App PRD (macOS & Windows)
 
-Dieses Dokument ergänzt die vorhandenen Tax-Engine-Dateien und beschreibt die Gesamtarchitektur von Clared als Desktop-Anwendung mit Backend, Datenbank, Caching und Authentifizierung – alles self-hosted über Coolify.
+Dieses Dokument ergänzt die vorhandenen Tax-Engine-Dateien und beschreibt die Gesamtarchitektur von Clared als **kostenpflichtiges SaaS-Produkt**: Desktop-App plus Backend, Datenbank, Caching und Authentik — alles auf **dem Coolify-Cluster des Anbieters** (nicht Kunden-Self-Host, nicht Open Source, nicht kostenlos). Stripe/Abo-Checkout ist v2; die Plattform-Gruppe `clared-platform` gehört schon ins Token.
 
 ## 1. Produktkontext
 
@@ -35,7 +35,7 @@ Clared ist eine nativenartige (Tauri/Electron-basierte) Desktop-App für macOS u
   - Authentik als selbstgehosteter Identity Provider (OIDC/OAuth2).
   - Aufgaben: Benutzerverwaltung, SSO, MFA, Rollen & Rechte.
 
-Alle Serverkomponenten laufen auf deinem Coolify-Cluster, während der Desktop-Client sich über HTTPS und OAuth2 mit dem Backend verbindet.
+Alle Serverkomponenten laufen auf dem Coolify-Cluster **des Anbieters**. Der Desktop-Client verbindet sich über HTTPS und OAuth2 mit diesem Backend. Kunden betreiben keinen eigenen Clared-Server.
 
 ## 3. Backend-Stack & Deployment (Coolify)
 
@@ -185,10 +185,10 @@ Empfohlene Ordner:
 3. **Backend-Skeleton erstellen**
    - Basis-API mit Routing, DB-Anbindung, Authentik/OIDC-Client.
 
-4. **Coolify-Deploy vorbereiten**
-   - Services: Backend-App, Postgres, Redis, Authentik, optional Supabase.
+4. **Coolify-Deploy vorbereiten** (Cluster des Anbieters)
+   - Services: Backend-App, Postgres, Redis, Authentik.
 
 5. **Desktop-App-Skeleton bauen**
-   - Tauri/Electron-Projekt mit Basis-Layout und API-Client.
+   - Tauri-Projekt mit Basis-Layout und API-Client.
 
-Damit ist Clared nicht nur als Tax-Engine, sondern als vollständige Desktop-App mit einem self-hosted Backend in Coolify sauber spezifiziert.
+Damit ist Clared als kostenpflichtiges SaaS spezifiziert: Desktop-App gegen das Backend auf dem Coolify des Anbieters.

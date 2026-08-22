@@ -6,10 +6,17 @@ afterEach(() => {
   cleanup();
 });
 
+async function renderSignedIn() {
+  window.location.hash = "#/";
+  render(<App />);
+  await waitFor(() => {
+    expect(screen.getByRole("navigation")).toBeTruthy();
+  });
+}
+
 describe("sidebar routes", () => {
-  it("lists Rechnung, Entities, Kunden, Tax, PDF in that order", () => {
-    window.location.hash = "#/";
-    render(<App />);
+  it("lists Rechnung, Entities, Kunden, Tax, PDF in that order", async () => {
+    await renderSignedIn();
     const nav = screen.getByRole("navigation");
     const labels = within(nav)
       .getAllByRole("link")
@@ -17,9 +24,8 @@ describe("sidebar routes", () => {
     expect(labels).toEqual(["Rechnung", "Entities", "Kunden", "Tax", "PDF"]);
   });
 
-  it("lands on the sample invoice number on the index route", () => {
-    window.location.hash = "#/";
-    render(<App />);
+  it("lands on the sample invoice number on the index route", async () => {
+    await renderSignedIn();
     expect(screen.getByText("RE-2026-001")).toBeTruthy();
   });
 
@@ -29,8 +35,7 @@ describe("sidebar routes", () => {
     ["Tax", "Tax"],
     ["PDF", "PDF"],
   ] as const)("navigates to %s without a blank page", async (linkLabel, heading) => {
-    window.location.hash = "#/";
-    render(<App />);
+    await renderSignedIn();
     fireEvent.click(screen.getByRole("link", { name: linkLabel }));
     await waitFor(() => {
       expect(

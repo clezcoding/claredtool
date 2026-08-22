@@ -1,18 +1,18 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 2
-current_phase_name: Self-Hosted Backend & Authentik SSO
-status: "Phase 01 shipped — PR #1"
-stopped_at: Phase 01 complete, ready to plan Phase 2
-last_updated: "2026-08-20T14:21:48.883Z"
-last_activity: 2026-08-20
-state_head: 6f649ae22f02476dc68de6144fa946a4139b21ad
+current_phase: 3
+current_phase_name: Entities, Invoices & Live Tax
+status: "Phase 2 shipped — PR #9"
+stopped_at: Phase 02 complete, ready to plan Phase 3
+last_updated: "2026-08-22T13:01:15.521Z"
+last_activity: 2026-08-22
+state_head: 53e0e7b3f58204e39e876a6cd3b3c42d43ec460b
 progress:
   total_phases: 4
-  completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
+  completed_phases: 2
+  total_plans: 12
+  completed_plans: 12
 milestone_name: milestone
 ---
 
@@ -23,14 +23,14 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 2 — Self-Hosted Backend & Authentik SSO
+**Current focus:** Phase 3 — Entities, Invoices & Live Tax
 
 ## Current Position
 
-Phase: 2 — Self-Hosted Backend & Authentik SSO
+Phase: 3 — Entities, Invoices & Live Tax
 Plan: Not started
-Status: Phase 01 shipped — PR #1
-Last activity: 2026-08-20
+Status: Phase 2 shipped — PR #9
+Last activity: 2026-08-22
 
 Progress: [██░░░░░░░░] 25%
 
@@ -38,7 +38,7 @@ Progress: [██░░░░░░░░] 25%
 
 **Velocity:**
 
-- Total plans completed: 5
+- Total plans completed: 12
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -47,6 +47,7 @@ Progress: [██░░░░░░░░] 25%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 5 | - | - |
+| 02 | 7 | - | - |
 
 **Recent Trend:**
 
@@ -62,6 +63,13 @@ Progress: [██░░░░░░░░] 25%
 | Phase 01 P02 | 8min | 3 tasks | 8 files |
 | Phase 01-tauri-desktop-mockup-first-ui P03 | 14 | 3 tasks | 8 files |
 | Phase 01-tauri-desktop-mockup-first-ui P04 | 6 | 2 tasks | 2 files |
+| Phase 02-self-hosted-backend-authentik-sso P01 | 7 min | 2 tasks | 18 files |
+| Phase 02-self-hosted-backend-authentik-sso P02 | 19 min | 3 tasks | 31 files |
+| Phase 02-self-hosted-backend-authentik-sso P03 | 8 min | 2 tasks | 14 files |
+| Phase 02-self-hosted-backend-authentik-sso P04 | 17 min | 3 tasks | 22 files |
+| Phase 02-self-hosted-backend-authentik-sso P05 | 7 min | 3 tasks | 7 files |
+| Phase 02-self-hosted-backend-authentik-sso P06 | 2 min | 2 tasks | 2 files |
+| Phase 02-self-hosted-backend-authentik-sso P07 | 12 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -85,6 +93,25 @@ Recent decisions affecting current work:
 - [Phase 01]: Empty-state hero is GPT Image 2 16:9 2k (2688×1520), not the 1×1 placeholder
 - [Phase 01]: CI uses explicit pnpm tauri build + upload-artifact, not tauri-action (no signing/secrets this phase)
 - [Phase 01]: Matrix windows-latest + macos-latest with fail-fast false so a macOS miss cannot cancel the Windows evidence job
+- [Phase 02]: Wave 0 stays RED; projectRbac /health /auth implementation is 02-02
+- [Phase 02]: Desktop auth specs use dynamic import specifiers so Vite collection ignores missing LoginGate/chip/banner files
+- [Phase 02]: prisma/@prisma/engines allowBuilds true so pnpm --filter backend install succeeds
+- [Phase 02-self-hosted-backend-authentik-sso]: MemoryStore at auth/memory-store.ts to match Wave 0 e2e imports
+- [Phase 02-self-hosted-backend-authentik-sso]: POST /auth/session HttpCode 200 (Nest POST default 201 would fail AUTH-01)
+- [Phase 02-self-hosted-backend-authentik-sso]: Empty Prisma init migration; no User/Role models (D-22)
+- [Phase 02-self-hosted-backend-authentik-sso]: SCHEMA_PUSH used compose Postgres; host :5432 was a different instance
+- [Phase 02-self-hosted-backend-authentik-sso]: AppManifest::commands in build.rs so keychain IPC is ACL-denied on the login WebView (T-02-10) — Tauri allows all app commands from every window unless AppManifest lists them; login.json core:default alone would not block keychain.
+- [Phase 02-self-hosted-backend-authentik-sso]: Login CSP via initialization_script meta because WebviewWindowBuilder has no CSP setter (A3) — on_navigation exists; no per-window CSP setter on this crate. Meta inject plus host allowlist.
+- [Phase 02-self-hosted-backend-authentik-sso]: login-init.html loaded as include_str data URL so src-tauri HTML does not depend on Vite public/ — Plan places the spinner HTML in src-tauri; WebviewUrl::App would look in frontend dist.
+- [Phase 02-self-hosted-backend-authentik-sso]: Chip/banner live in components/; open_login_window optional url for end_session; vitest fileParallelism false
+- [Phase 02-self-hosted-backend-authentik-sso]: Keep dynamic import of openid-client; static ESM import breaks Jest CJS (AUTH_TEST_MODE never loads the package)
+- [Phase 02-self-hosted-backend-authentik-sso]: Blueprint sets client_id clared and does not set client_secret (copy generated SECRET into env; prod only in Coolify)
+- [Phase 02-self-hosted-backend-authentik-sso]: wget official compose.yml verbatim — postgresql service is Authentik's DB, no redis, no /etc/localtime
+- [Phase 02-self-hosted-backend-authentik-sso]: Enable only webview-data-url on tauri; keep login_init_url() as data:text/html and WebviewUrl::External (no Vite public/ move, no asset-protocol fallback) — Plan 02-06: crate feature is sufficient; document location stays src-tauri include_str per D-16 / 02-03.
+- [Phase 02-self-hosted-backend-authentik-sso]: Human Anmelden window check deferred to end-of-phase UAT (human_verify_mode); Task 2 is Vitest-only — Orchestrator: do not halt; live OS window is harvested into 02-UAT.md.
+- [Phase 02-self-hosted-backend-authentik-sso]: Fix emit path to dist/main.js; do not paper over with a nested CMD (G-02-2) — prisma.config.ts at package root made tsc rootDir . and emit dist/src/main.js
+- [Phase 02-self-hosted-backend-authentik-sso]: apt-get install curl so Coolify Dockerfile HTTP healthcheck can probe /health — node:22-bookworm-slim has neither curl nor wget; first deploy rolled back a running Nest
+- [Phase 02-self-hosted-backend-authentik-sso]: Local Authentik GHCR 2026.8.0 denial stays environmental; compose.yml unchanged (G-02-5) — Plan prohibition: do not add GHCR credentials or compose tag fallback
 
 ### Pending Todos
 
@@ -105,6 +132,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-20T14:08:25Z
-Stopped at: Phase 01 complete, ready to plan Phase 2
+Last session: 2026-08-22T04:30:52.483Z
+Stopped at: Phase 02 complete, ready to plan Phase 3
 Resume file: None

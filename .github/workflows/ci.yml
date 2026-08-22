@@ -30,3 +30,11 @@ jobs:
       - run: pnpm --filter ./apps/desktop exec tsc --noEmit
 
       - run: pnpm --filter ./apps/desktop test
+
+      - run: pnpm --filter ./apps/backend test:e2e
+        env:
+          DATABASE_URL: postgresql://prisma-test:unused@127.0.0.1:5432/clared
+
+      - run: pnpm --filter ./apps/backend test
+        env:
+          DATABASE_URL: postgresql://prisma-test:unused@127.0.0.1:5432/clared

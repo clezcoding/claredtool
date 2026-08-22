@@ -1,6 +1,6 @@
 # Clared
 
-Clared ist eine Desktop-App für globale B2B-Rechnungsstellung mit integrierter Steuer-Engine. Nutzer verwalten ihre Gesellschaften, Kunden und Rechnungen und erhalten deterministische Steuerentscheidungen für grenzüberschreitende Umsätze.
+Clared ist eine **kostenpflichtige SaaS-Desktop-App** für globale B2B-Rechnungsstellung mit integrierter Steuer-Engine. Backend, Authentik, Postgres und Redis laufen auf dem Coolify-Cluster des Anbieters — nicht beim Kunden, nicht Open Source, nicht kostenlos. Abonnenten verwalten ihre Gesellschaften, Kunden und Rechnungen und erhalten deterministische Steuerentscheidungen für grenzüberschreitende Umsätze.
 
 ## Language
 
