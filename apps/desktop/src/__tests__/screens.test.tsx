@@ -36,6 +36,12 @@ async function openScreen(linkLabel: string, heading: string) {
         headers: { "Content-Type": "application/json" },
       });
     }
+    if (url.endsWith("/api/invoices")) {
+      return new Response(JSON.stringify([]), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     return new Response("not found", { status: 404 });
   });
 
@@ -85,7 +91,7 @@ describe("kunden screen", () => {
 });
 
 describe("tax screen", () => {
-  it("renders staged TaxDecision canonical fields including applied_rule_id", async () => {
+  it("renders canonical TaxDecision field labels including applied_rule_id", async () => {
     await openScreen("Tax", "Tax");
     const panel = within(screen.getByTestId("tax-decision"));
     expect(panel.getByText("applied_rule_id")).toBeTruthy();

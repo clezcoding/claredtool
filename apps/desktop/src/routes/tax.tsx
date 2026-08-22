@@ -1,4 +1,6 @@
-import { SAMPLE_INVOICE, type StagedTaxDecision } from "../data/sample-invoice";
+import { useSyncExternalStore } from "react";
+import type { StagedTaxDecision } from "../data/sample-invoice";
+import { getTaxLiveState, subscribeTaxLive } from "../data/tax-live-store";
 
 const TAX_FIELDS: (keyof StagedTaxDecision)[] = [
   "place_of_supply_country",
@@ -12,8 +14,15 @@ const TAX_FIELDS: (keyof StagedTaxDecision)[] = [
   "applied_rule_version",
 ];
 
+const TAX_ERROR_COPY =
+  "Steuerberechnung fehlgeschlagen. Letzte gültige Werte bleiben sichtbar.";
+
 export function TaxScreen() {
-  const tax = SAMPLE_INVOICE.taxDecision;
+  const { taxDecision, taxError } = useSyncExternalStore(
+    subscribeTaxLive,
+    getTaxLiveState,
+    getTaxLiveState,
+  );
 
   return (
     <div className="flex flex-col gap-4 p-6">
@@ -24,10 +33,15 @@ export function TaxScreen() {
           {TAX_FIELDS.map((field) => (
             <div key={field}>
               <dt className="text-muted-foreground">{field}</dt>
-              <dd className="break-words whitespace-normal">{String(tax[field])}</dd>
+              <dd className="break-words whitespace-normal">
+                {taxDecision ? String(taxDecision[field]) : "—"}
+              </dd>
             </div>
           ))}
         </dl>
+        {taxError ? (
+          <p className="mt-3 text-sm text-destructive">{TAX_ERROR_COPY}</p>
+        ) : null}
       </section>
     </div>
   );
