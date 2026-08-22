@@ -1,10 +1,11 @@
 ---
 phase: 3
 slug: entities-invoices-live-tax
-status: draft
+status: approved
 shadcn_initialized: true
 preset: radix-nova
 created: 2026-08-22
+reviewed_at: 2026-08-22T16:24:00+02:00
 ---
 
 # Phase 3 — UI Design Contract
@@ -288,55 +289,66 @@ Do not write: Stellen, issued, override, Steuer berechnen, Speichern (invoice), 
 
 > Populated by the ui-phase UI-consideration probe (Step 9.5). Empty-state and error-state COPY live in `## Copywriting Contract` — this section covers state coverage and references those rows.
 
-Applicable state considerations resolved: 48 covered, 0 backstop, 0 unresolved
+Applicable state considerations resolved: 52 covered (explicit), 0 backstop, 0 unresolved
 
-Phase 1 E1–E10 and Phase 2 E11–E17 remain in force except where this table **replaces** a Phase 1 empty/landing rule (E1/E4/E6/E7/E8).
+Probe kinds (user-confirmed 2026-08-22): E1 nav · E2 form+list-collection · E3 form+list-collection · E4 form+list-collection+interactive-control · E5 static-content+interactive-control · E6 interactive-control+list-collection · E7 form+media+list-collection · E8 interactive-control+static-content.
+
+Taxonomy does **not** raise `empty`/`populated` on E5 (rail is not form/list/media). Em-dash placeholders and four-field happy path stay in Surfaces / Copywriting, not duplicated here.
 
 | Category | Element(s) | Status | Resolution / Reason |
 |----------|------------|--------|---------------------|
-| empty | E4 first-run invoice | ✅ covered | Zero invoices: Phase 1 hero + Copywriting empty heading/body; no „Beispielrechnung anzeigen“; empty form under the copy (D-07, D-17). |
-| empty | E1 Neue Rechnung | ✅ covered | With existing drafts: empty identity card + empty line list; picker keeps prior drafts; no illustration (D-07). |
-| empty | E6 PDF peek / tax rail | ✅ covered | Hidden while first-run illustration is showing; revealed after first persistable keystroke/autosave. Peek stays staged. |
-| empty | E18 entity list | ✅ covered | Copywriting Entities empty heading/body; Anlegen still visible (enabled or disabled per D-04). |
-| empty | E20 kunden list | ✅ covered | Copywriting Kunden empty heading/body; Anlegen still visible. |
-| empty | E23 invoice picker | ✅ covered | Combobox empty: „Keine Rechnung passt zur Suche.“ First-run uses E4, not a blank picker-only pane. |
-| empty | E22 country/legal-form | ✅ covered | Combobox empty: „Kein Land passt zur Suche.“ / „Keine Rechtsform passt zur Suche.“ Legal form disabled until country set. |
-| empty | E25 tax rail | ✅ covered | Before first success: four labels + em dash `—`. Never sample tax numbers on the signed-in path. |
-| empty | E27 seller/customer | ✅ covered | Placeholders „Entity wählen“ / „Zuerst Entity wählen“ / „Kunde wählen“. Customer disabled until seller set. |
-| loading | E18, E20 lists | ✅ covered | `Skeleton` rows in the `max-w-xl` list (Phase 1 skeleton language). Header + Anlegen stay visible. |
-| loading | E1 invoice load | ✅ covered | `Skeleton` for identity card + three line-card placeholders; Spinner may sit in the header. No Demo buttons. |
-| loading | E24 autosave | ✅ covered | „Speichert…“ + optional 16×16 Spinner. `prefers-reduced-motion: reduce`: static ring. |
-| loading | E25, E26 evaluate | ✅ covered | Last good values (or em dashes) stay; do not swap the rail for a skeleton. Optional Spinner in the rail heading row while in flight. |
-| loading | E19, E21 create submit | ✅ covered | Panel submit button label stays; Spinner inside the button; button disabled while in flight. |
-| error | E18, E20, E1 load | ✅ covered | Phase 1 `ErrorState` + „Erneut versuchen“ (Copywriting error row). |
-| error | E24 autosave | ✅ covered | Copywriting autosave error; form stays; next debounce retries. |
-| error | E25, E26 evaluate | ✅ covered | Copywriting tax error in the rail/`/tax`; last good TaxDecision kept; typing unrestricted (D-11). |
-| error | E19, E21 validation | ✅ covered | Field error under the control, Label 12px `text-destructive`. EU VAT: „USt-IdNr. ist für EU-Länder Pflicht.“ |
-| error | E29 Anlegen RBAC | ✅ covered | Disabled button + hint; 403 is not the primary UX (D-04). |
-| populated | E18, E20 | ✅ covered | Name rows; selected `bg-muted`; click opens read-only detail under the list. |
-| populated | E2 line items | ✅ covered | Compact 4-field editable cards + „+ Position“ (D-17–D-21). |
-| populated | E23 picker | ✅ covered | Current number (or „Neue Rechnung“ if unnumbered) on the trigger; list of drafts. |
-| populated | E25 rail | ✅ covered | Four canonical fields from live TaxDecision (D-12). |
-| populated | E26 /tax | ✅ covered | Nine canonical fields from the same decision. |
-| partial | E1 identity | ✅ covered | Incomplete draft stays on-canvas; number placeholder until first autosave; missing seller/customer keep placeholders. |
-| partial | E2 line items | ✅ covered | Blank new card (Bezeichnung empty, Menge/Einzelpreis 0) is visible, not hidden. |
-| partial | E19, E21 | ✅ covered | USt-IdNr. hidden until EU country; legal form empty until country set. |
-| overflow | E18, E20 lists | ✅ covered | Column scrolls; header + Anlegen stay put. Names wrap (no ellipsis). |
-| overflow | E2 line items | ✅ covered | Left panel scrolls when cards exceed the pane. |
-| overflow | E23, E22, E27 combobox | ✅ covered | List viewport scrolls inside ComboboxContent; trigger truncates with `title` = full string. |
-| overflow | E25 rail | ✅ covered | Rail scrolls if legal text exceeds the pane. |
-| overflow | E5 nav | ✅ covered | Fixed 5 items; no overflow (Phase 1 D-06). |
-| zero-one-many | E18, E20 | ✅ covered | Zero = empty copy; one or many = stacked rows; panel still one at a time. |
-| zero-one-many | E2 line items | ✅ covered | Zero on first-run uses E4 illustration+form; zero after Neue Rechnung with drafts = empty list + „+ Position“; one or many = cards. |
-| zero-one-many | E23 picker | ✅ covered | Zero invoices = first-run E4; one or many = picker lists them. |
-| long-text | E18, E20 names | ✅ covered | Wrap in the row. |
-| long-text | E2 Bezeichnung | ✅ covered | Wrap inside the card. |
-| long-text | E25 legal_reference | ✅ covered | Wrap, then rail scrolls. |
-| long-text | E10 / E24 / tax error | ✅ covered | Wrap inside the rail/header. No ellipsis on errors. |
-| long-text | E23 trigger | ✅ covered | Truncate + native `title`. |
-| long-text | E3 nav, E9 CTA | ✅ covered | Short German/locked labels; no truncation. |
-
-**Kinds (author-confirmed):** E18/E20 list-collection + interactive-control · E19/E21 form · E22 interactive-control + form · E23 list-collection + interactive-control · E24 static-content · E25/E26 static-content · E27 interactive-control + form · E29 interactive-control. E1/E2/E4/E6 as Phase 1, updated by D-07/D-17.
+| loading | E1 nav | ✅ covered | Nav is local routes; no remote load chrome. Session chip/boot stay Phase 2. |
+| error | E1 nav | ✅ covered | Missing `invoice.read` after boot: Phase 1 `ErrorState` in main pane (Copywriting error row), nav still shown. |
+| overflow | E1 nav | ✅ covered | Fixed five items; no overflow (Phase 1 D-06). |
+| long-text | E1 nav | ✅ covered | Locked short labels (Rechnung / Entities / Kunden / Tax / PDF); no truncation. |
+| empty | E2 Entities | ✅ covered | Copywriting Entities empty heading/body; „Anlegen“ stays visible (enabled or disabled per D-04). |
+| loading | E2 Entities | ✅ covered | `Skeleton` rows in `max-w-xl` list; header + Anlegen stay. Create submit: Spinner in button, button disabled. |
+| error | E2 Entities | ✅ covered | List load: `ErrorState` + „Erneut versuchen“. Validation under fields (`text-destructive`); EU VAT copy row. RBAC: disabled Anlegen + hint, not 403 as primary UX. |
+| populated | E2 Entities | ✅ covered | Name rows; selected `bg-muted` + `aria-current`; click opens read-only detail under the list. |
+| partial | E2 Entities | ✅ covered | USt-IdNr. hidden until EU country; legal form empty/disabled until Land set. |
+| overflow | E2 Entities | ✅ covered | Column scrolls; header + Anlegen stay. Names wrap. |
+| zero-one-many | E2 Entities | ✅ covered | Zero = empty copy; one or many = stacked rows; one panel at a time. |
+| long-text | E2 Entities | ✅ covered | Entity names wrap in the row. |
+| empty | E3 Kunden | ✅ covered | Copywriting Kunden empty heading/body; Anlegen stays visible. |
+| loading | E3 Kunden | ✅ covered | Same skeleton/list + submit Spinner pattern as E2. |
+| error | E3 Kunden | ✅ covered | Same ErrorState / field-error / RBAC-hint pattern as E2 (`kunde.write`). |
+| populated | E3 Kunden | ✅ covered | Name rows; selected `bg-muted`; detail under list includes parent entity name. |
+| partial | E3 Kunden | ✅ covered | USt-IdNr. hidden until EU; customer Entity combobox required before other filters apply on invoice, not here. |
+| overflow | E3 Kunden | ✅ covered | Column scrolls; names wrap. |
+| zero-one-many | E3 Kunden | ✅ covered | Zero = empty copy; one or many = stacked rows; one panel. |
+| long-text | E3 Kunden | ✅ covered | Customer names wrap in the row. |
+| empty | E4 Rechnung canvas | ✅ covered | With drafts: empty identity card + empty line list; picker keeps drafts; no illustration (D-07). First-run empty is E7. |
+| loading | E4 Rechnung canvas | ✅ covered | Invoice load: `Skeleton` identity + three line-card placeholders; header Spinner allowed. Autosave: „Speichert…“ + optional 16×16 Spinner; `prefers-reduced-motion: reduce` = no spin. |
+| error | E4 Rechnung canvas | ✅ covered | Load: `ErrorState` + retry. Autosave: Copywriting autosave error; form stays; next debounce retries. Field errors under controls. Write missing: disabled „Neue Rechnung“ + hint. |
+| populated | E4 Rechnung canvas | ✅ covered | Last edited draft (D-17); identity card filled; compact 4-field line cards + „+ Position“. |
+| partial | E4 Rechnung canvas | ✅ covered | Incomplete draft stays; number „Wird vergeben…“ until first autosave; blank new line card visible (not hidden). |
+| overflow | E4 Rechnung canvas | ✅ covered | Left pane scrolls when line cards exceed; identity grid `gap-4`. |
+| zero-one-many | E4 Rechnung canvas | ✅ covered | Zero lines after Neue Rechnung (drafts exist) = empty list + „+ Position“; one or many = cards. |
+| long-text | E4 Rechnung canvas | ✅ covered | Bezeichnung wraps in the card; autosave/error labels wrap, no ellipsis. |
+| loading | E5 Tax rail / `/tax` | ✅ covered | Last good values or em dashes stay; optional Spinner in rail heading; no skeleton swap. |
+| error | E5 Tax rail / `/tax` | ✅ covered | Copywriting tax error in rail and `/tax`; last good TaxDecision kept; typing unrestricted (D-11); „Erneut versuchen“ text-link. |
+| overflow | E5 Tax rail / `/tax` | ✅ covered | Rail scrolls if `legal_reference` exceeds the pane. |
+| long-text | E5 Tax rail / `/tax` | ✅ covered | Legal text and error copy wrap, then scroll. No ellipsis on errors. |
+| empty | E6 Invoice picker | ✅ covered | Combobox empty: „Keine Rechnung passt zur Suche.“ Zero invoices uses E7, not a blank picker-only pane. |
+| loading | E6 Invoice picker | ✅ covered | Trigger stays; list may skeleton inside ComboboxContent while drafts load. |
+| error | E6 Invoice picker | ✅ covered | Draft list fail: ErrorState in main pane; picker trigger remains, not a second error surface. |
+| populated | E6 Invoice picker | ✅ covered | Trigger shows current number or „Neue Rechnung“ if unnumbered; list of drafts. |
+| partial | E6 Invoice picker | ✅ covered | Unnumbered new draft still appears as „Neue Rechnung“ on the trigger. |
+| overflow | E6 Invoice picker | ✅ covered | Combobox list viewport scrolls; trigger truncates with native `title` = full string. |
+| zero-one-many | E6 Invoice picker | ✅ covered | Zero invoices = E7 first-run; one or many = picker lists them. |
+| long-text | E6 Invoice picker | ✅ covered | Trigger truncates + `title`; list rows wrap or scroll inside content. |
+| empty | E7 First-run | ✅ covered | Hero `empty-state-hero.png` + Copywriting empty heading/body; empty form under copy; no „Beispielrechnung anzeigen“ (D-07, D-17). Missing file: keep heading/body/form, do not use login-gate art. |
+| loading | E7 First-run | ✅ covered | Illustration is static asset; no skeleton over the hero. After first persistable keystroke, hide hero and reveal rail. |
+| error | E7 First-run | ✅ covered | Missing `invoice.read`: ErrorState, not this marketing empty. Image 404: copy + empty form remain. |
+| populated | E7 First-run | ✅ covered | Not a populated list; leaving first-run is E4 populated after persist. Hero `alt=""`. |
+| partial | E7 First-run | ✅ covered | Empty identity + empty line list + „+ Position“ sit under copy so the user can start without a second CTA. |
+| overflow | E7 First-run | ✅ covered | Left pane `max-w-xl`; hero `rounded-md`; page column scrolls. |
+| zero-one-many | E7 First-run | ✅ covered | This surface is the zero-invoice layout. One+ invoices never show the hero. |
+| long-text | E7 First-run | ✅ covered | Empty body wraps in the column (Copywriting row). |
+| loading | E8 Session chip / gate | ✅ covered | Phase 2 silent-boot Spinner; success lands on last draft or E7 (D-17), not Phase 1 sample. |
+| error | E8 Session chip / gate | ✅ covered | Phase 2 auth error chrome unchanged. |
+| overflow | E8 Session chip / gate | ✅ covered | Chip footer unchanged; no new overflow. |
+| long-text | E8 Session chip / gate | ✅ covered | Chip truncates as Phase 2; login-gate copy unchanged. |
 
 ---
 
@@ -367,11 +379,11 @@ Phase 1 E1–E10 and Phase 2 E11–E17 remain in force except where this table *
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-08-22 (gsd-ui-checker; spacing BLOCK `py-1.5` snapped to `py-2` in revision 1)
