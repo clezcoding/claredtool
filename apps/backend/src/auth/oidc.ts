@@ -84,6 +84,7 @@ export async function beginAuthorization(redirectUri: string): Promise<{
     url.searchParams.set("state", state);
     return { url, state, codeVerifier };
   }
+  const secret = clientSecret();
   const client = await import("openid-client");
   const codeVerifier = client.randomPKCECodeVerifier();
   const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);
@@ -92,7 +93,7 @@ export async function beginAuthorization(redirectUri: string): Promise<{
     authentikIssuer(),
     process.env.CLIENT_ID ?? "clared",
     undefined,
-    client.ClientSecretPost(clientSecret()),
+    client.ClientSecretPost(secret),
   );
   const url = client.buildAuthorizationUrl(config, {
     redirect_uri: redirectUri,
@@ -112,12 +113,13 @@ export async function authorizationCodeGrant(
   if (testModeEnabled()) {
     return TEST_CLAIMS;
   }
+  const secret = clientSecret();
   const client = await import("openid-client");
   const config = await client.discovery(
     authentikIssuer(),
     process.env.CLIENT_ID ?? "clared",
     undefined,
-    client.ClientSecretPost(clientSecret()),
+    client.ClientSecretPost(secret),
   );
   const tokens = await client.authorizationCodeGrant(config, currentUrl, {
     pkceCodeVerifier: codeVerifier,
