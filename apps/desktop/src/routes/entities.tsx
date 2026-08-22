@@ -2,20 +2,30 @@ import {
   Button,
   Card,
   CardContent,
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
   Input,
   Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
 } from "@clared/ui";
 import { useCallback, useEffect, useState } from "react";
 import { apiFetch } from "../auth/api";
 import { useSession } from "../auth/session-provider";
+import { CreateDisabledButton } from "../components/create-disabled-button";
 import { ErrorState } from "../components/error-state";
 import { Skeleton } from "../components/skeleton";
 import { Spinner } from "../components/spinner";
+import { isEuCountry } from "../data/eu-countries";
+import {
+  COUNTRY_OPTIONS,
+  getCountryLabel,
+  getLegalFormsForCountry,
+  type CountryOption,
+  type LegalFormOption,
+} from "../data/legal-forms";
 
 type EntityRow = {
   id: string;
@@ -30,11 +40,14 @@ type PanelMode = "none" | "detail" | "create";
 
 const CREATE_DEFAULTS = {
   name: "",
-  country: "AT",
-  legalForm: "GmbH",
+  country: "",
+  legalForm: "",
   address: "",
-  vatId: "ATU12345678",
+  vatId: "",
 };
+
+const comboboxTriggerClass =
+  "min-h-11 w-full bg-card text-foreground font-normal hover:bg-muted";
 
 export function EntitiesScreen() {
   const { me } = useSession();
@@ -46,6 +59,7 @@ export function EntitiesScreen() {
   const [panelMode, setPanelMode] = useState<PanelMode>("none");
   const [submitting, setSubmitting] = useState(false);
   const [createForm, setCreateForm] = useState(CREATE_DEFAULTS);
+  const [fieldError, setFieldError] = useState<string | null>(null);
 
   const loadEntities = useCallback(async () => {
     setLoading(true);
@@ -67,23 +81,40 @@ export function EntitiesScreen() {
   }, [loadEntities]);
 
   const selected = entities.find((row) => row.id === selectedId);
+  const selectedCountry =
+    COUNTRY_OPTIONS.find((row) => row.iso === createForm.country) ?? null;
+  const legalFormOptions = createForm.country
+    ? getLegalFormsForCountry(createForm.country)
+    : [];
+  const selectedLegalForm =
+    legalFormOptions.find((row) => row.value === createForm.legalForm) ?? null;
 
   async function handleCreate(event: React.FormEvent) {
     event.preventDefault();
+    setFieldError(null);
     setSubmitting(true);
     try {
+      const body: Record<string, string> = {
+        name: createForm.name,
+        country: createForm.country,
+        legalForm: createForm.legalForm,
+        address: createForm.address,
+      };
+      if (isEuCountry(createForm.country)) {
+        body.vatId = createForm.vatId;
+      }
+
       const res = await apiFetch("/api/entities", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: createForm.name,
-          country: createForm.country,
-          legalForm: createForm.legalForm,
-          address: createForm.address,
-          vatId: createForm.vatId || undefined,
-        }),
+        body: JSON.stringify(body),
       });
-      if (!res.ok) throw new Error("create failed");
+      if (!res.ok) {
+        if (res.status === 400 && isEuCountry(createForm.country)) {
+          setFieldError("USt-IdNr. ist für EU-Länder Pflicht.");
+        }
+        throw new Error("create failed");
+      }
       const created = (await res.json()) as EntityRow;
       await loadEntities();
       setSelectedId(created.id);
@@ -97,35 +128,40 @@ export function EntitiesScreen() {
   function openCreate() {
     setSelectedId(null);
     setPanelMode("create");
+    setFieldError(null);
+    setCreateForm(CREATE_DEFAULTS);
   }
 
   function selectRow(id: string) {
     setSelectedId(id);
     setPanelMode("detail");
+    setFieldError(null);
+  }
+
+  function onCountryChange(country: CountryOption | null) {
+    if (!country) return;
+    setCreateForm((current) => ({
+      ...current,
+      country: country.iso,
+      legalForm: "",
+      vatId: "",
+    }));
+  }
+
+  function onLegalFormChange(form: LegalFormOption | null) {
+    if (!form) return;
+    setCreateForm((current) => ({ ...current, legalForm: form.value }));
   }
 
   return (
     <div className="flex flex-col gap-4 p-6">
       <header className="flex items-start justify-between gap-4">
         <h1 className="text-xl font-semibold">Entities</h1>
-        {canCreate ? (
-          <Button
-            type="button"
-            onClick={openCreate}
-            className="min-h-11 font-semibold"
-          >
-            Anlegen
-          </Button>
-        ) : (
-          <div className="flex flex-col items-end gap-1">
-            <Button type="button" disabled className="min-h-11 font-semibold">
-              Anlegen
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              Nur Inhaber können Entities anlegen.
-            </p>
-          </div>
-        )}
+        <CreateDisabledButton
+          enabled={canCreate}
+          hint="Nur Inhaber können Entities anlegen."
+          onClick={openCreate}
+        />
       </header>
 
       {loadError ? (
@@ -149,7 +185,7 @@ export function EntitiesScreen() {
                 data-testid="entity-row"
                 aria-current={selectedId === row.id ? "true" : undefined}
                 onClick={() => selectRow(row.id)}
-                className={`w-full rounded-md border border-border px-3 py-2 text-left text-sm hover:bg-muted ${
+                className={`w-full rounded-md border border-border px-3 py-2 text-left text-sm break-words hover:bg-muted ${
                   selectedId === row.id ? "bg-muted" : ""
                 }`}
               >
@@ -180,39 +216,56 @@ export function EntitiesScreen() {
               </div>
               <div className="flex flex-col gap-1">
                 <Label htmlFor="entity-country">Land</Label>
-                <Select
-                  value={createForm.country}
-                  onValueChange={(value) =>
-                    setCreateForm((current) => ({ ...current, country: value }))
-                  }
+                <Combobox
+                  items={COUNTRY_OPTIONS}
+                  itemToStringValue={(item) => item.labelDe}
+                  value={selectedCountry}
+                  onValueChange={onCountryChange}
                 >
-                  <SelectTrigger id="entity-country" className="w-full min-h-11">
-                    <SelectValue placeholder="Land wählen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="AT">Österreich</SelectItem>
-                    <SelectItem value="DE">Deutschland</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <ComboboxInput
+                    id="entity-country"
+                    placeholder="Land wählen"
+                    className={comboboxTriggerClass}
+                  />
+                  <ComboboxContent>
+                    <ComboboxEmpty>Kein Land passt zur Suche.</ComboboxEmpty>
+                    <ComboboxList>
+                      {(item) => (
+                        <ComboboxItem key={item.iso} value={item}>
+                          {item.labelDe}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
               </div>
               <div className="flex flex-col gap-1">
                 <Label htmlFor="entity-legal-form">Rechtsform</Label>
-                <Select
-                  value={createForm.legalForm}
-                  onValueChange={(value) =>
-                    setCreateForm((current) => ({
-                      ...current,
-                      legalForm: value,
-                    }))
-                  }
+                <Combobox
+                  items={legalFormOptions}
+                  itemToStringValue={(item) => item.labelDe}
+                  value={selectedLegalForm}
+                  onValueChange={onLegalFormChange}
                 >
-                  <SelectTrigger id="entity-legal-form" className="w-full min-h-11">
-                    <SelectValue placeholder="Rechtsform wählen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="GmbH">GmbH</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <ComboboxInput
+                    id="entity-legal-form"
+                    disabled={!createForm.country}
+                    placeholder={
+                      createForm.country ? "Rechtsform wählen" : "Zuerst Land wählen"
+                    }
+                    className={comboboxTriggerClass}
+                  />
+                  <ComboboxContent>
+                    <ComboboxEmpty>Keine Rechtsform passt zur Suche.</ComboboxEmpty>
+                    <ComboboxList>
+                      {(item) => (
+                        <ComboboxItem key={item.value} value={item}>
+                          {item.labelDe}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
               </div>
               <div className="flex flex-col gap-1">
                 <Label htmlFor="entity-address">Adresse</Label>
@@ -228,20 +281,25 @@ export function EntitiesScreen() {
                   }
                 />
               </div>
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="entity-vat">USt-IdNr.</Label>
-                <Input
-                  id="entity-vat"
-                  required
-                  value={createForm.vatId}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({
-                      ...current,
-                      vatId: event.target.value,
-                    }))
-                  }
-                />
-              </div>
+              {isEuCountry(createForm.country) ? (
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="entity-vat">USt-IdNr.</Label>
+                  <Input
+                    id="entity-vat"
+                    required
+                    value={createForm.vatId}
+                    onChange={(event) =>
+                      setCreateForm((current) => ({
+                        ...current,
+                        vatId: event.target.value,
+                      }))
+                    }
+                  />
+                  {fieldError ? (
+                    <p className="text-xs text-destructive">{fieldError}</p>
+                  ) : null}
+                </div>
+              ) : null}
               <Button
                 type="submit"
                 disabled={submitting}
@@ -257,11 +315,11 @@ export function EntitiesScreen() {
           <CardContent className="flex flex-col gap-2 pt-6 text-sm">
             <div>
               <div className="text-muted-foreground">Name</div>
-              <div>{selected.name}</div>
+              <div className="break-words">{selected.name}</div>
             </div>
             <div>
               <div className="text-muted-foreground">Land</div>
-              <div>{selected.country}</div>
+              <div>{getCountryLabel(selected.country)}</div>
             </div>
             <div>
               <div className="text-muted-foreground">Rechtsform</div>
@@ -269,7 +327,7 @@ export function EntitiesScreen() {
             </div>
             <div>
               <div className="text-muted-foreground">Adresse</div>
-              <div>{selected.address}</div>
+              <div className="break-words">{selected.address}</div>
             </div>
             {selected.vatId ? (
               <div>
