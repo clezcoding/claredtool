@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-keychain-set-session"
+description = "Enables the keychain_set_session command without any pre-configured scope."
+commands.allow = ["keychain_set_session"]
+
+[[permission]]
+identifier = "deny-keychain-set-session"
+description = "Denies the keychain_set_session command without any pre-configured scope."
+commands.deny = ["keychain_set_session"]
