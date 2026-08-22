@@ -6,7 +6,8 @@ export const tauriInvoke = vi.fn(async (cmd: string): Promise<string | null | un
   return undefined;
 });
 
-export const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+export const fetchMock = vi.fn(
+  async (input: RequestInfo | URL, _init?: RequestInit) => {
   const url = String(input);
   if (url.includes("/me")) {
     return new Response(JSON.stringify(signedInOwner), {
@@ -29,7 +30,7 @@ export function resetAuthMocks(): void {
     return undefined;
   });
   fetchMock.mockReset();
-  fetchMock.mockImplementation(async (input: RequestInfo | URL) => {
+  fetchMock.mockImplementation(async (input: RequestInfo | URL, _init?: RequestInit) => {
     const url = String(input);
     if (url.includes("/me")) {
       return new Response(JSON.stringify(signedInOwner), {
