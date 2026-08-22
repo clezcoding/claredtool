@@ -13,6 +13,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
+# Process-wide; only open_login_window loads a data URL (login-init).
 tauri = { version = "2", features = ["webview-data-url"] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
