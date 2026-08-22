@@ -48,12 +48,20 @@ export function endSessionUrl(): string {
   return `${authentik}/application/o/clared/end-session/`;
 }
 
+function testModeEnabled(): boolean {
+  if (process.env.AUTH_TEST_MODE !== "1") return false;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("AUTH_TEST_MODE=1 is forbidden when NODE_ENV=production");
+  }
+  return true;
+}
+
 export async function beginAuthorization(redirectUri: string): Promise<{
   url: URL;
   state: string;
   codeVerifier: string;
 }> {
-  if (process.env.AUTH_TEST_MODE === "1") {
+  if (testModeEnabled()) {
     const state = randomBytes(16).toString("base64url");
     const codeVerifier = randomBytes(32).toString("base64url");
     const backend = process.env.BACKEND_URL ?? "http://localhost:3000";
@@ -87,7 +95,7 @@ export async function authorizationCodeGrant(
   expectedState: string,
   codeVerifier: string,
 ): Promise<OidcClaims> {
-  if (process.env.AUTH_TEST_MODE === "1") {
+  if (testModeEnabled()) {
     return TEST_CLAIMS;
   }
   const client = await import("openid-client");
