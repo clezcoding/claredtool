@@ -11,7 +11,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { fetchMe, redeemTicket, setOnUnauthorized } from "./api";
+import { fetchMe, logoutSession, redeemTicket, replayLastRequest, setOnUnauthorized } from "./api";
 import type { MeResponse } from "./types";
 
 export type SessionState = "boot" | "unsigned" | "signed" | "boot-error";
@@ -91,6 +91,7 @@ export function SessionProvider({
         await invoke("keychain_set_session", { token: nextToken });
         const nextMe = await fetchMe(nextToken);
         applySession(nextToken, nextMe);
+        await replayLastRequest(nextToken).catch(() => undefined);
       } catch {
         setToken(null);
         setMe(null);
@@ -169,6 +170,7 @@ export function SessionProvider({
     }
     setOnUnauthorized(() => {
       setBannerKind("unauthorized");
+      void invoke("open_login_window");
     });
     return () => setOnUnauthorized(undefined);
   }, [state]);
@@ -183,12 +185,27 @@ export function SessionProvider({
   }, []);
 
   const logout = useCallback(async () => {
+    const current = token;
+    try {
+      if (current) {
+        const { endSessionUrl } = await logoutSession(current);
+        await invoke("keychain_delete_session");
+        setToken(null);
+        setMe(null);
+        setState("unsigned");
+        setBannerKind(null);
+        await invoke("open_login_window", { url: endSessionUrl });
+        return;
+      }
+    } catch {
+      /* drop local session even if the API call fails */
+    }
     await invoke("keychain_delete_session").catch(() => undefined);
     setToken(null);
     setMe(null);
     setState("unsigned");
     setBannerKind(null);
-  }, []);
+  }, [token]);
 
   const retryMe = useCallback(async () => {
     setState("boot");

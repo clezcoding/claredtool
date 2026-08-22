@@ -102,17 +102,22 @@ fn allow_navigation(url: &Url, backend_host: Option<&str>, authentik_host: Optio
 }
 
 #[tauri::command]
-async fn open_login_window(app: tauri::AppHandle) -> Result<(), String> {
-    if let Some(existing) = app.get_webview_window(LOGIN_LABEL) {
-        existing.set_focus().map_err(|e| e.to_string())?;
-        return Ok(());
-    }
-
+async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result<(), String> {
     let backend = backend_url();
     let authentik = authentik_url();
     let backend_host = host_of(&backend);
     let authentik_host = host_of(&authentik);
-    let auth_login = format!("{}/auth/login", backend.trim_end_matches('/'));
+    let auth_login = url.unwrap_or_else(|| {
+        format!("{}/auth/login", backend.trim_end_matches('/'))
+    });
+
+    if let Some(existing) = app.get_webview_window(LOGIN_LABEL) {
+        if let Ok(parsed) = Url::parse(&auth_login) {
+            let _ = existing.navigate(parsed);
+        }
+        existing.set_focus().map_err(|e| e.to_string())?;
+        return Ok(());
+    }
     let csp_script = csp_init_script(&backend, &authentik);
 
     let nav_app = app.clone();

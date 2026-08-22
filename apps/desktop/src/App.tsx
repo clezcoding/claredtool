@@ -15,6 +15,8 @@ import { useMemo } from "react";
 import { LoginGate } from "./auth/login-gate";
 import { SessionProvider, useSession } from "./auth/session-provider";
 import { ErrorState } from "./components/error-state";
+import { SessionBanner } from "./components/session-banner";
+import { SessionChip } from "./components/session-chip";
 import { Spinner } from "./components/spinner";
 import { EntitiesScreen } from "./routes/entities";
 import { KundenScreen } from "./routes/kunden";
@@ -31,6 +33,8 @@ const NAV_ITEMS = [
 ] as const;
 
 export function AppShell() {
+  const { me, bannerKind, login, logout, openingLogin } = useSession();
+
   return (
     <div className="flex h-screen bg-background text-foreground">
       <nav className="flex w-48 shrink-0 flex-col gap-1 border-r border-border p-2">
@@ -51,8 +55,20 @@ export function AppShell() {
             {label}
           </NavLink>
         ))}
+        {me ? (
+          <div className="mt-auto">
+            <SessionChip me={me} onLogout={() => void logout()} />
+          </div>
+        ) : null}
       </nav>
       <main className="flex-1 overflow-auto">
+        {bannerKind ? (
+          <SessionBanner
+            kind={bannerKind}
+            onLogin={() => void login()}
+            opening={openingLogin}
+          />
+        ) : null}
         <Outlet />
       </main>
     </div>

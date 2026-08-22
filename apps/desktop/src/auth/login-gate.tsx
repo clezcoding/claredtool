@@ -1,6 +1,7 @@
 import { Button } from "@clared/ui";
 import { invoke } from "@tauri-apps/api/core";
 import { useContext } from "react";
+import { SessionBanner } from "../components/session-banner";
 import { SessionContext } from "./session-provider";
 
 const CTA_CLASS =
@@ -20,7 +21,13 @@ export function LoginGate() {
   return (
     <div className="flex h-screen overflow-auto bg-background text-foreground">
       <div className="m-auto flex w-full max-w-xl flex-col gap-4 px-4 py-16">
-        {session?.banner}
+        {session?.bannerKind ? (
+          <SessionBanner
+            kind={session.bannerKind}
+            onLogin={() => void session.login()}
+            opening={session.openingLogin}
+          />
+        ) : null}
         <img
           src="/login-gate-hero.png"
           alt=""

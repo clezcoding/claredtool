@@ -46,8 +46,10 @@ describe("phase02-auth", () => {
     const specifier = ["..", "components", "session-chip"].join("/");
     const { SessionChip } = await import(specifier);
     render(<SessionChip me={signedInOwner} />);
-    fireEvent.click(screen.getByRole("button", { name: "Ada Owner" }));
-    expect(screen.getByText("Rolle: Inhaber")).toBeTruthy();
+    const trigger = screen.getByRole("button", { name: "Ada Owner" });
+    fireEvent.pointerDown(trigger);
+    fireEvent.click(trigger);
+    expect(await screen.findByText("Rolle: Inhaber")).toBeTruthy();
     expect(screen.getByRole("menuitem", { name: "Abmelden" })).toBeTruthy();
   });
 });

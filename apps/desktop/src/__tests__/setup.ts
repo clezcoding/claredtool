@@ -1,5 +1,5 @@
-import { vi } from "vitest";
-import { fetchMock } from "./auth-test-doubles";
+import { beforeEach, vi } from "vitest";
+import { fetchMock, resetAuthMocks } from "./auth-test-doubles";
 
 const NativeRequest = globalThis.Request;
 
@@ -35,3 +35,21 @@ vi.mock("@tauri-apps/plugin-os", async () => {
 });
 
 globalThis.fetch = fetchMock as typeof fetch;
+
+class ResizeObserverStub {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+globalThis.ResizeObserver = ResizeObserverStub;
+
+for (const proto of [Element.prototype, HTMLElement.prototype]) {
+  proto.hasPointerCapture = () => false;
+  proto.setPointerCapture = () => undefined;
+  proto.releasePointerCapture = () => undefined;
+  proto.scrollIntoView = () => undefined;
+}
+
+beforeEach(() => {
+  resetAuthMocks();
+});
