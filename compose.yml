@@ -56,9 +56,7 @@ services:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2026.8.0}
     restart: unless-stopped
     shm_size: 512mb
-    user: root
     volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
     - ./data:/data
     - ./certs:/certs
     - ./custom-templates:/templates
