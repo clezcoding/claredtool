@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { signedInOwner } from "./auth-signed-in";
 
@@ -17,11 +17,11 @@ const BADGE_LABELS: Record<string, string> = {
   viewer: "Ansicht",
 };
 
-describe.skip("phase02-auth", () => {
+describe("phase02-auth", () => {
   it.each(Object.entries(BADGE_LABELS))(
     "badge for %s is %s",
     async (primaryRole, label) => {
-      const specifier = ["..", "auth", "session-chip"].join("/");
+      const specifier = ["..", "components", "session-chip"].join("/");
       const { SessionChip } = await import(specifier);
       render(
         <SessionChip me={{ ...signedInOwner, primaryRole, groups: [`clared-${primaryRole}`] }} />,
@@ -31,7 +31,7 @@ describe.skip("phase02-auth", () => {
   );
 
   it("falls back to email when name is empty and never shows sub", async () => {
-    const specifier = ["..", "auth", "session-chip"].join("/");
+    const specifier = ["..", "components", "session-chip"].join("/");
     const { SessionChip } = await import(specifier);
     render(
       <SessionChip
@@ -40,5 +40,14 @@ describe.skip("phase02-auth", () => {
     );
     expect(screen.getByText("fallback@clared.test")).toBeTruthy();
     expect(screen.queryByText("must-not-appear")).toBeNull();
+  });
+
+  it("mini-menu shows Rolle then Abmelden", async () => {
+    const specifier = ["..", "components", "session-chip"].join("/");
+    const { SessionChip } = await import(specifier);
+    render(<SessionChip me={signedInOwner} />);
+    fireEvent.click(screen.getByRole("button", { name: "Ada Owner" }));
+    expect(screen.getByText("Rolle: Inhaber")).toBeTruthy();
+    expect(screen.getByRole("menuitem", { name: "Abmelden" })).toBeTruthy();
   });
 });

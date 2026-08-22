@@ -6,9 +6,9 @@ afterEach(() => {
   cleanup();
 });
 
-describe.skip("phase02-auth", () => {
+describe("phase02-auth", () => {
   it("401 banner uses session copy with role alert, not ErrorState copy", async () => {
-    const specifier = ["..", "auth", "session-banner"].join("/");
+    const specifier = ["..", "components", "session-banner"].join("/");
     const { SessionBanner } = await import(specifier);
     render(<SessionBanner kind="unauthorized" />);
     const banner = screen.getByRole("alert");
@@ -18,7 +18,7 @@ describe.skip("phase02-auth", () => {
   });
 
   it("cancel banner uses Anmeldung abgebrochen with role status", async () => {
-    const specifier = ["..", "auth", "session-banner"].join("/");
+    const specifier = ["..", "components", "session-banner"].join("/");
     const { SessionBanner } = await import(specifier);
     render(<SessionBanner kind="cancel" />);
     const banner = screen.getByRole("status");
