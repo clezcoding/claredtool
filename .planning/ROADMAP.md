@@ -99,11 +99,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. User sees live tax preview as invoice facts change (TransactionFacts → TaxDecision: rate, reverse charge, legal text, applied_rule_id)
   5. Live preview comes from an integrated library `evaluate(facts): decision` using TaxRule JSON Schema as SSOT; decision-matrix rule classes produce expected TaxDecisions (collision/priority-tie behavior stays unspecified)
 
-**Plans:** 6 plans
+**Plans:** 1/6 plans executed
 
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Nyquist Wave 0: skip-wrapped Nest e2e + RED tax-engine spec + desktop product specs
+- [x] 03-01-PLAN.md — Nyquist Wave 0: skip-wrapped Nest e2e + RED tax-engine spec + desktop product specs
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -148,5 +148,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Tauri Desktop & Mockup-First UI | 5/5 | Complete    | 2026-08-20 |
 | 2. Self-Hosted Backend & Authentik SSO | 7/7 | Complete    | 2026-08-22 |
-| 3. Entities, Invoices & Live Tax | 0/6 | Not started | - |
+| 3. Entities, Invoices & Live Tax | 1/6 | In Progress|  |
 | 4. PDF, Audit & Offline Sync | 0/? | Not started | - |
