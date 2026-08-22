@@ -1,0 +1,1 @@
+{"content":"Intercept clared:// in login WebView via on_navigation (cancel nav, emit ticket) AND register OS deep-link for cold start. Windows needs single-instance. Create login window with async command to avoid WebView2 deadlock.","source":"web","provider":"websearch","confidence":"MEDIUM","fetched_at":"2026-08-22T00:22:50.058Z","ttl":86400000,"kind":"web"}
