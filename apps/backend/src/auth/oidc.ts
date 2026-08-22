@@ -56,6 +56,14 @@ function testModeEnabled(): boolean {
   return true;
 }
 
+function clientSecret(): string {
+  const secret = process.env.SECRET;
+  if (!secret) {
+    throw new Error("SECRET is required");
+  }
+  return secret;
+}
+
 export async function beginAuthorization(redirectUri: string): Promise<{
   url: URL;
   state: string;
@@ -78,7 +86,7 @@ export async function beginAuthorization(redirectUri: string): Promise<{
     authentikIssuer(),
     process.env.CLIENT_ID ?? "clared",
     undefined,
-    client.ClientSecretPost(process.env.SECRET ?? ""),
+    client.ClientSecretPost(clientSecret()),
   );
   const url = client.buildAuthorizationUrl(config, {
     redirect_uri: redirectUri,
@@ -103,7 +111,7 @@ export async function authorizationCodeGrant(
     authentikIssuer(),
     process.env.CLIENT_ID ?? "clared",
     undefined,
-    client.ClientSecretPost(process.env.SECRET ?? ""),
+    client.ClientSecretPost(clientSecret()),
   );
   const tokens = await client.authorizationCodeGrant(config, currentUrl, {
     pkceCodeVerifier: codeVerifier,

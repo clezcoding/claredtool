@@ -27,10 +27,16 @@ describe("OIDC_SCOPES", () => {
 describe("AUTH_TEST_MODE", () => {
   const origMode = process.env.AUTH_TEST_MODE;
   const origNode = process.env.NODE_ENV;
+  const origSecret = process.env.SECRET;
 
   afterEach(() => {
     process.env.AUTH_TEST_MODE = origMode;
     process.env.NODE_ENV = origNode;
+    if (origSecret === undefined) {
+      delete process.env.SECRET;
+    } else {
+      process.env.SECRET = origSecret;
+    }
   });
 
   it("throws when AUTH_TEST_MODE=1 and NODE_ENV=production", async () => {
@@ -39,5 +45,14 @@ describe("AUTH_TEST_MODE", () => {
     await expect(
       beginAuthorization("http://localhost:3000/auth/callback"),
     ).rejects.toThrow("AUTH_TEST_MODE=1 is forbidden when NODE_ENV=production");
+  });
+
+  it("throws when SECRET is missing outside test mode", async () => {
+    delete process.env.AUTH_TEST_MODE;
+    delete process.env.SECRET;
+    process.env.NODE_ENV = "development";
+    await expect(
+      beginAuthorization("http://localhost:3000/auth/callback"),
+    ).rejects.toThrow("SECRET is required");
   });
 });
