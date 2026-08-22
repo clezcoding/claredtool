@@ -3,6 +3,7 @@ import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import helmet from "helmet";
 import { AppModule } from "./app.module";
+import { setOpenApiDocument } from "./http/docs.controller";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,6 +23,7 @@ async function bootstrap() {
       .addBearerAuth()
       .build(),
   );
+  setOpenApiDocument(document);
   SwaggerModule.setup("api/docs", app, document, {
     jsonDocumentUrl: "openapi.json",
   });

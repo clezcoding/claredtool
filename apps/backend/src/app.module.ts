@@ -4,6 +4,7 @@ import { TerminusModule } from "@nestjs/terminus";
 import { AuthController } from "./auth/auth.controller";
 import { AuthGuard } from "./auth/auth.guard";
 import { CatchAllController } from "./http/catch-all.controller";
+import { DocsController } from "./http/docs.controller";
 import { HealthController } from "./health/health.controller";
 import { MeController } from "./me/me.controller";
 import { PrismaService } from "./prisma/prisma.service";
@@ -15,6 +16,7 @@ import { KEY_VALUE_STORE, RedisService, createKeyValueStore } from "./redis/redi
     HealthController,
     AuthController,
     MeController,
+    DocsController,
     CatchAllController,
   ],
   providers: [
