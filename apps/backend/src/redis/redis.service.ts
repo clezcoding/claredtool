@@ -38,6 +38,10 @@ class RedisStore implements KeyValueStore {
     return this.redis.getdel(key);
   }
 
+  ping() {
+    return this.redis.ping();
+  }
+
   quit() {
     return this.redis.quit();
   }
@@ -74,6 +78,10 @@ export class RedisService implements OnModuleDestroy {
 
   getdel(key: string) {
     return this.store.getdel(key);
+  }
+
+  ping() {
+    return this.store.ping();
   }
 
   async onModuleDestroy(): Promise<void> {

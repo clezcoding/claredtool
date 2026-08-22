@@ -1,7 +1,8 @@
 import { Controller, Get } from "@nestjs/common";
-import { HealthCheck, HealthCheckService, PrismaHealthIndicator } from "@nestjs/terminus";
+import { HealthCheck, HealthCheckService, HealthIndicatorResult, PrismaHealthIndicator } from "@nestjs/terminus";
 import { Public } from "../auth/public.decorator";
 import { PrismaService } from "../prisma/prisma.service";
+import { RedisService } from "../redis/redis.service";
 
 @Controller("health")
 export class HealthController {
@@ -9,6 +10,7 @@ export class HealthController {
     private readonly health: HealthCheckService,
     private readonly prismaHealth: PrismaHealthIndicator,
     private readonly prisma: PrismaService,
+    private readonly redis: RedisService,
   ) {}
 
   @Public()
@@ -23,6 +25,10 @@ export class HealthController {
   ready() {
     return this.health.check([
       () => this.prismaHealth.pingCheck("postgres", this.prisma, { timeout: 400 }),
+      async (): Promise<HealthIndicatorResult> => {
+        await this.redis.ping();
+        return { redis: { status: "up" } };
+      },
     ]);
   }
 }

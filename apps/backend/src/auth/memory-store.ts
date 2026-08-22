@@ -11,6 +11,7 @@ export type KeyValueStore = {
   get(key: string): Promise<string | null>;
   del(key: string): Promise<number>;
   getdel(key: string): Promise<string | null>;
+  ping(): Promise<string>;
 };
 
 export class MemoryStore implements KeyValueStore {
@@ -63,6 +64,10 @@ export class MemoryStore implements KeyValueStore {
     }
     this.map.delete(key);
     return entry.value;
+  }
+
+  async ping(): Promise<string> {
+    return "PONG";
   }
 
   private purge(key: string): void {
