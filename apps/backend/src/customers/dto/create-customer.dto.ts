@@ -1,4 +1,5 @@
-import { IsOptional, IsString, IsUUID } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, IsUUID, ValidateIf } from "class-validator";
+import { isEuCountry } from "../../common/eu-countries";
 
 export class CreateCustomerDto {
   @IsUUID()
@@ -13,7 +14,8 @@ export class CreateCustomerDto {
   @IsString()
   address!: string;
 
-  @IsOptional()
+  @ValidateIf((dto: CreateCustomerDto) => isEuCountry(dto.country))
+  @IsNotEmpty()
   @IsString()
   vatId?: string;
 }

@@ -1,4 +1,5 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, ValidateIf } from "class-validator";
+import { isEuCountry } from "../../common/eu-countries";
 
 export class CreateEntityDto {
   @IsString()
@@ -13,7 +14,8 @@ export class CreateEntityDto {
   @IsString()
   address!: string;
 
-  @IsOptional()
+  @ValidateIf((dto: CreateEntityDto) => isEuCountry(dto.country))
+  @IsNotEmpty()
   @IsString()
   vatId?: string;
 

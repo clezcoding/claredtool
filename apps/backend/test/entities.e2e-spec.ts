@@ -30,6 +30,7 @@ const ENTITY_BODY = {
   country: "AT",
   legalForm: "GmbH",
   address: "Mariahilfer Straße 1, 1060 Wien",
+  vatId: "ATU12345678",
 };
 
 const CUSTOMER_BODY = {
@@ -165,6 +166,49 @@ describe("phase03-product", () => {
         .expect(201);
 
       expect(first.body.id).not.toBe(second.body.id);
+    });
+
+    it("owner POST /api/entities with DE and empty vatId returns 400", () => {
+      return request(app.getHttpServer())
+        .post("/api/entities")
+        .set("Authorization", `Bearer ${ownerToken}`)
+        .send({
+          name: "Missing VAT GmbH",
+          country: "DE",
+          legalForm: "GmbH",
+          address: "Teststraße 1, 10115 Berlin",
+        })
+        .expect(400);
+    });
+
+    it("owner POST /api/entities with US and empty vatId returns 201", async () => {
+      const res = await request(app.getHttpServer())
+        .post("/api/entities")
+        .set("Authorization", `Bearer ${ownerToken}`)
+        .send({
+          name: "US Corp",
+          country: "US",
+          legalForm: "LLC",
+          address: "1 Main St, Wilmington, DE",
+        })
+        .expect(201);
+
+      expect(res.body.id).toEqual(expect.any(String));
+      expect(res.body.country).toBe("US");
+    });
+
+    it("owner POST /api/entities with DE and legalForm LLC returns 422", () => {
+      return request(app.getHttpServer())
+        .post("/api/entities")
+        .set("Authorization", `Bearer ${ownerToken}`)
+        .send({
+          name: "Invalid Form GmbH",
+          country: "DE",
+          legalForm: "LLC",
+          address: "Teststraße 1, 10115 Berlin",
+          vatId: "DE123456789",
+        })
+        .expect(422);
     });
   });
 });
