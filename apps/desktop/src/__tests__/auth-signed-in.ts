@@ -12,6 +12,12 @@ export const signedInOwner: MeResponse = {
   email: "owner@clared.test",
   name: "Ada Owner",
   groups: ["clared-owner"],
-  permissions: [],
+  permissions: [
+    "entity.create",
+    "kunde.write",
+    "invoice.write",
+    "invoice.read",
+    "tax.evaluate",
+  ],
   primaryRole: "owner",
 };
