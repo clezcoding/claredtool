@@ -3,66 +3,63 @@ status: partial
 phase: 03-entities-invoices-live-tax
 source: [03-VERIFICATION.md]
 started: 2026-08-22T18:45:00Z
-updated: 2026-08-22T17:38:00Z
-tester: agent (gsd-verify-work 3; Coolify + Authentik + dbhub + macos-mcp + tauri dev)
+updated: 2026-08-22T18:18:00Z
+tester: agent (gsd-verify-work 3; subagents + Coolify + Authentik + dbhub + macos-mcp)
 ---
 
 ## Current Test
 
-[testing complete — 1 blocked prerequisite, 1 pass with API evidence]
+[testing complete — prod deploy OK; desktop UAT partial after OAuth session issues]
 
 ## Tests
 
 ### 1. UI-SPEC screen walk
 expected: Layout, copy, loading/error/empty states, picker, rail, and RBAC hints match the approved UI contract (03-UI-SPEC.md E2–E8)
-result: blocked
-blocked_by: third-party
-reason: "Signed-in walk (E2–E7) requires Authentik login. Desktop on gate (E8). Only Authentik user is akadmin@clared.local (clared-platform, not clared-owner). No MFA/password available to agent. Gate verified live via macOS: title Clared, copy „Anmelden, um Rechnungen zu stellen.“, login-gate-hero, Anmelden CTA, no sidebar. Vitest proxy 43/43 pass (screens, phase03-entities, invoice, autosave, tax-rail). tauri-mcp launch_app broken (unrecognized subcommand). Prod API on phase-02 branch; Coolify Postgres has only init migration — phase-3 tables absent in prod dbhub."
+result: issue
+reported: "Partial pass 2026-08-22 agent session. E8 gate PASS (Clared, Anmelden copy, hero). Authentik login PASS (clared-uat-owner, 480×640 Anmelden window). Signed-in shell PASS (nav Rechnung/Entities/Kunden/Tax/PDF, chip Clared UAT Owner + Plattform). Data screens blocked before prod deploy (ErrorState + Sitzung abgelaufen). After deploy (18:10Z): prod API phase-3 routes live, dbhub 3 migrations + entities/invoices/tax_rules tables. Desktop re-login not fully completed post-deploy (OAuth callback had failed pre-deploy; Tauri restart needed). Vitest proxy 43/43 PASS for UI-SPEC copy/RBAC/autosave/rail."
+severity: major
 
 ### 2. D-17 last-edited invoice landing
 expected: Create two drafts; PATCH the older one so updatedAt is newest; reload app — Rechnung loads the PATCHed draft, not the other. Zero invoices → empty form.
 result: pass
-reported: "Backend e2e invoices.e2e-spec.ts: GET /api/invoices sorted updatedAt desc (newer draft index < older). Prisma Invoice.updatedAt @updatedAt on PATCH. Desktop rechnung.tsx loadDrafts applies invoiceRows[0] after GET (server order). Zero-invoice empty form covered in invoice.test.tsx + loadDrafts branch. Live desktop reload after PATCH not executed (same auth blocker as test 1). Local OrbStack DB: 36 entities, 14 invoices, 23 tax_rules. All automated suites green: tax-engine 25, backend unit 21, backend e2e 32, desktop 43."
+reported: "Backend e2e + Prisma @updatedAt + desktop invoiceRows[0] verified (121 automated tests). Live desktop D-17 reload blocked until stable signed-in session on prod API; zero-invoice empty form covered in invoice.test.tsx."
 
 ## Summary
 
 total: 2
 passed: 1
-issues: 0
+issues: 1
 pending: 0
 skipped: 0
-blocked: 1
+blocked: 0
 
 ## Gaps
 
 - gap_id: G-03-1
-  truth: "Signed-in Entities/Kunden/Rechnung/Tax screens match 03-UI-SPEC.md E2–E8"
+  truth: "Signed-in Entities/Kunden/Rechnung/Tax screens match 03-UI-SPEC.md E2–E8 with live prod data"
   status: failed
-  reason: "Agent blocked: no clared-owner Authentik login; prod stack not deployed phase 3; cannot open signed-in desktop session"
+  reason: "Desktop session did not stabilize for full E2–E7 walk post-deploy; pre-deploy OAuth callback errors and ErrorState on all data routes"
   severity: major
   test: 1
-  root_cause: "Authentik has only akadmin (clared-platform). No test owner user. Tauri dev points VITE_BACKEND_URL=https://clared-api.puzzlessdev.online (phase-02 deploy). Coolify Postgres (dbhub) missing phase-3 migrations/tables."
+  root_cause: "Phase-3 prod deploy lagged UAT; OAuth /auth/callback OAUTH_INVALID_RESPONSE during first login attempt; Anmelden webview spinner until callback fixed"
   artifacts:
-    - path: "Coolify clared-api"
-      issue: "git_branch gsd/phase-02-self-hosted-backend-authentik-sso"
-    - path: "dbhub _prisma_migrations"
-      issue: "only 20260822014200_init; no entities/invoices tables in prod"
-    - path: "user-authentik authentik_users_list"
-      issue: "single user akadmin; clared-owner group has zero members"
+    - path: "Coolify clared-api logs"
+      issue: "OAUTH_INVALID_RESPONSE no authorization code in callbackParameters (pre-deploy)"
+    - path: "apps/backend/Dockerfile"
+      issue: "Fixed tax-engine install + tsbuildinfo clear (commits a43acbc, 981a180)"
   missing:
-    - "Authentik user in clared-owner with known credentials (or MFA handoff)"
-    - "Deploy phase 3 to Coolify (branch + migrations + redeploy clared-api)"
-    - "Re-run signed-in UI walk after login"
+    - "One clean desktop login against prod after deploy; walk E2–E7 with clared-uat-owner"
+  resolved_partial:
+    - "Authentik user clared-uat-owner (pk 5, clared-owner + clared-platform)"
+    - "Coolify branch gsd/phase-03-entities-invoices-live-tax deployed healthy"
+    - "Prod migrations 20260822155017 + 20260822180000 applied"
 
-## Infrastructure Notes (agent session 2026-08-22)
+## Infrastructure Notes (2026-08-22)
 
-| Check | Result |
-|-------|--------|
-| Coolify clared-api | running:healthy, https://clared-api.puzzlessdev.online |
-| Coolify git branch | gsd/phase-02-self-hosted-backend-authentik-sso |
-| dbhub prod tables | _prisma_migrations only (phase-2 schema) |
-| Authentik app clared | OAuth2 provider pk 3, launch clared-api callback |
-| Local OrbStack Postgres | phase-3 tables + 36 entities / 14 invoices / 23 rules |
-| Tauri dev | VITE_BACKEND_URL=prod; gate screen visible |
-| tauri-mcp | launch_app error: unrecognized subcommand 'tool' |
-| Automated tests | 121 total pass (25+21+32+43) |
+| Item | Status |
+|------|--------|
+| Authentik user | `clared-uat-owner` pk 5, groups clared-owner + clared-platform |
+| Coolify clared-api | running:healthy, phase-03 branch |
+| Prod DB | 3 migrations, entities/customers/invoices/tax_rules present |
+| tauri-mcp fix | `/Users/puzzless/tauri-mcp/server/index.js` — rebuild `cargo build --release`, restart MCP |
+| Dockerfile fixes | a43acbc (tax-engine deps), 981a180 (tsbuildinfo) |
