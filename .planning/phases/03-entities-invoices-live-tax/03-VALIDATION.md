@@ -46,6 +46,7 @@ created: 2026-08-22
 | 03-W0-04 | 00 | 0 | TAX-02 | T-03-04 | evaluate() 23 classes; 0/2 matches throw | unit | `pnpm --filter @clared/tax-engine test` | ❌ W0 | ⬜ pending |
 | 03-W0-05 | 00 | 0 | ENT-01 | T-03-01 | Anlegen disabled without entity.create | unit | `pnpm --filter desktop test -- entities` | ❌ W0 | ⬜ pending |
 | 03-W0-06 | 00 | 0 | TAX-01 | T-03-03 | Desktop keep last good on 422 | unit | `pnpm --filter desktop test -- tax-rail` | ❌ W0 | ⬜ pending |
+| 03-W0-07 | 00 | 0 | INV-01 | T-03-02 | Autosave Speichert/Gespeichert after 600ms | unit | `pnpm --filter desktop test -- phase03-autosave` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -57,7 +58,9 @@ created: 2026-08-22
 - [ ] `apps/backend/test/invoices.e2e-spec.ts` — stubs for INV-01
 - [ ] `apps/backend/test/tax.e2e-spec.ts` — stubs for TAX-01
 - [ ] `packages/tax-engine/src/evaluate.spec.ts` — TAX-02 (23 classes + no unique match)
-- [ ] Desktop vitest for create panel, disabled Anlegen, autosave status, tax error keep-last
+- [ ] `apps/desktop/src/__tests__/phase03-entities.test.tsx` — create panel, disabled Anlegen
+- [ ] `apps/desktop/src/__tests__/phase03-tax-rail.test.tsx` — tax error keep-last
+- [ ] `apps/desktop/src/__tests__/phase03-autosave.test.tsx` — autosave Speichert/Gespeichert (skip-wrapped in 03-01; unsip in 03-05)
 - [ ] `PermissionsGuard` unit spec next to `rbac.spec.ts`
 - [ ] Framework install: none — Jest/Vitest already present; add `ajv` inside tax-engine
 

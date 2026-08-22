@@ -612,26 +612,23 @@ Skip evaluate until seller + customer present; still autosave partial drafts.
 
 **If this table is empty:** All claims in this research were verified or cited — no user confirmation needed.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Exact country → legal-form rows**
+1. **Exact country → legal-form rows** RESOLVED
    - What we know: D-03 two-step picker; ISO stored; German display names (UI-SPEC).
-   - What's unclear: official form names per jurisdiction.
-   - Recommendation: ship a static JSON covering EU-27 + US + AE + a generic “Sonstige” per other ISO country; planner does not scrape government registers.
+   - Locked: static JSON catalog covering EU-27 + US + AE plus a single Sonstige row per other ISO country (03-03 Task 1, D-03, A2). No government-register scrape.
 
-2. **GET/PATCH surface vs PRD examples**
+2. **GET/PATCH surface vs PRD examples** RESOLVED
    - What we know: PRD lists `POST /api/invoices`, `GET /api/invoices/:id`, `POST /api/tax/evaluate`, `GET /api/entities`.
-   - What's unclear: list + update + customers + entity create paths are required by D-01/D-05/D-08 but not named.
-   - Recommendation: add `POST /api/entities`, `GET /api/entities/:id`, `POST /api/customers`, `GET /api/customers?entityId=`, `GET /api/invoices`, `PATCH /api/invoices/:id`. Keep PRD four as the documented core.
+   - Locked: extra routes `POST /api/entities`, `GET /api/entities/:id`, `POST /api/customers`, `GET /api/customers?entityId=`, `GET /api/invoices`, `PATCH /api/invoices/:id` (03-02 create/GET-by-id; 03-05 list+PATCH; A9). PRD four remain the documented core.
 
-3. **Root glossary vs Phase 3 tax grain**
+3. **Root glossary vs Phase 3 tax grain** RESOLVED
    - What we know: `CONTEXT.md` says TaxDecision **pro Position**; Phase 1/3 UI is document-level (D-12).
-   - What's unclear: when per-line tax returns.
-   - Recommendation: honor D-12 this phase; do not add Leistungsart on line cards.
+   - Locked: honor D-12 this phase; invoice-level `supplyType` default `service` hidden; no Leistungsart on line cards.
 
-4. **Prisma pool size**
+4. **Prisma pool size** RESOLVED
    - What we know: `max: 1` today.
-   - Recommendation: raise in the schema/product plan (not a user-facing decision).
+   - Locked: PrismaPg pool `max: 10` in `prisma.service.ts` (03-02, Pitfall 4).
 
 ## Environment Availability
 
@@ -693,7 +690,9 @@ Existing tests that **must be rewritten** (will go red when Demo/sample landing 
 - [ ] `apps/backend/test/invoices.e2e-spec.ts` — INV-01
 - [ ] `apps/backend/test/tax.e2e-spec.ts` — TAX-01
 - [ ] `packages/tax-engine/src/evaluate.spec.ts` — TAX-02 (23 classes + no unique match)
-- [ ] Desktop vitest for create panel, disabled Anlegen, autosave status, tax error keep-last
+- [ ] `apps/desktop/src/__tests__/phase03-entities.test.tsx` — create panel, disabled Anlegen
+- [ ] `apps/desktop/src/__tests__/phase03-tax-rail.test.tsx` — tax error keep-last
+- [ ] `apps/desktop/src/__tests__/phase03-autosave.test.tsx` — autosave status (skip until 03-05)
 - [ ] `PermissionsGuard` unit spec next to `rbac.spec.ts`
 - [ ] Framework install: none — Jest/Vitest already present; add `ajv` inside tax-engine
 
