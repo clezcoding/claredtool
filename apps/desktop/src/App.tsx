@@ -12,6 +12,10 @@ import {
   createHashRouter,
 } from "react-router";
 import { useMemo } from "react";
+import { LoginGate } from "./auth/login-gate";
+import { SessionProvider, useSession } from "./auth/session-provider";
+import { ErrorState } from "./components/error-state";
+import { Spinner } from "./components/spinner";
 import { EntitiesScreen } from "./routes/entities";
 import { KundenScreen } from "./routes/kunden";
 import { PdfScreen } from "./routes/pdf";
@@ -55,7 +59,8 @@ export function AppShell() {
   );
 }
 
-export default function App() {
+function AuthenticatedApp() {
+  const { state, retryMe } = useSession();
   const router = useMemo(
     () =>
       createHashRouter([
@@ -74,5 +79,33 @@ export default function App() {
     [],
   );
 
+  if (state === "boot") {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (state === "boot-error") {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <ErrorState onRetry={() => void retryMe()} />
+      </div>
+    );
+  }
+
+  if (state === "unsigned") {
+    return <LoginGate />;
+  }
+
   return <RouterProvider router={router} />;
+}
+
+export default function App() {
+  return (
+    <SessionProvider>
+      <AuthenticatedApp />
+    </SessionProvider>
+  );
 }

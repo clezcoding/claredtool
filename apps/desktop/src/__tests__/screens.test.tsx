@@ -10,6 +10,9 @@ afterEach(() => {
 async function openScreen(linkLabel: string, heading: string) {
   window.location.hash = "#/";
   render(<App />);
+  await waitFor(() => {
+    expect(screen.getByRole("navigation")).toBeTruthy();
+  });
   fireEvent.click(screen.getByRole("link", { name: linkLabel }));
   await waitFor(() => {
     expect(

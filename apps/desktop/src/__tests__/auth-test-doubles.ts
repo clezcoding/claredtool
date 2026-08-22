@@ -1,7 +1,7 @@
 import { vi } from "vitest";
 import { signedInOwner } from "./auth-signed-in";
 
-export const tauriInvoke = vi.fn(async (cmd: string) => {
+export const tauriInvoke = vi.fn(async (cmd: string): Promise<string | null | undefined> => {
   if (cmd === "keychain_get_session") return "test-token";
   return undefined;
 });
@@ -24,7 +24,7 @@ export const hostnameMock = vi.fn(async () => "test-host");
 
 export function resetAuthMocks(): void {
   tauriInvoke.mockReset();
-  tauriInvoke.mockImplementation(async (cmd: string) => {
+  tauriInvoke.mockImplementation(async (cmd: string): Promise<string | null | undefined> => {
     if (cmd === "keychain_get_session") return "test-token";
     return undefined;
   });

@@ -1,6 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { signedInOwner } from "./auth-signed-in";
 import { fetchMock, resetAuthMocks, tauriInvoke } from "./auth-test-doubles";
 
 afterEach(() => {
@@ -46,24 +45,11 @@ describe("phase02-auth", () => {
   });
 
   it("boot with keychain token shows Wird geladen then the sample invoice", async () => {
-    let resolveMe!: (value: Response) => void;
-    fetchMock.mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          resolveMe = resolve;
-        }),
-    );
     window.location.hash = "#/";
     const { default: App } = await import("../App");
     render(<App />);
     expect(screen.getByText("Wird geladen")).toBeTruthy();
     expect(screen.queryByRole("navigation")).toBeNull();
-    resolveMe(
-      new Response(JSON.stringify(signedInOwner), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
     await waitFor(() => {
       expect(screen.getByText("RE-2026-001")).toBeTruthy();
     });

@@ -6,16 +6,40 @@ const BASE =
 
 export type OnUnauthorized = () => void;
 
+export type LastRequest = { path: string; init?: RequestInit };
+
 let onUnauthorized: OnUnauthorized | undefined;
+let lastRequest: LastRequest | undefined;
 
 export function setOnUnauthorized(cb: OnUnauthorized | undefined): void {
   onUnauthorized = cb;
+}
+
+export function getLastRequest(): LastRequest | undefined {
+  return lastRequest;
+}
+
+export async function replayLastRequest(token: string): Promise<Response | undefined> {
+  if (!lastRequest) return undefined;
+  const headers = new Headers(lastRequest.init?.headers);
+  headers.set("Authorization", `Bearer ${token}`);
+  return apiFetch(lastRequest.path, { ...lastRequest.init, headers });
+}
+
+export class ApiError extends Error {
+  readonly status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
 }
 
 export async function apiFetch(
   path: string,
   init?: RequestInit,
 ): Promise<Response> {
+  lastRequest = { path, init };
   const res = await fetch(`${BASE}${path}`, init);
   if (res.status === 401) {
     onUnauthorized?.();
@@ -33,7 +57,7 @@ export async function redeemTicket(
     body: JSON.stringify({ ticket, hostname }),
   });
   if (!res.ok) {
-    throw new Error(`redeemTicket failed: ${res.status}`);
+    throw new ApiError(res.status, `redeemTicket failed: ${res.status}`);
   }
   return (await res.json()) as { token: string };
 }
@@ -43,7 +67,7 @@ export async function fetchMe(token: string): Promise<MeResponse> {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) {
-    throw new Error(`fetchMe failed: ${res.status}`);
+    throw new ApiError(res.status, `fetchMe failed: ${res.status}`);
   }
   return (await res.json()) as MeResponse;
 }
