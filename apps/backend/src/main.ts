@@ -7,9 +7,13 @@ import { AppModule } from "./app.module";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(helmet());
-  app.enableCors({
-    origin: process.env.CORS_ORIGINS?.split(",") ?? true,
-  });
+  const origins = process.env.CORS_ORIGINS?.split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (!origins?.length) {
+    throw new Error("CORS_ORIGINS is required");
+  }
+  app.enableCors({ origin: origins });
   const document = SwaggerModule.createDocument(
     app,
     new DocumentBuilder()
