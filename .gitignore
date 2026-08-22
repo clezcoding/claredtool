@@ -18,3 +18,7 @@ apps/desktop/src-tauri/gen/schemas
 .cursor/mcp.json
 .planning/tmp/
 .gsd/
+
+# Nest / Prisma
+apps/backend/.env
+apps/backend/src/generated/

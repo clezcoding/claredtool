@@ -1,9 +1,17 @@
 import { INestApplication } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
-import * as request from "supertest";
+import request from "supertest";
 import { AppModule } from "../src/app.module";
 import { SESSION_TTL_SECONDS, TICKET_TTL_SECONDS } from "../src/auth/ttl";
 import { MemoryStore } from "../src/auth/memory-store";
+import { RedisService } from "../src/redis/redis.service";
+
+const TICKET_CLAIMS = JSON.stringify({
+  sub: "auth0|owner",
+  email: "owner@clared.test",
+  name: "Ada Owner",
+  groups: ["clared-owner"],
+});
 
 describe("Auth (e2e)", () => {
   let app: INestApplication;
@@ -13,12 +21,21 @@ describe("Auth (e2e)", () => {
       imports: [AppModule],
     }).compile();
     app = moduleFixture.createNestApplication();
-    await app.init();
+    await app.listen(0);
+    const redis = app.get(RedisService);
+    for (const id of [
+      "replay-ticket",
+      "parallel-ticket",
+      "logout-ticket-a",
+      "logout-ticket-b",
+    ]) {
+      await redis.set(`ticket:${id}`, TICKET_CLAIMS, "EX", 60, "NX");
+    }
   });
 
   afterAll(async () => {
     await app.close();
-  });
+  }, 15000);
 
   it("GET /me without Authorization returns 401", () => {
     return request(app.getHttpServer()).get("/me").expect(401);

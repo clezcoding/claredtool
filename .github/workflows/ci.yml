@@ -30,3 +30,7 @@ jobs:
       - run: pnpm --filter ./apps/desktop exec tsc --noEmit
 
       - run: pnpm --filter ./apps/desktop test
+
+      - run: pnpm --filter ./apps/backend test:e2e
+
+      - run: pnpm --filter ./apps/backend test -- rbac

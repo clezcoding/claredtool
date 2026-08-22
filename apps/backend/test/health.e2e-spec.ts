@@ -1,6 +1,6 @@
 import { INestApplication } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
-import * as request from "supertest";
+import request from "supertest";
 import { AppModule } from "../src/app.module";
 
 describe("Health (e2e)", () => {
@@ -11,12 +11,12 @@ describe("Health (e2e)", () => {
       imports: [AppModule],
     }).compile();
     app = moduleFixture.createNestApplication();
-    await app.init();
+    await app.listen(0);
   });
 
   afterAll(async () => {
     await app.close();
-  });
+  }, 15000);
 
   it("GET /health returns 200 with no Postgres I/O", () => {
     return request(app.getHttpServer()).get("/health").expect(200);

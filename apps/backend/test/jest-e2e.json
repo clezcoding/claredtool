@@ -3,6 +3,9 @@
   "rootDir": "..",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
+  "setupFiles": ["reflect-metadata"],
+  "forceExit": true,
+  "detectOpenHandles": false,
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   }
