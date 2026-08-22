@@ -44,10 +44,14 @@ class RedisStore implements KeyValueStore {
 }
 
 export function createKeyValueStore(): KeyValueStore {
-  if (process.env.NODE_ENV === "test" || !process.env.REDIS_URL) {
+  if (process.env.NODE_ENV === "test") {
     return new MemoryStore();
   }
-  return new RedisStore(new Redis(process.env.REDIS_URL));
+  const url = process.env.REDIS_URL;
+  if (!url) {
+    throw new Error("REDIS_URL is required");
+  }
+  return new RedisStore(new Redis(url));
 }
 
 @Injectable()
