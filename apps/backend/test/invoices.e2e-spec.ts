@@ -90,6 +90,7 @@ describe("phase03-product", () => {
           country: "AT",
           legalForm: "GmbH",
           address: "Teststraße 1",
+          vatId: "ATU12345678",
         })
         .expect(201);
       entityId = entity.body.id as string;
