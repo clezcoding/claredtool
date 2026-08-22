@@ -21,8 +21,8 @@ created: 2026-08-22
 |----------|-------|
 | **Framework** | Vitest 4.1.10 + Testing Library (desktop); Nest `@nestjs/testing` 11.2.1 + `supertest` (backend) |
 | **Config file** | `apps/desktop/vitest.config.ts` (existing); backend none yet — Wave 0 `apps/backend/package.json` script `test` |
-| **Quick run command** | `pnpm --filter ./apps/desktop test` and/or `pnpm --filter ./apps/backend test` |
-| **Full suite command** | `pnpm --filter ./apps/desktop test && pnpm --filter ./apps/backend test` |
+| **Quick run command** | `pnpm --filter ./apps/desktop test` and/or `pnpm --filter ./apps/backend test` (unit) plus `pnpm --filter ./apps/backend test:e2e` (health/auth) |
+| **Full suite command** | `pnpm --filter ./apps/desktop test && pnpm --filter ./apps/backend test && pnpm --filter ./apps/backend test:e2e` |
 | **Estimated runtime** | ~30 seconds |
 
 ---
@@ -40,17 +40,17 @@ created: 2026-08-22
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 02-W0-01 | 00 | 0 | BACK-01 | — | Nest app + `test` script exist | infra | `pnpm --filter ./apps/backend test` | ❌ W0 | ⬜ pending |
-| 02-health | 01 | 1 | BACK-01 | — | `GET /health` 200 without DB | e2e | `pnpm --filter ./apps/backend test -- health` | ❌ W0 | ⬜ pending |
-| 02-ready | 01 | 1 | BACK-01 | — | `GET /health/ready` 200 with Postgres (or 503 if down) | e2e | `pnpm --filter ./apps/backend test -- health` | ❌ W0 | ⬜ pending |
-| 02-401 | 01 | 1 | BACK-01 | T-unauth | Unauthenticated `GET /me` and `GET /api/invoices` → 401 | e2e | `pnpm --filter ./apps/backend test -- auth` | ❌ W0 | ⬜ pending |
-| 02-rbac | 02 | 1 | AUTH-01 | T-rbac | Group union + `primaryRole` precedence | unit | `pnpm --filter ./apps/backend test -- rbac` | ❌ W0 | ⬜ pending |
-| 02-ticket | 02 | 1 | AUTH-01 | T-replay | Ticket one-time: second `POST /auth/session` 401 | unit/e2e | `pnpm --filter ./apps/backend test -- ticket` | ❌ W0 | ⬜ pending |
-| 02-session | 02 | 1 | AUTH-01 | T-session | Session EX 86400 / logout DEL | unit | `pnpm --filter ./apps/backend test -- ticket` | ❌ W0 | ⬜ pending |
-| 02-gate | 03 | 2 | AUTH-01 | — | Gate copy + Anmelden; no shell | unit | `pnpm --filter ./apps/desktop test` | ❌ W0 | ⬜ pending |
-| 02-chip | 03 | 2 | AUTH-01 | — | Chip badge German labels | unit | `pnpm --filter ./apps/desktop test` | ❌ W0 | ⬜ pending |
-| 02-banner | 03 | 2 | AUTH-01 | — | 401 banner vs `ErrorState` network | unit | `pnpm --filter ./apps/desktop test` | ❌ W0 | ⬜ pending |
-| 02-boot | 03 | 2 | AUTH-01 | — | Silent boot spinner `sr-only` „Wird geladen“ | unit | `pnpm --filter ./apps/desktop test` | partial ✅ | ⬜ pending |
+| 02-W0-01 | 02-01 | 1 | BACK-01 | — | Nest app + `test` and `test:e2e` scripts exist | infra | `node -e 'const p=require("./apps/backend/package.json"); if(!p.scripts.test\|\|!p.scripts["test:e2e"]) process.exit(1)'` | ❌ W0 | ⬜ pending |
+| 02-health | 02-02 | 2 | BACK-01 | — | `GET /health` 200 without DB | e2e | `pnpm --filter ./apps/backend test:e2e -- health` | ❌ W0 | ⬜ pending |
+| 02-ready | 02-02 | 2 | BACK-01 | — | `GET /health/ready` 200 with Postgres (or 503 if down) | e2e | `pnpm --filter ./apps/backend test:e2e -- health` | ❌ W0 | ⬜ pending |
+| 02-401 | 02-02 | 2 | BACK-01 | T-unauth | Unauthenticated `GET /me` and `GET /api/invoices` → 401 | e2e | `pnpm --filter ./apps/backend test:e2e -- auth` | ❌ W0 | ⬜ pending |
+| 02-rbac | 02-02 | 2 | AUTH-01 | T-rbac | Group union + `primaryRole` precedence | unit | `pnpm --filter ./apps/backend test -- rbac` | ❌ W0 | ⬜ pending |
+| 02-ticket | 02-02 | 2 | AUTH-01 | T-replay | Ticket one-time + parallel GETDEL: second/loser `POST /auth/session` 401 | e2e | `pnpm --filter ./apps/backend test:e2e -- auth` | ❌ W0 | ⬜ pending |
+| 02-session | 02-02 | 2 | AUTH-01 | T-session | Ticket EX 60 / session EX 86400 / logout DEL this device | e2e | `pnpm --filter ./apps/backend test:e2e -- auth` | ❌ W0 | ⬜ pending |
+| 02-gate | 02-04 | 3 | AUTH-01 | — | Gate copy + Anmelden; no shell | unit | `pnpm --filter ./apps/desktop test -- auth-gate` | ❌ W0 | ⬜ pending |
+| 02-chip | 02-04 | 3 | AUTH-01 | — | Chip badge German labels | unit | `pnpm --filter ./apps/desktop test -- session-chip` | ❌ W0 | ⬜ pending |
+| 02-banner | 02-04 | 3 | AUTH-01 | — | 401 banner vs `ErrorState` network | unit | `pnpm --filter ./apps/desktop test -- session-banner` | ❌ W0 | ⬜ pending |
+| 02-boot | 02-04 | 3 | AUTH-01 | — | Silent boot spinner `sr-only` „Wird geladen“ | unit | `pnpm --filter ./apps/desktop test` | partial ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 

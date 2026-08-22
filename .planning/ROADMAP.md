@@ -74,6 +74,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Wave 3** *(blocked on Wave 2 completion)*
 
 - [ ] 02-04-PLAN.md — Gate, session chip, banners, Higgsfield hero
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 02-05-PLAN.md — openid-client + vendor Authentik compose.yml + blueprint
 
 **UI hint**: yes

@@ -207,11 +207,12 @@ pnpm --filter ./apps/backend add -D prisma@7.9.1 @nestjs/cli@11.0.24 @nestjs/tes
 **Desktop:**
 
 ```bash
-pnpm --filter ./apps/desktop add @tauri-apps/plugin-deep-link@2.4.9
+pnpm --filter ./apps/desktop add @tauri-apps/plugin-deep-link@2.4.9 @tauri-apps/plugin-os@2
 # in apps/desktop/src-tauri:
 #   cargo add tauri-plugin-deep-link@2
 #   cargo add tauri-plugin-single-instance@2 --features deep-link
 #   cargo add keyring@4
+#   cargo add tauri-plugin-os@2
 ```
 
 **Version verification (this session):** `npm view` 2026-08-22 as table above. Prisma engines: `node: '^20.19 || ^22.12 || >=24.0'` — local Node v26.7.0 satisfies. Nest engines: `node: '>= 20'`.
@@ -634,22 +635,22 @@ UI-SPEC locked [VERIFIED: 02-UI-SPEC.md:256-269]: CLI `higgsfield`, model `gpt_i
 
 A1 and A2 need executor verification, not a discuss-phase reopen, unless `/me.groups` is empty after blueprint apply.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Prod URLs and Coolify env**
    - What we know: Nest env names `AUTHENTIK_URL`, `CLIENT_ID`, `SECRET`; desktop `BACKEND_URL`. Laptop never sees prod secret (D-13).
    - What's unclear: Actual hostnames (`https://…`).
-   - Recommendation: `.env.example` with local OrbStack defaults; Coolify env in UI. Planner does not invent production FQDNs.
+   - Recommendation: `.env.example` with local OrbStack defaults; Coolify env in UI. Planner does not invent production FQDNs. **RESOLVED**
 
 2. **Swagger JSON exact path**
    - What we know: D-05 wants `/api/docs` + `openapi.json`. Nest `jsonDocumentUrl` is configurable.
    - What's unclear: Whether Nest prefixes the setup path.
-   - Recommendation: Wave 0 curl both; adjust `jsonDocumentUrl` until `/openapi.json` 200.
+   - Recommendation: Wave 0 curl both; adjust `jsonDocumentUrl` until `/openapi.json` 200. **RESOLVED**
 
 3. **Authentik Coolify one-click vs compose tag**
    - What we know: Local OrbStack uses vendor `compose.yml` `AUTHENTIK_TAG:-2026.8.0`. D-11 same image tags local and prod.
    - What's unclear: Coolify template tag may lag.
-   - Recommendation: Pin `2026.8.0` (or the downloaded compose tag) in Coolify image field.
+   - Recommendation: Pin `2026.8.0` (or the downloaded compose tag) in Coolify image field. **RESOLVED**
 
 ## Environment Availability
 
@@ -693,12 +694,12 @@ Step 2.6: probed this session. Graphify disabled — no graph queries.
 
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| BACK-01 | `GET /health` 200 without DB | e2e | `pnpm --filter ./apps/backend test -- health` | ❌ Wave 0 |
+| BACK-01 | `GET /health` 200 without DB | e2e | `pnpm --filter ./apps/backend test:e2e -- health` | ❌ Wave 0 |
 | BACK-01 | `GET /health/ready` 200 with Postgres (or 503 if down) | e2e | same | ❌ Wave 0 |
-| BACK-01 | Unauthenticated `GET /me` and `GET /api/invoices` → 401 | e2e | `pnpm --filter ./apps/backend test -- auth` | ❌ Wave 0 |
+| BACK-01 | Unauthenticated `GET /me` and `GET /api/invoices` → 401 | e2e | `pnpm --filter ./apps/backend test:e2e -- auth` | ❌ Wave 0 |
 | AUTH-01 | Group union + `primaryRole` precedence | unit | `pnpm --filter ./apps/backend test -- rbac` | ❌ Wave 0 |
-| AUTH-01 | Ticket one-time: second `POST /auth/session` 401 | unit/e2e (fake Redis) | `pnpm --filter ./apps/backend test -- ticket` | ❌ Wave 0 |
-| AUTH-01 | Session EX 86400 / logout DEL | unit (fake Redis) | same | ❌ Wave 0 |
+| AUTH-01 | Ticket one-time: second `POST /auth/session` 401 | e2e (fake Redis) | `pnpm --filter ./apps/backend test:e2e -- auth` | ❌ Wave 0 |
+| AUTH-01 | Session EX 86400 / logout DEL | e2e (fake Redis) | `pnpm --filter ./apps/backend test:e2e -- auth` | ❌ Wave 0 |
 | UI-01 / D-33 | Gate copy + Anmelden; no shell | unit (jsdom) | `pnpm --filter ./apps/desktop test` | ❌ Wave 0 (extend desktop tests) |
 | D-36 | Chip badge German labels | unit | same | ❌ Wave 0 |
 | D-31 | 401 banner vs `ErrorState` network | unit | same | ❌ Wave 0 |
