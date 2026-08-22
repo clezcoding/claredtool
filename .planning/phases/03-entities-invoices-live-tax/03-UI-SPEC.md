@@ -36,7 +36,7 @@ created: 2026-08-22
 | „Neue Rechnung“, owner/write „Anlegen“, empty-form primary | keep `bg-primary`; add `min-h-11 font-semibold` (600) |
 | Disabled „Anlegen“ / disabled „Neue Rechnung“ | keep `bg-primary`; `disabled` + `min-h-11 font-semibold`; hint sits under the button (Label 12px / 400 / `text-muted-foreground`) |
 | Invoice picker trigger, seller/customer/currency/country/legal-form triggers | `min-h-11 bg-card text-foreground font-normal hover:bg-muted` — never `bg-primary` |
-| „+ Position“ | `bg-primary font-semibold` (600), compact `px-3 py-1.5` (not 44px — Phase 1 inherit, list-bottom control) |
+| „+ Position“ | `bg-primary font-semibold` (600), compact `px-4 py-2` (16×8 — not 44px; list-bottom control) |
 
 ---
 
@@ -54,7 +54,7 @@ Declared values (must be multiples of 4):
 | 2xl | 48px | Major section breaks |
 | 3xl | 64px | Page-level spacing, empty-state column |
 
-Exceptions: Interactive header/picker/Anlegen/Neue-Rechnung controls use 44px (`min-h-11`) minimum hit target (not strictly 4-multiple). Do not enlarge Phase 1 nav rows or „+ Position“ to 44px. Line-item hover-X stays 14px icon, visible on hover/focus (Phase 1 D-21).
+Exceptions: Interactive header/picker/Anlegen/Neue-Rechnung controls use 44px (`min-h-11`) minimum hit target (not strictly 4-multiple). Do not enlarge Phase 1 nav rows or „+ Position“ to 44px. Line-item hover-X stays 14px icon, visible on hover/focus (Phase 1 D-21). Phase 1 live `py-1.5` (6px), `gap-3` / `p-3` (12px) are **not** in this scale — snap: „+ Position“ `px-4 py-2`; identity card `grid gap-4`; `LineItemCard` `p-4`. Do not promote 6px or 12px into the scale.
 
 **Source:** Phase 1 UI-SPEC 8-point scale + Phase 2 44px exception. No new scale. Radius: `--radius` / `--radius-md` = 8px. Lists, panels, inputs, pickers, cards use `rounded-md` (8px). Do not introduce a new radius.
 
@@ -107,9 +107,10 @@ Accent reserved for:
 - „+ Position“
 - Active sidebar navigation item (Phase 1 inherit)
 - Empty-state text link (if any remains — this phase has none on Rechnung)
+- Tax-rail / `/tax` text-link „Erneut versuchen“ (`text-primary` underline, not a filled CTA — same class as empty-state text link)
 - Phase 2 gate / 401 / cancel „Anmelden“ (unchanged)
 
-Do **not** put accent on: invoice picker trigger, seller/customer/currency/country/legal-form triggers, selected list row, tax rail, autosave status, disabled Anlegen, PDF peek, session chip, role badge.
+Do **not** put accent on: invoice picker trigger, seller/customer/currency/country/legal-form triggers, selected list row, tax-rail **fill/background** (retry text-link is reserved above), autosave status, disabled Anlegen, PDF peek, session chip, role badge.
 
 **List row hover/selected (Phase 3 correction):** `hover:bg-muted` and selected `bg-muted` + `border-border`. Do not use `hover:bg-accent` on entity/customer/invoice-picker rows (live Phase 1 mock painted primary on hover; that violates the 10% accent list once these lists are real). Nav active state stays `bg-accent` (already reserved).
 
@@ -186,7 +187,7 @@ Failure does not blank the form and does not block typing. Retry on the next deb
 
 **Without `invoice.write`:** picker and fields are read-only; autosave is off; status hidden; „Neue Rechnung“ disabled with the hint above. Tax rail still evaluates if `tax.evaluate` (viewer/auditor).
 
-**Identity card** (new, under header; `Card` + `grid gap-3` like the existing number/date/due card):
+**Identity card** (new, under header; `Card` + `grid gap-4` — snap from Phase 1 live `gap-3`):
 
 | Field | Control | Rules |
 |-------|---------|-------|
@@ -197,7 +198,7 @@ Failure does not blank the form and does not block typing. Retry on the next deb
 | Kunde | Combobox | Required. Disabled until Entity is set. Placeholder „Zuerst Entity wählen“. Options = customers of that entity only (D-02). |
 | Währung | Select | Defaults from seller entity; changeable per invoice (D-20). Options: EUR, USD, AED, plus the entity default if missing from that list. Trigger is secondary (not accent). |
 
-**Line items:** compact cards (Phase 1 D-17–D-21). Four fields stay visible. This phase they are **editable `Input`s** (same chrome as header inputs). Netto is computed read-only. Document-level tax only — no per-line tax on the card. „+ Position“ at list bottom. Hover/focus X deletes the line immediately (no confirm dialog; copy is the accessible name „Position löschen“).
+**Line items:** compact cards (Phase 1 D-17–D-21) with `p-4` (snap from live `p-3`). Four fields stay visible. This phase they are **editable `Input`s** (same chrome as header inputs). Netto is computed read-only. Document-level tax only — no per-line tax on the card. „+ Position“ at list bottom (`px-4 py-2`). Hover/focus X deletes the line immediately (no confirm dialog; copy is the accessible name „Position löschen“).
 
 **Empty form vs first-run illustration:**
 - **Zero invoices (first-run):** reuse `apps/desktop/public/empty-state-hero.png` above the empty form in the left pane (`max-w-xl`, `rounded-md`, `alt=""`). Heading + body from Copywriting empty rows. **Remove** „Beispielrechnung anzeigen“. Tax rail and PDF peek stay hidden while the illustration is showing (Phase 1 E6). The empty identity card + empty line list + „+ Position“ sit under the copy so the user can start without a second CTA.
@@ -212,12 +213,12 @@ Failure does not blank the form and does not block typing. Retry on the next deb
 - Invoice **rail shows exactly four fields** as `dt` keys (canonical, not translated): `invoice_tax_rate`, `reverse_charge_flag`, `legal_reference`, `applied_rule_id` (D-12). Heading remains „Live Steuerberechnung“.
 - `/tax` shows all nine TaxDecision fields (Phase 1 list) from the **same** evaluate result, live.
 - Before the first successful evaluate: labels visible, values em dash `—`. Never show `SAMPLE_INVOICE` tax numbers on the signed-in path.
-- On evaluate failure (D-11): **keep the last good TaxDecision** (or em dashes if none). Show a small error **in the rail** (and the same line on `/tax`): Body 14px / 400 / `text-destructive`, wraps. Do not blank the rail. Do not block typing. No modal. Next debounce retries. Optional rail text button „Erneut versuchen“ (accent link style `text-primary`, not a filled CTA) re-fires evaluate immediately.
+- On evaluate failure (D-11): **keep the last good TaxDecision** (or em dashes if none). Show a small error **in the rail** (and the same line on `/tax`): Body 14px / 400 / `text-destructive`, wraps. Do not blank the rail. Do not block typing. No modal. Next debounce retries. Optional rail text button „Erneut versuchen“ (`text-primary` underline, not a filled CTA — reserved accent text-link) re-fires evaluate immediately.
 - No tax override UI (D-16). `tax.override` unused in UI.
 
 ### Country → legal form (D-03)
 
-Two sequential Comboboxes, never one 200-row dump. Country Combobox is searchable (German display names, ISO stored). Legal-form Combobox is searchable **within the selected country**. Changing country clears legal form. Combobox empty copy: „Kein Land gefunden.“ / „Keine Rechtsform gefunden.“
+Two sequential Comboboxes, never one 200-row dump. Country Combobox is searchable (German display names, ISO stored). Legal-form Combobox is searchable **within the selected country**. Changing country clears legal form. Combobox empty copy: „Kein Land passt zur Suche.“ / „Keine Rechtsform passt zur Suche.“
 
 ### Higgsfield
 
@@ -250,7 +251,7 @@ Additional copy elements:
 | Kunden empty heading | Noch keine Kunden angelegt |
 | Kunden empty body | Legen Sie einen Kunden für die gewählte Entity an. |
 | Invoice write hint | Keine Berechtigung zum Anlegen von Rechnungen. |
-| Invoice picker empty | Keine Rechnung gefunden. |
+| Invoice picker empty | Keine Rechnung passt zur Suche. |
 | Invoice number placeholder | Wird vergeben… |
 | Seller placeholder | Entity wählen |
 | Customer placeholder | Zuerst Entity wählen |
@@ -258,8 +259,8 @@ Additional copy elements:
 | Country placeholder | Land wählen |
 | Legal form placeholder (no country) | Zuerst Land wählen |
 | Legal form placeholder (country set) | Rechtsform wählen |
-| Country combobox empty | Kein Land gefunden. |
-| Legal form combobox empty | Keine Rechtsform gefunden. |
+| Country combobox empty | Kein Land passt zur Suche. |
+| Legal form combobox empty | Keine Rechtsform passt zur Suche. |
 | EU VAT required | USt-IdNr. ist für EU-Länder Pflicht. |
 | Autosave in flight | Speichert… |
 | Autosave success | Gespeichert |
@@ -298,8 +299,8 @@ Phase 1 E1–E10 and Phase 2 E11–E17 remain in force except where this table *
 | empty | E6 PDF peek / tax rail | ✅ covered | Hidden while first-run illustration is showing; revealed after first persistable keystroke/autosave. Peek stays staged. |
 | empty | E18 entity list | ✅ covered | Copywriting Entities empty heading/body; Anlegen still visible (enabled or disabled per D-04). |
 | empty | E20 kunden list | ✅ covered | Copywriting Kunden empty heading/body; Anlegen still visible. |
-| empty | E23 invoice picker | ✅ covered | Combobox empty: „Keine Rechnung gefunden.“ First-run uses E4, not a blank picker-only pane. |
-| empty | E22 country/legal-form | ✅ covered | Combobox empty: „Kein Land gefunden.“ / „Keine Rechtsform gefunden.“ Legal form disabled until country set. |
+| empty | E23 invoice picker | ✅ covered | Combobox empty: „Keine Rechnung passt zur Suche.“ First-run uses E4, not a blank picker-only pane. |
+| empty | E22 country/legal-form | ✅ covered | Combobox empty: „Kein Land passt zur Suche.“ / „Keine Rechtsform passt zur Suche.“ Legal form disabled until country set. |
 | empty | E25 tax rail | ✅ covered | Before first success: four labels + em dash `—`. Never sample tax numbers on the signed-in path. |
 | empty | E27 seller/customer | ✅ covered | Placeholders „Entity wählen“ / „Zuerst Entity wählen“ / „Kunde wählen“. Customer disabled until seller set. |
 | loading | E18, E20 lists | ✅ covered | `Skeleton` rows in the `max-w-xl` list (Phase 1 skeleton language). Header + Anlegen stay visible. |
