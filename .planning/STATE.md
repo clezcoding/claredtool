@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 02
 current_phase_name: Self-Hosted Backend & Authentik SSO
 status: executing
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-08-22T01:58:16.084Z"
+stopped_at: Completed 02-04-PLAN.md
+last_updated: "2026-08-22T02:18:17.812Z"
 last_activity: 2026-08-22
 last_activity_desc: Phase 02 execution started
-state_head: 8d5bd7451b72ebad74dc9950557a6b045ef57afd
+state_head: 401373721f6ff66b686cdec52ac87a123d54a5a9
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 10
-  completed_plans: 8
+  completed_plans: 9
 milestone_name: milestone
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 02 (Self-Hosted Backend & Authentik SSO) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-08-22 — Phase 02 execution started
 
@@ -66,6 +66,7 @@ Progress: [██░░░░░░░░] 25%
 | Phase 02-self-hosted-backend-authentik-sso P01 | 7 min | 2 tasks | 18 files |
 | Phase 02-self-hosted-backend-authentik-sso P02 | 19 min | 3 tasks | 31 files |
 | Phase 02-self-hosted-backend-authentik-sso P03 | 8 min | 2 tasks | 14 files |
+| Phase 02-self-hosted-backend-authentik-sso P04 | 17 min | 3 tasks | 22 files |
 
 ## Accumulated Context
 
@@ -99,6 +100,7 @@ Recent decisions affecting current work:
 - [Phase 02-self-hosted-backend-authentik-sso]: AppManifest::commands in build.rs so keychain IPC is ACL-denied on the login WebView (T-02-10) — Tauri allows all app commands from every window unless AppManifest lists them; login.json core:default alone would not block keychain.
 - [Phase 02-self-hosted-backend-authentik-sso]: Login CSP via initialization_script meta because WebviewWindowBuilder has no CSP setter (A3) — on_navigation exists; no per-window CSP setter on this crate. Meta inject plus host allowlist.
 - [Phase 02-self-hosted-backend-authentik-sso]: login-init.html loaded as include_str data URL so src-tauri HTML does not depend on Vite public/ — Plan places the spinner HTML in src-tauri; WebviewUrl::App would look in frontend dist.
+- [Phase 02-self-hosted-backend-authentik-sso]: Chip/banner live in components/; open_login_window optional url for end_session; vitest fileParallelism false
 
 ### Pending Todos
 
@@ -119,6 +121,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-22T01:58:01.097Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-08-22T02:18:17.785Z
+Stopped at: Completed 02-04-PLAN.md
 Resume file: None
