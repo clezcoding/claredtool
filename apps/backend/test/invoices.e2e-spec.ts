@@ -192,6 +192,54 @@ describe("phase03-product", () => {
       expect(ids.indexOf(newer.body.id)).toBeLessThan(ids.indexOf(older.body.id));
     });
 
+    it("PATCH items-only bumps updatedAt so older draft becomes last-edited (D-17)", async () => {
+      const older = await request(app.getHttpServer())
+        .post("/api/invoices")
+        .set("Authorization", `Bearer ${ownerToken}`)
+        .send({
+          entityId,
+          currency: "EUR",
+          items: [{ bezeichnung: "Older", menge: 1, einzelpreis: 10 }],
+        })
+        .expect(201);
+
+      await new Promise((resolve) => setTimeout(resolve, 20));
+
+      const newer = await request(app.getHttpServer())
+        .post("/api/invoices")
+        .set("Authorization", `Bearer ${ownerToken}`)
+        .send({
+          entityId,
+          currency: "EUR",
+          items: [{ bezeichnung: "Newer", menge: 1, einzelpreis: 20 }],
+        })
+        .expect(201);
+
+      const before = await request(app.getHttpServer())
+        .get("/api/invoices")
+        .set("Authorization", `Bearer ${ownerToken}`)
+        .expect(200);
+
+      expect((before.body as { id: string }[])[0].id).toBe(newer.body.id);
+
+      await new Promise((resolve) => setTimeout(resolve, 20));
+
+      await request(app.getHttpServer())
+        .patch(`/api/invoices/${older.body.id}`)
+        .set("Authorization", `Bearer ${ownerToken}`)
+        .send({
+          items: [{ bezeichnung: "Edited line", menge: 2, einzelpreis: 15 }],
+        })
+        .expect(200);
+
+      const after = await request(app.getHttpServer())
+        .get("/api/invoices")
+        .set("Authorization", `Bearer ${ownerToken}`)
+        .expect(200);
+
+      expect((after.body as { id: string }[])[0].id).toBe(older.body.id);
+    });
+
     it("PATCH /api/invoices/:id replaces items and updates draft fields", async () => {
       const created = await request(app.getHttpServer())
         .post("/api/invoices")

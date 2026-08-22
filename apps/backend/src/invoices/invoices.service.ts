@@ -114,22 +114,6 @@ export class InvoicesService {
     }
 
     return this.prisma.$transaction(async (tx) => {
-      if (dto.items !== undefined) {
-        await tx.invoiceItem.deleteMany({ where: { invoiceId: id } });
-        if (dto.items.length > 0) {
-          await tx.invoiceItem.createMany({
-            data: dto.items.map((row, index) => ({
-              invoiceId: id,
-              position: index,
-              bezeichnung: row.bezeichnung,
-              menge: row.menge,
-              einzelpreis: row.einzelpreis,
-              netto: row.menge * row.einzelpreis,
-            })),
-          });
-        }
-      }
-
       const data: Prisma.InvoiceUpdateInput = {};
       if (dto.entityId !== undefined) {
         data.entity = { connect: { id: dto.entityId } };
@@ -150,6 +134,20 @@ export class InvoicesService {
       }
       if (dto.dueDate !== undefined) {
         data.dueDate = new Date(dto.dueDate);
+      }
+      if (dto.items !== undefined) {
+        data.items = {
+          deleteMany: {},
+          create: dto.items.map((row, index) => ({
+            position: index,
+            bezeichnung: row.bezeichnung,
+            menge: row.menge,
+            einzelpreis: row.einzelpreis,
+            netto: row.menge * row.einzelpreis,
+          })),
+        };
+        // ponytail: Prisma @updatedAt does not fire on nested-only invoice updates (D-17 sort)
+        data.updatedAt = new Date();
       }
 
       return tx.invoice.update({
