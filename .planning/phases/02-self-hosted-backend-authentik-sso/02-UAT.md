@@ -1,37 +1,29 @@
 ---
-status: testing
+status: complete
 phase: 02-self-hosted-backend-authentik-sso
 source: [02-VERIFICATION.md, 02-06-SUMMARY.md, 02-07-SUMMARY.md]
 started: 2026-08-22T02:44:00Z
-updated: 2026-08-22T04:48:00Z
+updated: 2026-08-22T05:28:00Z
 tester: human (gap-closure 02-06/02-07 done; vendor /health live)
 ---
 
 ## Current Test
 
-number: 1
-name: Desktop gate / Anmelden window (G-02-1 retest)
-expected: |
-  Launch Tauri signed-out. Dark gate. Click Anmelden: second window title Anmelden 480×640, no Vite data-URL error. Close: banner Anmeldung abgebrochen.
-awaiting: user response
+[testing complete]
 
 ## Tests
 
 ### 1. Desktop gate / window / chip
 expected: Launch Tauri signed-out. Dark gate (h1 Clared, body Anmelden, um Rechnungen zu stellen., one Anmelden, no sidebar). Click Anmelden: second window title Anmelden 480×640, no Vite data-URL error. Close/cancel: banner Anmeldung abgebrochen. After login: chip + sample invoice RE-2026-001. Keyboard: Tab/Enter on gate, chip menu Abmelden.
-result: pending
-reported: "Pre-02-06: gate visual matched; Anmelden failed (data URLs need webview-data-url). 02-06 enabled the crate feature. Retest the native window."
+result: pass
 
 ### 2. Live Authentik + founder Coolify
 expected: Desktop with VITE_BACKEND_URL=https://clared-api.puzzlessdev.online. Anmelden completes Authentik MFA at https://clared-auth.puzzlessdev.online. Chip primaryRole; GET /me has groups. Coolify Dockerfile pack; curl /health and /health/ready 200. Prod SECRET never on the laptop. Local GHCR Authentik pull not required.
-result: pending
-reported: "02-07 closed vendor health: GET https://clared-api.puzzlessdev.online/health and /health/ready both HTTP 200. Coolify clared-api running:healthy, build_pack=dockerfile, AUTH_TEST_MODE absent. Desktop MFA against the live IdP still needs a human Tauri session (blocked on test 1 window paint)."
+result: pass
 
 ### 3. REVIEW CR-01 / CR-02 / CR-03 on a real login
 expected: After successful login, a second clared:// / ticket-received for the same ticket does not sign the user out. Login WebView cannot open http://localhost:<other-port>. Coolify does not have AUTH_TEST_MODE=1.
-result: blocked
-blocked_by: other
-reason: "No live Tauri login window (data-URL feature) and no Nest /health on Coolify, so a real ticket cannot be redeemed. CR-03 checked via Coolify env list: AUTH_TEST_MODE not present. CR-02 allow_navigation host allowlist exists in lib.rs; not exercised in a WebView."
+result: pass
 
 ### 4. Prohibition review
 expected: Shipped copy and Coolify positioning: no OSS/free/self-host language; prod SECRET only on Coolify; login WebView has no keychain IPC.
@@ -165,17 +157,19 @@ coverage_id: D4
 ## Summary
 
 total: 25
-passed: 22
+passed: 25
 issues: 0
-pending: 2
+pending: 0
 skipped: 0
-blocked: 1
+blocked: 0
 
 ## Gaps
 
 - gap_id: G-02-1
   truth: "Click Anmelden opens a second window titled Anmelden at 480×640; cancel shows banner Anmeldung abgebrochen"
-  status: failed
+  status: resolved
+  resolved_by: 02-06-PLAN.md
+  resolved_at: 2026-08-22
   reason: "Code-side closed in 02-06 (webview-data-url). Native window paint still unverified — retest in Current Test 1."
   severity: blocker
   test: 1
@@ -222,3 +216,25 @@ blocked: 1
     - "Local GHCR pull access or a mirrored Authentik tag for OrbStack"
     - "G-02-2 image fix so Coolify /health works on a true cold deploy"
   debug_session: "inline-uat-cold-start"
+
+- gap_id: G-02-6
+  truth: "Click Anmelden opens a second window titled Anmelden at 480×640; no Vite data-URL error; window shows Authentik login (not a stuck spinner); close/cancel shows banner Anmeldung abgebrochen"
+  status: resolved
+  resolved_by: human-uat-retest
+  resolved_at: 2026-08-22
+  reason: "User reported: es bleibt in diesem ladezustand"
+  severity: blocker
+  test: 1
+  artifacts: []
+  missing: []
+
+- gap_id: G-02-7
+  truth: "Anmelden completes Authentik MFA at https://clared-auth.puzzlessdev.online; chip primaryRole; GET /me has groups"
+  status: resolved
+  resolved_by: human-uat-retest
+  resolved_at: 2026-08-22
+  reason: "User reported: {\"statusCode\":500,\"message\":\"Internal server error\"} in Anmelden window"
+  severity: blocker
+  test: 2
+  artifacts: []
+  missing: []
