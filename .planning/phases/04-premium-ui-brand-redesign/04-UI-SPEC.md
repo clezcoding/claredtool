@@ -72,9 +72,9 @@ Accent reserved for: Primary action pills, success states, active sidebar select
 | Element | Copy |
 |---------|------|
 | Primary CTA | Neue Rechnung erstellen |
-| Empty state heading | Keine Daten vorhanden |
-| Empty state body | Es wurden noch keine Einträge erstellt. |
-| Error state | Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut. |
+| Empty state heading | Noch keine Rechnungen erstellt |
+| Empty state body | Erstellen Sie Ihre erste Rechnung, um loszulegen. |
+| Error state | Ein Fehler ist aufgetreten. Überprüfen Sie Ihre Internetverbindung und laden Sie die Seite neu. |
 | Destructive confirmation | Löschen: Möchten Sie diesen Eintrag wirklich unwiderruflich löschen? |
 
 ---
