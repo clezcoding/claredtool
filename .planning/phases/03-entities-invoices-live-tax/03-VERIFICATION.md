@@ -1,7 +1,7 @@
 ---
 phase: 03-entities-invoices-live-tax
 verified: 2026-08-22T19:26:00Z
-status: verified
+status: passed
 score: 13/13
 behavior_unverified: 0
 overrides_applied: 0
