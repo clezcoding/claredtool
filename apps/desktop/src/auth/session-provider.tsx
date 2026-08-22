@@ -21,7 +21,6 @@ export type BannerKind = "unauthorized" | "cancel" | null;
 export type SessionContextValue = {
   state: SessionState;
   me: MeResponse | null;
-  token: string | null;
   bannerKind: BannerKind;
   banner: ReactNode;
   openingLogin: boolean;
@@ -245,7 +244,6 @@ export function SessionProvider({
     () => ({
       state,
       me,
-      token,
       bannerKind,
       banner: banner ?? null,
       openingLogin,
@@ -254,7 +252,7 @@ export function SessionProvider({
       retryMe,
       clearBanner: () => setBannerKind(null),
     }),
-    [state, me, token, bannerKind, banner, openingLogin, login, logout, retryMe],
+    [state, me, bannerKind, banner, openingLogin, login, logout, retryMe],
   );
 
   return (
