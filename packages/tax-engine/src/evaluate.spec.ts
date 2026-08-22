@@ -1,4 +1,4 @@
-import { evaluate } from "./index";
+import { evaluate, EvaluateError, type TransactionFacts } from "./index";
 
 /**
  * All 23 rule class ids from docs/clared-tax-rule-matrix.md (D-13).
@@ -30,8 +30,22 @@ const MATRIX_RULE_IDS = [
   "THIRD_TO_THIRD_B2B_SERVICE",
 ] as const;
 
+const EU_INTRACOMM_B2B_FACTS: TransactionFacts = {
+  supplier_country: "AT",
+  customer_country: "DE",
+  supplier_is_business: true,
+  customer_is_business: true,
+  supplier_vat_registered: true,
+  customer_vat_registered: true,
+  supplier_vat_id: "ATU12345678",
+  customer_vat_id: "DE123456789",
+  supply_type: "service",
+  channel: "direct",
+  currency: "EUR",
+};
+
 describe("evaluate(facts)", () => {
-  it.each(MATRIX_RULE_IDS)(
+  it.each(MATRIX_RULE_IDS.filter((id) => id !== "EU_INTRACOMM_B2B_SERVICE"))(
     "returns applied_rule_id %s for the matrix fixture",
     (ruleId) => {
       expect(typeof evaluate).toBe("function");
@@ -40,11 +54,32 @@ describe("evaluate(facts)", () => {
     },
   );
 
+  it("returns applied_rule_id EU_INTRACOMM_B2B_SERVICE for the matrix fixture", () => {
+    const decision = evaluate(EU_INTRACOMM_B2B_FACTS);
+    expect(decision.applied_rule_id).toBe("EU_INTRACOMM_B2B_SERVICE");
+    expect(decision.invoice_tax_rate).toBe(0);
+    expect(decision.reverse_charge_flag).toBe(true);
+    expect(decision.tax_liability_party).toBe("customer");
+    expect(decision.legal_reference).toBe("EU VAT Directive Art. 44, 196");
+  });
+
   it("throws when zero rules match (no silent empty decision)", () => {
-    expect(() => evaluate({} as never)).toThrow();
+    expect(() =>
+      evaluate({
+        supplier_country: "XX",
+        customer_country: "YY",
+        supplier_is_business: false,
+        customer_is_business: false,
+        supplier_vat_registered: false,
+        customer_vat_registered: false,
+        supply_type: "service",
+        channel: "direct",
+      }),
+    ).toThrow(EvaluateError);
   });
 
   it("throws when two rules match (no first-match or priority pick)", () => {
+    // With only one rule file, ambiguous case is not reachable yet — verify throw contract.
     expect(() => evaluate({ ambiguous: true } as never)).toThrow();
   });
 });

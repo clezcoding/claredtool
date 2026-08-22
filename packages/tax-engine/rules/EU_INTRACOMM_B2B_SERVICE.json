@@ -1,0 +1,27 @@
+{
+  "rule_id": "EU_INTRACOMM_B2B_SERVICE",
+  "version": "1.0.0",
+  "description": "Intra-EU B2B services with reverse charge (D-13 exemplar AT supplier / DE customer)",
+  "conditions": {
+    "supplier_country": ["AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI", "SK"],
+    "customer_country": ["AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI", "SK"],
+    "supplier_is_business": true,
+    "customer_is_business": true,
+    "supplier_vat_registered": true,
+    "customer_vat_registered": true,
+    "supply_type": "service",
+    "channel": "direct",
+    "intracomm_eu": true
+  },
+  "effect": {
+    "place_of_supply_country": "{{customer_country}}",
+    "tax_liability_party": "customer",
+    "invoice_tax_rate": 0,
+    "invoice_tax_shown": false,
+    "reverse_charge_flag": true,
+    "legal_reference": "EU VAT Directive Art. 44, 196",
+    "invoice_text_block_id": "EU_RC_B2B_SERVICE"
+  },
+  "source_citation": [],
+  "tags": ["eu", "b2b", "service", "reverse-charge"]
+}
