@@ -14,7 +14,7 @@ Clared ships as a stunning Tauri desktop app whose core loop is create invoice �
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Tauri Desktop & Mockup-First UI** - Launch Clared in a Tauri window; invoice+tax+PDF mockups exist before implementation (completed 2026-08-20)
-- [ ] **Phase 2: Self-Hosted Backend & Authentik SSO** - Sign in via Authentik; desktop talks HTTPS+OIDC to vendor Coolify (founder's cluster)
+- [x] **Phase 2: Self-Hosted Backend & Authentik SSO** - Sign in via Authentik; desktop talks HTTPS+OIDC to vendor Coolify (founder's cluster) (completed 2026-08-22)
 - [ ] **Phase 3: Entities, Invoices & Live Tax** - Create invoice, see live tax from modular engine
 - [ ] **Phase 4: PDF, Audit & Offline Sync** - Download PDF, inspect tax audit trail, work offline and sync
 
@@ -125,6 +125,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Tauri Desktop & Mockup-First UI | 5/5 | Complete    | 2026-08-20 |
-| 2. Self-Hosted Backend & Authentik SSO | 7/7 | In Progress|  |
+| 2. Self-Hosted Backend & Authentik SSO | 7/7 | Complete    | 2026-08-22 |
 | 3. Entities, Invoices & Live Tax | 0/? | Not started | - |
 | 4. PDF, Audit & Offline Sync | 0/? | Not started | - |
