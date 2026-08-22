@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 02
 current_phase_name: Self-Hosted Backend & Authentik SSO
 status: executing
-stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-08-22T01:23:17.015Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-08-22T01:46:41.123Z"
 last_activity: 2026-08-22
 last_activity_desc: Phase 02 execution started
-state_head: 30e3c6c0864172bbbfd7ebd651e1b4ed6a7dbc7d
+state_head: 23ab9d8b916a6e3519b27c9e61a30db55b2d9083
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 10
-  completed_plans: 6
+  completed_plans: 7
 milestone_name: milestone
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Phase: 02 (Self-Hosted Backend & Authentik SSO) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-08-22 — Phase 02 execution started
 
@@ -64,6 +64,7 @@ Progress: [██░░░░░░░░] 25%
 | Phase 01-tauri-desktop-mockup-first-ui P03 | 14 | 3 tasks | 8 files |
 | Phase 01-tauri-desktop-mockup-first-ui P04 | 6 | 2 tasks | 2 files |
 | Phase 02-self-hosted-backend-authentik-sso P01 | 7 min | 2 tasks | 18 files |
+| Phase 02-self-hosted-backend-authentik-sso P02 | 19 min | 3 tasks | 31 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,10 @@ Recent decisions affecting current work:
 - [Phase 02]: Wave 0 stays RED; projectRbac /health /auth implementation is 02-02
 - [Phase 02]: Desktop auth specs use dynamic import specifiers so Vite collection ignores missing LoginGate/chip/banner files
 - [Phase 02]: prisma/@prisma/engines allowBuilds true so pnpm --filter backend install succeeds
+- [Phase 02-self-hosted-backend-authentik-sso]: MemoryStore at auth/memory-store.ts to match Wave 0 e2e imports
+- [Phase 02-self-hosted-backend-authentik-sso]: POST /auth/session HttpCode 200 (Nest POST default 201 would fail AUTH-01)
+- [Phase 02-self-hosted-backend-authentik-sso]: Empty Prisma init migration; no User/Role models (D-22)
+- [Phase 02-self-hosted-backend-authentik-sso]: SCHEMA_PUSH used compose Postgres; host :5432 was a different instance
 
 ### Pending Todos
 
@@ -110,6 +115,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-22T01:23:16.990Z
-Stopped at: Completed 02-01-PLAN.md
+Last session: 2026-08-22T01:46:41.100Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None

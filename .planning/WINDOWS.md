@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 5
+open_count: 9
 waived_count: 1
 fixed_count: 2
-total_count: 8
-last_updated: 2026-08-22T01:22:05.072Z
+total_count: 12
+last_updated: 2026-08-22T01:46:25.164Z
 ---
 
 # Broken Windows Ledger
@@ -23,6 +23,10 @@ last_updated: 2026-08-22T01:22:05.072Z
 | 6 | 02 | skipped-test | apps/desktop/src/__tests__/session-chip.test.tsx |  | describe.skip(phase02-auth) until 02-04 SessionChip | open |  | 2026-08-22T01:22:04.912Z |  |
 | 7 | 02 | skipped-test | apps/desktop/src/__tests__/session-banner.test.tsx |  | describe.skip(phase02-auth) until 02-04 SessionBanner | open |  | 2026-08-22T01:22:04.991Z |  |
 | 8 | 02 | deviation | pnpm-workspace.yaml |  | Allow prisma engine builds so pnpm --filter install succeeds | open |  | 2026-08-22T01:22:05.072Z |  |
+| 9 | 02 | stub | apps/backend/src/auth/oidc.ts | 20 | AUTH_TEST_MODE skips live Authentik discovery until 02-05 | open |  | 2026-08-22T01:46:24.880Z |  |
+| 10 | 02 | stub | apps/backend/src/auth/auth.controller.ts | 144 | endSessionUrl path string until 02-05 real Authentik end-session | open |  | 2026-08-22T01:46:24.969Z |  |
+| 11 | 02 | stub | apps/desktop/src/auth/api.ts | 11 | setOnUnauthorized callback placeholder until 02-04 | open |  | 2026-08-22T01:46:25.055Z |  |
+| 12 | 02 | deviation | apps/backend/test/auth.e2e-spec.ts |  | e2e seeds tickets and listen(0) for parallel GETDEL | open |  | 2026-08-22T01:46:25.164Z |  |
 
 ````json
 [
@@ -120,6 +124,54 @@ last_updated: 2026-08-22T01:22:05.072Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-22T01:22:05.072Z",
+    "resolved_at": null
+  },
+  {
+    "id": 9,
+    "kind": "stub",
+    "phase": "02",
+    "file": "apps/backend/src/auth/oidc.ts",
+    "line": 20,
+    "description": "AUTH_TEST_MODE skips live Authentik discovery until 02-05",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-22T01:46:24.880Z",
+    "resolved_at": null
+  },
+  {
+    "id": 10,
+    "kind": "stub",
+    "phase": "02",
+    "file": "apps/backend/src/auth/auth.controller.ts",
+    "line": 144,
+    "description": "endSessionUrl path string until 02-05 real Authentik end-session",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-22T01:46:24.969Z",
+    "resolved_at": null
+  },
+  {
+    "id": 11,
+    "kind": "stub",
+    "phase": "02",
+    "file": "apps/desktop/src/auth/api.ts",
+    "line": 11,
+    "description": "setOnUnauthorized callback placeholder until 02-04",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-22T01:46:25.055Z",
+    "resolved_at": null
+  },
+  {
+    "id": 12,
+    "kind": "deviation",
+    "phase": "02",
+    "file": "apps/backend/test/auth.e2e-spec.ts",
+    "line": null,
+    "description": "e2e seeds tickets and listen(0) for parallel GETDEL",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-22T01:46:25.164Z",
     "resolved_at": null
   }
 ]
