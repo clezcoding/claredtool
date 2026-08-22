@@ -51,7 +51,11 @@ describe("Auth (e2e)", () => {
 
   it("second POST /auth/session with the same ticket returns 401", async () => {
     const ticket = "replay-ticket";
-    await request(app.getHttpServer()).post("/auth/session").send({ ticket });
+    const first = await request(app.getHttpServer())
+      .post("/auth/session")
+      .send({ ticket })
+      .expect(200);
+    expect(first.body.token).toEqual(expect.any(String));
     await request(app.getHttpServer())
       .post("/auth/session")
       .send({ ticket })
