@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 02
 current_phase_name: Self-Hosted Backend & Authentik SSO
-status: "Phase 01 shipped — PR #1"
-stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-08-22T01:08:17.642Z"
+status: executing
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-08-22T01:23:17.015Z"
 last_activity: 2026-08-22
-last_activity_desc: Phase 02 planning complete
-state_head: 4354cde3348b21cf26fa6a0418d9be2b2b64b912
+last_activity_desc: Phase 02 execution started
+state_head: 30e3c6c0864172bbbfd7ebd651e1b4ed6a7dbc7d
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 10
-  completed_plans: 5
+  completed_plans: 6
 milestone_name: milestone
 ---
 
@@ -24,14 +24,14 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 2 — Self-Hosted Backend & Authentik SSO
+**Current focus:** Phase 02 — Self-Hosted Backend & Authentik SSO
 
 ## Current Position
 
-Phase: 02 (Self-Hosted Backend & Authentik SSO) — READY TO EXECUTE
-Plan: Not started
-Status: Phase 01 shipped — PR #1
-Last activity: 2026-08-22 — Phase 02 planning complete
+Phase: 02 (Self-Hosted Backend & Authentik SSO) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-08-22 — Phase 02 execution started
 
 Progress: [██░░░░░░░░] 25%
 
@@ -63,6 +63,7 @@ Progress: [██░░░░░░░░] 25%
 | Phase 01 P02 | 8min | 3 tasks | 8 files |
 | Phase 01-tauri-desktop-mockup-first-ui P03 | 14 | 3 tasks | 8 files |
 | Phase 01-tauri-desktop-mockup-first-ui P04 | 6 | 2 tasks | 2 files |
+| Phase 02-self-hosted-backend-authentik-sso P01 | 7 min | 2 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Empty-state hero is GPT Image 2 16:9 2k (2688×1520), not the 1×1 placeholder
 - [Phase 01]: CI uses explicit pnpm tauri build + upload-artifact, not tauri-action (no signing/secrets this phase)
 - [Phase 01]: Matrix windows-latest + macos-latest with fail-fast false so a macOS miss cannot cancel the Windows evidence job
+- [Phase 02]: Wave 0 stays RED; projectRbac /health /auth implementation is 02-02
+- [Phase 02]: Desktop auth specs use dynamic import specifiers so Vite collection ignores missing LoginGate/chip/banner files
+- [Phase 02]: prisma/@prisma/engines allowBuilds true so pnpm --filter backend install succeeds
 
 ### Pending Todos
 
@@ -106,6 +110,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-21T21:36:18.261Z
-Stopped at: Phase 2 UI-SPEC approved
-Resume file: /Users/puzzless/Desktop/claredtool/.planning/phases/02-self-hosted-backend-authentik-sso/02-UI-SPEC.md
+Last session: 2026-08-22T01:23:16.990Z
+Stopped at: Completed 02-01-PLAN.md
+Resume file: None

@@ -60,11 +60,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Desktop reaches the vendor Coolify backend over HTTPS with a backend-validated session or API key; unauthenticated calls are rejected
   4. Tokens carry RBAC groups (AUTH-01: owner, accountant, viewer, plus catalog including `clared-platform`); Postgres, Redis, Authentik, and the backend app run on the founder's Coolify
 
-**Plans**: 5 plans
+**Plans**: 1/5 plans executed
 
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Nyquist Wave 0: Nest package + RED health/auth/rbac specs + skipped desktop auth tests
+- [x] 02-01-PLAN.md — Nyquist Wave 0: Nest package + RED health/auth/rbac specs + skipped desktop auth tests
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -120,6 +120,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Tauri Desktop & Mockup-First UI | 5/5 | Complete    | 2026-08-20 |
-| 2. Self-Hosted Backend & Authentik SSO | 0/5 | Not started | - |
+| 2. Self-Hosted Backend & Authentik SSO | 1/5 | In Progress|  |
 | 3. Entities, Invoices & Live Tax | 0/? | Not started | - |
 | 4. PDF, Audit & Offline Sync | 0/? | Not started | - |
