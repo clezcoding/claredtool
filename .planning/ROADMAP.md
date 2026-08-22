@@ -99,7 +99,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. User sees live tax preview as invoice facts change (TransactionFacts → TaxDecision: rate, reverse charge, legal text, applied_rule_id)
   5. Live preview comes from an integrated library `evaluate(facts): decision` using TaxRule JSON Schema as SSOT; decision-matrix rule classes produce expected TaxDecisions (collision/priority-tie behavior stays unspecified)
 
-**Plans:** 5/6 plans executed
+**Plans:** 6/6 plans executed
 
 **Wave 1**
 
@@ -120,7 +120,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 5** *(blocked on 03-02, 03-06, and 03-03)*
 
-- [ ] 03-05-PLAN.md — Invoice PATCH/list, 600ms autosave, header picker, live tax rail (INV-01, TAX-01)
+- [x] 03-05-PLAN.md — Invoice PATCH/list, 600ms autosave, header picker, live tax rail (INV-01, TAX-01)
 
 **UI hint**: yes
 
@@ -148,5 +148,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Tauri Desktop & Mockup-First UI | 5/5 | Complete    | 2026-08-20 |
 | 2. Self-Hosted Backend & Authentik SSO | 7/7 | Complete    | 2026-08-22 |
-| 3. Entities, Invoices & Live Tax | 5/6 | In Progress|  |
+| 3. Entities, Invoices & Live Tax | 6/6 | In Progress|  |
 | 4. PDF, Audit & Offline Sync | 0/? | Not started | - |
