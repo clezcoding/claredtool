@@ -20,7 +20,7 @@ export function getLastRequest(): LastRequest | undefined {
 }
 
 export async function replayLastRequest(token: string): Promise<Response | undefined> {
-  if (!lastRequest) return undefined;
+  if (!lastRequest || lastRequest.path === "/auth/logout") return undefined;
   const headers = new Headers(lastRequest.init?.headers);
   headers.set("Authorization", `Bearer ${token}`);
   return apiFetch(lastRequest.path, { ...lastRequest.init, headers });
@@ -75,12 +75,13 @@ export async function fetchMe(token: string): Promise<MeResponse> {
 export async function logoutSession(
   token: string,
 ): Promise<{ endSessionUrl: string }> {
-  const res = await apiFetch("/auth/logout", {
+  const res = await fetch(`${BASE}/auth/logout`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
   if (!res.ok) {
     throw new Error(`logoutSession failed: ${res.status}`);
   }
+  lastRequest = undefined;
   return (await res.json()) as { endSessionUrl: string };
 }
