@@ -24,4 +24,7 @@ RUN pnpm exec prisma generate && pnpm exec nest build && test -f dist/main.js
 ENV DATABASE_URL=
 ENV NODE_ENV=production
 
+RUN chown -R node:node /app
+USER node
+
 CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/main.js"]
