@@ -10,6 +10,7 @@
     "os:allow-hostname",
     "allow-keychain-set-session",
     "allow-keychain-get-session",
-    "allow-keychain-delete-session"
+    "allow-keychain-delete-session",
+    "allow-open-login-window"
   ]
 }

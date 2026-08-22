@@ -4,6 +4,7 @@ fn main() {
             "keychain_set_session",
             "keychain_get_session",
             "keychain_delete_session",
+            "open_login_window",
         ])),
     )
     .expect("failed to run tauri-build");
