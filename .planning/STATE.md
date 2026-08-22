@@ -2,14 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04
-current_phase_name: PDF, Audit & Offline Sync
-status: "Phase 03 shipped — PR #10"
-stopped_at: Phase 3 complete — UAT + verification 13/13; Phase 4 unblocked
-last_updated: "2026-08-22T19:41:10.090Z"
-last_activity: 2026-08-22 - Completed quick task 260822-u6p: Räume das Projektverzeichniss auf.
-state_head: cb4422e41c4c125c44be8bcde132886c202fe450
+current_phase_name: Premium UI & Brand Redesign
+status: Phase 04 added — Premium UI & Brand Redesign (Nordic Calm Fintech); PDF/Audit/Offline moved to Phase 05
+stopped_at: Phase 4 context gathered
+last_updated: "2026-08-22T23:17:08.670Z"
+last_activity: 2026-08-22
+last_activity_desc: Added Phase 04 (Premium UI & Brand Redesign); renumbered PDF/Audit/Offline to Phase 05.
+state_head: 323fc204cf95cf26b7204e0064966921549e654c
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 3
   total_plans: 18
   completed_plans: 18
@@ -27,13 +28,14 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 ## Current Position
 
-Status: Phase 03 shipped — PR #10
-Total Plans in Phase: 6
+Status: Phase 04 added — Premium UI & Brand Redesign (Nordic Calm Fintech)
 Phase: 03 (Entities, Invoices & Live Tax) — **COMPLETE**
-Phase 04 (PDF, Audit & Offline Sync) — **NEXT**
-Last activity: 2026-08-22 - Completed quick task 260822-u6p: Räume das Projektverzeichniss auf.
+Phase 04 (Premium UI & Brand Redesign) — **NEXT** (mockup-first: image mockups → approval → code)
+Phase 05 (PDF, Audit & Offline Sync) — deferred until after redesign
+Decided: workflow = image-gen mockups until approved then code; redesign before PDF; brand = Nordic Calm Fintech
+Last activity: 2026-08-22 - Added Phase 04 (Premium UI & Brand Redesign); renumbered PDF/Audit/Offline to Phase 05.
 
-Progress: [███████░░░] 75%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
@@ -81,6 +83,8 @@ Recent decisions affecting current work:
 
 - Locked: Tauri (not Electron); Coolify Postgres/Redis/Authentik/backend; tax library `evaluate(facts): decision` + TaxRule JSON Schema SSOT; HTTPS+OIDC
 - Pending: NestJS/Express vs FastAPI vs Axum; integrated tax module vs later microservice; collision logic; Supabase not v1 default
+- [Phase 04]: Premium UI Redesign (Crafted Minimal: Oatmeal, Charcoal, Pure White, Sage/Amber)
+- [Phase 04]: i18n required from day 1 (German and English UI)
 - [Phase 01]: React 19 + Vite 8 + Tauri 2 for the desktop client (Phase 1 UI stack lock)
 - [Phase 01]: createHashRouter from react-router so sub-routes survive tauri://localhost
 - [Phase 01]: Vite/Tauri bound to 5174 because 5173 was occupied by BILLIT Vite
@@ -139,6 +143,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-22T19:35:00Z
-Stopped at: Phase 3 complete — run /gsd-secure-phase 3 then Phase 4 UI-SPEC
-Resume file: .planning/phases/04-pdf-audit-offline-sync/ (not created yet)
+Last session: 2026-08-22T23:17:08.590Z
+Stopped at: Phase 4 context gathered
+Resume file: .planning/phases/04-premium-ui-brand-redesign/04-CONTEXT.md
