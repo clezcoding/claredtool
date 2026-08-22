@@ -10,7 +10,7 @@ import App from "../App";
 import { fetchMock, resetAuthMocks } from "./auth-test-doubles";
 import { signedInOwner } from "./auth-signed-in";
 
-describe.skip("phase03-product", () => {
+describe("phase03-product", () => {
   afterEach(() => {
     cleanup();
     resetAuthMocks();
@@ -25,15 +25,63 @@ describe.skip("phase03-product", () => {
           headers: { "Content-Type": "application/json" },
         });
       }
+      if (url.includes("/api/entities")) {
+        return new Response(
+          JSON.stringify([
+            {
+              id: "ent-1",
+              name: "Seller GmbH",
+              country: "DE",
+              legalForm: "GmbH",
+              address: "Berlin",
+              vatId: "DE123",
+              currencyDefault: "EUR",
+            },
+          ]),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        );
+      }
+      if (url.endsWith("/api/invoices") && !init?.method) {
+        return new Response(JSON.stringify([]), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      if (url.includes("/api/customers")) {
+        return new Response(JSON.stringify([]), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
       if (url.includes("/api/invoices") && init?.method === "POST") {
         return new Response(
-          JSON.stringify({ id: "inv-1", items: [] }),
+          JSON.stringify({
+            id: "inv-1",
+            number: "RE-2026-001",
+            entityId: "ent-1",
+            customerId: null,
+            currency: "EUR",
+            date: null,
+            dueDate: null,
+            items: [],
+            updatedAt: new Date().toISOString(),
+          }),
           { status: 201, headers: { "Content-Type": "application/json" } },
         );
       }
       if (url.includes("/api/invoices/") && init?.method === "PATCH") {
         return new Response(
-          JSON.stringify({ id: "inv-1", items: [] }),
+          JSON.stringify({
+            id: "inv-1",
+            number: "RE-2026-001",
+            entityId: "ent-1",
+            customerId: null,
+            currency: "EUR",
+            date: null,
+            dueDate: null,
+            items: [],
+            updatedAt: new Date().toISOString(),
+          }),
           { status: 200, headers: { "Content-Type": "application/json" } },
         );
       }
@@ -47,16 +95,23 @@ describe.skip("phase03-product", () => {
       expect(screen.getByRole("navigation")).toBeTruthy();
     });
 
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Neue Rechnung" })).toBeTruthy();
+    });
+
     fireEvent.click(screen.getByRole("button", { name: "Neue Rechnung" }));
 
-    const inputs = screen.getAllByRole("textbox");
-    fireEvent.change(inputs[0], { target: { value: "Draft note" } });
+    const lineInput = screen.getAllByRole("textbox").find((node) =>
+      node.closest('[data-testid="line-item-card"]'),
+    );
+    expect(lineInput).toBeTruthy();
+    fireEvent.change(lineInput!, { target: { value: "Draft note" } });
 
     await waitFor(
       () => {
         expect(screen.getByText(/Speichert/)).toBeTruthy();
       },
-      { timeout: 2000 },
+      { timeout: 3000 },
     );
 
     await waitFor(
