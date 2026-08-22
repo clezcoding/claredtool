@@ -202,6 +202,10 @@ export function SessionProvider({
 
   const logout = useCallback(async () => {
     const current = token;
+    const authentik =
+      (import.meta.env.VITE_AUTHENTIK_URL as string | undefined) ??
+      "http://localhost:9000";
+    const fallbackEndSession = `${authentik.replace(/\/$/, "")}/application/o/clared/end-session/`;
     try {
       if (current) {
         const { endSessionUrl } = await logoutSession(current);
@@ -215,7 +219,14 @@ export function SessionProvider({
         return;
       }
     } catch {
-      /* drop local session even if the API call fails */
+      await invoke("keychain_delete_session").catch(() => undefined);
+      tokenRef.current = null;
+      setToken(null);
+      setMe(null);
+      setState("unsigned");
+      setBannerKind(null);
+      await invoke("open_login_window", { url: fallbackEndSession });
+      return;
     }
     await invoke("keychain_delete_session").catch(() => undefined);
     tokenRef.current = null;
