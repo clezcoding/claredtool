@@ -8,6 +8,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -75,8 +76,11 @@ export function SessionProvider({
   const [token, setToken] = useState<string | null>(null);
   const [bannerKind, setBannerKind] = useState<BannerKind>(null);
   const [openingLogin, setOpeningLogin] = useState(false);
+  const tokenRef = useRef<string | null>(null);
+  const seenTickets = useRef(new Set<string>());
 
   const applySession = useCallback((nextToken: string, nextMe: MeResponse) => {
+    tokenRef.current = nextToken;
     setToken(nextToken);
     setMe(nextMe);
     setState("signed");
@@ -85,6 +89,8 @@ export function SessionProvider({
 
   const redeem = useCallback(
     async (ticket: string) => {
+      if (seenTickets.current.has(ticket)) return;
+      seenTickets.current.add(ticket);
       try {
         const host = (await hostname()) ?? "unknown";
         const { token: nextToken } = await redeemTicket(ticket, host);
@@ -93,10 +99,11 @@ export function SessionProvider({
         applySession(nextToken, nextMe);
         await replayLastRequest(nextToken).catch(() => undefined);
       } catch {
+        setBannerKind("cancel");
+        if (tokenRef.current) return;
         setToken(null);
         setMe(null);
         setState("unsigned");
-        setBannerKind("cancel");
       }
     },
     [applySession],
@@ -105,6 +112,7 @@ export function SessionProvider({
   const loadFromKeychain = useCallback(async () => {
     const stored = await invoke<string | null>("keychain_get_session");
     if (!stored) {
+      tokenRef.current = null;
       setToken(null);
       setMe(null);
       setState("unsigned");
@@ -117,6 +125,7 @@ export function SessionProvider({
     } catch (err) {
       if (isUnauthorized(err)) {
         await invoke("keychain_delete_session").catch(() => undefined);
+        tokenRef.current = null;
         setToken(null);
         setMe(null);
         setState("unsigned");
@@ -190,6 +199,7 @@ export function SessionProvider({
       if (current) {
         const { endSessionUrl } = await logoutSession(current);
         await invoke("keychain_delete_session");
+        tokenRef.current = null;
         setToken(null);
         setMe(null);
         setState("unsigned");
@@ -201,6 +211,7 @@ export function SessionProvider({
       /* drop local session even if the API call fails */
     }
     await invoke("keychain_delete_session").catch(() => undefined);
+    tokenRef.current = null;
     setToken(null);
     setMe(null);
     setState("unsigned");
