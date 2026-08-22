@@ -1,3 +1,5 @@
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::{
     Emitter, Manager, Url, WebviewUrl, WebviewWindowBuilder, webview::PageLoadEvent,
 };
@@ -6,6 +8,7 @@ const KEYCHAIN_SERVICE: &str = "com.clared.app";
 const KEYCHAIN_ACCOUNT: &str = "session";
 const LOGIN_LABEL: &str = "login";
 const TICKET_EVENT: &str = "ticket-received";
+const CANCEL_EVENT: &str = "login-cancelled";
 
 fn session_entry() -> Result<keyring::Entry, String> {
     keyring::Entry::new(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT).map_err(|e| e.to_string())
@@ -136,7 +139,11 @@ async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result
     let csp_script = csp_init_script(&backend, &authentik);
 
     let nav_app = app.clone();
+    let close_app = app.clone();
     let load_login = parsed_login;
+    let ticket_emitted = Arc::new(AtomicBool::new(false));
+    let ticket_for_nav = ticket_emitted.clone();
+    let ticket_for_close = ticket_emitted;
 
     let window = WebviewWindowBuilder::new(
         &app,
@@ -156,6 +163,7 @@ async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result
                 .find(|(key, _)| key == "ticket")
                 .map(|(_, value)| value.into_owned())
             {
+                ticket_for_nav.store(true, Ordering::SeqCst);
                 if let Some(main) = nav_app.get_webview_window("main") {
                     let _ = main.emit(TICKET_EVENT, ticket);
                 }
@@ -175,7 +183,16 @@ async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result
     .build()
     .map_err(|e| e.to_string())?;
 
-    let _ = window;
+    window.on_window_event(move |event| {
+        if let tauri::WindowEvent::Destroyed = event {
+            if ticket_for_close.load(Ordering::SeqCst) {
+                return;
+            }
+            if let Some(main) = close_app.get_webview_window("main") {
+                let _ = main.emit(CANCEL_EVENT, ());
+            }
+        }
+    });
     Ok(())
 }
 

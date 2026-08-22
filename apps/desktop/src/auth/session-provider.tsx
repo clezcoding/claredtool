@@ -77,6 +77,7 @@ export function SessionProvider({
   const [openingLogin, setOpeningLogin] = useState(false);
   const tokenRef = useRef<string | null>(null);
   const seenTickets = useRef(new Set<string>());
+  const expectLoginCancel = useRef(false);
 
   const applySession = useCallback((nextToken: string, nextMe: MeResponse) => {
     tokenRef.current = nextToken;
@@ -95,6 +96,7 @@ export function SessionProvider({
         const { token: nextToken } = await redeemTicket(ticket, host);
         await invoke("keychain_set_session", { token: nextToken });
         const nextMe = await fetchMe(nextToken);
+        expectLoginCancel.current = false;
         applySession(nextToken, nextMe);
         await replayLastRequest(nextToken).catch(() => undefined);
       } catch {
@@ -145,6 +147,13 @@ export function SessionProvider({
         });
         unlisteners.push(unlistenTicket);
 
+        const unlistenCancel = await listen("login-cancelled", () => {
+          if (!expectLoginCancel.current) return;
+          expectLoginCancel.current = false;
+          setBannerKind("cancel");
+        });
+        unlisteners.push(unlistenCancel);
+
         const unlistenUrls = await onOpenUrl((urls) => {
           const ticket = ticketFromUrls(urls);
           if (ticket) void redeem(ticket);
@@ -182,6 +191,7 @@ export function SessionProvider({
         await invoke("keychain_delete_session").catch(() => undefined);
         tokenRef.current = null;
         setToken(null);
+        expectLoginCancel.current = true;
         await invoke("open_login_window");
       })();
     });
@@ -190,6 +200,7 @@ export function SessionProvider({
 
   const login = useCallback(async () => {
     setOpeningLogin(true);
+    expectLoginCancel.current = true;
     try {
       await invoke("open_login_window");
     } finally {
