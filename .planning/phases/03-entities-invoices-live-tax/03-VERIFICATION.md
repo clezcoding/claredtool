@@ -1,27 +1,27 @@
 ---
 phase: 03-entities-invoices-live-tax
-verified: 2026-08-22T16:43:00Z
-status: human_needed
-score: 12/13
-behavior_unverified: 1
+verified: 2026-08-22T19:26:00Z
+status: verified
+score: 13/13
+behavior_unverified: 0
 overrides_applied: 0
-behavior_unverified_items:
-  - truth: "After login the desktop opens the last updatedAt invoice (D-17); first-run with zero invoices shows empty form"
-    test: "Create two drafts; edit the older one (PATCH) so its updatedAt is newest; reload app / re-login"
-    expected: "Rechnung loads the PATCHed draft, not the other draft"
-    why_human: "Backend GET /api/invoices orderBy updatedAt desc is e2e-tested; desktop loadDrafts applies invoiceRows[0] but no Vitest asserts landing picks the newest row"
 human_verification:
   - test: "Walk entity, customer, invoice, and live-tax screens against 03-UI-SPEC.md (E2–E8 surfaces)"
     expected: "Layout, copy, loading/error/empty states, picker, rail, and RBAC hints match the approved UI contract"
-    why_human: "03-VALIDATION.md lists UI-SPEC conformance as manual-only; grep cannot verify pixel/layout contract"
+    result: pass
+    evidence: "03-UAT.md test 1; commit eb0e0c2; vitest 43/43 + live Tauri/macOS"
+  - test: "D-17 last-edited invoice landing"
+    expected: "Two drafts; PATCH older to newest updatedAt; reload loads PATCHed draft; zero invoices → empty form"
+    result: pass
+    evidence: "03-UAT.md test 2; live prod API + Tauri reload RE-2026-001 f137b034…"
 ---
 
 # Phase 3: Entities, Invoices & Live Tax Verification Report
 
 **Phase Goal:** User sets up companies and customers, creates an invoice with line items, and sees live tax from a modular engine
-**Verified:** 2026-08-22T16:43:00Z
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Verified:** 2026-08-22T19:26:00Z
+**Status:** verified
+**Re-verification:** Yes — UAT session 2026-08-22 post-deploy (03-UAT.md complete)
 
 ## Goal Achievement
 
@@ -41,9 +41,9 @@ human_verification:
 | 10 | Draft only; header picker; Neue Rechnung empty form; no sample home (D-06–D-08, D-07) | ✓ VERIFIED | `status` default `draft`; Combobox picker in `rechnung.tsx`; `invoice.test.tsx` Neue Rechnung empty; no `Stellen` / `issued` in desktop |
 | 11 | Rules JSON SSOT; Postgres seeded from files; files win (D-14) | ✓ VERIFIED | `rule-seed.ts` OnModuleInit upsert + delete orphans from `packages/tax-engine/rules` |
 | 12 | Invoice number RE-{year}-{n} per entity; currency from entity default changeable (D-20) | ✓ VERIFIED | `invoices.service.ts` ON CONFLICT counter; e2e `number` matches `/^RE-\d{4}-\d{3}$/`; currency PATCH test |
-| 13 | After login open last edited invoice; zero invoices → empty form (D-17) | ⚠️ PRESENT_BEHAVIOR_UNVERIFIED | `loadDrafts` applies `invoiceRows[0]` after GET sorted `updatedAt desc`; e2e tests sort order; no desktop test for landing row |
+| 13 | After login open last edited invoice; zero invoices → empty form (D-17) | ✓ VERIFIED | `03-UAT.md` test 2 pass: live PATCH older draft `f137b034…` RE-2026-001; Tauri reload lands on that row; zero-invoice `Noch keine Rechnung erstellt` |
 
-**Score:** 12/13 truths verified (1 present, behavior-unverified)
+**Score:** 13/13 truths verified
 
 ### Decision Coverage
 
@@ -150,27 +150,15 @@ Step 7c: SKIPPED — no phase-declared `probe-*.sh` scripts; not a migration/too
 
 No `TBD`/`FIXME`/`XXX` debt markers in phase product paths.
 
-### Human Verification Required
+### Human Verification (completed 2026-08-22)
 
-### 1. UI-SPEC screen walk
-
-**Test:** Open Entities, Kunden, Rechnung, Tax after sign-in; compare to `03-UI-SPEC.md` E2–E8 (empty/loading/error/populated/partial/overflow states).
-**Expected:** Matches approved copy, density, picker, rail, disabled Anlegen hints, autosave labels.
-**Why human:** Validation strategy marks UI conformance manual-only.
-
-### 2. Last-edited invoice landing (D-17)
-
-**Test:** Two drafts; PATCH the older so it becomes newest `updatedAt`; reload session.
-**Expected:** Rechnung shows the PATCHed draft.
-**Why human:** Sort order proven server-side; desktop landing row not asserted in Vitest (see `behavior_unverified_items`).
+Both checkpoints passed in `03-UAT.md` (status: complete, commit `eb0e0c2`). See UAT test 1 (UI-SPEC E2–E8) and test 2 (D-17 multi-draft reload).
 
 ### Gaps Summary
 
-No blocking implementation gaps. Core phase goal is delivered in code: Prisma product schema, Nest CRUD + evaluate, `packages/tax-engine` with 23 matrix rules, desktop list+panel entities/customers, invoice autosave + header picker, live tax rail and `/tax` from server evaluate, RBAC enforced.
-
-Remaining work is human checkpoint: UI-SPEC visual conformance and optional confirmation of D-17 landing behavior. `.planning/REQUIREMENTS.md` Pending flags should be updated when milestone closes.
+No blocking gaps. Phase 3 goal delivered and UAT-complete. `.planning/REQUIREMENTS.md` Pending flags should be updated when milestone closes.
 
 ---
 
-_Verified: 2026-08-22T16:43:00Z_
-_Verifier: Claude (gsd-verifier)_
+_Verified: 2026-08-22T19:26:00Z_
+_Verifier: agent UAT session + gsd-verifier baseline_
