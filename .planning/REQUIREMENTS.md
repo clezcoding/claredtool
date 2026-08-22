@@ -14,8 +14,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Backend & Identity
 
-- [ ] **BACK-01**: Desktop connects over HTTPS and OIDC/OAuth2 to the **vendor Coolify** backend (Backend-App, Postgres, Redis, Authentik on the founder's cluster — not customer self-host)
-- [ ] **AUTH-01**: User authenticates via Authentik OIDC (SSO/MFA); backend validates token and creates session/API-key; Mandant-Gruppen plus `clared-platform`; AUTH-01 minimum roles owner, accountant, viewer remain on the token
+- [x] **BACK-01**: Desktop connects over HTTPS and OIDC/OAuth2 to the **vendor Coolify** backend (Backend-App, Postgres, Redis, Authentik on the founder's cluster — not customer self-host)
+- [x] **AUTH-01**: User authenticates via Authentik OIDC (SSO/MFA); backend validates token and creates session/API-key; Mandant-Gruppen plus `clared-platform`; AUTH-01 minimum roles owner, accountant, viewer remain on the token
 
 ### Entities & Invoices
 
@@ -89,8 +89,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | UI-01 | Phase 1 | Complete |
 | DESK-01 | Phase 1 | Complete |
-| BACK-01 | Phase 2 | Pending |
-| AUTH-01 | Phase 2 | Pending |
+| BACK-01 | Phase 2 | Complete |
+| AUTH-01 | Phase 2 | Complete |
 | ENT-01 | Phase 3 | Pending |
 | INV-01 | Phase 3 | Pending |
 | TAX-01 | Phase 3 | Pending |

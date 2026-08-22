@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 02
 current_phase_name: Self-Hosted Backend & Authentik SSO
-status: executing
-stopped_at: Completed 02-04-PLAN.md
-last_updated: "2026-08-22T02:18:17.812Z"
+status: verifying
+stopped_at: Completed 02-05-PLAN.md
+last_updated: "2026-08-22T02:28:38.432Z"
 last_activity: 2026-08-22
 last_activity_desc: Phase 02 execution started
-state_head: 401373721f6ff66b686cdec52ac87a123d54a5a9
+state_head: c1c406e71ac68723a91171748e7a59f7c4a583b8
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
 milestone_name: milestone
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 Phase: 02 (Self-Hosted Backend & Authentik SSO) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-08-22 — Phase 02 execution started
 
 Progress: [██░░░░░░░░] 25%
@@ -67,6 +67,7 @@ Progress: [██░░░░░░░░] 25%
 | Phase 02-self-hosted-backend-authentik-sso P02 | 19 min | 3 tasks | 31 files |
 | Phase 02-self-hosted-backend-authentik-sso P03 | 8 min | 2 tasks | 14 files |
 | Phase 02-self-hosted-backend-authentik-sso P04 | 17 min | 3 tasks | 22 files |
+| Phase 02-self-hosted-backend-authentik-sso P05 | 7 min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,9 @@ Recent decisions affecting current work:
 - [Phase 02-self-hosted-backend-authentik-sso]: Login CSP via initialization_script meta because WebviewWindowBuilder has no CSP setter (A3) — on_navigation exists; no per-window CSP setter on this crate. Meta inject plus host allowlist.
 - [Phase 02-self-hosted-backend-authentik-sso]: login-init.html loaded as include_str data URL so src-tauri HTML does not depend on Vite public/ — Plan places the spinner HTML in src-tauri; WebviewUrl::App would look in frontend dist.
 - [Phase 02-self-hosted-backend-authentik-sso]: Chip/banner live in components/; open_login_window optional url for end_session; vitest fileParallelism false
+- [Phase 02-self-hosted-backend-authentik-sso]: Keep dynamic import of openid-client; static ESM import breaks Jest CJS (AUTH_TEST_MODE never loads the package)
+- [Phase 02-self-hosted-backend-authentik-sso]: Blueprint sets client_id clared and does not set client_secret (copy generated SECRET into env; prod only in Coolify)
+- [Phase 02-self-hosted-backend-authentik-sso]: wget official compose.yml verbatim — postgresql service is Authentik's DB, no redis, no /etc/localtime
 
 ### Pending Todos
 
@@ -121,6 +125,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-22T02:18:17.785Z
-Stopped at: Completed 02-04-PLAN.md
+Last session: 2026-08-22T02:28:38.406Z
+Stopped at: Completed 02-05-PLAN.md
 Resume file: None
