@@ -14,7 +14,11 @@ import { randomBytes } from "node:crypto";
 import { IsOptional, IsString } from "class-validator";
 import type { Response } from "express";
 import { Public } from "./public.decorator";
-import { authorizationCodeGrant, buildAuthorizationUrl } from "./oidc";
+import {
+  authorizationCodeGrant,
+  beginAuthorization,
+  endSessionUrl,
+} from "./oidc";
 import { projectRbac } from "./rbac";
 import { AuthedRequest } from "./auth.guard";
 import {
@@ -40,22 +44,15 @@ export class AuthController {
   @Public()
   @Get("login")
   async login(@Res() res: Response): Promise<void> {
-    const state = randomBytes(16).toString("base64url");
-    const codeVerifier = randomBytes(32).toString("base64url");
+    const backend = process.env.BACKEND_URL ?? "http://localhost:3000";
+    const redirectUri = `${backend}/auth/callback`;
+    const { url, state, codeVerifier } = await beginAuthorization(redirectUri);
     await this.redis.set(
       `oauth:${state}`,
       JSON.stringify({ code_verifier: codeVerifier }),
       "EX",
       OAUTH_TTL_SECONDS,
     );
-    const backend = process.env.BACKEND_URL ?? "http://localhost:3000";
-    const redirectUri = `${backend}/auth/callback`;
-    const codeChallenge = randomBytes(32).toString("base64url");
-    const url = await buildAuthorizationUrl({
-      redirectUri,
-      state,
-      codeChallenge,
-    });
     res.redirect(url.toString());
   }
 
@@ -139,9 +136,6 @@ export class AuthController {
     if (request.sessionToken) {
       await this.redis.del(`session:${request.sessionToken}`);
     }
-    const authentik = process.env.AUTHENTIK_URL ?? "http://localhost:9000";
-    return {
-      endSessionUrl: `${authentik.replace(/\/$/, "")}/application/o/clared/end-session/`,
-    };
+    return { endSessionUrl: endSessionUrl() };
   }
 }

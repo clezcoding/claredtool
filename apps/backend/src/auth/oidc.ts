@@ -1,3 +1,7 @@
+import { randomBytes } from "node:crypto";
+
+export const OIDC_SCOPES = "openid profile email groups";
+
 export type OidcClaims = {
   sub: string;
   email: string;
@@ -12,36 +16,70 @@ const TEST_CLAIMS: OidcClaims = {
   groups: ["clared-owner"],
 };
 
-export async function buildAuthorizationUrl(params: {
-  redirectUri: string;
-  state: string;
-  codeChallenge: string;
-}): Promise<URL> {
-  if (process.env.AUTH_TEST_MODE === "1") {
-    const backend = process.env.BACKEND_URL ?? "http://localhost:3000";
-    const url = new URL("/auth/callback", backend);
-    url.searchParams.set("code", "test");
-    url.searchParams.set("state", params.state);
-    return url;
+function asStringGroups(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((g): g is string => typeof g === "string")
+    : [];
+}
+
+export function pickGroups(
+  idToken: { groups?: unknown; [key: string]: unknown } | undefined,
+  userinfo?: { groups?: unknown; [key: string]: unknown },
+): string[] {
+  const fromToken = asStringGroups(idToken?.groups);
+  if (fromToken.length > 0) {
+    return fromToken;
   }
-  const client = await import("openid-client");
-  const issuer = new URL(
+  return asStringGroups(userinfo?.groups);
+}
+
+export function authentikIssuer(): URL {
+  return new URL(
     "/application/o/clared/",
     process.env.AUTHENTIK_URL ?? "http://localhost:9000",
   );
+}
+
+export function endSessionUrl(): string {
+  const authentik = (process.env.AUTHENTIK_URL ?? "http://localhost:9000").replace(
+    /\/$/,
+    "",
+  );
+  return `${authentik}/application/o/clared/end-session/`;
+}
+
+export async function beginAuthorization(redirectUri: string): Promise<{
+  url: URL;
+  state: string;
+  codeVerifier: string;
+}> {
+  if (process.env.AUTH_TEST_MODE === "1") {
+    const state = randomBytes(16).toString("base64url");
+    const codeVerifier = randomBytes(32).toString("base64url");
+    const backend = process.env.BACKEND_URL ?? "http://localhost:3000";
+    const url = new URL("/auth/callback", backend);
+    url.searchParams.set("code", "test");
+    url.searchParams.set("state", state);
+    return { url, state, codeVerifier };
+  }
+  const client = await import("openid-client");
+  const codeVerifier = client.randomPKCECodeVerifier();
+  const codeChallenge = await client.calculatePKCECodeChallenge(codeVerifier);
+  const state = client.randomState();
   const config = await client.discovery(
-    issuer,
+    authentikIssuer(),
     process.env.CLIENT_ID ?? "clared",
     undefined,
     client.ClientSecretPost(process.env.SECRET ?? ""),
   );
-  return client.buildAuthorizationUrl(config, {
-    redirect_uri: params.redirectUri,
-    scope: "openid profile email groups",
-    code_challenge: params.codeChallenge,
+  const url = client.buildAuthorizationUrl(config, {
+    redirect_uri: redirectUri,
+    scope: OIDC_SCOPES,
+    code_challenge: codeChallenge,
     code_challenge_method: "S256",
-    state: params.state,
+    state,
   });
+  return { url, state, codeVerifier };
 }
 
 export async function authorizationCodeGrant(
@@ -53,12 +91,8 @@ export async function authorizationCodeGrant(
     return TEST_CLAIMS;
   }
   const client = await import("openid-client");
-  const issuer = new URL(
-    "/application/o/clared/",
-    process.env.AUTHENTIK_URL ?? "http://localhost:9000",
-  );
   const config = await client.discovery(
-    issuer,
+    authentikIssuer(),
     process.env.CLIENT_ID ?? "clared",
     undefined,
     client.ClientSecretPost(process.env.SECRET ?? ""),
@@ -68,9 +102,15 @@ export async function authorizationCodeGrant(
     expectedState,
   });
   const claims = tokens.claims();
-  const groups = Array.isArray(claims?.groups)
-    ? claims.groups.filter((g): g is string => typeof g === "string")
-    : [];
+  let groups = pickGroups(claims);
+  if (groups.length === 0 && tokens.access_token && claims?.sub) {
+    const info = await client.fetchUserInfo(
+      config,
+      tokens.access_token,
+      claims.sub,
+    );
+    groups = pickGroups(claims, info);
+  }
   return {
     sub: String(claims?.sub ?? ""),
     email: String(claims?.email ?? ""),

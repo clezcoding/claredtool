@@ -6,6 +6,8 @@ import { SESSION_TTL_SECONDS, TICKET_TTL_SECONDS } from "../src/auth/ttl";
 import { MemoryStore } from "../src/auth/memory-store";
 import { RedisService } from "../src/redis/redis.service";
 
+process.env.AUTH_TEST_MODE = "1";
+
 const TICKET_CLAIMS = JSON.stringify({
   sub: "auth0|owner",
   email: "owner@clared.test",
@@ -72,6 +74,21 @@ describe("Auth (e2e)", () => {
     expect(statuses).toEqual([200, 401]);
   });
 
+  it("GET /auth/callback redirects to clared://auth?ticket=", async () => {
+    const login = await request(app.getHttpServer())
+      .get("/auth/login")
+      .redirects(0);
+    expect(login.status).toBe(302);
+    const authorize = new URL(login.headers.location as string);
+    const callback = await request(app.getHttpServer())
+      .get(
+        `/auth/callback?code=${authorize.searchParams.get("code")}&state=${authorize.searchParams.get("state")}`,
+      )
+      .redirects(0);
+    expect(callback.status).toBe(302);
+    expect(callback.headers.location).toMatch(/^clared:\/\/auth\?ticket=/);
+  });
+
   it("POST /auth/logout with Bearer DELs only that session", async () => {
     const first = await request(app.getHttpServer())
       .post("/auth/session")
@@ -85,10 +102,13 @@ describe("Auth (e2e)", () => {
     const tokenA = first.body.token as string;
     const tokenB = second.body.token as string;
 
-    await request(app.getHttpServer())
+    const logout = await request(app.getHttpServer())
       .post("/auth/logout")
       .set("Authorization", `Bearer ${tokenA}`)
       .expect(200);
+    expect(logout.body.endSessionUrl).toContain(
+      "application/o/clared/end-session",
+    );
 
     await request(app.getHttpServer())
       .get("/me")
