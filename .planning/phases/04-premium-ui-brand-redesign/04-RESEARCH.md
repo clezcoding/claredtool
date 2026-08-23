@@ -396,12 +396,12 @@ body { font-family: var(--font-sans); font-size: 14px; font-weight: 400; line-he
 
 ## Open Questions
 
-1. **Login-window (`login-init.html`) brand treatment**
+1. **Login-window (`login-init.html`) brand treatment** — **(RESOLVED)** optional polish, not a Phase 4 gate; `login-gate.tsx` is the branded surface.
    - What we know: the Authentik login runs in a separate Tauri webview seeded by `src-tauri/login-init.html` (include_str, data URL). `[VERIFIED: lib.rs:74,151]`
    - What's unclear: whether its spinner/background should get Crafted styling this phase (it is Rust-embedded HTML, outside the React tree).
    - Recommendation: minimal — match splash colors in `login-init.html` if trivial; otherwise leave (login gate `login-gate.tsx` is the branded surface). Treat as optional polish, not a gate.
 
-2. **Where to instantiate the Darstellung menu**
+2. **Where to instantiate the Darstellung menu** — **(RESOLVED)** build once in `main.tsx` after `applyTheme`, via `lib/theme-menu.ts` (main-window only, out of render loop). Planned in 04-01 Task 2.
    - What we know: menu is `main`-window-scoped; `App.tsx` mounts the shell.
    - Recommendation: build once in `main.tsx` (after `applyTheme`) or a `lib/theme-menu.ts` called from `AuthenticatedApp` mount; keep out of render loop.
 
