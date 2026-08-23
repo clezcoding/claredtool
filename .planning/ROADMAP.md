@@ -138,7 +138,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. New graphics (hero art, illustrations, empty-state art) are generated via Higgsfield CLI and wired in
   5. Motion is implemented per interface-design rules (durations <300ms, custom ease-out, `prefers-reduced-motion` respected), including a loading/splash experience
 
-**Plans**: 5/5 plans executed
+**Plans**: 6 plans
 
 **Wave 1**
 
@@ -156,6 +156,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Wave 4** *(gap closure; blocked on Wave 3)*
 
 - [x] 04-05-PLAN.md — Empty CTA + login hero + OS applyTheme paint (G-04-4–6)
+
+**Wave 5** *(gap closure; blocked on Wave 4)*
+
+- [ ] 04-06-PLAN.md — D-02 canvas token SSOT + FOUC (G-04-1, G-04-2)
 
 **UI hint**: yes
 
