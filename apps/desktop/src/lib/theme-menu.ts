@@ -42,7 +42,8 @@ export async function installThemeMenu(): Promise<void> {
     const menu = await Menu.default();
     await menu.append(darstellung);
     await menu.setAsAppMenu();
-  } catch {
+  } catch (err) {
+    console.warn("[theme-menu] Darstellung menu install failed:", err);
     // Non-Tauri / test / missing menu ACL — shell still runs without native menu.
   }
 }
