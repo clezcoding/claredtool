@@ -2,8 +2,8 @@ export const THEME_KEY = "clared-theme";
 export type ThemePref = "light" | "dark" | "system";
 
 /** D-02 first-paint canvas — keep in sync with apps/desktop/index.html boot IIFE. */
-const PAINT_LIGHT = "#F7F7F5";
-const PAINT_DARK = "#111110";
+export const PAINT_LIGHT = "#F7F7F5";
+export const PAINT_DARK = "#111110";
 
 const PREFS = new Set<string>(["light", "dark", "system"]);
 
