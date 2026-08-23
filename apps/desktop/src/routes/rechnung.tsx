@@ -485,7 +485,7 @@ export function RechnungScreen() {
 
   return (
     <div className="flex h-full min-h-0">
-      <section className="flex min-h-0 max-w-xl flex-1 flex-col overflow-auto p-6">
+      <section className="flex min-h-0 max-w-xl flex-1 flex-col overflow-auto bg-background p-6">
         <div className="flex flex-col gap-4">
           <header className="flex items-start justify-between gap-4">
             <div className="flex min-w-0 flex-1 flex-col gap-2">
@@ -560,7 +560,7 @@ export function RechnungScreen() {
 
           {showHero ? <InvoiceEmptyState /> : null}
 
-          <Card>
+          <Card className="border-border bg-card">
             <CardContent className="grid gap-4 pt-6 text-sm sm:grid-cols-2">
               <div className="flex flex-col gap-1">
                 <Label htmlFor="rechnungsnummer">Rechnungsnummer</Label>
@@ -704,7 +704,7 @@ export function RechnungScreen() {
                   setLineItems((current) => [...current, { ...BLANK_LINE }]);
                   if (canWrite) setAutosaveStatus("saving");
                 }}
-                className="self-start rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+                className="btn-primary min-h-11 self-start rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-[scale] active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
                 + Position
               </button>

@@ -78,7 +78,7 @@ export function LineItemCard({
           <dt className="text-muted-foreground">Einzelpreis</dt>
           <dd>
             {readOnly ? (
-              <span>{item.einzelpreis.toFixed(2)}</span>
+              <span className="tabular-nums">{item.einzelpreis.toFixed(2)}</span>
             ) : (
               <Input
                 type="number"
@@ -93,14 +93,14 @@ export function LineItemCard({
                     netto: item.menge * einzelpreis,
                   });
                 }}
-                className="mt-1"
+                className="mt-1 tabular-nums"
               />
             )}
           </dd>
         </div>
         <div>
           <dt className="text-muted-foreground">Netto</dt>
-          <dd className="break-words whitespace-normal pt-2">
+          <dd className="break-words whitespace-normal pt-2 tabular-nums">
             {netto.toFixed(2)}
           </dd>
         </div>
