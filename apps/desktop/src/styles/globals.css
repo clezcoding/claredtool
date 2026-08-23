@@ -31,11 +31,11 @@
 
 :root {
   color-scheme: light;
-  --background: #ffffff;
+  --background: #F7F7F5;
   --foreground: #111110;
-  --card: #f7f7f5;
+  --card: #FFFFFF;
   --card-foreground: #111110;
-  --popover: #ffffff;
+  --popover: #FFFFFF;
   --popover-foreground: #111110;
   --primary: #a8bfa3;
   --primary-foreground: #111110;
@@ -101,6 +101,10 @@
 @layer base {
   * {
     @apply border-border;
+  }
+
+  html {
+    @apply bg-background;
   }
 
   body {
