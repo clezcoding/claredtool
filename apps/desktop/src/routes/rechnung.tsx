@@ -1,13 +1,5 @@
 import {
   Button,
-  Card,
-  CardContent,
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
   Input,
   Label,
   Select,
@@ -16,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@clared/ui";
+import { Eye, Send } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { apiFetch } from "../auth/api";
@@ -82,8 +75,8 @@ const BLANK_LINE: LineItem = {
 };
 
 const AUTOSAVE_DELAY_MS = 600;
-const comboboxTriggerClass =
-  "min-h-11 w-full bg-card text-foreground font-normal hover:bg-muted";
+const SOLID_CTA =
+  "btn-primary min-h-11 font-semibold bg-foreground text-background hover:bg-foreground/90";
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
@@ -482,242 +475,299 @@ export function RechnungScreen() {
   const currencyOptions = Array.from(
     new Set([currency, "EUR", "USD", "AED", selectedEntity?.currencyDefault ?? "EUR"]),
   );
+  const nettoGesamt = lineItems.reduce(
+    (sum, item) => sum + item.menge * item.einzelpreis,
+    0,
+  );
+  const rate = railTax?.invoice_tax_rate ?? 0;
+  const taxPercent = rate <= 1 ? Math.round(rate * 100) : Math.round(rate);
+
+  if (showHero) {
+    return <InvoiceEmptyState onStart={startNewDraft} />;
+  }
 
   return (
     <div className="flex h-full min-h-0">
-      <section className="flex min-h-0 max-w-xl flex-1 flex-col overflow-auto bg-background p-6">
-        <div className="flex flex-col gap-4">
-          <header className="flex items-start justify-between gap-4">
-            <div className="flex min-w-0 flex-1 flex-col gap-2">
+      <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-auto bg-background">
+        <header className="flex items-start justify-between gap-4 border-b border-border/70 px-8 py-5">
+          <div className="flex min-w-0 flex-1 flex-col gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-xl font-semibold">Rechnung</h1>
-              <Combobox
-                items={drafts}
-                itemToStringValue={(item) => invoiceLabel(item, false)}
-                value={currentPickerInvoice}
-                onValueChange={(item) => {
-                  if (item) handlePickerSelect(item);
-                }}
-              >
-                <ComboboxInput
-                  placeholder={pickerLabel}
-                  aria-label="Rechnung wählen"
-                  className={comboboxTriggerClass}
-                  title={pickerLabel}
-                />
-                <ComboboxContent>
-                  <ComboboxEmpty>Keine Rechnung passt zur Suche.</ComboboxEmpty>
-                  <ComboboxList>
-                    {(item) => (
-                      <ComboboxItem key={item.id} value={item}>
-                        {invoiceLabel(item, false)}
-                      </ComboboxItem>
-                    )}
-                  </ComboboxList>
-                </ComboboxContent>
-              </Combobox>
-            </div>
-            <div className="flex shrink-0 flex-col items-end gap-2">
-              {canWrite && autosaveStatus !== "hidden" ? (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  {autosaveStatus === "saving" ? (
-                    <>
-                      <Spinner />
-                      <span>Speichert…</span>
-                    </>
-                  ) : null}
-                  {autosaveStatus === "saved" ? <span>Gespeichert</span> : null}
-                  {autosaveStatus === "error" ? (
-                    <span>
-                      Speichern fehlgeschlagen. Eingaben bleiben sichtbar.
-                    </span>
-                  ) : null}
-                </div>
+              {pickerLabel !== "Neue Rechnung" ? (
+                <span className="text-xl font-semibold text-muted-foreground">
+                  {pickerLabel}
+                </span>
               ) : null}
-              {canWrite ? (
-                <Button
-                  type="button"
-                  onClick={startNewDraft}
-                  className="min-h-11 font-semibold"
-                >
-                  Neue Rechnung
-                </Button>
-              ) : (
-                <div className="flex flex-col items-end gap-1">
-                  <Button
-                    type="button"
-                    disabled
-                    className="min-h-11 font-semibold"
-                  >
-                    Neue Rechnung
-                  </Button>
-                  <p className="text-xs text-muted-foreground">
-                    Keine Berechtigung zum Anlegen von Rechnungen.
-                  </p>
-                </div>
-              )}
+              <span className="rounded-full bg-primary/30 px-2 py-0.5 text-xs font-medium">
+                Entwurf
+              </span>
             </div>
-          </header>
-
-          {showHero ? <InvoiceEmptyState /> : null}
-
-          <Card className="border-border bg-card">
-            <CardContent className="grid gap-4 pt-6 text-sm sm:grid-cols-2">
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="rechnungsnummer">Rechnungsnummer</Label>
-                <Input
-                  id="rechnungsnummer"
-                  readOnly
-                  placeholder="Wird vergeben…"
-                  value={rechnungsnummer}
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="datum">Datum</Label>
-                <Input
-                  id="datum"
-                  type="date"
-                  value={datum}
-                  readOnly={!canWrite}
-                  onChange={(event) => {
-                    setDatum(event.target.value);
-                    if (canWrite) setAutosaveStatus("saving");
-                  }}
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="faellig">Fällig</Label>
-                <Input
-                  id="faellig"
-                  type="date"
-                  value={faellig}
-                  readOnly={!canWrite}
-                  onChange={(event) => {
-                    setFaellig(event.target.value);
-                    if (canWrite) setAutosaveStatus("saving");
-                  }}
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="entity-picker">Entity</Label>
-                <Select
-                  value={entityId}
-                  onValueChange={(value) => {
-                    handleEntityChange(value);
-                    if (canWrite) setAutosaveStatus("saving");
-                  }}
-                  disabled={!canWrite}
-                >
-                  <SelectTrigger
-                    id="entity-picker"
-                    className="min-h-11 w-full bg-card font-normal text-foreground hover:bg-muted"
-                  >
-                    <SelectValue placeholder="Entity wählen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {entities.map((row) => (
-                      <SelectItem key={row.id} value={row.id}>
-                        {row.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="customer-picker">Kunde</Label>
-                <Select
-                  value={customerId}
-                  onValueChange={(value) => {
-                    setCustomerId(value);
-                    if (canWrite) setAutosaveStatus("saving");
-                  }}
-                  disabled={!canWrite || !entityId}
-                >
-                  <SelectTrigger
-                    id="customer-picker"
-                    className="min-h-11 w-full bg-card font-normal text-foreground hover:bg-muted"
-                  >
-                    <SelectValue placeholder="Kunde wählen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map((row) => (
-                      <SelectItem key={row.id} value={row.id}>
-                        {row.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="currency">Währung</Label>
-                <Select
-                  value={currency}
-                  onValueChange={(value) => {
-                    setCurrency(value);
-                    if (canWrite) setAutosaveStatus("saving");
-                  }}
-                  disabled={!canWrite}
-                >
-                  <SelectTrigger
-                    id="currency"
-                    className="min-h-11 w-full bg-card font-normal text-foreground hover:bg-muted"
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {currencyOptions.map((code) => (
-                      <SelectItem key={code} value={code}>
-                        {code}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="flex flex-col gap-2">
-            {lineItems.map((item, index) => (
-              <LineItemCard
-                key={`line-${index}`}
-                item={item}
-                readOnly={!canWrite}
-                onChange={(next) => {
-                  setLineItems((current) =>
-                    current.map((row, rowIndex) =>
-                      rowIndex === index ? next : row,
-                    ),
-                  );
-                  if (canWrite) setAutosaveStatus("saving");
+            {drafts.length > 0 ? (
+              <Select
+                value={draftId ?? ""}
+                onValueChange={(value) => {
+                  const next = drafts.find((row) => row.id === value);
+                  if (next) handlePickerSelect(next);
                 }}
-                onDelete={() => {
-                  setLineItems((current) =>
-                    current.filter((_, rowIndex) => rowIndex !== index),
-                  );
-                  if (canWrite) setAutosaveStatus("saving");
-                }}
-              />
-            ))}
-            {canWrite ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setLineItems((current) => [...current, { ...BLANK_LINE }]);
-                  if (canWrite) setAutosaveStatus("saving");
-                }}
-                className="btn-primary min-h-11 self-start rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-[scale] active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               >
-                + Position
-              </button>
+                <SelectTrigger
+                  aria-label="Rechnung wählen"
+                  className="h-9 w-full max-w-xs bg-transparent font-normal"
+                  title={pickerLabel}
+                >
+                  <SelectValue placeholder={pickerLabel} />
+                </SelectTrigger>
+                <SelectContent>
+                  {drafts.map((row) => (
+                    <SelectItem key={row.id} value={row.id}>
+                      {invoiceLabel(row, false)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : null}
+            {canWrite && autosaveStatus !== "hidden" ? (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                {autosaveStatus === "saving" ? (
+                  <>
+                    <Spinner />
+                    <span>Speichert…</span>
+                  </>
+                ) : null}
+                {autosaveStatus === "saved" ? <span>Gespeichert</span> : null}
+                {autosaveStatus === "error" ? (
+                  <span>Speichern fehlgeschlagen. Eingaben bleiben sichtbar.</span>
+                ) : null}
+              </div>
             ) : null}
           </div>
+          <div className="flex shrink-0 items-center gap-2">
+            {showRail ? (
+              <Link
+                to="/pdf"
+                className="inline-flex min-h-11 items-center gap-2 rounded-md border border-border px-3 text-sm"
+              >
+                <Eye size={16} />
+                Vorschau
+              </Link>
+            ) : null}
+            {canWrite ? (
+              <Button type="button" onClick={startNewDraft} className={SOLID_CTA}>
+                Neue Rechnung
+              </Button>
+            ) : (
+              <div className="flex flex-col items-end gap-1">
+                <Button type="button" disabled className="min-h-11 font-semibold">
+                  Neue Rechnung
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Keine Berechtigung zum Anlegen von Rechnungen.
+                </p>
+              </div>
+            )}
+            {showRail ? (
+              <Link
+                to="/pdf"
+                className={`${SOLID_CTA} inline-flex items-center gap-2 rounded-md px-4`}
+              >
+                <Send size={14} />
+                Senden
+              </Link>
+            ) : null}
+          </div>
+        </header>
 
-          {showRail ? (
-            <Link
-              to="/pdf"
-              className="text-sm text-primary"
+        <div className="flex flex-col gap-6 px-8 py-6">
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="rounded-lg border border-border bg-card p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Von
+              </p>
+              <Label htmlFor="entity-picker" className="sr-only">
+                Entity
+              </Label>
+              <Select
+                value={entityId}
+                onValueChange={(value) => {
+                  handleEntityChange(value);
+                  if (canWrite) setAutosaveStatus("saving");
+                }}
+                disabled={!canWrite}
+              >
+                <SelectTrigger
+                  id="entity-picker"
+                  className="mt-2 min-h-11 w-full bg-transparent font-normal"
+                >
+                  <SelectValue placeholder="Entity wählen" />
+                </SelectTrigger>
+                <SelectContent>
+                  {entities.map((row) => (
+                    <SelectItem key={row.id} value={row.id}>
+                      {row.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedEntity ? (
+                <p className="mt-2 whitespace-normal break-words text-sm text-muted-foreground">
+                  {selectedEntity.address}
+                  {selectedEntity.vatId ? ` · ${selectedEntity.vatId}` : ""}
+                </p>
+              ) : null}
+            </div>
+            <div className="rounded-lg border border-border bg-card p-4">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Kunde
+              </p>
+              <Label htmlFor="customer-picker" className="sr-only">
+                Kunde
+              </Label>
+              <Select
+                value={customerId}
+                onValueChange={(value) => {
+                  setCustomerId(value);
+                  if (canWrite) setAutosaveStatus("saving");
+                }}
+                disabled={!canWrite || !entityId}
+              >
+                <SelectTrigger
+                  id="customer-picker"
+                  className="mt-2 min-h-11 w-full bg-transparent font-normal"
+                >
+                  <SelectValue placeholder="Kunde wählen" />
+                </SelectTrigger>
+                <SelectContent>
+                  {customers.map((row) => (
+                    <SelectItem key={row.id} value={row.id}>
+                      {row.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedCustomer ? (
+                <p className="mt-2 whitespace-normal break-words text-sm text-muted-foreground">
+                  {selectedCustomer.address}
+                  {selectedCustomer.vatId ? ` · ${selectedCustomer.vatId}` : ""}
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-4">
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="rechnungsnummer">Rechnungsnummer</Label>
+              <Input
+                id="rechnungsnummer"
+                readOnly
+                placeholder="Wird vergeben…"
+                value={rechnungsnummer}
+                className="bg-card"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="datum">Datum</Label>
+              <Input
+                id="datum"
+                type="date"
+                value={datum}
+                readOnly={!canWrite}
+                onChange={(event) => {
+                  setDatum(event.target.value);
+                  if (canWrite) setAutosaveStatus("saving");
+                }}
+                className="bg-card"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="faellig">Fällig</Label>
+              <Input
+                id="faellig"
+                type="date"
+                value={faellig}
+                readOnly={!canWrite}
+                onChange={(event) => {
+                  setFaellig(event.target.value);
+                  if (canWrite) setAutosaveStatus("saving");
+                }}
+                className="bg-card"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="currency">Währung</Label>
+              <Select
+                value={currency}
+                onValueChange={(value) => {
+                  setCurrency(value);
+                  if (canWrite) setAutosaveStatus("saving");
+                }}
+                disabled={!canWrite}
+              >
+                <SelectTrigger
+                  id="currency"
+                  className="min-h-11 w-full bg-card font-normal"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {currencyOptions.map((code) => (
+                    <SelectItem key={code} value={code}>
+                      {code}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-border text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <th className="py-2 pr-2 font-medium">Pos.</th>
+                <th className="py-2 pr-2 font-medium">Beschreibung</th>
+                <th className="py-2 pr-2 font-medium">Menge</th>
+                <th className="py-2 pr-2 font-medium">Einheit</th>
+                <th className="py-2 pr-2 font-medium">Preis</th>
+                <th className="py-2 pr-2 font-medium">USt.</th>
+                <th className="py-2 pr-2 text-right font-medium">Betrag</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lineItems.map((item, index) => (
+                <LineItemCard
+                  key={`line-${index}`}
+                  item={item}
+                  index={index}
+                  taxPercent={taxPercent}
+                  readOnly={!canWrite}
+                  onChange={(next) => {
+                    setLineItems((current) =>
+                      current.map((row, rowIndex) =>
+                        rowIndex === index ? next : row,
+                      ),
+                    );
+                    if (canWrite) setAutosaveStatus("saving");
+                  }}
+                  onDelete={() => {
+                    setLineItems((current) =>
+                      current.filter((_, rowIndex) => rowIndex !== index),
+                    );
+                    if (canWrite) setAutosaveStatus("saving");
+                  }}
+                />
+              ))}
+            </tbody>
+          </table>
+          {canWrite ? (
+            <button
+              type="button"
+              onClick={() => {
+                setLineItems((current) => [...current, { ...BLANK_LINE }]);
+                if (canWrite) setAutosaveStatus("saving");
+              }}
+              className="self-start text-sm text-muted-foreground hover:text-foreground"
             >
-              PDF Vorschau
-            </Link>
+              + Position
+            </button>
           ) : null}
         </div>
       </section>
@@ -726,6 +776,9 @@ export function RechnungScreen() {
           tax={railTax}
           evaluateError={taxEvaluateError}
           onRetry={() => void evaluateDraft()}
+          netto={nettoGesamt}
+          currency={currency}
+          dueDate={faellig}
         />
       ) : null}
     </div>
