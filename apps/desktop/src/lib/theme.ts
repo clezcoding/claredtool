@@ -11,11 +11,19 @@ export function resolveDark(pref: ThemePref): boolean {
 }
 
 export function applyTheme(pref: ThemePref): void {
-  localStorage.setItem(THEME_KEY, pref);
   document.documentElement.classList.toggle("dark", resolveDark(pref));
+  try {
+    localStorage.setItem(THEME_KEY, pref);
+  } catch {
+    // persist is best-effort; class already applied
+  }
 }
 
 export function currentPref(): ThemePref {
-  const stored = localStorage.getItem(THEME_KEY);
-  return stored && PREFS.has(stored) ? (stored as ThemePref) : "system";
+  try {
+    const stored = localStorage.getItem(THEME_KEY);
+    return stored && PREFS.has(stored) ? (stored as ThemePref) : "system";
+  } catch {
+    return "system";
+  }
 }
