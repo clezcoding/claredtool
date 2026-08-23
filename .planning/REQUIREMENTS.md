@@ -97,9 +97,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INV-01 | Phase 3 | Pending |
 | TAX-01 | Phase 3 | Pending |
 | TAX-02 | Phase 3 | Pending |
-| PDF-01 | Phase 4 | Pending |
-| OFFL-01 | Phase 4 | Pending |
-| AUDT-01 | Phase 4 | Pending |
+| PDF-01 | Phase 5 | Pending |
+| OFFL-01 | Phase 5 | Pending |
+| AUDT-01 | Phase 5 | Pending |
 
 **Coverage:**
 
