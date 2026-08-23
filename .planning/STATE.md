@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04
 current_phase_name: Premium UI & Brand Redesign
 status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-08-23T01:08:19.519Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-08-23T01:18:49.206Z"
 last_activity: 2026-08-23
-last_activity_desc: Completed 04-01-PLAN.md
-state_head: 8e9eb5ff21d47be4fc17d8f3e5fb953149e30691
+last_activity_desc: Completed 04-02-PLAN.md
+state_head: 49a843c7bd207d106669d16b6eabc6c602bc82bf
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 21
-  completed_plans: 19
+  completed_plans: 20
 milestone_name: milestone
 ---
 
@@ -33,7 +33,7 @@ Phase: 04 (Premium UI & Brand Redesign) — EXECUTING
 Phase 04 (Premium UI & Brand Redesign) — **NEXT** (mockup-first: image mockups → approval → code)
 Phase 05 (PDF, Audit & Offline Sync) — deferred until after redesign
 Decided: workflow = image-gen mockups until approved then code; redesign before PDF; brand = Crafted Minimal
-Last activity: 2026-08-23 — Completed 04-01-PLAN.md
+Last activity: 2026-08-23 — Completed 04-02-PLAN.md
 
 Progress: [██████░░░░] 60%
 
@@ -74,6 +74,7 @@ Progress: [██████░░░░] 60%
 | Phase 02-self-hosted-backend-authentik-sso P06 | 2 min | 2 tasks | 2 files |
 | Phase 02-self-hosted-backend-authentik-sso P07 | 12 min | 2 tasks | 4 files |
 | Phase 04-premium-ui-brand-redesign P01 | 9 min | 4 tasks | 12 files |
+| Phase 04-premium-ui-brand-redesign P02 | 6 min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -121,6 +122,9 @@ Recent decisions affecting current work:
 - [Phase 04]: Amber --destructive #C9A227 sampled from 03-rechnung-dark (A1) — D-02 grants hex discretion; sparse emphasis only
 - [Phase 04]: Dark raised card #1C1C1A hairline #2A2A28 (A2) — Sampled from dark mockups for whisper separator
 - [Phase 04]: Menu.default() plus Darstellung; core:menu:default granted — Keep macOS app menu; A4 ACL for JS setAsAppMenu
+- [Phase 04-premium-ui-brand-redesign]: Did not rebuild mockup Von/Kunde cards, serif totals, or tax-rules editor — D-11 IA lock; class-only restyle — Plan locks IA; restyle is token classes on existing split canvas / dl / empty hero
+- [Phase 04-premium-ui-brand-redesign]: Empty CTA Beispielrechnung anzeigen restored; click focuses form instead of SAMPLE_INVOICE — Phase 3 removed sample restore; UI-SPEC still requires the CTA copy
+- [Phase 04-premium-ui-brand-redesign]: PdfPaper numerals may use tabular-nums; inline #fff/#111 stay (D-09) — Dark theme must not invert invoice paper content
 
 ### Pending Todos
 
@@ -147,6 +151,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-23T01:08:18.773Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-08-23T01:18:49.144Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None

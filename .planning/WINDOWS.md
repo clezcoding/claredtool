@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 9
+open_count: 10
 waived_count: 1
 fixed_count: 2
-total_count: 12
-last_updated: 2026-08-22T01:46:25.164Z
+total_count: 13
+last_updated: 2026-08-23T01:18:49.549Z
 ---
 
 # Broken Windows Ledger
@@ -27,6 +27,7 @@ last_updated: 2026-08-22T01:46:25.164Z
 | 10 | 02 | stub | apps/backend/src/auth/auth.controller.ts | 144 | endSessionUrl path string until 02-05 real Authentik end-session | open |  | 2026-08-22T01:46:24.969Z |  |
 | 11 | 02 | stub | apps/desktop/src/auth/api.ts | 11 | setOnUnauthorized callback placeholder until 02-04 | open |  | 2026-08-22T01:46:25.055Z |  |
 | 12 | 02 | deviation | apps/backend/test/auth.e2e-spec.ts |  | e2e seeds tickets and listen(0) for parallel GETDEL | open |  | 2026-08-22T01:46:25.164Z |  |
+| 13 | 04 | deviation | apps/desktop/src/components/invoice-empty-state.tsx |  | CTA Beispielrechnung anzeigen restored; focuses form instead of sample restore (Phase 3) | open |  | 2026-08-23T01:18:49.549Z |  |
 
 ````json
 [
@@ -172,6 +173,18 @@ last_updated: 2026-08-22T01:46:25.164Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-22T01:46:25.164Z",
+    "resolved_at": null
+  },
+  {
+    "id": 13,
+    "kind": "deviation",
+    "phase": "04",
+    "file": "apps/desktop/src/components/invoice-empty-state.tsx",
+    "line": null,
+    "description": "CTA Beispielrechnung anzeigen restored; focuses form instead of sample restore (Phase 3)",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-23T01:18:49.549Z",
     "resolved_at": null
   }
 ]
