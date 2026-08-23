@@ -44,6 +44,10 @@ function stubMatchMedia(matches: boolean) {
 beforeEach(() => {
   stubLocalStorage();
   document.documentElement.classList.remove("dark");
+  document.documentElement.style.background = "";
+  document.documentElement.style.colorScheme = "";
+  document.body.style.background = "";
+  document.body.style.colorScheme = "";
 });
 
 describe("theme", () => {
@@ -73,6 +77,40 @@ describe("theme", () => {
     applyTheme("light");
     expect(document.documentElement.classList.contains("dark")).toBe(false);
     expect(localStorage.getItem(THEME_KEY)).toBe("light");
+  });
+
+  it('applyTheme("dark") paints html and body #111110 with color-scheme dark', () => {
+    applyTheme("dark");
+    expect(document.documentElement.classList.contains("dark")).toBe(true);
+    expect(document.documentElement.style.background).toBe("#111110");
+    expect(document.body.style.background).toBe("#111110");
+    expect(document.documentElement.style.colorScheme).toBe("dark");
+    expect(document.body.style.colorScheme).toBe("dark");
+  });
+
+  it('applyTheme("light") paints html and body #F7F7F5 with color-scheme light', () => {
+    document.documentElement.classList.add("dark");
+    applyTheme("light");
+    expect(document.documentElement.classList.contains("dark")).toBe(false);
+    expect(document.documentElement.style.background).toBe("#F7F7F5");
+    expect(document.body.style.background).toBe("#F7F7F5");
+    expect(document.documentElement.style.colorScheme).toBe("light");
+    expect(document.body.style.colorScheme).toBe("light");
+  });
+
+  it('applyTheme("system") follows mocked matchMedia for html+body paint', () => {
+    stubMatchMedia(true);
+    applyTheme("system");
+    expect(document.documentElement.style.background).toBe("#111110");
+    expect(document.body.style.background).toBe("#111110");
+    expect(document.documentElement.style.colorScheme).toBe("dark");
+    expect(document.body.style.colorScheme).toBe("dark");
+    stubMatchMedia(false);
+    applyTheme("system");
+    expect(document.documentElement.style.background).toBe("#F7F7F5");
+    expect(document.body.style.background).toBe("#F7F7F5");
+    expect(document.documentElement.style.colorScheme).toBe("light");
+    expect(document.body.style.colorScheme).toBe("light");
   });
 
   it("currentPref returns the persisted pref", () => {
