@@ -10,7 +10,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Desktop & UI
 
 - [x] **UI-01**: Every UI-bearing phase has interactive mockups / UI-SPEC before implementation (ALWAYS build mockups)
-- [ ] **BRAND-01**: Crafted Minimal is the visual system (design tokens + approved-mockup SSOT + motion). UI-01 still requires mockup/UI-SPEC before code.
+- [x] **BRAND-01**: Crafted Minimal is the visual system (design tokens + approved-mockup SSOT + motion). UI-01 still requires mockup/UI-SPEC before code.
 - [x] **DESK-01**: User can run Clared as a Tauri desktop app (Rust + Web-UI) on macOS and Windows
 
 ### Backend & Identity
@@ -89,7 +89,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | UI-01 | Phase 1 | Complete |
-| BRAND-01 | Phase 4 | Pending |
+| BRAND-01 | Phase 4 | Complete |
 | DESK-01 | Phase 1 | Complete |
 | BACK-01 | Phase 2 | Complete |
 | AUTH-01 | Phase 2 | Complete |

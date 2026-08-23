@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04
 current_phase_name: Premium UI & Brand Redesign
-status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-08-23T01:18:49.206Z"
+status: verifying
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-08-23T01:31:23.578Z"
 last_activity: 2026-08-23
 last_activity_desc: Completed 04-02-PLAN.md
-state_head: 49a843c7bd207d106669d16b6eabc6c602bc82bf
+state_head: 23a1756fbc474d96070b7b83f6e998fad29ea8cb
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 21
-  completed_plans: 20
+  completed_plans: 21
 milestone_name: milestone
 ---
 
@@ -28,12 +28,13 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 ## Current Position
 
-Status: Executing Phase 04
+Status: Phase complete — ready for verification
 Phase: 04 (Premium UI & Brand Redesign) — EXECUTING
+Plan: 3 of 3 in current phase
 Phase 04 (Premium UI & Brand Redesign) — **NEXT** (mockup-first: image mockups → approval → code)
 Phase 05 (PDF, Audit & Offline Sync) — deferred until after redesign
 Decided: workflow = image-gen mockups until approved then code; redesign before PDF; brand = Crafted Minimal
-Last activity: 2026-08-23 — Completed 04-02-PLAN.md
+Last activity: 2026-08-23 — Completed 04-03-PLAN.md
 
 Progress: [██████░░░░] 60%
 
@@ -75,6 +76,7 @@ Progress: [██████░░░░] 60%
 | Phase 02-self-hosted-backend-authentik-sso P07 | 12 min | 2 tasks | 4 files |
 | Phase 04-premium-ui-brand-redesign P01 | 9 min | 4 tasks | 12 files |
 | Phase 04-premium-ui-brand-redesign P02 | 6 min | 3 tasks | 7 files |
+| Phase 04-premium-ui-brand-redesign P03 | 9 | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -125,6 +127,10 @@ Recent decisions affecting current work:
 - [Phase 04-premium-ui-brand-redesign]: Did not rebuild mockup Von/Kunde cards, serif totals, or tax-rules editor — D-11 IA lock; class-only restyle — Plan locks IA; restyle is token classes on existing split canvas / dl / empty hero
 - [Phase 04-premium-ui-brand-redesign]: Empty CTA Beispielrechnung anzeigen restored; click focuses form instead of SAMPLE_INVOICE — Phase 3 removed sample restore; UI-SPEC still requires the CTA copy
 - [Phase 04-premium-ui-brand-redesign]: PdfPaper numerals may use tabular-nums; inline #fff/#111 stay (D-09) — Dark theme must not invert invoice paper content
+- [Phase 04]: Class-only Entities/Kunden restyle; mockup table/search/tabs not built (D-11 IA lock)
+- [Phase 04]: Session chip gained no Darstellung/theme item (D-07 / Phase 2 D-36)
+- [Phase 04]: Login-gate hero GPT Image 2 after cost-check (7 credits); leftover 3 of 10 Starter credits
+- [Phase 04]: splash.png copied into public/; splash.tsx stays wordmark+spinner (D-16 type-only)
 
 ### Pending Todos
 
@@ -151,6 +157,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-23T01:18:49.144Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-08-23T01:31:23.512Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None
