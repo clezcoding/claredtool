@@ -49,15 +49,15 @@ export function PdfPaper() {
           {invoice.lineItems.map((item) => (
             <tr key={item.bezeichnung}>
               <td className="break-words whitespace-normal py-1">{item.bezeichnung}</td>
-              <td className="py-1">{item.menge}</td>
-              <td className="py-1">{item.einzelpreis.toFixed(2)}</td>
-              <td className="py-1">{item.netto.toFixed(2)}</td>
+              <td className="py-1 tabular-nums">{item.menge}</td>
+              <td className="py-1 tabular-nums">{item.einzelpreis.toFixed(2)}</td>
+              <td className="py-1 tabular-nums">{item.netto.toFixed(2)}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <div className="mb-8 ml-auto w-48 text-sm">
+      <div className="mb-8 ml-auto w-48 text-sm tabular-nums">
         <p>Netto {invoice.nettoGesamt.toFixed(2)}</p>
         <p>Brutto {invoice.bruttoGesamt.toFixed(2)}</p>
       </div>
