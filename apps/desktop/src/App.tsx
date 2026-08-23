@@ -17,7 +17,7 @@ import { SessionProvider, useSession } from "./auth/session-provider";
 import { ErrorState } from "./components/error-state";
 import { SessionBanner } from "./components/session-banner";
 import { SessionChip } from "./components/session-chip";
-import { Spinner } from "./components/spinner";
+import { Splash } from "./components/splash";
 import { EntitiesScreen } from "./routes/entities";
 import { KundenScreen } from "./routes/kunden";
 import { PdfScreen } from "./routes/pdf";
@@ -37,14 +37,15 @@ export function AppShell() {
 
   return (
     <div className="flex h-screen bg-background text-foreground">
-      <nav className="flex w-48 shrink-0 flex-col gap-1 border-r border-border p-2">
+      <nav className="flex w-48 shrink-0 flex-col gap-1 border-r border-border bg-card p-2">
+        <p className="px-3 py-2 text-sm font-semibold tracking-tight">Clared</p>
         {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
             end={to === "/"}
             className={({ isActive }) =>
-              `flex items-center gap-2 rounded-md px-3 py-2 text-sm ${
+              `flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors [transition-duration:var(--dur)] [transition-timing-function:var(--ease-out)] ${
                 isActive
                   ? "bg-accent text-accent-foreground"
                   : "text-muted-foreground hover:text-foreground"
@@ -96,11 +97,7 @@ function AuthenticatedApp() {
   );
 
   if (state === "boot") {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <Spinner />
-      </div>
-    );
+    return <Splash />;
   }
 
   if (state === "boot-error") {
