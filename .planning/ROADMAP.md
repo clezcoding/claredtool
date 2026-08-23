@@ -138,7 +138,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. New graphics (hero art, illustrations, empty-state art) are generated via Higgsfield CLI and wired in
   5. Motion is implemented per interface-design rules (durations <300ms, custom ease-out, `prefers-reduced-motion` respected), including a loading/splash experience
 
-**Plans**: 4 plans (3 executed, 1 gap-closure)
+**Plans**: 4/4 plans executed (3 executed, 1 gap-closure)
 
 **Wave 1**
 
@@ -151,7 +151,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 3** *(gap closure; blocked on Wave 2)*
 
-- [ ] 04-04-PLAN.md — FOUC inline paint + splash hold + invoice picker / Combobox unnest (G-04-1–3)
+- [x] 04-04-PLAN.md — FOUC inline paint + splash hold + invoice picker / Combobox unnest (G-04-1–3)
 
 **UI hint**: yes
 
@@ -180,5 +180,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Tauri Desktop & Mockup-First UI | 5/5 | Complete    | 2026-08-20 |
 | 2. Self-Hosted Backend & Authentik SSO | 7/7 | Complete    | 2026-08-22 |
 | 3. Entities, Invoices & Live Tax | 6/6 | Complete    | 2026-08-22 |
-| 4. Premium UI & Brand Redesign | 3/4 | In Progress|  |
+| 4. Premium UI & Brand Redesign | 4/4 | In Progress|  |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |

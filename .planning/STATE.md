@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04
-current_phase_name: premium-ui-brand-redesign
+current_phase_name: Premium UI & Brand Redesign
 status: executing
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-08-23T03:21:57.338Z"
+stopped_at: Completed 04-04-PLAN.md
+last_updated: "2026-08-23T03:38:10.456Z"
 last_activity: 2026-08-23
-last_activity_desc: Completed 04-02-PLAN.md
-state_head: 5f482dbb2e6703fc1a3c99ecf41c2f3b0e457382
+last_activity_desc: Phase 04 execution started
+state_head: dee691f50a66f64c25122d2f13a24a6a6c532d82
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 22
-  completed_plans: 21
+  completed_plans: 22
 milestone_name: milestone
 ---
 
@@ -29,12 +29,12 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 ## Current Position
 
 Status: Ready to execute
-Phase: 04 (premium-ui-brand-redesign) — READY TO EXECUTE
-Plan: 3 of 3 in current phase
+Phase: 04 (Premium UI & Brand Redesign) — EXECUTING
+Plan: 2 of 4
 Phase 04 (Premium UI & Brand Redesign) — **NEXT** (mockup-first: image mockups → approval → code)
 Phase 05 (PDF, Audit & Offline Sync) — deferred until after redesign
 Decided: workflow = image-gen mockups until approved then code; redesign before PDF; brand = Crafted Minimal
-Last activity: 2026-08-23 — Completed 04-03-PLAN.md
+Last activity: 2026-08-23 — Phase 04 execution started
 
 Progress: [██████░░░░] 60%
 
@@ -77,6 +77,7 @@ Progress: [██████░░░░] 60%
 | Phase 04-premium-ui-brand-redesign P01 | 9 min | 4 tasks | 12 files |
 | Phase 04-premium-ui-brand-redesign P02 | 6 min | 3 tasks | 7 files |
 | Phase 04-premium-ui-brand-redesign P03 | 9 | 3 tasks | 10 files |
+| Phase 04 P04 | 4min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -131,6 +132,9 @@ Recent decisions affecting current work:
 - [Phase 04]: Session chip gained no Darstellung/theme item (D-07 / Phase 2 D-36)
 - [Phase 04]: Login-gate hero GPT Image 2 after cost-check (7 credits); leftover 3 of 10 Starter credits
 - [Phase 04]: splash.png copied into public/; splash.tsx stays wordmark+spinner (D-16 type-only)
+- [Phase 04]: First-paint hex is Pale Oatmeal #F7F7F5 / Deep Charcoal #111110, not UA white
+- [Phase 04]: Head IIFE injects html,body CSS then body.style when body exists
+- [Phase 04]: PDF-01 OFFL-01 AUDT-01 remapped to Phase 5 Pending
 
 ### Pending Todos
 
@@ -157,6 +161,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-23T01:31:23.512Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-08-23T03:38:10.360Z
+Stopped at: Completed 04-04-PLAN.md
 Resume file: None

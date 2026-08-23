@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 10
+open_count: 11
 waived_count: 1
 fixed_count: 2
-total_count: 13
-last_updated: 2026-08-23T01:18:49.549Z
+total_count: 14
+last_updated: 2026-08-23T03:37:27.623Z
 ---
 
 # Broken Windows Ledger
@@ -28,6 +28,7 @@ last_updated: 2026-08-23T01:18:49.549Z
 | 11 | 02 | stub | apps/desktop/src/auth/api.ts | 11 | setOnUnauthorized callback placeholder until 02-04 | open |  | 2026-08-22T01:46:25.055Z |  |
 | 12 | 02 | deviation | apps/backend/test/auth.e2e-spec.ts |  | e2e seeds tickets and listen(0) for parallel GETDEL | open |  | 2026-08-22T01:46:25.164Z |  |
 | 13 | 04 | deviation | apps/desktop/src/components/invoice-empty-state.tsx |  | CTA Beispielrechnung anzeigen restored; focuses form instead of sample restore (Phase 3) | open |  | 2026-08-23T01:18:49.549Z |  |
+| 14 | 04 | unrun-verify | apps/desktop/index.html |  | Human cold-launch FOUC/splash check (04-UAT tests 1–3) not run in this executor | open |  | 2026-08-23T03:37:27.623Z |  |
 
 ````json
 [
@@ -185,6 +186,18 @@ last_updated: 2026-08-23T01:18:49.549Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-23T01:18:49.549Z",
+    "resolved_at": null
+  },
+  {
+    "id": 14,
+    "kind": "unrun-verify",
+    "phase": "04",
+    "file": "apps/desktop/index.html",
+    "line": null,
+    "description": "Human cold-launch FOUC/splash check (04-UAT tests 1–3) not run in this executor",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-23T03:37:27.623Z",
     "resolved_at": null
   }
 ]
