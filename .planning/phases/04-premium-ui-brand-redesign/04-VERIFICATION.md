@@ -1,8 +1,8 @@
 ---
 phase: 04-premium-ui-brand-redesign
-verified: 2026-08-23T03:45:00Z
-status: gaps_found
-score: 17/24 must-haves verified
+verified: 2026-08-23T05:15:00Z
+status: human_needed
+score: 20/24 must-haves verified
 behavior_unverified: 1
 overrides_applied: 0
 decision_coverage:
@@ -10,46 +10,14 @@ decision_coverage:
   total: 19
   not_honored: []
 re_verification:
-  previous_status: human_needed
-  previous_score: 16/19
+  previous_status: gaps_found
+  previous_score: 17/24
   gaps_closed:
-    - "G-04-1 invoice picker value is row.id; display uses invoiceLabel; ComboboxClear is not InputGroupButton"
-    - "G-04-2 boot IIFE + applyTheme paint Pale Oatmeal #F7F7F5 / Deep Charcoal #111110 on html and body"
-    - "G-04-3 Splash inline Clared + ring; AuthenticatedApp holds Splash for boot or SPLASH_HOLD_MS 700"
-  gaps_remaining:
-    - "1:1 craft vs mockups/approved 02–09 still needs human (D-11 look, D-13 5-item IA)"
-    - "Splash min-hold observability at runtime (no unit test for minSplashDone)"
-  regressions:
-    - "login-gate.tsx no longer renders /login-gate-hero.png (file remains in public/)"
-    - "invoice-empty-state CTA is Neue Rechnung, not UI-SPEC/04-04 Beispielrechnung anzeigen"
-    - "main.tsx prefers-color-scheme change only toggles .dark; does not applyTheme paint after 04-04 inline backgrounds"
-gaps:
-  - truth: "Empty states render the documented empty copy and illustration. Return CTA is Beispielrechnung anzeigen. Tax rail and Vorschau hide while empty state is showing."
-    status: failed
-    reason: "Illustration and showRail=!showHero still hide Tax/PDF. CTA text is Neue Rechnung, contradicting 04-UI-SPEC empty coverage and 04-04 must_have."
-    artifacts:
-      - path: apps/desktop/src/components/invoice-empty-state.tsx
-        issue: "Button label Neue Rechnung"
-    missing:
-      - "Set empty-state CTA to Beispielrechnung anzeigen, or change UI-SPEC + 04-04 must_have if Neue Rechnung is the accepted copy"
-  - truth: "The login gate is restyled to 08-login.png with the new Crafted Login-Gate hero and the system-font wordmark Clared (D-04); bilingual DE/EN copy where the mockup shows it (D-15)."
-    status: failed
-    reason: "Wordmark + DE/EN copy exist. No <img src=/login-gate-hero.png>. 04-03 artifact is orphaned. Prior verification claimed the img was wired."
-    artifacts:
-      - path: apps/desktop/src/auth/login-gate.tsx
-        issue: "Hero image omitted; h1 uses font-serif not font-sans"
-      - path: apps/desktop/public/login-gate-hero.png
-        issue: "PNG present (2688×1520) but unused"
-    missing:
-      - "Wire login-gate-hero.png into LoginGate per 04-03/D-14, or record an accepted override that 08-login is card-only"
-  - truth: "matchMedia prefers-color-scheme change listener re-resolves appearance while pref === system, including D-02 html/body paint."
-    status: failed
-    reason: "Listener toggles documentElement.dark only. applyTheme writes inline background/color-scheme that beat Tailwind body bg. OS switch while system can leave oatmeal/charcoal stuck against the other theme tokens."
-    artifacts:
-      - path: apps/desktop/src/main.tsx
-        issue: "change handler does not call applyTheme('system') / paintDocument"
-    missing:
-      - "On matchMedia change when currentPref()==='system', call applyTheme('system') so class and inline paint stay aligned"
+    - "G-04-4 Empty CTA is Beispielrechnung anzeigen; empty-state-hero.png; showRail = !showHero"
+    - "G-04-5 LoginGate img src /login-gate-hero.png; h1 Clared font-sans; bg-background"
+    - "G-04-6 matchMedia change calls syncSystemAppearance → applyTheme('system') html+body paint"
+  gaps_remaining: []
+  regressions: []
 deferred:
   - truth: "PDF-01 backend-rendered multilingual invoice PDF"
     addressed_in: "Phase 5"
@@ -67,17 +35,17 @@ behavior_unverified_items:
   - truth: "Splash wordmark Clared plus an observable spinner remains until CSS is applied and the min hold elapses (G-04-3, D-16)."
     test: "Cold-launch unsigned and signed; watch Splash for ~700ms (0 in test MODE) before LoginGate or shell."
     expected: "Clared + inline ring visible; then gate or AppShell. Reduced-motion omits spin, still shows ring."
-    why_human: "minSplashDone timer and boot vs hold race are not covered by theme.test.ts."
+    why_human: "minSplashDone timer and boot vs hold race are not covered by theme.test.ts. SPLASH_HOLD_MS is 0 in vitest MODE."
 human_verification:
   - test: "Open in-scope screens in Light and Dark (Darstellung Hell then Dunkel) and compare to mockups/approved 02–09 as a restyle of the 5-item shell (D-11, D-13)."
     expected: "Rechnung, Entities/Kunden, Tax, PDF, Login, empty-state match Crafted density (whisper border-border/70, sage accent). No Übersicht/Banking/Senden. Screens 10–15 absent."
-    why_human: "Pixel/craft match cannot be proven by class greps."
+    why_human: "Pixel/craft match cannot be proven by class greps. Prior UAT still reported 1:1 miss vs aspirational mockup IA."
   - test: "Cold-launch with clared-theme cleared, OS Dark then OS Light; confirm splash then LoginGate/shell; no UA-white flash."
-    expected: "First paint oatmeal or charcoal; Clared splash observable; Hell/Dunkel/System persist; chip is identity + Abmelden only."
-    why_human: "Native menu and FOUC are runtime. Code has IIFE+applyTheme; live paint still human after G-04-2/3."
-  - test: "OS reduced-motion on; press Anmelden / + Position; live OS theme change while Darstellung=System."
-    expected: "No press scale. Theme class AND canvas hex follow OS."
-    why_human: "Motion feel; OS-change paint bug is code-failed but still wants a visual confirm after fix."
+    expected: "First paint oatmeal or charcoal; Clared splash observable ~700ms; Hell/Dunkel/System persist; chip is identity + Abmelden only."
+    why_human: "Native menu and FOUC are runtime. Code has IIFE+applyTheme+hold; live paint still human after G-04-2/3."
+  - test: "OS reduced-motion on; press Anmelden / + Position; live OS theme change while Darstellung=System (04-UAT test 3)."
+    expected: "No press scale. Theme class AND canvas hex follow OS together (syncSystemAppearance unit-tested; live OS flip is not)."
+    why_human: "Motion feel and macOS appearance cannot be flipped in jsdom."
 ---
 
 # Phase 04: Premium UI & Brand Redesign Verification Report
@@ -86,44 +54,44 @@ human_verification:
 
 **Scope:** In-scope mockups 01–09 (D-12). Mockups 10–15 out (D-13). PDF/Audit/Offline Phase 5.
 
-**Verified:** 2026-08-23T03:45:00Z
-**Status:** gaps_found
-**Re-verification:** Yes — after 04-04 gap closure (G-04-1/2/3). Previous file was `human_needed` 16/19 with no `gaps:` YAML.
+**Verified:** 2026-08-23T05:15:00Z
+**Status:** human_needed
+**Re-verification:** Yes — after 04-05 gap closure (G-04-4/5/6). Previous file was `gaps_found` 17/24.
 
 ## Goal Achievement
 
-04-04 shipped picker ids, oatmeal/charcoal boot paint, and inline splash hold. That does **not** close the phase: empty CTA and login hero regress vs PLAN/UI-SPEC, and the OS `change` listener was not updated when paint moved to inline styles. 1:1 mockup craft remains human. SUMMARY.md was not treated as evidence.
+04-05 wired empty CTA copy, LoginGate hero PNG + system sans wordmark, and OS `syncSystemAppearance` paint. Those three blockers are **closed in code** (vitest 21/21 on theme + auth-gate + autosave). Phase goal still needs human UAT: 1:1 craft vs approved 02–09, splash observability, live OS/reduced-motion. SUMMARY.md was not treated as evidence.
 
 ### Observable Truths
 
 | # | Truth | Status | Evidence |
 | --- | --- | --- | --- |
-| 1 | Crafted Minimal design system exists as SSOT and is approved | ✓ VERIFIED | Dual `:root` / `.dark` in `apps/desktop/src/styles/globals.css` and `packages/ui/src/styles/globals.css`: `#ffffff` / `#f7f7f5` / `#111110` / `#8a8a8a` / sage `#a8bfa3` / amber `#c9a227`, radius 8px, `--dur: 180ms`, `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`. `04-UI-SPEC.md` approved. |
+| 1 | Crafted Minimal design system exists as SSOT and is approved | ✓ VERIFIED | Dual `:root` / `.dark` in `apps/desktop/src/styles/globals.css` and `packages/ui/src/styles/globals.css`: oatmeal/charcoal, sage `#a8bfa3`, radius 8px, `--dur: 180ms`, `--ease-out: cubic-bezier(0.22, 1, 0.36, 1)`. `04-UI-SPEC.md` approved. |
 | 2 | User-approved mockups exist for every in-scope page before code (UI-01) | ✓ VERIFIED | `mockups/approved/01-brandkit.png` … `09-empty-state.png`. Single `04-UI-SPEC.md`. 10–15 files exist; no routes. |
 | 3 | In-scope surfaces rebuilt with empty / error / loading | ✓ VERIFIED | Token classes on shell + routes. Rechnung Skeleton/`ErrorState`/`InvoiceEmptyState`. Entities/Kunden loading-empty-error. Tax empty `—`. Login is the unsigned state. Boot Splash then ErrorState/LoginGate. |
-| 4 | Higgsfield graphics generated and in `public/` | ✓ VERIFIED | Four 2688×1520 PNGs. Empty invoices/entities wired. `splash.png` present, unused (D-16 type-only). Login PNG orphaned — scored under truth 16. |
-| 5 | Motion <300ms, custom ease-out, `prefers-reduced-motion`, splash | ✓ VERIFIED | `--dur` 180ms; `.btn-primary:active scale(0.97)` clamped in reduce media. Splash inline keyframes omitted when reduce matches. Feel still human. |
+| 4 | Higgsfield graphics generated and in `public/` | ✓ VERIFIED | Four PNGs in `apps/desktop/public/`. Empty invoices + entities + login-gate hero wired. `splash.png` present, unused (D-16 type-only). |
+| 5 | Motion <300ms, custom ease-out, `prefers-reduced-motion`, splash | ✓ VERIFIED | `--dur` 180ms; press `scale(0.97)` clamped in reduce media. Splash inline keyframes omitted when reduce matches. Feel still human. |
 | 6 | One component tree; Light/Dark from tokens (D-08) | ✓ VERIFIED | Single `App.tsx` tree. Token file mirrored desktop + `packages/ui`, not two theme bundles. |
-| 7 | Launch follows OS when no stored pref (D-06) | ✓ VERIFIED | `currentPref()` defaults `system`. `theme.test.ts` 11/11 including applyTheme html+body paint. `index.html` IIFE same PREFS + matchMedia. `main.tsx` `applyTheme(currentPref())` before `createRoot`. Live OS *change* is truth 24. |
+| 7 | Launch follows OS when no stored pref (D-06) | ✓ VERIFIED | `currentPref()` defaults `system`. `theme.test.ts` covers applyTheme html+body paint. `index.html` IIFE same PREFS + matchMedia. `main.tsx` `applyTheme(currentPref())` before `createRoot`. Live OS change is truth 24. |
 | 8 | Darstellung Hell / Dunkel / System; chip has no theme item (D-07) | ✓ VERIFIED | `theme-menu.ts` submenu + CheckMenuItems. `session-chip.tsx` Abmelden only. |
-| 9 | Money uses `.tabular-nums`, not a second webfont family (D-03) | ✓ VERIFIED | Utility in globals. Applied on line-item / tax / pdf amounts. `--font-serif` is system Palatino/Iowan, not a packaged webfont — see Anti-Patterns. |
+| 9 | Money uses `.tabular-nums`, not a second webfont family (D-03) | ✓ VERIFIED | Utility in globals. Applied on line-item / tax / pdf amounts. `--font-serif` is system Palatino/Iowan, not a packaged webfont. |
 | 10 | BRAND-01 in REQUIREMENTS Desktop & UI + Phase 4 row (D-05) | ✓ VERIFIED | Line 13 checked; traceability `BRAND-01 \| Phase 4 \| Complete`. |
 | 11 | ROADMAP Phase 4 names only Crafted Minimal (D-01) | ✓ VERIFIED | `grep Nordic Calm .planning/ROADMAP.md` empty. Goal + SC #1 Crafted Minimal. |
 | 12 | No webfont family in the token file (D-03) | ✓ VERIFIED | `--font-sans` system stack. No `@font-face`. No Inter. |
 | 13 | Primary / + Position uses Sage and press scale (D-17) | ✓ VERIFIED | `btn-primary` + `bg-primary` / solid CTAs with `active:scale-[0.97]` and `motion-reduce:active:scale-100`. |
-| 14 | Empty-state illustration + Beispielrechnung CTA; rail/Vorschau hidden | ✗ FAILED | Hero `/empty-state-hero.png`. `showRail = !showHero`. CTA is **Neue Rechnung** not **Beispielrechnung anzeigen**. |
+| 14 | Empty-state illustration + Beispielrechnung CTA; rail/Vorschau hidden | ✓ VERIFIED | `invoice-empty-state.tsx` CTA `Beispielrechnung anzeigen`; hero `/empty-state-hero.png`. `rechnung.tsx` `showRail = !showHero`. Autosave RTL clicks that accessible name. |
 | 15 | PDF stage follows theme; PdfPaper stays light (D-09) | ✓ VERIFIED | `pdf.tsx` `bg-background`. `pdf-paper.tsx` inline `#fff`/`#111`. |
-| 16 | Login gate: Crafted hero + system wordmark Clared + bilingual (D-04, D-15) | ✗ FAILED | Bilingual DE/EN + Clared heading present. **No hero `<img>`**. `h1` is `font-serif`. `public/login-gate-hero.png` unused. |
-| 17 | Invoice split canvas 1:1 to 02/03-rechnung | ? UNCERTAIN | Structure + tokens present. Pixel match is UAT. D-13 IA is 5-item shell, not mockup Übersicht/Banking. |
+| 16 | Login gate: Crafted hero + system wordmark Clared + bilingual (D-04, D-15) | ✓ VERIFIED | `login-gate.tsx` `<img src="/login-gate-hero.png">`, `h1` `font-sans` Clared, DE/EN copy, Anmelden → `session.login` / `open_login_window`. Canvas `bg-background`. auth-gate test asserts img src. |
+| 17 | Invoice split canvas 1:1 to 02/03-rechnung | ? UNCERTAIN | Structure + tokens present. Pixel match is UAT. D-13 IA is 5-item shell, not mockup Übersicht/Banking. Prior UAT still `issue`. |
 | 18 | Entities/Kunden 1:1 to 04/05-entities (D-12) | ? UNCERTAIN | list+panel, `empty-entities.png`, whisper `border-border/70`. Craft is human. |
-| 19 | Login 1:1 to 08-login.png | ? UNCERTAIN | Card layout present; hero gap is truth 16. Remaining spacing/type is visual. |
-| 20 | Splash inline + min hold until boot or 700ms (G-04-3) | ⚠️ PRESENT_BEHAVIOR_UNVERIFIED | `splash.tsx` inline Clared + ring. `App.tsx` `state === "boot" \|\| !minSplashDone`, `SPLASH_HOLD_MS` 700 / 0 in test. No test exercises the timer. |
-| 21 | Invoice picker visible text is invoiceLabel; value is id (G-04-1) | ✓ VERIFIED | `invoiceLabel`; `Select value={draftId}`; `SelectItem value={row.id}` children `invoiceLabel(row, false)`. |
-| 22 | ComboboxInput chevron/clear is a single control (G-04-1) | ✓ VERIFIED | `ComboboxClear` is `ComboboxPrimitive.Clear` + XIcon. `render={<InputGroupButton` absent. ChipRemove still uses Button (chips path, not Input addon). |
+| 19 | Login 1:1 to 08-login.png | ? UNCERTAIN | Card + hero now wired; remaining spacing/type is visual. |
+| 20 | Splash inline + min hold until boot or 700ms (G-04-3) | ⚠️ PRESENT_BEHAVIOR_UNVERIFIED | `splash.tsx` inline Clared + ring. `App.tsx` `state === "boot" \|\| !minSplashDone`, `SPLASH_HOLD_MS` 700 / 0 in test. No test exercises the timer. 04-05 prohibition: do not rewrite splash. |
+| 21 | Invoice picker visible text is invoiceLabel; value is id (G-04-1) | ✓ VERIFIED | `Select value={draftId ?? ""}`; `SelectItem value={row.id}` children `invoiceLabel(row, false)`. |
+| 22 | ComboboxInput chevron/clear is a single control (G-04-1) | ✓ VERIFIED | `ComboboxClear` is `ComboboxPrimitive.Clear`. `render={<InputGroupButton` absent. |
 | 23 | 5-item shell, whisper separators, sage pills (D-11, D-13) | ✓ VERIFIED | `NAV_ITEMS` Rechnung · Entities · Kunden · Tax · PDF. `border-border/70`. `bg-primary/30` Entwurf pill. No extra routes. |
-| 24 | OS color-scheme change while system re-paints D-02 hex | ✗ FAILED | `main.tsx` lines 10–16: `classList.toggle("dark")` only. `applyTheme` not called. Inline `background` from boot can stick. |
+| 24 | OS color-scheme change while system re-paints D-02 hex | ✓ VERIFIED | `main.tsx` change listener calls `syncSystemAppearance()`. `theme.ts` no-ops unless `currentPref()==='system'` then `applyTheme('system')`. theme.test.ts: oatmeal drop-dark, Hell/Dunkel lock. Live macOS flip still human (04-UAT 3). |
 
-**Score:** 17/24 truths verified (1 present, behavior-unverified)
+**Score:** 20/24 truths verified (1 present, behavior-unverified)
 
 ### Deferred Items
 
@@ -137,36 +105,35 @@ human_verification:
 
 ### Required Artifacts
 
-`gsd-tools query verify.artifacts` returned `total: 0` (PLAN artifacts are path strings). Manual:
+`gsd-tools query verify.artifacts` not used as source of truth (PLAN artifacts are path strings). Manual:
 
 | Artifact | Expected | Status | Details |
 | -------- | ----------- | ------ | ------- |
-| `apps/desktop/index.html` | Boot IIFE D-02 paint | ✓ VERIFIED | `#clared-boot-paint` on html,body; PREFS; catch → matchMedia |
-| `apps/desktop/src/lib/theme.ts` | applyTheme paint | ✓ VERIFIED | `PAINT_LIGHT`/`PAINT_DARK` on html+body |
-| `apps/desktop/src/lib/theme.test.ts` | Paint tests | ✓ VERIFIED | 11/11 pass |
+| `apps/desktop/index.html` | Boot IIFE D-02 paint | ✓ VERIFIED | `#clared-boot-paint` on html,body; PREFS; `#F7F7F5` / `#111110` |
+| `apps/desktop/src/lib/theme.ts` | applyTheme + syncSystemAppearance | ✓ VERIFIED | Paint html+body; OS sync gated on pref system |
+| `apps/desktop/src/lib/theme.test.ts` | Paint + OS-lock tests | ✓ VERIFIED | Included in 21 passing tests this run |
 | `apps/desktop/src/lib/theme-menu.ts` | Darstellung | ✓ VERIFIED | Hell/Dunkel/System |
 | `apps/desktop/src/components/splash.tsx` | Inline splash | ✓ VERIFIED | Clared + ring, reduce-motion |
 | `apps/desktop/src/App.tsx` | Hold + 5-item nav | ✓ VERIFIED | SPLASH_HOLD_MS / NAV_ITEMS |
-| `apps/desktop/src/main.tsx` | Pre-paint + OS listener | ⚠️ PARTIAL | applyTheme before root OK; change listener incomplete |
+| `apps/desktop/src/main.tsx` | Pre-paint + OS listener | ✓ VERIFIED | applyTheme before root; change → syncSystemAppearance |
 | `packages/ui/src/components/combobox.tsx` | Unnest Clear | ✓ VERIFIED | No InputGroupButton Clear |
-| `apps/desktop/src/routes/rechnung.tsx` | Picker ids | ✓ VERIFIED | invoiceLabel + row.id |
-| `apps/desktop/src/auth/login-gate.tsx` | Hero + gate | ✗ STUB-ish | Gate works; hero unwired |
-| `apps/desktop/src/components/invoice-empty-state.tsx` | Empty copy | ⚠️ PARTIAL | Art wired; CTA wrong vs SPEC |
-| `apps/desktop/public/login-gate-hero.png` | Login art | ⚠️ ORPHANED | File exists, no import |
-| `.planning/REQUIREMENTS.md` | BRAND-01 + Phase 5 PDF/OFFL/AUDT | ✓ VERIFIED | Traceability rows Phase 5 |
+| `apps/desktop/src/routes/rechnung.tsx` | Picker ids + hide rail | ✓ VERIFIED | invoiceLabel + row.id; showRail = !showHero |
+| `apps/desktop/src/auth/login-gate.tsx` | Hero + gate | ✓ VERIFIED | img + font-sans + bilingual |
+| `apps/desktop/src/components/invoice-empty-state.tsx` | Empty copy | ✓ VERIFIED | Beispielrechnung anzeigen |
+| `apps/desktop/public/login-gate-hero.png` | Login art | ✓ VERIFIED | File on disk; wired in LoginGate |
+| `.planning/REQUIREMENTS.md` | BRAND-01 + Phase 5 PDF/OFFL/AUDT | ✓ VERIFIED | Traceability rows |
 
 ### Key Link Verification
 
-`verify.key-links` also `total: 0`. Manual:
-
 | From | To | Via | Status | Details |
 | ---- | --- | ---- | ------ | ------- |
-| `index.html` IIFE | `theme.ts` paint | shared `#F7F7F5`/`#111110` + PREFS | ✓ WIRED | Semantics aligned at boot |
+| `index.html` IIFE | `theme.ts` paint | shared `#F7F7F5`/`#111110` + PREFS | ✓ WIRED | Boot aligned |
 | `AuthenticatedApp` | `Splash` | boot OR !minSplashDone | ✓ WIRED | Hold present; duration untested |
 | `rechnung` picker | `invoiceLabel` / `row.id` | Select | ✓ WIRED | G-04-1 |
 | ComboboxClear | entities/kunden | shared primitive | ✓ WIRED | Callers inherit |
-| `login-gate` | `login-gate-hero.png` | img src | ✗ NOT_WIRED | No img |
-| `main.tsx` change | `applyTheme` | matchMedia | ✗ NOT_WIRED | class only |
+| `login-gate` | `login-gate-hero.png` | img src | ✓ WIRED | G-04-5 |
+| `main.tsx` change | `applyTheme` | `syncSystemAppearance` | ✓ WIRED | G-04-6 |
+| InvoiceEmptyState | `startNewDraft` | onStart | ✓ WIRED | CTA copy restored; handler unchanged |
 | Surfaces | tokens | semantic classes | ✓ WIRED | `bg-background`, `border-border/70` |
 | Reduced-motion | OS | CSS + splash matchMedia | ✓ WIRED | Independent of Darstellung |
 
@@ -174,26 +141,25 @@ human_verification:
 
 | Artifact | Data Variable | Source | Produces Real Data | Status |
 | -------- | ------------- | ------ | ------------------ | ------ |
-| Theme class + inline paint | `.dark`, style.background | localStorage + matchMedia + applyTheme | Yes at boot | ✓ FLOWING |
-| OS live change | same | matchMedia listener | Class yes, paint no | ✗ DISCONNECTED |
+| Theme class + inline paint | `.dark`, style.background | localStorage + matchMedia + applyTheme | Yes at boot and on OS sync when pref=system | ✓ FLOWING |
+| OS live change | same | matchMedia → syncSystemAppearance | Unit-tested function; live OS is UAT | ✓ FLOWING |
 | Splash | boot / minSplashDone | session `/me` + timer | Yes | ✓ FLOWING |
 | Rechnung / Entities / Kunden | API lists | Phase 3 fetches | Yes | ✓ FLOWING |
 | Tax | taxDecision | tax-live-store | Yes | ✓ FLOWING |
-| Empty / login art | img src | public PNG | Empty yes; login no | ⚠️ HOLLOW login |
+| Empty / login art | img src | public PNG | Both wired | ✓ FLOWING |
 | PdfPaper | invoice | SAMPLE_INVOICE | Sample | ⚠️ STATIC — Phase 5 |
 
 ### Behavioral Spot-Checks
 
 | Behavior | Command | Result | Status |
 | -------- | ------- | ------ | ------ |
-| applyTheme html+body paint | `pnpm --filter desktop exec vitest run src/lib/theme.test.ts` | 11/11 pass | ✓ PASS |
-| Boot hex + splash + picker + combobox + Phase 5 rows | python asserts from 04-04 PLAN | `python gates ok` | ✓ PASS |
-| Forced-dark boot | `classList.add("dark")` in main.tsx | no match | ✓ PASS |
+| applyTheme + syncSystemAppearance | `pnpm --filter desktop exec vitest run src/lib/theme.test.ts src/__tests__/auth-gate.test.tsx src/__tests__/phase03-autosave.test.tsx` | 3 files, 21 tests pass | ✓ PASS |
 | Nordic name | `grep Nordic Calm ROADMAP.md` | no match | ✓ PASS |
 | Combobox nested InputGroupButton | `render={<InputGroupButton` | no match | ✓ PASS |
-| Login hero img | grep login-gate-hero in login-gate.tsx | no match | ✗ FAIL |
-| Empty CTA | grep Beispielrechnung invoice-empty-state | no match (Neue Rechnung) | ✗ FAIL |
-| OS change applyTheme | grep applyTheme in main.tsx change handler | not in listener | ✗ FAIL |
+| Login hero img | grep `login-gate-hero` in login-gate.tsx | match line 51 | ✓ PASS |
+| Empty CTA | grep Beispielrechnung invoice-empty-state | match line 29 | ✓ PASS |
+| OS change applyTheme | main.tsx listener `syncSystemAppearance` | present | ✓ PASS |
+| Forced-dark boot | `classList.add("dark")` in main.tsx | no match | ✓ PASS |
 
 ### Probe Execution
 
@@ -205,37 +171,36 @@ human_verification:
 
 | Requirement | Source Plan | Description | Status | Evidence |
 | ----------- | ---------- | ----------- | ------ | -------- |
-| UI-01 | 04-01, 04-02, 04-03, 04-04 | Mockups / UI-SPEC before implementation | ✓ SATISFIED | Approved 01–09 + `04-UI-SPEC.md` exist before restyle. Visual 1:1 still human. Empty CTA diverges from SPEC (code gap, not missing spec). |
-| BRAND-01 | 04-01 … 04-04 | Crafted Minimal tokens + mockup SSOT + motion | ? NEEDS HUMAN | Tokens, theme engine, motion utilities in code. 1:1 craft and splash observability need human. Login hero unwired weakens brand SSOT. |
+| UI-01 | 04-01 … 04-05 | Mockups / UI-SPEC before implementation | ✓ SATISFIED | Approved 01–09 + `04-UI-SPEC.md` exist before restyle. Visual 1:1 still human. Empty CTA now matches SPEC. |
+| BRAND-01 | 04-01 … 04-05 | Crafted Minimal tokens + mockup SSOT + motion | ? NEEDS HUMAN | Tokens, theme engine, motion, login hero, empty art in code. 1:1 craft and splash observability need human. |
 | PDF-01 | none | Backend PDF | deferred | Plans did not claim it. REQUIREMENTS Phase 5. |
 | OFFL-01 | none | Offline | deferred | Phase 5. |
 | AUDT-01 | none | Audit logs | deferred | Phase 5. |
 
-Orphan vs Phase 4 **plans**: PDF-01 / OFFL-01 / AUDT-01 not in any `requirements:` array — correct after 04-04 remapped the table. Not Phase 4 blockers.
+Orphan vs Phase 4 **plans**: PDF-01 / OFFL-01 / AUDT-01 not in any `requirements:` array — correct. Not Phase 4 blockers.
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 | ---- | ---- | ------- | -------- | ------ |
-| `invoice-empty-state.tsx` | CTA | Copy vs UI-SPEC empty row | 🛑 Blocker | Must-have CTA missed |
-| `login-gate.tsx` | — | Hero PNG unused; `bg-[#f7f7f5]` hex | 🛑 Blocker | 04-03 wiring gone; hex vs token prohibition |
-| `login-gate.tsx` / entities / tax-rail / pdf-paper | headings / money | `font-serif` / `.money-display` | ⚠️ Warning | D-03 rejected brandkit serif for shipping app; not a webfont package |
-| `main.tsx` | 10–16 | OS change without paint | 🛑 Blocker | Inline bg can desync from `.dark` |
-| `globals.css` | `.dark --background: #0f1113` | Boot paint `#111110` vs token | ℹ️ Info | After CSS, dark canvas may shift vs G-04-2 hex |
+| `login-gate.tsx` / entities / tax-rail / pdf-paper | headings / money | `font-serif` / `.money-display` | ⚠️ Warning | D-03 rejected brandkit serif for shipping app; not a webfont package. Login wordmark is now `font-sans`. |
+| `globals.css` | `.dark --background` | Boot paint `#111110` vs token canvas | ℹ️ Info | After CSS, dark canvas may shift vs G-04-2 hex |
 | `splash.tsx` | — | `splash.png` unused | ℹ️ Info | D-16 type-only |
 | `pdf-paper.tsx` | SAMPLE_INVOICE | hardcoded sample | ℹ️ Info | Phase 5 |
 
-No `TBD` / `FIXME` / `XXX` in desktop `src` TS/TSX.
+No `TBD` / `FIXME` / `XXX` in desktop `src` TS/TSX. Prior blockers (wrong CTA, orphaned hero, class-only OS listener, login hex `bg-[#f7f7f5]`) are gone.
 
 ### Test Quality Audit
 
 | Test File | Linked Req | Active | Skipped | Circular | Assertion Level | Verdict |
 |-----------|-----------|--------|---------|----------|-----------------|---------|
-| `apps/desktop/src/lib/theme.test.ts` | BRAND-01 | 11 | 0 | no | Value (classList, localStorage, painted background, color-scheme) | PASS for applyTheme; does **not** load `index.html` IIFE or `main.tsx` change listener |
+| `apps/desktop/src/lib/theme.test.ts` | BRAND-01 | includes applyTheme + syncSystemAppearance | 0 | no | Value (classList, localStorage, painted background, color-scheme, Hell/Dunkel lock) | PASS for paint + OS-pref lock; does **not** dispatch matchMedia from `main.tsx` or load `index.html` IIFE |
+| `apps/desktop/src/__tests__/auth-gate.test.tsx` | BRAND-01 | active | 0 | no | DOM img src + Clared + Anmelden | PASS for G-04-5 |
+| `apps/desktop/src/__tests__/phase03-autosave.test.tsx` | UI-01 | active | 0 | no | Role name Beispielrechnung anzeigen | PASS for G-04-4 |
 
 **Disabled tests on requirements:** 0
 **Circular patterns detected:** 0
-**Insufficient assertions:** WARNING — live OS-change paint uncovered (now a FAILED truth, not only a test-quality note). Splash hold uncovered → PBU.
+**Insufficient assertions:** Splash hold uncovered → PBU. Live OS appearance still human (coverage D4 in 04-05-SUMMARY).
 
 ### Prohibitions
 
@@ -247,53 +212,53 @@ No `TBD` / `FIXME` / `XXX` in desktop `src` TS/TSX.
 | must NOT package a webfont (D-03) | held | no @font-face |
 | must NOT let Darstellung win over OS reduced-motion (D-17) | held | motion media query |
 | must NOT implement mockups 10–15 (D-13) | held | no routes |
-| must NOT build custom titlebar (D-19) | held | `decorations: true` |
+| must NOT rebuild mockup product IA to chase 1:1 (D-11/D-13) | held | 5-item shell; craft is UAT |
+| must NOT build custom titlebar (D-19) | held | `decorations: true` (prior evidence) |
 | must NOT invert PdfPaper (D-09) | held | inline light |
-| must NOT generate illustrations at runtime (D-25) | held | static public PNGs |
-| must NOT hard-code hex in restyled components | **breached** | login-gate `bg-[#f7f7f5]`; D-09 islands still allowed |
+| must NOT generate illustrations at runtime (D-25) | held | static public PNGs; 04-05 reused login PNG |
+| must NOT rewrite splash / SPLASH_HOLD_MS | held | hold still 700/0 |
+| must NOT hard-code hex in restyled components | held on login | login-gate uses `bg-background`; D-09 islands still allowed |
 
-Judgment-tier; hex on login is a warning stacked on the hero gap.
+Judgment-tier; no unverified prohibition halt.
 
 ### Decision Coverage
 
 `gsd-tools query check.decision-coverage-verify`: **19/19 honored**, blocking false.
 
-Heuristic miss: D-14 "wire login-gate hero into public **and** the gate" — file in public, component dropped the img. Treat as execution drift, not a second blocker beyond truth 16.
+Message: All trackable CONTEXT.md decisions are honored by shipped artifacts.
 
 ### Human Verification Required
 
-Still required after gap *code* for G-04-2/3. Do not treat UAT as passed.
+Code blockers from 04-04 are closed. Do **not** treat 04-UAT as passed — tests 1–3 were still `issue` in `04-UAT.md` (last updated before 04-05). Re-run after this code.
+
+Harvested PLAN human-checks: 04-04 cold launch FOUC/splash; 04-05 OS Light/Dark with Darstellung=System.
 
 ### 1. 1:1 mockup match (Light + Dark, 5-item shell)
 
 **Test:** Sign in, walk Rechnung (empty + populated), Entities, Kunden, Tax, PDF, Login. Hell then Dunkel. Compare to `mockups/approved/02–09` as restyle of existing IA (D-13).
 **Expected:** Crafted density, sage, oatmeal/charcoal. No mockup product IA (Übersicht/Banking/Senden).
-**Why human:** Craft.
+**Why human:** Craft. Prior user report: UI does not look like mockups.
 
 ### 2. Cold launch FOUC + splash
 
 **Test:** Clear `clared-theme`, relaunch OS Dark and OS Light.
-**Expected:** No UA-white document. Clared + spinner, then gate/shell.
-**Why human:** Webview paint order.
+**Expected:** No UA-white document. Clared + spinner ~700ms, then gate/shell.
+**Why human:** Webview paint order; splash timer untested.
 
 ### 3. Reduced-motion + OS theme while System
 
 **Test:** Reduce motion; press primary; flip OS appearance with Darstellung=System.
-**Expected:** No scale; canvas hex follows OS (after truth 24 is fixed).
+**Expected:** No scale; canvas hex and tokens follow OS together.
 
 ## Gaps Summary
 
-**Three blocking gaps** after 04-04:
+**No blocking code gaps** after 04-05. G-04-4/5/6 verified in source + named tests.
 
-1. Empty CTA copy vs UI-SPEC / 04-04 must_have.
-2. Login hero PNG orphaned; gate restyle incomplete vs 04-03.
-3. `matchMedia` change does not call `applyTheme`, so G-04-2 inline paint can fight `.dark`.
+Status is `human_needed` because visual 1:1 (truths 17–19), splash min-hold (truth 20 PBU), and harvested UAT items remain. Score 20/24 does not certify craft.
 
-G-04-1 picker/Combobox unnest is **closed in code**. G-04-2/3 **partially closed** (boot IIFE + splash hold exist; FOUC/splash still human; OS-change paint regresses the new paint model).
-
-Visual 1:1 stays UNCERTAIN, not FAILED: D-13 forbids implementing mockup IA. After blockers, human re-runs 04-UAT 1–3.
+G-04-1 picker/Combobox unnest remains closed (regression check). Phase 5 PDF/OFFL/AUDT stay deferred.
 
 ---
 
-_Verified: 2026-08-23T03:45:00Z_
+_Verified: 2026-08-23T05:15:00Z_
 _Verifier: Claude (gsd-verifier)_
