@@ -47,7 +47,13 @@ const CREATE_DEFAULTS = {
 };
 
 const comboboxTriggerClass =
-  "min-h-11 w-full bg-card text-foreground font-normal hover:bg-muted";
+  "min-h-11 w-full bg-card text-foreground font-normal hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
+const LIST_ROW_CLASS =
+  "w-full rounded-md border border-border bg-card px-3 py-3 text-left transition-colors duration-[180ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
+const PRIMARY_SUBMIT_CLASS =
+  "btn-primary mt-2 min-h-11 self-start rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-[scale] active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 export function EntitiesScreen() {
   const { me } = useSession();
@@ -156,7 +162,12 @@ export function EntitiesScreen() {
   return (
     <div className="flex flex-col gap-4 p-6">
       <header className="flex items-start justify-between gap-4">
-        <h1 className="text-xl font-semibold">Entities</h1>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-xl font-semibold text-foreground">Entities</h1>
+          <p className="text-sm text-muted-foreground">
+            {entities.length === 1 ? "1 Entity" : `${entities.length} Entities`}
+          </p>
+        </div>
         <CreateDisabledButton
           enabled={canCreate}
           hint="Nur Inhaber können Entities anlegen."
@@ -168,13 +179,20 @@ export function EntitiesScreen() {
         <ErrorState onRetry={() => void loadEntities()} />
       ) : loading ? (
         <div className="flex max-w-xl flex-col gap-2">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-16 w-full" />
         </div>
       ) : entities.length === 0 ? (
-        <div className="max-w-xl text-sm text-muted-foreground">
+        <div className="flex max-w-xl flex-col gap-4 text-sm">
+          <img
+            src="/empty-entities.png"
+            alt=""
+            className="w-full max-w-xl rounded-md"
+          />
           <p className="font-semibold text-foreground">Noch keine Entity angelegt</p>
-          <p>Legen Sie Ihre erste Firma an, um Rechnungen zu stellen.</p>
+          <p className="text-muted-foreground">
+            Legen Sie Ihre erste Firma an, um Rechnungen zu stellen.
+          </p>
         </div>
       ) : (
         <ul className="flex max-w-xl flex-col gap-2">
@@ -185,11 +203,30 @@ export function EntitiesScreen() {
                 data-testid="entity-row"
                 aria-current={selectedId === row.id ? "true" : undefined}
                 onClick={() => selectRow(row.id)}
-                className={`w-full rounded-md border border-border px-3 py-2 text-left text-sm break-words hover:bg-muted ${
+                className={`${LIST_ROW_CLASS} ${
                   selectedId === row.id ? "bg-muted" : ""
                 }`}
               >
-                {row.name}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="font-medium break-words text-foreground">
+                      {row.name}
+                    </div>
+                    <div className="mt-0.5 text-sm text-muted-foreground">
+                      {getCountryLabel(row.country)}
+                    </div>
+                  </div>
+                  <div className="flex shrink-0 flex-col items-end gap-1">
+                    <span className="rounded-md bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
+                      {row.legalForm}
+                    </span>
+                    {row.vatId ? (
+                      <span className="tabular-nums text-xs text-muted-foreground">
+                        {row.vatId}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
               </button>
             </li>
           ))}
@@ -197,9 +234,9 @@ export function EntitiesScreen() {
       )}
 
       {panelMode === "create" ? (
-        <Card data-testid="entity-detail" className="max-w-xl">
-          <CardContent className="flex flex-col gap-2 pt-6">
-            <form className="flex flex-col gap-2" onSubmit={handleCreate}>
+        <Card data-testid="entity-detail" className="max-w-xl border-border">
+          <CardContent className="flex flex-col gap-4 pt-6">
+            <form className="flex flex-col gap-4" onSubmit={handleCreate}>
               <div className="flex flex-col gap-1">
                 <Label htmlFor="entity-name">Name</Label>
                 <Input
@@ -303,7 +340,7 @@ export function EntitiesScreen() {
               <Button
                 type="submit"
                 disabled={submitting}
-                className="mt-2 min-h-11 self-start font-semibold"
+                className={PRIMARY_SUBMIT_CLASS}
               >
                 {submitting ? <Spinner /> : "Entity anlegen"}
               </Button>
@@ -311,28 +348,32 @@ export function EntitiesScreen() {
           </CardContent>
         </Card>
       ) : selected ? (
-        <Card data-testid="entity-detail" className="max-w-xl">
-          <CardContent className="flex flex-col gap-2 pt-6 text-sm">
-            <div>
+        <Card data-testid="entity-detail" className="max-w-xl border-border">
+          <CardContent className="flex flex-col gap-4 pt-6 text-sm">
+            <div className="flex flex-col gap-0.5">
               <div className="text-muted-foreground">Name</div>
-              <div className="break-words">{selected.name}</div>
+              <div className="font-medium break-words text-foreground">
+                {selected.name}
+              </div>
             </div>
-            <div>
+            <div className="flex flex-col gap-0.5">
               <div className="text-muted-foreground">Land</div>
-              <div>{getCountryLabel(selected.country)}</div>
+              <div className="text-foreground">{getCountryLabel(selected.country)}</div>
             </div>
-            <div>
+            <div className="flex flex-col gap-0.5">
               <div className="text-muted-foreground">Rechtsform</div>
-              <div>{selected.legalForm}</div>
+              <span className="w-fit rounded-md bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
+                {selected.legalForm}
+              </span>
             </div>
-            <div>
+            <div className="flex flex-col gap-0.5">
               <div className="text-muted-foreground">Adresse</div>
-              <div className="break-words">{selected.address}</div>
+              <div className="break-words text-foreground">{selected.address}</div>
             </div>
             {selected.vatId ? (
-              <div>
+              <div className="flex flex-col gap-0.5">
                 <div className="text-muted-foreground">USt-IdNr.</div>
-                <div>{selected.vatId}</div>
+                <div className="tabular-nums text-foreground">{selected.vatId}</div>
               </div>
             ) : null}
           </CardContent>
