@@ -13,7 +13,8 @@ describe("phase02-auth", () => {
     const { LoginGate } = await import(specifier);
     render(<LoginGate />);
     expect(screen.getByRole("heading", { name: "Clared" })).toBeTruthy();
-    expect(screen.getByText("Anmelden, um Rechnungen zu stellen.")).toBeTruthy();
+    expect(screen.getByText("Willkommen zurück")).toBeTruthy();
+    expect(screen.getByText("Welcome back. Sign in to issue invoices.")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Anmelden" })).toBeTruthy();
     expect(screen.queryByRole("navigation")).toBeNull();
   });
@@ -72,7 +73,7 @@ describe("phase02-auth", () => {
     await waitFor(() => {
       expect(screen.getByRole("heading", { name: "Clared" })).toBeTruthy();
     });
-    expect(screen.getByText("Anmelden, um Rechnungen zu stellen.")).toBeTruthy();
+    expect(screen.getByText("Willkommen zurück")).toBeTruthy();
     expect(screen.queryByRole("navigation")).toBeNull();
   });
 
@@ -90,7 +91,7 @@ describe("phase02-auth", () => {
     });
     expect(
       screen.getByText(
-        "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.",
+        /Ein Fehler ist aufgetreten\. Überprüfen Sie Ihre Internetverbindung/,
       ),
     ).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Erneut versuchen" }));
