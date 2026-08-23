@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { applyTheme, currentPref, resolveDark, THEME_KEY } from "./theme";
+import { applyTheme, currentPref, resolveDark, syncSystemAppearance, THEME_KEY } from "./theme";
 
 function stubLocalStorage() {
   const store = new Map<string, string>();
@@ -130,5 +130,33 @@ describe("theme", () => {
   it("currentPref defaults to system on an unknown stored value", () => {
     localStorage.setItem(THEME_KEY, "solarized");
     expect(currentPref()).toBe("system");
+  });
+
+  it("syncSystemAppearance paints oatmeal and drops dark when pref is system and OS is light", () => {
+    stubMatchMedia(true);
+    applyTheme("system");
+    stubMatchMedia(false);
+    syncSystemAppearance();
+    expect(document.documentElement.classList.contains("dark")).toBe(false);
+    expect(paintedBackground(document.documentElement)).toMatch(/#F7F7F5|rgb\(247,247,245\)/i);
+    expect(paintedBackground(document.body)).toMatch(/#F7F7F5|rgb\(247,247,245\)/i);
+  });
+
+  it("syncSystemAppearance leaves charcoal when pref is dark even if OS is light", () => {
+    applyTheme("dark");
+    stubMatchMedia(false);
+    syncSystemAppearance();
+    expect(document.documentElement.classList.contains("dark")).toBe(true);
+    expect(paintedBackground(document.documentElement)).toMatch(/#111110|rgb\(17,17,16\)/i);
+    expect(paintedBackground(document.body)).toMatch(/#111110|rgb\(17,17,16\)/i);
+  });
+
+  it("syncSystemAppearance leaves oatmeal when pref is light even if OS is dark", () => {
+    applyTheme("light");
+    stubMatchMedia(true);
+    syncSystemAppearance();
+    expect(document.documentElement.classList.contains("dark")).toBe(false);
+    expect(paintedBackground(document.documentElement)).toMatch(/#F7F7F5|rgb\(247,247,245\)/i);
+    expect(paintedBackground(document.body)).toMatch(/#F7F7F5|rgb\(247,247,245\)/i);
   });
 });
