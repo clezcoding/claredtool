@@ -33,14 +33,22 @@ export function TaxRail({
   return (
     <aside
       data-testid="tax-rail"
-      className="flex w-80 shrink-0 flex-col gap-4 overflow-auto border-l border-border p-4"
+      className="flex w-80 shrink-0 flex-col gap-4 overflow-auto border-l border-border bg-card p-4"
     >
-      <h2 className="text-sm font-semibold">Live Steuerberechnung</h2>
+      <h2 className="text-sm font-semibold text-foreground">
+        Live Steuerberechnung
+      </h2>
       <dl className="flex flex-col gap-3 text-sm">
         {RAIL_KEYS.map((field) => (
           <div key={field}>
             <dt className="text-muted-foreground">{field}</dt>
-            <dd className="break-words whitespace-normal">
+            <dd
+              className={
+                field === "invoice_tax_rate"
+                  ? "break-words whitespace-normal tabular-nums"
+                  : "break-words whitespace-normal"
+              }
+            >
               {displayValue(field)}
             </dd>
           </div>
@@ -53,7 +61,7 @@ export function TaxRail({
         <button
           type="button"
           onClick={onRetry}
-          className="self-start text-sm text-primary underline"
+          className="self-start text-sm text-primary underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           Erneut versuchen
         </button>

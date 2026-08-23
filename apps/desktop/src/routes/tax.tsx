@@ -25,15 +25,26 @@ export function TaxScreen() {
   );
 
   return (
-    <div className="flex flex-col gap-4 p-6">
-      <h1 className="text-xl font-semibold">Tax</h1>
-      <section data-testid="tax-decision" className="max-w-xl">
-        <h2 className="mb-3 text-sm font-semibold">Live Steuerberechnung</h2>
+    <div className="flex flex-col gap-4 bg-background p-6">
+      <h1 className="text-xl font-semibold text-foreground">Tax</h1>
+      <section
+        data-testid="tax-decision"
+        className="max-w-xl rounded-md border border-border bg-card p-4"
+      >
+        <h2 className="mb-3 text-sm font-semibold text-foreground">
+          Live Steuerberechnung
+        </h2>
         <dl className="flex flex-col gap-3 text-sm">
           {TAX_FIELDS.map((field) => (
             <div key={field}>
               <dt className="text-muted-foreground">{field}</dt>
-              <dd className="break-words whitespace-normal">
+              <dd
+                className={
+                  field === "invoice_tax_rate"
+                    ? "break-words whitespace-normal tabular-nums"
+                    : "break-words whitespace-normal"
+                }
+              >
                 {taxDecision ? String(taxDecision[field]) : "—"}
               </dd>
             </div>
