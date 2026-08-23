@@ -132,7 +132,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Requirements**: UI-01, BRAND-01 (new)
 **Success Criteria** (what must be TRUE):
 
-  1. A "Nordic Calm Fintech" design system (color tokens, type scale, spacing, depth, radius, motion) exists as SSOT and is approved
+  1. A "Crafted Minimal" design system (color tokens, type scale, spacing, depth, radius, motion) exists as SSOT and is approved
   2. User-approved image mockups exist for every page before it is coded (mockup-first, per Phase 1 precedent)
   3. All existing surfaces (app shell, Rechnung, Entities, Kunden, Tax, PDF, Login/Session) are rebuilt in the new system, each with empty / error / loading states
   4. New graphics (hero art, illustrations, empty-state art) are generated via Higgsfield CLI and wired in
