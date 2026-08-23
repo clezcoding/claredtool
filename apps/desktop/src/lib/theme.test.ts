@@ -41,6 +41,11 @@ function stubMatchMedia(matches: boolean) {
   });
 }
 
+/** jsdom may serialize hex background as rgb(). */
+function paintedBackground(el: HTMLElement): string {
+  return (el.style.background || el.style.backgroundColor).replace(/\s+/g, "");
+}
+
 beforeEach(() => {
   stubLocalStorage();
   document.documentElement.classList.remove("dark");
@@ -82,8 +87,8 @@ describe("theme", () => {
   it('applyTheme("dark") paints html and body #111110 with color-scheme dark', () => {
     applyTheme("dark");
     expect(document.documentElement.classList.contains("dark")).toBe(true);
-    expect(document.documentElement.style.background).toBe("#111110");
-    expect(document.body.style.background).toBe("#111110");
+    expect(paintedBackground(document.documentElement)).toMatch(/#111110|rgb\(17,17,16\)/i);
+    expect(paintedBackground(document.body)).toMatch(/#111110|rgb\(17,17,16\)/i);
     expect(document.documentElement.style.colorScheme).toBe("dark");
     expect(document.body.style.colorScheme).toBe("dark");
   });
@@ -92,8 +97,8 @@ describe("theme", () => {
     document.documentElement.classList.add("dark");
     applyTheme("light");
     expect(document.documentElement.classList.contains("dark")).toBe(false);
-    expect(document.documentElement.style.background).toBe("#F7F7F5");
-    expect(document.body.style.background).toBe("#F7F7F5");
+    expect(paintedBackground(document.documentElement)).toMatch(/#F7F7F5|rgb\(247,247,245\)/i);
+    expect(paintedBackground(document.body)).toMatch(/#F7F7F5|rgb\(247,247,245\)/i);
     expect(document.documentElement.style.colorScheme).toBe("light");
     expect(document.body.style.colorScheme).toBe("light");
   });
@@ -101,14 +106,14 @@ describe("theme", () => {
   it('applyTheme("system") follows mocked matchMedia for html+body paint', () => {
     stubMatchMedia(true);
     applyTheme("system");
-    expect(document.documentElement.style.background).toBe("#111110");
-    expect(document.body.style.background).toBe("#111110");
+    expect(paintedBackground(document.documentElement)).toMatch(/#111110|rgb\(17,17,16\)/i);
+    expect(paintedBackground(document.body)).toMatch(/#111110|rgb\(17,17,16\)/i);
     expect(document.documentElement.style.colorScheme).toBe("dark");
     expect(document.body.style.colorScheme).toBe("dark");
     stubMatchMedia(false);
     applyTheme("system");
-    expect(document.documentElement.style.background).toBe("#F7F7F5");
-    expect(document.body.style.background).toBe("#F7F7F5");
+    expect(paintedBackground(document.documentElement)).toMatch(/#F7F7F5|rgb\(247,247,245\)/i);
+    expect(paintedBackground(document.body)).toMatch(/#F7F7F5|rgb\(247,247,245\)/i);
     expect(document.documentElement.style.colorScheme).toBe("light");
     expect(document.body.style.colorScheme).toBe("light");
   });

@@ -11,7 +11,7 @@ import {
   RouterProvider,
   createHashRouter,
 } from "react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LoginGate } from "./auth/login-gate";
 import { SessionProvider, useSession } from "./auth/session-provider";
 import { ErrorState } from "./components/error-state";
@@ -32,37 +32,39 @@ const NAV_ITEMS = [
   { to: "/pdf", label: "PDF", icon: FileImage },
 ] as const;
 
+const SPLASH_HOLD_MS = import.meta.env.MODE === "test" ? 0 : 700;
+
 export function AppShell() {
   const { me, bannerKind, login, logout, openingLogin } = useSession();
 
   return (
     <div className="flex h-screen bg-background text-foreground">
-      <nav className="flex w-48 shrink-0 flex-col gap-1 border-r border-border bg-card p-2">
-        <p className="px-3 py-2 text-sm font-semibold tracking-tight">Clared</p>
+      <nav className="flex w-56 shrink-0 flex-col gap-1 border-r border-border/70 bg-background px-3 py-4">
+        <p className="px-3 pb-3 text-[15px] font-semibold tracking-tight">Clared</p>
         {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
             end={to === "/"}
             className={({ isActive }) =>
-              `flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors [transition-duration:var(--dur)] [transition-timing-function:var(--ease-out)] ${
+              `flex items-center gap-2 rounded-full px-3 py-2 text-sm transition-colors [transition-duration:var(--dur)] [transition-timing-function:var(--ease-out)] ${
                 isActive
-                  ? "bg-accent text-accent-foreground"
+                  ? "bg-primary/35 text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               }`
             }
           >
-            <Icon size={16} />
+            <Icon size={16} strokeWidth={1.6} />
             {label}
           </NavLink>
         ))}
         {me ? (
-          <div className="mt-auto">
+          <div className="mt-auto pt-3">
             <SessionChip me={me} onLogout={() => void logout()} />
           </div>
         ) : null}
       </nav>
-      <main className="flex-1 overflow-auto">
+      <main className="min-w-0 flex-1 overflow-auto bg-background">
         {bannerKind ? (
           <SessionBanner
             kind={bannerKind}
@@ -78,6 +80,7 @@ export function AppShell() {
 
 function AuthenticatedApp() {
   const { state, retryMe } = useSession();
+  const [minSplashDone, setMinSplashDone] = useState(SPLASH_HOLD_MS === 0);
   const router = useMemo(
     () =>
       createHashRouter([
@@ -96,7 +99,13 @@ function AuthenticatedApp() {
     [],
   );
 
-  if (state === "boot") {
+  useEffect(() => {
+    if (SPLASH_HOLD_MS === 0) return;
+    const timer = window.setTimeout(() => setMinSplashDone(true), SPLASH_HOLD_MS);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  if (state === "boot" || !minSplashDone) {
     return <Splash />;
   }
 
