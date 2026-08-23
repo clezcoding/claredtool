@@ -34,6 +34,13 @@ export function applyTheme(pref: ThemePref): void {
   }
 }
 
+export function syncSystemAppearance(): void {
+  if (currentPref() !== "system") {
+    return;
+  }
+  applyTheme("system");
+}
+
 export function currentPref(): ThemePref {
   try {
     const stored = localStorage.getItem(THEME_KEY);
