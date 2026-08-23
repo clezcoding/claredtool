@@ -30,11 +30,11 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 Status: Ready to execute
 Phase: 04 (premium-ui-brand-redesign) — READY TO EXECUTE
-Plan: 4 of 4
-Phase 04 (Premium UI & Brand Redesign) — **NEXT** (mockup-first: image mockups → approval → code)
+Plan: 5 of 5 (04-05 gap_closure G-04-4/5/6)
+Phase 04 (Premium UI & Brand Redesign) — **NEXT** execute 04-05-PLAN.md (`--gaps-only`)
 Phase 05 (PDF, Audit & Offline Sync) — deferred until after redesign
 Decided: workflow = image-gen mockups until approved then code; redesign before PDF; brand = Crafted Minimal
-Last activity: 2026-08-23 — Phase 04 execution started
+Last activity: 2026-08-23 — Phase 04 gap-closure plan 04-05 planned
 
 Progress: [██████░░░░] 60%
 
