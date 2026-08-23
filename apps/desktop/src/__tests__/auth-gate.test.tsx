@@ -13,6 +13,7 @@ describe("phase02-auth", () => {
     const { LoginGate } = await import(specifier);
     render(<LoginGate />);
     expect(screen.getByRole("heading", { name: "Clared" })).toBeTruthy();
+    expect(document.querySelector('img[src="/login-gate-hero.png"]')).toBeTruthy();
     expect(screen.getByText("Willkommen zurück")).toBeTruthy();
     expect(screen.getByText("Welcome back. Sign in to issue invoices.")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Anmelden" })).toBeTruthy();
