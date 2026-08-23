@@ -159,7 +159,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 5** *(gap closure; blocked on Wave 4)*
 
-- [ ] 04-06-PLAN.md — D-02 canvas token SSOT + FOUC (G-04-1, G-04-2)
+- [x] 04-06-PLAN.md — D-02 canvas token SSOT + FOUC (G-04-1, G-04-2)
 
 **UI hint**: yes
 

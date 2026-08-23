@@ -1,19 +1,19 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 4
+current_phase: 04
 current_phase_name: Premium UI & Brand Redesign
-status: planned
-stopped_at: Gap-closure 04-06-PLAN.md ready
-last_updated: "2026-08-23T20:50:39.099Z"
+status: executing
+stopped_at: Completed 04-06-PLAN.md
+last_updated: "2026-08-23T21:40:00.000Z"
 last_activity: 2026-08-23
-last_activity_desc: Phase 04 gap-closure planned (04-06 canvas SSOT / FOUC)
-state_head: aa6309b31671041820759fd13ed559b2b2b43ec1
+last_activity_desc: Completed 04-06 canvas SSOT + FOUC
+state_head: f374f15
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 24
-  completed_plans: 23
+  completed_plans: 24
 milestone_name: milestone
 ---
 
@@ -28,13 +28,13 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 ## Current Position
 
-Status: Ready to execute Phase 04 gap-closure
-Phase: 4 (Premium UI & Brand Redesign) — READY TO EXECUTE
-Plan: 6 of 6 (04-01–05 done; 04-06 pending)
-Phase 04 (Premium UI & Brand Redesign) — **NEXT** `/gsd-execute-phase 4 --gaps-only`
+Status: Executing Phase 04
+Phase: 04 (Premium UI & Brand Redesign) — EXECUTING
+Plan: 6 of 6
+Phase 04 (Premium UI & Brand Redesign) — **NEXT** human UAT (G-04-3 motion/OS + signed-in craft)
 Phase 05 (PDF, Audit & Offline Sync) — deferred until after redesign
 Decided: workflow = image-gen mockups until approved then code; redesign before PDF; brand = Crafted Minimal
-Last activity: 2026-08-23 — Phase 04 gap-closure 04-06 planned
+Last activity: 2026-08-23 — Completed 04-06-PLAN.md (G-04-1 / G-04-2 canvas SSOT)
 
 Progress: [██████░░░░] 60%
 
@@ -79,6 +79,7 @@ Progress: [██████░░░░] 60%
 | Phase 04-premium-ui-brand-redesign P03 | 9 | 3 tasks | 10 files |
 | Phase 04 P04 | 4min | 3 tasks | 8 files |
 | Phase 04-premium-ui-brand-redesign P05 | 3 | 3 tasks | 7 files |
+| Phase 04-premium-ui-brand-redesign P06 | 6min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -140,6 +141,7 @@ Recent decisions affecting current work:
 - [Phase 04]: Hell/Dunkel ignore matchMedia because syncSystemAppearance returns unless currentPref() is system
 - [Phase 04]: Empty CTA copy restored to UI-SPEC; startNewDraft and showRail = !showHero unchanged
 - [Phase 04]: Login hero reuses 04-03 public PNG; no Higgsfield; canvas bg-background
+- [Phase 04-06]: Canvas --background SSOT is Pale Oatmeal #F7F7F5 / Deep Charcoal #111110 across IIFE, PAINT_*, and both globals.css (G-04-1, G-04-2)
 
 ### Pending Todos
 
@@ -166,6 +168,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-23T05:09:01.084Z
-Stopped at: 04-06-PLAN.md planned (G-04-1 / G-04-2)
+Last session: 2026-08-23T21:40:00.000Z
+Stopped at: Completed 04-06-PLAN.md; G-04-3 + signed-in craft still human UAT
 Resume file: None
