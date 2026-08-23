@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 Status: Ready to execute
 Phase: 04 (Premium UI & Brand Redesign) — EXECUTING
-Plan: 2 of 4
+Plan: 4 of 4
 Phase 04 (Premium UI & Brand Redesign) — **NEXT** (mockup-first: image mockups → approval → code)
 Phase 05 (PDF, Audit & Offline Sync) — deferred until after redesign
 Decided: workflow = image-gen mockups until approved then code; redesign before PDF; brand = Crafted Minimal

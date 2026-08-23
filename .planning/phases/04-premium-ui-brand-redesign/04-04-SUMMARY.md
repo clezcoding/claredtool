@@ -120,7 +120,7 @@ status: complete
 3. **Task 2: invoiceLabel picker + Combobox unnest** - `2a0e1aa` (fix)
 4. **Task 3: Phase 5 traceability** - `dee691f` (docs)
 
-**Plan metadata:** (this SUMMARY commit)
+**Plan metadata:** `a6ad1e3` (docs: complete plan)
 
 ## Files Created/Modified
 
