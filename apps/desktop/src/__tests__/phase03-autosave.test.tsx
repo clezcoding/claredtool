@@ -96,10 +96,10 @@ describe("phase03-product", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Neue Rechnung" })).toBeTruthy();
+      expect(screen.getByRole("button", { name: "Beispielrechnung anzeigen" })).toBeTruthy();
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "Neue Rechnung" }));
+    fireEvent.click(screen.getByRole("button", { name: "Beispielrechnung anzeigen" }));
 
     const lineInput = screen.getAllByRole("textbox").find((node) =>
       node.closest('[data-testid="line-item-card"]'),
