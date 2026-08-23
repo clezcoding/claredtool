@@ -26,7 +26,7 @@ export function roleLabel(primaryRole: string): string {
 }
 
 const CHIP_CLASS =
-  "flex w-full min-h-11 items-center justify-start gap-2 bg-card px-2 text-left font-normal text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+  "flex w-full min-h-11 items-center justify-start gap-2 rounded-md border border-border bg-card px-2 text-left font-normal text-foreground transition-colors duration-[180ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
 export function SessionChip({
   me,
@@ -54,7 +54,12 @@ export function SessionChip({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="top" align="start" className="rounded-md">
-        <DropdownMenuLabel className="font-normal">Rolle: {label}</DropdownMenuLabel>
+        <DropdownMenuLabel className="font-normal">
+          <span className="block truncate text-foreground">{name}</span>
+          <span className="block truncate text-xs text-muted-foreground">
+            Rolle: {label}
+          </span>
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => onLogout?.()}>Abmelden</DropdownMenuItem>
       </DropdownMenuContent>
