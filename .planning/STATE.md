@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04
-current_phase_name: premium-ui-brand-redesign
-status: Phase 04 added — Premium UI & Brand Redesign (Nordic Calm Fintech); PDF/Audit/Offline moved to Phase 05
-stopped_at: Phase 4 context gathered
-last_updated: "2026-08-23T00:20:28.878Z"
-last_activity: 2026-08-22
-last_activity_desc: Added Phase 04 (Premium UI & Brand Redesign); renumbered PDF/Audit/Offline to Phase 05.
-state_head: 3a35121baca2bb7913dbe7d9e1401fab396ea06c
+current_phase_name: Premium UI & Brand Redesign
+status: executing
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-08-23T01:08:19.519Z"
+last_activity: 2026-08-23
+last_activity_desc: Completed 04-01-PLAN.md
+state_head: 8e9eb5ff21d47be4fc17d8f3e5fb953149e30691
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 21
-  completed_plans: 18
+  completed_plans: 19
 milestone_name: milestone
 ---
 
@@ -24,16 +24,16 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 04 — PDF, Audit & Offline Sync
+**Current focus:** Phase 04 — Premium UI & Brand Redesign
 
 ## Current Position
 
-Status: Phase 04 added — Premium UI & Brand Redesign (Nordic Calm Fintech)
-Phase: 04 (premium-ui-brand-redesign) — READY TO EXECUTE
+Status: Executing Phase 04
+Phase: 04 (Premium UI & Brand Redesign) — EXECUTING
 Phase 04 (Premium UI & Brand Redesign) — **NEXT** (mockup-first: image mockups → approval → code)
 Phase 05 (PDF, Audit & Offline Sync) — deferred until after redesign
-Decided: workflow = image-gen mockups until approved then code; redesign before PDF; brand = Nordic Calm Fintech
-Last activity: 2026-08-22 - Added Phase 04 (Premium UI & Brand Redesign); renumbered PDF/Audit/Offline to Phase 05.
+Decided: workflow = image-gen mockups until approved then code; redesign before PDF; brand = Crafted Minimal
+Last activity: 2026-08-23 — Completed 04-01-PLAN.md
 
 Progress: [██████░░░░] 60%
 
@@ -73,6 +73,7 @@ Progress: [██████░░░░] 60%
 | Phase 02-self-hosted-backend-authentik-sso P05 | 7 min | 3 tasks | 7 files |
 | Phase 02-self-hosted-backend-authentik-sso P06 | 2 min | 2 tasks | 2 files |
 | Phase 02-self-hosted-backend-authentik-sso P07 | 12 min | 2 tasks | 4 files |
+| Phase 04-premium-ui-brand-redesign P01 | 9 min | 4 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -117,6 +118,9 @@ Recent decisions affecting current work:
 - [Phase 02-self-hosted-backend-authentik-sso]: Fix emit path to dist/main.js; do not paper over with a nested CMD (G-02-2) — prisma.config.ts at package root made tsc rootDir . and emit dist/src/main.js
 - [Phase 02-self-hosted-backend-authentik-sso]: apt-get install curl so Coolify Dockerfile HTTP healthcheck can probe /health — node:22-bookworm-slim has neither curl nor wget; first deploy rolled back a running Nest
 - [Phase 02-self-hosted-backend-authentik-sso]: Local Authentik GHCR 2026.8.0 denial stays environmental; compose.yml unchanged (G-02-5) — Plan prohibition: do not add GHCR credentials or compose tag fallback
+- [Phase 04]: Amber --destructive #C9A227 sampled from 03-rechnung-dark (A1) — D-02 grants hex discretion; sparse emphasis only
+- [Phase 04]: Dark raised card #1C1C1A hairline #2A2A28 (A2) — Sampled from dark mockups for whisper separator
+- [Phase 04]: Menu.default() plus Darstellung; core:menu:default granted — Keep macOS app menu; A4 ACL for JS setAsAppMenu
 
 ### Pending Todos
 
@@ -143,6 +147,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-22T23:17:08.590Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-premium-ui-brand-redesign/04-CONTEXT.md
+Last session: 2026-08-23T01:08:18.773Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None
