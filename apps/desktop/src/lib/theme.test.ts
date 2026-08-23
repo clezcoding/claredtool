@@ -1,6 +1,29 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { applyTheme, currentPref, resolveDark, THEME_KEY } from "./theme";
 
+function stubLocalStorage() {
+  const store = new Map<string, string>();
+  const storage: Storage = {
+    get length() {
+      return store.size;
+    },
+    clear: () => store.clear(),
+    getItem: (key: string) => store.get(key) ?? null,
+    key: (index: number) => [...store.keys()][index] ?? null,
+    removeItem: (key: string) => {
+      store.delete(key);
+    },
+    setItem: (key: string, value: string) => {
+      store.set(key, value);
+    },
+  };
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    writable: true,
+    value: storage,
+  });
+}
+
 function stubMatchMedia(matches: boolean) {
   Object.defineProperty(window, "matchMedia", {
     writable: true,
@@ -19,7 +42,7 @@ function stubMatchMedia(matches: boolean) {
 }
 
 beforeEach(() => {
-  localStorage.clear();
+  stubLocalStorage();
   document.documentElement.classList.remove("dark");
 });
 
