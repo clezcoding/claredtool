@@ -1,5 +1,32 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { applyTheme, currentPref, resolveDark, syncSystemAppearance, THEME_KEY } from "./theme";
+import {
+  applyTheme,
+  currentPref,
+  PAINT_DARK,
+  PAINT_LIGHT,
+  resolveDark,
+  syncSystemAppearance,
+  THEME_KEY,
+} from "./theme";
+
+const here = dirname(fileURLToPath(import.meta.url));
+
+function readRepo(...parts: string[]): string {
+  return readFileSync(join(here, ...parts), "utf8");
+}
+
+function cssBackground(css: string, selector: ":root" | ".dark"): string {
+  const escaped = selector.replace(".", "\\.");
+  const block = css.match(new RegExp(`${escaped}\\s*\\{([^}]+)\\}`))?.[1];
+  const hex = block?.match(/--background:\s*(#[0-9A-Fa-f]{6})/)?.[1];
+  if (!hex) {
+    throw new Error(`missing --background in ${selector}`);
+  }
+  return hex.toUpperCase();
+}
 
 function stubLocalStorage() {
   const store = new Map<string, string>();
@@ -158,5 +185,24 @@ describe("theme", () => {
     expect(document.documentElement.classList.contains("dark")).toBe(false);
     expect(paintedBackground(document.documentElement)).toMatch(/#F7F7F5|rgb\(247,247,245\)/i);
     expect(paintedBackground(document.body)).toMatch(/#F7F7F5|rgb\(247,247,245\)/i);
+  });
+
+  it("PAINT_* match boot IIFE and both globals.css --background tokens", () => {
+    const html = readRepo("../../index.html");
+    const themeSrc = readRepo("./theme.ts");
+    const desktopCss = readRepo("../styles/globals.css");
+    const uiCss = readRepo("../../../../packages/ui/src/styles/globals.css");
+    const light = html.match(/var light = "(#[0-9A-Fa-f]{6})"/)?.[1];
+    const darkBg = html.match(/var darkBg = "(#[0-9A-Fa-f]{6})"/)?.[1];
+    expect(light?.toUpperCase()).toBe(PAINT_LIGHT.toUpperCase());
+    expect(darkBg?.toUpperCase()).toBe(PAINT_DARK.toUpperCase());
+    expect(themeSrc).toMatch(/export const PAINT_LIGHT/);
+    expect(themeSrc).toMatch(/export const PAINT_DARK/);
+    expect(PAINT_LIGHT.toUpperCase()).toBe("#F7F7F5");
+    expect(PAINT_DARK.toUpperCase()).toBe("#111110");
+    expect(cssBackground(desktopCss, ":root")).toBe(PAINT_LIGHT.toUpperCase());
+    expect(cssBackground(desktopCss, ".dark")).toBe(PAINT_DARK.toUpperCase());
+    expect(cssBackground(uiCss, ":root")).toBe(PAINT_LIGHT.toUpperCase());
+    expect(cssBackground(uiCss, ".dark")).toBe(PAINT_DARK.toUpperCase());
   });
 });
