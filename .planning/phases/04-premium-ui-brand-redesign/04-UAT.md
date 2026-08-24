@@ -3,8 +3,8 @@ status: complete
 phase: 04-premium-ui-brand-redesign
 source: 04-01-SUMMARY.md, 04-02-SUMMARY.md, 04-03-SUMMARY.md, 04-04-SUMMARY.md, 04-05-SUMMARY.md, 04-06-SUMMARY.md, 04-VERIFICATION.md
 started: 2026-08-24T00:02:00Z
-updated: 2026-08-24T00:16:00Z
-tester: agent (gsd-verify-work 4; macos-mcp + tauri dev; signed-in UAT session)
+updated: 2026-08-24T01:28:00Z
+tester: agent (gsd-verify-work 4; tauri-mcp + macos-mcp; prod Coolify API + Authentik)
 ---
 
 ## Current Test
@@ -30,8 +30,8 @@ reported: "Entities Hell: 1 Entity UAT Seller GmbH, Anlegen, list columns ENTITY
 
 ### 4. Cold-launch first paint oatmeal/charcoal; Clared splash observable
 expected: Kill/relaunch with clared-theme cleared. First paint #F7F7F5/#111110. Splash Clared + spinner ~700ms. No UA-white FOUC.
-result: skipped
-reason: "tauri dev already running (PID target/debug/clared). Cold kill would drop the live Vite/Tauri session. Warm window already on shell. CSS+boot SSOT verified as #F7F7F5/#111110 after 04-06. Splash hold 700ms in App.tsx; not captured this run."
+result: pass
+reported: "2026-08-24 agent. clared-theme cleared then cold relaunch via pnpm tauri dev with Coolify prod BACKEND_URL/AUTHENTIK_URL (https://clared-api.puzzlessdev.online, https://clared-auth.puzzlessdev.online). Authentik MCP issuer https://clared-auth.puzzlessdev.online/application/o/clared/. GET /health/ready 200 postgres+redis. Burst 24 frames: zero UA-white; window paint moves to rgb(17,17,16)=#111110 matching OS Dark + D-02. Tauri MCP after boot: text Clared, canvas #111110, localStorage system. LoginGate hero+Anmelden (unsigned). Splash hold 700ms in App.tsx; wordmark Clared on gate after hold."
 
 ### 5. Invoice picker shows invoiceLabel; value is invoice id; single clear control
 expected: Picker displays invoiceLabel (number or Neue Rechnung). Select value is row.id. One clear/trigger control (no nested button).
@@ -40,8 +40,8 @@ reported: "Header/picker surface shows RE-2026-001 not a raw object. Code: invoi
 
 ### 6. Live OS Light/Dark flip while Darstellung=System
 expected: With Darstellung=System, OS appearance change repaints canvas hex and tokens together.
-result: skipped
-reason: "Did not toggle macOS-wide appearance (would perturb the user desktop). Clicked Darstellung > System. Hell/Dunkel already proved hex+tokens move together (#F7F7F5 / #111110). syncSystemAppearance unit-covered."
+result: pass
+reported: "localStorage clared-theme=system. osascript Appearance dark mode false: mq=false, class dark removed, --background #F7F7F5, html/body rgb(247,247,245), Tauri screenshot LoginGate oatmeal. dark mode true: mq+class dark, --background #111110, rgb(17,17,16). Hex and tokens moved together. OS left Dark (pre-test)."
 
 ### 7. Theme engine resolveDark / applyTheme / currentPref
 expected: Theme engine resolveDark / applyTheme / currentPref with guarded localStorage fallback
@@ -172,13 +172,13 @@ coverage_id: 04-06-D3
 ## Summary
 
 total: 27
-passed: 25
+passed: 27
 issues: 0
 pending: 0
-skipped: 2
+skipped: 0
 blocked: 0
 
-env: macos-mcp vision + screencapture pixel sample; tauri dev; signed-in UAT; no Playwright MCP
+env: tauri-mcp webview + macos-mcp appearance/screencapture; tauri dev VITE/BACKEND/AUTHENTIK prod Coolify; Authentik app clared issuer live; no Playwright MCP
 
 ## Gaps
 
@@ -188,9 +188,4 @@ Prior gaps G-04-1 and G-04-2 (canvas #ffffff/#0f1113 vs D-02) reconciled resolve
 
 ## Deferred Follow-Ups
 
-- test: 4
-  idea: Human cold-launch capture with tauri CLI kept alive (splash + FOUC)
-  deferred_at: 2026-08-24
-- test: 6
-  idea: Human OS appearance toggle while Darstellung=System
-  deferred_at: 2026-08-24
+[none]
