@@ -133,7 +133,7 @@ describe("invoice canvas", () => {
 
   it("exposes + Position at the list bottom and a hover-delete control on each card", async () => {
     await renderRechnung();
-    expect(screen.getByRole("button", { name: "+ Position" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "+ Zeile hinzufügen" })).toBeTruthy();
     expect(screen.getAllByRole("button", { name: "Position löschen" })).toHaveLength(
       DRAFT_INVOICE.items.length,
     );
@@ -155,24 +155,21 @@ describe("invoice canvas", () => {
     const tax = SAMPLE_INVOICE.taxDecision;
 
     await waitFor(() => {
-      expect(rail.getByText(String(tax.invoice_tax_rate))).toBeTruthy();
+      expect(rail.getByText(tax.legal_reference)).toBeTruthy();
     });
 
-    expect(rail.getByRole("heading", { name: "Live Steuerberechnung" })).toBeTruthy();
-    expect(rail.getByText("invoice_tax_rate")).toBeTruthy();
-    expect(rail.getByText("reverse_charge_flag")).toBeTruthy();
-    expect(rail.getByText(String(tax.reverse_charge_flag))).toBeTruthy();
-    expect(rail.getByText("legal_reference")).toBeTruthy();
+    expect(rail.getByRole("heading", { name: "Steuerübersicht" })).toBeTruthy();
     expect(rail.getByText(tax.legal_reference)).toBeTruthy();
-    expect(rail.getByText("applied_rule_id")).toBeTruthy();
-    expect(rail.getByText(tax.applied_rule_id)).toBeTruthy();
+    expect(rail.getByText("Rechnung erfüllt Pflichtangaben")).toBeTruthy();
 
     const peek = screen.getByRole("link", { name: "PDF Vorschau" });
     expect(peek.getAttribute("href")).toBe("#/pdf");
     fireEvent.click(peek);
     await waitFor(() => {
       expect(
-        within(screen.getByRole("main")).getByRole("heading", { name: "PDF" }),
+        within(screen.getByRole("main")).getByRole("heading", {
+          name: "PDF Viewer / Export",
+        }),
       ).toBeTruthy();
     });
   });

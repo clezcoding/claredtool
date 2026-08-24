@@ -27,3 +27,7 @@ apps/backend/.env
 apps/backend/src/generated/
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# Stitch local exports (source of truth is stitch.withgoogle.com + DESIGN.md)
+.stitch/designs/
+stitch-output/

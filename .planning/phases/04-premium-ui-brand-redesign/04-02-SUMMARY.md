@@ -138,7 +138,7 @@ Each task was committed atomically:
 2. **Task 2: Tax screen + Tax rail + invoice empty-state restyle** - `51c9542` (feat)
 3. **Task 3: PDF viewer stage restyle with PdfPaper guard (D-09)** - `49a843c` (feat)
 
-**Plan metadata:** pending docs commit
+**Plan metadata:** `docs(04-02): complete invoice restyle plan`
 
 ## Files Created/Modified
 

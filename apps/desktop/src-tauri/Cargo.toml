@@ -22,3 +22,4 @@ tauri-plugin-deep-link = "2"
 tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
 keyring = "4"
 tauri-plugin-os = "2"
+tauri-plugin-mcp-bridge = "0.12"

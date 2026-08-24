@@ -1,7 +1,5 @@
 import {
   Button,
-  Card,
-  CardContent,
   Combobox,
   ComboboxContent,
   ComboboxEmpty,
@@ -11,17 +9,17 @@ import {
   Input,
   Label,
 } from "@clared/ui";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { apiFetch } from "../auth/api";
 import { useSession } from "../auth/session-provider";
-import { CreateDisabledButton } from "../components/create-disabled-button";
-import { ErrorState } from "../components/error-state";
-import { Skeleton } from "../components/skeleton";
+import {
+  RegistryListPanel,
+  type RegistryListRow,
+} from "../components/registry-list-panel";
 import { Spinner } from "../components/spinner";
 import { isEuCountry } from "../data/eu-countries";
 import {
   COUNTRY_OPTIONS,
-  getCountryLabel,
   type CountryOption,
 } from "../data/legal-forms";
 
@@ -53,11 +51,21 @@ const CREATE_DEFAULTS = {
 const comboboxTriggerClass =
   "min-h-11 w-full bg-card text-foreground font-normal hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
-const LIST_ROW_CLASS =
-  "w-full rounded-md border border-border bg-card px-3 py-3 text-left transition-colors duration-[180ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
-
 const PRIMARY_SUBMIT_CLASS =
   "btn-primary mt-2 min-h-11 self-start rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-[scale] active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
+function toRegistryRow(row: CustomerRow): RegistryListRow {
+  return {
+    id: row.id,
+    name: row.name,
+    subtitle: row.entityName || "—",
+    pillLabel: row.entityName,
+    countryIso: row.country,
+    address: row.address,
+    taxId: row.vatId,
+    linkedAccount: row.entityName,
+  };
+}
 
 export function KundenScreen() {
   const { me } = useSession();
@@ -104,7 +112,19 @@ export function KundenScreen() {
     void loadData();
   }, [loadData]);
 
-  const selected = customers.find((row) => row.id === selectedId);
+  useEffect(() => {
+    if (loading || customers.length === 0 || panelMode === "create") return;
+    if (selectedId == null || !customers.some((row) => row.id === selectedId)) {
+      setSelectedId(customers[0].id);
+      setPanelMode("detail");
+    }
+  }, [loading, customers, selectedId, panelMode]);
+
+  const registryRows = useMemo(
+    () => customers.map(toRegistryRow),
+    [customers],
+  );
+  const selectedRow = registryRows.find((row) => row.id === selectedId);
   const selectedEntity =
     entities.find((row) => row.id === createForm.entityId) ?? null;
   const selectedCountry =
@@ -159,6 +179,16 @@ export function KundenScreen() {
     setFieldError(null);
   }
 
+  function closePanel() {
+    if (panelMode === "create" && customers[0]) {
+      setSelectedId(customers[0].id);
+      setPanelMode("detail");
+      return;
+    }
+    setPanelMode("none");
+    setSelectedId(null);
+  }
+
   function onEntityChange(entity: EntityRow | null) {
     if (!entity) return;
     setCreateForm((current) => ({ ...current, entityId: entity.id }));
@@ -173,226 +203,144 @@ export function KundenScreen() {
     }));
   }
 
-  return (
-    <div className="flex flex-col gap-4 p-6">
-      <header className="flex items-start justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-xl font-semibold text-foreground">Kunden</h1>
-          <p className="text-sm text-muted-foreground">
-            {customers.length === 1 ? "1 Kunde" : `${customers.length} Kunden`}
-          </p>
-        </div>
-        <CreateDisabledButton
-          enabled={canCreate}
-          hint="Keine Berechtigung zum Anlegen von Kunden."
-          onClick={openCreate}
-        />
-      </header>
-
-      {loadError ? (
-        <ErrorState onRetry={() => void loadData()} />
-      ) : loading ? (
-        <div className="flex max-w-xl flex-col gap-2">
-          <Skeleton className="h-16 w-full" />
-          <Skeleton className="h-16 w-full" />
-        </div>
-      ) : customers.length === 0 ? (
-        <div className="flex max-w-xl flex-col gap-4 text-sm">
-          <img
-            src="/empty-entities.png"
-            alt=""
-            className="w-full max-w-xl rounded-md"
+  const createPanel = (
+    <form className="flex flex-col gap-4" onSubmit={handleCreate}>
+      <div className="flex flex-col gap-1">
+        <Label htmlFor="kunde-entity">Entity</Label>
+        <Combobox
+          items={entities}
+          itemToStringValue={(item) => item.name}
+          value={selectedEntity}
+          onValueChange={onEntityChange}
+        >
+          <ComboboxInput
+            id="kunde-entity"
+            placeholder="Entity wählen"
+            className={comboboxTriggerClass}
           />
-          <p className="font-semibold text-foreground">Noch keine Kunden angelegt</p>
-          <p className="text-muted-foreground">
-            Legen Sie einen Kunden für die gewählte Entity an.
-          </p>
+          <ComboboxContent>
+            <ComboboxEmpty>Keine Entity passt zur Suche.</ComboboxEmpty>
+            <ComboboxList>
+              {(item) => (
+                <ComboboxItem key={item.id} value={item}>
+                  {item.name}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+      </div>
+      <div className="flex flex-col gap-1">
+        <Label htmlFor="kunde-name">Name</Label>
+        <Input
+          id="kunde-name"
+          required
+          value={createForm.name}
+          onChange={(event) =>
+            setCreateForm((current) => ({
+              ...current,
+              name: event.target.value,
+            }))
+          }
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <Label htmlFor="kunde-country">Land</Label>
+        <Combobox
+          items={COUNTRY_OPTIONS}
+          itemToStringValue={(item) => item.labelDe}
+          value={selectedCountry}
+          onValueChange={onCountryChange}
+        >
+          <ComboboxInput
+            id="kunde-country"
+            disabled={!createForm.entityId}
+            placeholder={
+              createForm.entityId ? "Land wählen" : "Zuerst Entity wählen"
+            }
+            className={comboboxTriggerClass}
+          />
+          <ComboboxContent>
+            <ComboboxEmpty>Kein Land passt zur Suche.</ComboboxEmpty>
+            <ComboboxList>
+              {(item) => (
+                <ComboboxItem key={item.iso} value={item}>
+                  {item.labelDe}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+      </div>
+      <div className="flex flex-col gap-1">
+        <Label htmlFor="kunde-address">Adresse</Label>
+        <Input
+          id="kunde-address"
+          required
+          value={createForm.address}
+          onChange={(event) =>
+            setCreateForm((current) => ({
+              ...current,
+              address: event.target.value,
+            }))
+          }
+        />
+      </div>
+      {isEuCountry(createForm.country) ? (
+        <div className="flex flex-col gap-1">
+          <Label htmlFor="kunde-vat">USt-IdNr.</Label>
+          <Input
+            id="kunde-vat"
+            required
+            value={createForm.vatId}
+            onChange={(event) =>
+              setCreateForm((current) => ({
+                ...current,
+                vatId: event.target.value,
+              }))
+            }
+          />
+          {fieldError ? (
+            <p className="text-xs text-destructive">{fieldError}</p>
+          ) : null}
         </div>
-      ) : (
-        <ul className="flex max-w-xl flex-col gap-2">
-          {customers.map((row) => (
-            <li key={row.id}>
-              <button
-                type="button"
-                data-testid="kunden-row"
-                aria-current={selectedId === row.id ? "true" : undefined}
-                onClick={() => selectRow(row.id)}
-                className={`${LIST_ROW_CLASS} ${
-                  selectedId === row.id ? "bg-muted" : ""
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <div className="font-medium break-words text-foreground">
-                      {row.name}
-                    </div>
-                    <div className="mt-0.5 text-sm text-muted-foreground">
-                      {getCountryLabel(row.country)}
-                    </div>
-                  </div>
-                  <div className="flex shrink-0 flex-col items-end gap-1">
-                    <span className="rounded-md bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
-                      {row.entityName}
-                    </span>
-                    {row.vatId ? (
-                      <span className="tabular-nums text-xs text-muted-foreground">
-                        {row.vatId}
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {panelMode === "create" ? (
-        <Card data-testid="kunden-detail" className="max-w-xl border-border">
-          <CardContent className="flex flex-col gap-4 pt-6">
-            <form className="flex flex-col gap-4" onSubmit={handleCreate}>
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="kunde-entity">Entity</Label>
-                <Combobox
-                  items={entities}
-                  itemToStringValue={(item) => item.name}
-                  value={selectedEntity}
-                  onValueChange={onEntityChange}
-                >
-                  <ComboboxInput
-                    id="kunde-entity"
-                    placeholder="Entity wählen"
-                    className={comboboxTriggerClass}
-                  />
-                  <ComboboxContent>
-                    <ComboboxEmpty>Keine Entity passt zur Suche.</ComboboxEmpty>
-                    <ComboboxList>
-                      {(item) => (
-                        <ComboboxItem key={item.id} value={item}>
-                          {item.name}
-                        </ComboboxItem>
-                      )}
-                    </ComboboxList>
-                  </ComboboxContent>
-                </Combobox>
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="kunde-name">Name</Label>
-                <Input
-                  id="kunde-name"
-                  required
-                  value={createForm.name}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({
-                      ...current,
-                      name: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="kunde-country">Land</Label>
-                <Combobox
-                  items={COUNTRY_OPTIONS}
-                  itemToStringValue={(item) => item.labelDe}
-                  value={selectedCountry}
-                  onValueChange={onCountryChange}
-                >
-                  <ComboboxInput
-                    id="kunde-country"
-                    disabled={!createForm.entityId}
-                    placeholder={
-                      createForm.entityId ? "Land wählen" : "Zuerst Entity wählen"
-                    }
-                    className={comboboxTriggerClass}
-                  />
-                  <ComboboxContent>
-                    <ComboboxEmpty>Kein Land passt zur Suche.</ComboboxEmpty>
-                    <ComboboxList>
-                      {(item) => (
-                        <ComboboxItem key={item.iso} value={item}>
-                          {item.labelDe}
-                        </ComboboxItem>
-                      )}
-                    </ComboboxList>
-                  </ComboboxContent>
-                </Combobox>
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="kunde-address">Adresse</Label>
-                <Input
-                  id="kunde-address"
-                  required
-                  value={createForm.address}
-                  onChange={(event) =>
-                    setCreateForm((current) => ({
-                      ...current,
-                      address: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-              {isEuCountry(createForm.country) ? (
-                <div className="flex flex-col gap-1">
-                  <Label htmlFor="kunde-vat">USt-IdNr.</Label>
-                  <Input
-                    id="kunde-vat"
-                    required
-                    value={createForm.vatId}
-                    onChange={(event) =>
-                      setCreateForm((current) => ({
-                        ...current,
-                        vatId: event.target.value,
-                      }))
-                    }
-                  />
-                  {fieldError ? (
-                    <p className="text-xs text-destructive">{fieldError}</p>
-                  ) : null}
-                </div>
-              ) : null}
-              <Button
-                type="submit"
-                disabled={submitting}
-                className={PRIMARY_SUBMIT_CLASS}
-              >
-                {submitting ? <Spinner /> : "Kunden anlegen"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      ) : selected ? (
-        <Card data-testid="kunden-detail" className="max-w-xl border-border">
-          <CardContent className="flex flex-col gap-4 pt-6 text-sm">
-            <div className="flex flex-col gap-0.5">
-              <div className="text-muted-foreground">Name</div>
-              <div className="font-medium break-words text-foreground">
-                {selected.name}
-              </div>
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <div className="text-muted-foreground">Entity</div>
-              <span className="w-fit rounded-md bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
-                {selected.entityName}
-              </span>
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <div className="text-muted-foreground">Land</div>
-              <div className="text-foreground">{getCountryLabel(selected.country)}</div>
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <div className="text-muted-foreground">Adresse</div>
-              <div className="break-words text-foreground">{selected.address}</div>
-            </div>
-            {selected.vatId ? (
-              <div className="flex flex-col gap-0.5">
-                <div className="text-muted-foreground">USt-IdNr.</div>
-                <div className="tabular-nums text-foreground">{selected.vatId}</div>
-              </div>
-            ) : null}
-          </CardContent>
-        </Card>
       ) : null}
-    </div>
+      <Button
+        type="submit"
+        disabled={submitting}
+        className={PRIMARY_SUBMIT_CLASS}
+      >
+        {submitting ? <Spinner /> : "Kunden anlegen"}
+      </Button>
+    </form>
+  );
+
+  return (
+    <RegistryListPanel
+      title="Kunden"
+      count={customers.length}
+      countSingular="Kunde"
+      countPlural="Kunden"
+      searchPlaceholder="Search kunden..."
+      newButtonLabel="+ New Kunde"
+      canCreate={canCreate}
+      createHint="Keine Berechtigung zum Anlegen von Kunden."
+      onNew={openCreate}
+      rows={registryRows}
+      rowTestId="kunden-row"
+      loading={loading}
+      loadError={loadError}
+      onRetry={() => void loadData()}
+      emptyTitle="Noch keine Kunden angelegt"
+      emptyDescription="Legen Sie einen Kunden für die gewählte Entity an."
+      selectedId={selectedId}
+      onSelectRow={selectRow}
+      panelMode={panelMode}
+      onClosePanel={closePanel}
+      selectedRow={selectedRow}
+      pillColumnHeader="Entity"
+      createPanel={createPanel}
+      detailTestId="kunden-detail"
+    />
   );
 }

@@ -758,82 +758,7 @@ Tauri unterstützt plattformspezifische Konfigurationsdateien wie `tauri.macos.c
 
 ---
 
-## 20. Empfohlene Web-UI-Basis
 
-Die folgenden CSS-Tokens sind ein Startpunkt, kein unveränderliches Designsystem:
-
-```css
-:root {
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "SF Pro Text",
-    system-ui,
-    sans-serif;
-
-  color-scheme: light dark;
-
-  --control-height: 28px;
-  --compact-control-height: 24px;
-  --sidebar-width: 240px;
-  --inspector-width: 280px;
-
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
-
-  --radius-small: 4px;
-  --radius-medium: 6px;
-  --radius-large: 10px;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-button,
-[role="button"],
-input,
-select,
-textarea {
-  box-sizing: border-box;
-}
-
-:focus-visible {
-  outline: 2px solid AccentColor;
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .translucent {
-    background: Canvas;
-    backdrop-filter: none;
-  }
-}
-
-@media (prefers-contrast: more) {
-  .surface {
-    border: 1px solid CanvasText;
-  }
-}
-```
 
 ### Wichtige Hinweise
 
@@ -847,7 +772,7 @@ textarea {
 
 ---
 
-## 21. Komponenten-Checkliste
+## 20. Komponenten-Checkliste
 
 ### App-Fenster
 
@@ -913,7 +838,7 @@ textarea {
 
 ---
 
-## 22. Häufige Fehler
+## 21. Häufige Fehler
 
 ### Designfehler
 
@@ -961,7 +886,7 @@ textarea {
 
 ---
 
-## 23. Abnahme-Checkliste
+## 22. Abnahme-Checkliste
 
 ### Struktur und Verständlichkeit
 
@@ -1039,7 +964,7 @@ textarea {
 
 ---
 
-## 24. Quellen
+## 23. Quellen
 
 ### Apple Human Interface Guidelines
 

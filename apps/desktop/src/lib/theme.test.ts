@@ -111,11 +111,11 @@ describe("theme", () => {
     expect(localStorage.getItem(THEME_KEY)).toBe("light");
   });
 
-  it('applyTheme("dark") paints html and body #111110 with color-scheme dark', () => {
+  it('applyTheme("dark") paints html and body #0F0F0F with color-scheme dark', () => {
     applyTheme("dark");
     expect(document.documentElement.classList.contains("dark")).toBe(true);
-    expect(paintedBackground(document.documentElement)).toMatch(/#111110|rgb\(17,17,16\)/i);
-    expect(paintedBackground(document.body)).toMatch(/#111110|rgb\(17,17,16\)/i);
+    expect(paintedBackground(document.documentElement)).toMatch(/#0F0F0F|rgb\(15,15,15\)/i);
+    expect(paintedBackground(document.body)).toMatch(/#0F0F0F|rgb\(15,15,15\)/i);
     expect(document.documentElement.style.colorScheme).toBe("dark");
     expect(document.body.style.colorScheme).toBe("dark");
   });
@@ -133,8 +133,8 @@ describe("theme", () => {
   it('applyTheme("system") follows mocked matchMedia for html+body paint', () => {
     stubMatchMedia(true);
     applyTheme("system");
-    expect(paintedBackground(document.documentElement)).toMatch(/#111110|rgb\(17,17,16\)/i);
-    expect(paintedBackground(document.body)).toMatch(/#111110|rgb\(17,17,16\)/i);
+    expect(paintedBackground(document.documentElement)).toMatch(/#0F0F0F|rgb\(15,15,15\)/i);
+    expect(paintedBackground(document.body)).toMatch(/#0F0F0F|rgb\(15,15,15\)/i);
     expect(document.documentElement.style.colorScheme).toBe("dark");
     expect(document.body.style.colorScheme).toBe("dark");
     stubMatchMedia(false);
@@ -174,8 +174,8 @@ describe("theme", () => {
     stubMatchMedia(false);
     syncSystemAppearance();
     expect(document.documentElement.classList.contains("dark")).toBe(true);
-    expect(paintedBackground(document.documentElement)).toMatch(/#111110|rgb\(17,17,16\)/i);
-    expect(paintedBackground(document.body)).toMatch(/#111110|rgb\(17,17,16\)/i);
+    expect(paintedBackground(document.documentElement)).toMatch(/#0F0F0F|rgb\(15,15,15\)/i);
+    expect(paintedBackground(document.body)).toMatch(/#0F0F0F|rgb\(15,15,15\)/i);
   });
 
   it("syncSystemAppearance leaves oatmeal when pref is light even if OS is dark", () => {
@@ -199,7 +199,7 @@ describe("theme", () => {
     expect(themeSrc).toMatch(/export const PAINT_LIGHT/);
     expect(themeSrc).toMatch(/export const PAINT_DARK/);
     expect(PAINT_LIGHT.toUpperCase()).toBe("#F7F7F5");
-    expect(PAINT_DARK.toUpperCase()).toBe("#111110");
+    expect(PAINT_DARK.toUpperCase()).toBe("#0F0F0F");
     expect(cssBackground(desktopCss, ":root")).toBe(PAINT_LIGHT.toUpperCase());
     expect(cssBackground(desktopCss, ".dark")).toBe(PAINT_DARK.toUpperCase());
     expect(cssBackground(uiCss, ":root")).toBe(PAINT_LIGHT.toUpperCase());

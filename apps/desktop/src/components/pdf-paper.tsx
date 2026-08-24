@@ -15,11 +15,17 @@ export function PdfPaper() {
         padding: "48px 56px",
       }}
     >
-      <header className="mb-8 flex flex-col gap-1">
-        <p className="text-xs uppercase tracking-wide">Rechnung</p>
-        <p className="text-lg font-semibold">{invoice.rechnungsnummer}</p>
-        <p className="text-sm">Datum {invoice.datum} · Fällig {invoice.faellig}</p>
+      <header className="mb-8">
+        <p className="font-serif text-3xl tracking-tight">INVOICE</p>
       </header>
+
+      <p className="mb-6 text-sm">
+        <span>{invoice.rechnungsnummer}</span>
+        {" · Datum "}
+        {invoice.datum}
+        {" · Fällig "}
+        {invoice.faellig}
+      </p>
 
       <div className="mb-8 grid grid-cols-2 gap-6 text-sm">
         <div>
@@ -57,9 +63,12 @@ export function PdfPaper() {
         </tbody>
       </table>
 
-      <div className="mb-8 ml-auto w-48 text-sm tabular-nums">
+      <div className="mb-8 ml-auto w-56 text-right text-sm tabular-nums">
         <p>Netto {invoice.nettoGesamt.toFixed(2)}</p>
         <p>Brutto {invoice.bruttoGesamt.toFixed(2)}</p>
+        <p className="mt-2 font-serif text-2xl tracking-tight">
+          {invoice.bruttoGesamt.toFixed(2)}
+        </p>
       </div>
 
       <p className="break-words whitespace-normal text-xs">

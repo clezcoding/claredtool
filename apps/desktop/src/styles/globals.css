@@ -5,7 +5,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Inter Variable", Inter, sans-serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -37,48 +38,81 @@
   --card-foreground: #111110;
   --popover: #FFFFFF;
   --popover-foreground: #111110;
-  --primary: #a8bfa3;
+  --primary: #A8BFA3;
   --primary-foreground: #111110;
-  --secondary: #f7f7f5;
+  --secondary: #F7F7F5;
   --secondary-foreground: #111110;
-  --muted: #efefee;
-  --muted-foreground: #8a8a8a;
-  --accent: #a8bfa3;
+  --muted: #EFEFEE;
+  --muted-foreground: #8A8A8A;
+  --accent: #A8BFA3;
   --accent-foreground: #111110;
-  --destructive: #c9a227;
-  --border: #e8e8e4;
-  --input: #e8e8e4;
-  --ring: #a8bfa3;
+  --destructive: #C9A227;
+  --border: #E8E8E4;
+  --input: #E8E8E4;
+  --ring: #A8BFA3;
   --radius: 8px;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --dur: 180ms;
+  --sage: #A8BFA3;
+  --cta-send: #A8BFA3;
+  --nav-active-bar: #A8BFA3;
+  --stone: #8A8A8A;
+  --charcoal: #111110;
 }
 
 .dark {
   color-scheme: dark;
-  --background: #111110;
-  --foreground: #f7f7f5;
-  --card: #1c1c1a;
-  --card-foreground: #f7f7f5;
-  --popover: #1c1c1a;
-  --popover-foreground: #f7f7f5;
-  --primary: #a8bfa3;
+  --background: #0F0F0F;
+  --foreground: #F7F7F5;
+  --card: #1A1A1A;
+  --card-foreground: #F7F7F5;
+  --popover: #1A1A1A;
+  --popover-foreground: #F7F7F5;
+  --primary: #A8BFA3;
   --primary-foreground: #111110;
-  --secondary: #1c1c1a;
-  --secondary-foreground: #f7f7f5;
+  --secondary: #1A1A1A;
+  --secondary-foreground: #F7F7F5;
   --muted: #222220;
-  --muted-foreground: #8a8a8a;
-  --accent: #a8bfa3;
+  --muted-foreground: #8A8A8A;
+  --accent: #A8BFA3;
   --accent-foreground: #111110;
-  --destructive: #c9a227;
-  --border: #2a2a28;
-  --input: #2a2a28;
-  --ring: #a8bfa3;
+  --destructive: #C9A227;
+  --border: #2A2A28;
+  --input: #2A2A28;
+  --ring: #A8BFA3;
   --radius: 8px;
+  --sage: #A8BFA3;
+  --cta-send: #A8BFA3;
+  --nav-active-bar: #A8BFA3;
 }
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.wordmark {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.money-display {
+  font-family: var(--font-serif);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.dark .money-display {
+  text-shadow: 0 0 32px rgba(168, 191, 163, 0.12);
+}
+
+.dark .bg-card {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.03), 0 4px 24px rgba(0, 0, 0, 0.35);
 }
 
 .btn-primary:active {

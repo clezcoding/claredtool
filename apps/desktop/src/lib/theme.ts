@@ -3,7 +3,7 @@ export type ThemePref = "light" | "dark" | "system";
 
 /** D-02 first-paint canvas — keep in sync with apps/desktop/index.html boot IIFE. */
 export const PAINT_LIGHT = "#F7F7F5";
-export const PAINT_DARK = "#111110";
+export const PAINT_DARK = "#0F0F0F";
 
 const PREFS = new Set<string>(["light", "dark", "system"]);
 

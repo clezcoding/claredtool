@@ -190,3 +190,14 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 3. Entities, Invoices & Live Tax | 6/6 | Complete    | 2026-08-22 |
 | 4. Premium UI & Brand Redesign | 5/5 | In Progress|  |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
+
+### Phase 6: Mockup 1:1 Fidelity Closure — all 5 routes pixel-match approved mockups 02–07
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 5
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 6 to break down)
