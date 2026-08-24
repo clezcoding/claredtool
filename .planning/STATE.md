@@ -3,12 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04
 current_phase_name: Premium UI & Brand Redesign
-status: executing
+status: "Phase 04 shipped — PR #25"
 stopped_at: Completed 04-06-PLAN.md
-last_updated: "2026-08-23T21:40:00.000Z"
-last_activity: 2026-08-23
-last_activity_desc: Completed 04-06 canvas SSOT + FOUC
-state_head: f374f15
+last_updated: "2026-08-24T21:08:17.219Z"
+last_activity: 2026-08-24
+state_head: 0bdbabe446fbd38ca893fe934fb71cbc00d02fb6
 progress:
   total_phases: 5
   completed_phases: 3
@@ -28,13 +27,13 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 ## Current Position
 
-Status: Executing Phase 04
+Status: Phase 04 shipped — PR #25
 Phase: 04 (Premium UI & Brand Redesign) — EXECUTING
 Plan: 6 of 6
 Phase 04 (Premium UI & Brand Redesign) — **NEXT** human UAT (G-04-3 motion/OS + signed-in craft)
 Phase 05 (PDF, Audit & Offline Sync) — deferred until after redesign
 Decided: workflow = image-gen mockups until approved then code; redesign before PDF; brand = Crafted Minimal
-Last activity: 2026-08-23 — Completed 04-06-PLAN.md (G-04-1 / G-04-2 canvas SSOT)
+Last activity: 2026-08-24
 
 Progress: [██████░░░░] 60%
 
