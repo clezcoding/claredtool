@@ -10,16 +10,10 @@
     "./components/*": "./src/components/*.tsx"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@base-ui/react": "^1.7.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^1.31.0",
-=======
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
     "lucide-react": "^1.33.0",
->>>>>>> origin/main
     "radix-ui": "^1.6.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
