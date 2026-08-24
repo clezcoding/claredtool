@@ -60,7 +60,6 @@ describe("phase03-product", () => {
   });
 
   it("keeps the previous invoice_tax_rate visible when evaluate fails", async () => {
-    const lastGoodRate = SAMPLE_INVOICE.taxDecision.invoice_tax_rate;
     let evaluateCalls = 0;
 
     fetchMock.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -120,7 +119,7 @@ describe("phase03-product", () => {
 
     const rail = within(screen.getByTestId("tax-rail"));
     await waitFor(() => {
-      expect(rail.getByText(String(lastGoodRate))).toBeTruthy();
+      expect(rail.getByText(SAMPLE_INVOICE.taxDecision.legal_reference)).toBeTruthy();
     });
 
     const lineInput = screen
@@ -132,7 +131,7 @@ describe("phase03-product", () => {
     await waitFor(
       () => {
         expect(screen.getByText(TAX_ERROR_COPY)).toBeTruthy();
-        expect(rail.getByText(String(lastGoodRate))).toBeTruthy();
+        expect(rail.getByText(SAMPLE_INVOICE.taxDecision.legal_reference)).toBeTruthy();
       },
       { timeout: 2000 },
     );

@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04
-current_phase_name: PDF, Audit & Offline Sync
-status: "Phase 03 shipped — PR #10"
-stopped_at: Phase 3 complete — UAT + verification 13/13; Phase 4 unblocked
-last_updated: "2026-08-22T19:41:10.090Z"
-last_activity: 2026-08-22 - Completed quick task 260822-u6p: Räume das Projektverzeichniss auf.
-state_head: cb4422e41c4c125c44be8bcde132886c202fe450
+current_phase_name: Premium UI & Brand Redesign
+status: "Phase 04 shipped — PR #25"
+stopped_at: Completed 04-06-PLAN.md
+last_updated: "2026-08-24T21:08:17.219Z"
+last_activity: 2026-08-24
+state_head: 0bdbabe446fbd38ca893fe934fb71cbc00d02fb6
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 3
-  total_plans: 18
-  completed_plans: 18
+  total_plans: 24
+  completed_plans: 24
 milestone_name: milestone
 ---
 
@@ -23,17 +23,19 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 04 — PDF, Audit & Offline Sync
+**Current focus:** Phase 04 — Premium UI & Brand Redesign
 
 ## Current Position
 
-Status: Phase 03 shipped — PR #10
-Total Plans in Phase: 6
-Phase: 03 (Entities, Invoices & Live Tax) — **COMPLETE**
-Phase 04 (PDF, Audit & Offline Sync) — **NEXT**
-Last activity: 2026-08-22 - Completed quick task 260822-u6p: Räume das Projektverzeichniss auf.
+Status: Phase 04 shipped — PR #25
+Phase: 04 (Premium UI & Brand Redesign) — EXECUTING
+Plan: 6 of 6
+Phase 04 (Premium UI & Brand Redesign) — **NEXT** human UAT (G-04-3 motion/OS + signed-in craft)
+Phase 05 (PDF, Audit & Offline Sync) — deferred until after redesign
+Decided: workflow = image-gen mockups until approved then code; redesign before PDF; brand = Crafted Minimal
+Last activity: 2026-08-24
 
-Progress: [███████░░░] 75%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
@@ -71,6 +73,12 @@ Progress: [███████░░░] 75%
 | Phase 02-self-hosted-backend-authentik-sso P05 | 7 min | 3 tasks | 7 files |
 | Phase 02-self-hosted-backend-authentik-sso P06 | 2 min | 2 tasks | 2 files |
 | Phase 02-self-hosted-backend-authentik-sso P07 | 12 min | 2 tasks | 4 files |
+| Phase 04-premium-ui-brand-redesign P01 | 9 min | 4 tasks | 12 files |
+| Phase 04-premium-ui-brand-redesign P02 | 6 min | 3 tasks | 7 files |
+| Phase 04-premium-ui-brand-redesign P03 | 9 | 3 tasks | 10 files |
+| Phase 04 P04 | 4min | 3 tasks | 8 files |
+| Phase 04-premium-ui-brand-redesign P05 | 3 | 3 tasks | 7 files |
+| Phase 04-premium-ui-brand-redesign P06 | 6min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -81,6 +89,8 @@ Recent decisions affecting current work:
 
 - Locked: Tauri (not Electron); Coolify Postgres/Redis/Authentik/backend; tax library `evaluate(facts): decision` + TaxRule JSON Schema SSOT; HTTPS+OIDC
 - Pending: NestJS/Express vs FastAPI vs Axum; integrated tax module vs later microservice; collision logic; Supabase not v1 default
+- [Phase 04]: Premium UI Redesign (Crafted Minimal: Oatmeal, Charcoal, Pure White, Sage/Amber)
+- [Phase 04]: i18n required from day 1 (German and English UI)
 - [Phase 01]: React 19 + Vite 8 + Tauri 2 for the desktop client (Phase 1 UI stack lock)
 - [Phase 01]: createHashRouter from react-router so sub-routes survive tauri://localhost
 - [Phase 01]: Vite/Tauri bound to 5174 because 5173 was occupied by BILLIT Vite
@@ -113,6 +123,24 @@ Recent decisions affecting current work:
 - [Phase 02-self-hosted-backend-authentik-sso]: Fix emit path to dist/main.js; do not paper over with a nested CMD (G-02-2) — prisma.config.ts at package root made tsc rootDir . and emit dist/src/main.js
 - [Phase 02-self-hosted-backend-authentik-sso]: apt-get install curl so Coolify Dockerfile HTTP healthcheck can probe /health — node:22-bookworm-slim has neither curl nor wget; first deploy rolled back a running Nest
 - [Phase 02-self-hosted-backend-authentik-sso]: Local Authentik GHCR 2026.8.0 denial stays environmental; compose.yml unchanged (G-02-5) — Plan prohibition: do not add GHCR credentials or compose tag fallback
+- [Phase 04]: Amber --destructive #C9A227 sampled from 03-rechnung-dark (A1) — D-02 grants hex discretion; sparse emphasis only
+- [Phase 04]: Dark raised card #1C1C1A hairline #2A2A28 (A2) — Sampled from dark mockups for whisper separator
+- [Phase 04]: Menu.default() plus Darstellung; core:menu:default granted — Keep macOS app menu; A4 ACL for JS setAsAppMenu
+- [Phase 04-premium-ui-brand-redesign]: Did not rebuild mockup Von/Kunde cards, serif totals, or tax-rules editor — D-11 IA lock; class-only restyle — Plan locks IA; restyle is token classes on existing split canvas / dl / empty hero
+- [Phase 04-premium-ui-brand-redesign]: Empty CTA Beispielrechnung anzeigen restored; click focuses form instead of SAMPLE_INVOICE — Phase 3 removed sample restore; UI-SPEC still requires the CTA copy
+- [Phase 04-premium-ui-brand-redesign]: PdfPaper numerals may use tabular-nums; inline #fff/#111 stay (D-09) — Dark theme must not invert invoice paper content
+- [Phase 04]: Class-only Entities/Kunden restyle; mockup table/search/tabs not built (D-11 IA lock)
+- [Phase 04]: Session chip gained no Darstellung/theme item (D-07 / Phase 2 D-36)
+- [Phase 04]: Login-gate hero GPT Image 2 after cost-check (7 credits); leftover 3 of 10 Starter credits
+- [Phase 04]: splash.png copied into public/; splash.tsx stays wordmark+spinner (D-16 type-only)
+- [Phase 04]: First-paint hex is Pale Oatmeal #F7F7F5 / Deep Charcoal #111110, not UA white
+- [Phase 04]: Head IIFE injects html,body CSS then body.style when body exists
+- [Phase 04]: PDF-01 OFFL-01 AUDT-01 remapped to Phase 5 Pending
+- [Phase 04]: OS appearance sync reuses applyTheme('system') so inline D-02 hex and .dark stay aligned
+- [Phase 04]: Hell/Dunkel ignore matchMedia because syncSystemAppearance returns unless currentPref() is system
+- [Phase 04]: Empty CTA copy restored to UI-SPEC; startNewDraft and showRail = !showHero unchanged
+- [Phase 04]: Login hero reuses 04-03 public PNG; no Higgsfield; canvas bg-background
+- [Phase 04-06]: Canvas --background SSOT is Pale Oatmeal #F7F7F5 / Deep Charcoal #111110 across IIFE, PAINT_*, and both globals.css (G-04-1, G-04-2)
 
 ### Pending Todos
 
@@ -139,6 +167,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-22T19:35:00Z
-Stopped at: Phase 3 complete — run /gsd-secure-phase 3 then Phase 4 UI-SPEC
-Resume file: .planning/phases/04-pdf-audit-offline-sync/ (not created yet)
+Last session: 2026-08-23T21:40:00.000Z
+Stopped at: Completed 04-06-PLAN.md; G-04-3 + signed-in craft still human UAT
+Resume file: None

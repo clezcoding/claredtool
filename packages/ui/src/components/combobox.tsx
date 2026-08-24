@@ -8,7 +8,6 @@ import { Button } from "@clared/ui/components/button"
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupInput,
 } from "@clared/ui/components/input-group"
 import { ChevronDownIcon, XIcon, CheckIcon } from "lucide-react"
@@ -40,11 +39,13 @@ function ComboboxClear({ className, ...props }: ComboboxPrimitive.Clear.Props) {
   return (
     <ComboboxPrimitive.Clear
       data-slot="combobox-clear"
-      render={<InputGroupButton variant="ghost" size="icon-xs" />}
-      className={cn(className)}
+      className={cn(
+        "inline-flex size-6 items-center justify-center rounded-[calc(var(--radius)-3px)] p-0 text-muted-foreground",
+        className,
+      )}
       {...props}
     >
-      <XIcon className="pointer-events-none" />
+      <XIcon className="pointer-events-none size-3.5" />
     </ComboboxPrimitive.Clear>
   )
 }
@@ -68,16 +69,11 @@ function ComboboxInput({
       />
       <InputGroupAddon align="inline-end">
         {showTrigger && (
-          <InputGroupButton
-            size="icon-xs"
-            variant="ghost"
-            asChild
-            data-slot="input-group-button"
-            className="group-has-data-[slot=combobox-clear]/input-group:hidden data-pressed:bg-transparent"
+          <ComboboxTrigger
             disabled={disabled}
-          >
-            <ComboboxTrigger />
-          </InputGroupButton>
+            data-slot="input-group-button"
+            className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground group-has-data-[slot=combobox-clear]/input-group:hidden data-pressed:bg-transparent"
+          />
         )}
         {showClear && <ComboboxClear disabled={disabled} />}
       </InputGroupAddon>
