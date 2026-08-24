@@ -12,12 +12,15 @@ pnpm-debug.log*
 
 # Rust / Tauri
 target
+**/target
 apps/desktop/src-tauri/gen/schemas
 
 # Local agent/runtime (never commit secrets or GSD scratch)
 .cursor/mcp.json
 .planning/tmp/
 .gsd/
+.codex/
+.claude/
 
 .env
 !.env.example
@@ -25,9 +28,18 @@ apps/desktop/src-tauri/gen/schemas
 # Nest / Prisma
 apps/backend/.env
 apps/backend/src/generated/
-# TypeScript incremental build info
 *.tsbuildinfo
 
-# Stitch local exports (source of truth is stitch.withgoogle.com + DESIGN.md)
-.stitch/designs/
+# Google Stitch — local MCP workspace (SSOT: stitch.withgoogle.com + phase mockups in .planning/)
+.stitch/
 stitch-output/
+
+# Stitch QA scripts + root mockup symlinks (canonical: .planning/phases/.../mockups/)
+scripts/
+mockups/
+
+# Python (stitch-*.py helpers)
+__pycache__/
+*.py[cod]
+*.pyo
+.Python

@@ -1,8 +1,36 @@
+# Git / agent / planning (not in backend image)
+.git
+.gitignore
+.planning
+.gsd
+.cursor
+.claude
+.codex
+
+# Google Stitch + local mockup/QA tooling
+.stitch
+stitch-output
+mockups
+scripts
+
+# Desktop app (backend Dockerfile only copies backend + tax-engine)
+apps/desktop
+
+# Dependencies & build output (reinstalled/built in image)
 node_modules
 **/node_modules
-**/.env
 **/dist
-.git
-.planning
-.claude
-.cursor
+**/.env
+**/.env.*
+!**/.env.example
+
+# Rust / Tauri artifacts
+target
+**/target
+apps/desktop/src-tauri
+
+# OS / editor noise
+**/.DS_Store
+**/*.log
+**/.idea
+**/.vscode
