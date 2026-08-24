@@ -7,6 +7,13 @@
   "forceExit": true,
   "detectOpenHandles": false,
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
+    "^.+\\.(t|j)s$": [
+      "ts-jest",
+      {
+        "tsconfig": {
+          "types": ["node", "jest"]
+        }
+      }
+    ]
   }
 }
