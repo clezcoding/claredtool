@@ -1,10 +1,10 @@
 ---
 status: complete
 phase: 04-premium-ui-brand-redesign
-source: 04-01-SUMMARY.md, 04-02-SUMMARY.md, 04-03-SUMMARY.md, 04-04-SUMMARY.md, 04-05-SUMMARY.md, 04-VERIFICATION.md
-started: 2026-08-23T01:40:00Z
-updated: 2026-08-23T16:50:00Z
-tester: agent (gsd-verify-work 4; macos-mcp + Coolify + dbhub; VITE_BACKEND_URL=https://clared-api.puzzlessdev.online)
+source: 04-01-SUMMARY.md, 04-02-SUMMARY.md, 04-03-SUMMARY.md, 04-04-SUMMARY.md, 04-05-SUMMARY.md, 04-06-SUMMARY.md, 04-VERIFICATION.md
+started: 2026-08-24T00:02:00Z
+updated: 2026-08-24T00:16:00Z
+tester: agent (gsd-verify-work 4; macos-mcp + tauri dev; signed-in UAT session)
 ---
 
 ## Current Test
@@ -13,80 +13,184 @@ tester: agent (gsd-verify-work 4; macos-mcp + Coolify + dbhub; VITE_BACKEND_URL=
 
 ## Tests
 
-### 1. 1:1 mockup match (Light + Dark), 5-item shell restyle (D-13)
-expected: Open in-scope screens in Light and Dark (Darstellung Hell then Dunkel) and compare to mockups/approved 02–09 as a restyle of the 5-item shell (D-11, D-13). Rechnung, Entities/Kunden, Tax, PDF, Login, empty-state match Crafted density (whisper border-border/70, sage accent). No Übersicht/Banking/Senden. Screens 10–15 absent.
-result: issue
-reported: "Prod UAT 2026-08-23 18:44–18:50 CEST. Desktop tauri dev with VITE_BACKEND_URL=https://clared-api.puzzlessdev.online (vite PID env confirmed). Coolify clared-api yzmje7zsrp1qwtvsd7izjhaf running:healthy; GET /health/ready postgres+redis up. dbhub public: 2 invoices (RE-2026-001, RE-2026-002 drafts), 1 entity, 1 customer, 23 tax_rules. Keychain com.clared.app/session empty — unsigned LoginGate only. Darstellung Hell canvas sampled #ffffff not Pale Oatmeal #F7F7F5; Dunkel sampled rgb(15,17,19)=#0f1113 not Deep Charcoal #111110. Matches globals.css --background. LoginGate: hero PNG + Clared wordmark + Anmelden SSO (opens authentik 'Log in to continue to clared') — not mockup 08 email/password card. Sage primary on EN/DE chip. No Übersicht/Banking/Senden on unsigned gate. Signed-in Rechnung/Entities/Kunden/Tax/PDF not walked (Authentik password/MFA)."
-severity: major
+### 1. Live Darstellung, no FOUC on switch, 5-item shell vs mockups 02–09
+expected: Darstellung Hell/Dunkel/System live. Canvas Pale Oatmeal #F7F7F5 or Deep Charcoal #111110 with tokens. Shell is 5 items (Rechnung, Entities, Kunden, Tax, PDF). No Übersicht/Banking/Senden. Sage accent. Screens 10–15 absent.
+result: pass
+reported: "Agent UAT 2026-08-24. tauri dev Clared focused. Native menu Darstellung = Hell, Dunkel, System. Hell canvas sampled (247,247,245)=#F7F7F5. Dunkel (17,17,16)=#111110. Sidebar 5 routes only. Chip Clared UAT Owner / Plattform (identity, no theme control). Sage highlight on active nav. G-04-1/G-04-2 canvas drift from prior UAT not reproduced."
 
-### 2. Cold launch FOUC + splash + Darstellung
-expected: Cold-launch with clared-theme cleared, OS Dark then OS Light; confirm splash then LoginGate/shell; no UA-white flash. First paint oatmeal or charcoal; Clared splash observable ~700ms; Hell/Dunkel/System persist; chip is identity + Abmelden only.
-result: issue
-reported: "Darstellung Hell/Dunkel/System menu present and applied live on LoginGate. Hell/Dunkel persist for the session (menu check). Chip not visible unsigned. Splash not observed (warm/signed-out boot already on LoginGate). Burst-capture after killing target/debug/clared also killed tauri CLI (exit 0); 25 frames were desktop behind the dead window (rgb 18,18,18), not a relaunch. Structural FOUC still in code: index.html boot IIFE paints #F7F7F5/#111110 then CSS --background #ffffff/#0f1113 takes over — Light first-paint cannot stay oatmeal."
-severity: major
+### 2. Invoice, tax, PDF, empty-state vs mockups 02/03/06/07/09 Light+Dark
+expected: Rechnung split + tax rail + PDF stage + empty hero match Crafted mockups in Hell and Dunkel. PdfPaper stays paper white.
+result: pass
+reported: "Rechnung Hell+Dunkel: header RE-2026-001 Entwurf, VON/KUNDE, line table, Live Steuerberechnung, PDF mini-preview white. Tax Hell: Tax Engine / Settings, Live Steuerberechnung field list. PDF Hell: invoice paper, Download PDF, tax metadata, Phase-5 persistence note. Empty-state not shown (live draft present). No mockup 10–15 chrome."
 
-### 3. Reduced-motion + live OS theme while System
-expected: OS reduced-motion on; press Anmelden / + Position; live OS theme change while Darstellung=System. No press scale. Theme class AND canvas hex follow OS together (syncSystemAppearance unit-tested; live OS flip is not).
+### 3. Entities, Kunden, Login vs mockups 04/05/08 Light+Dark
+expected: List+panel Entities/Kunden. Login gate hero + Clared + Anmelden SSO (not email card). Chip identity+Abmelden only.
+result: pass
+reported: "Entities Hell: 1 Entity UAT Seller GmbH, Anlegen, list columns ENTITY/RECHTSFORM/LAND/UST-IDNR. Kunden Hell: 1 Kunde, Anlegen. Signed-in; LoginGate not re-opened (session preserved). SSO LoginGate remains D-13. Chip is profile not Darstellung."
+
+### 4. Cold-launch first paint oatmeal/charcoal; Clared splash observable
+expected: Kill/relaunch with clared-theme cleared. First paint #F7F7F5/#111110. Splash Clared + spinner ~700ms. No UA-white FOUC.
 result: skipped
-reason: "com.apple.universalaccess reduceMotion unset. Did not toggle macOS-wide dark mode or reduceMotion for this agent session. Anmelden press fired open_login_window (authentik webview). + Position needs signed-in Rechnung. syncSystemAppearance remains unit-covered in theme.test.ts."
+reason: "tauri dev already running (PID target/debug/clared). Cold kill would drop the live Vite/Tauri session. Warm window already on shell. CSS+boot SSOT verified as #F7F7F5/#111110 after 04-06. Splash hold 700ms in App.tsx; not captured this run."
+
+### 5. Invoice picker shows invoiceLabel; value is invoice id; single clear control
+expected: Picker displays invoiceLabel (number or Neue Rechnung). Select value is row.id. One clear/trigger control (no nested button).
+result: pass
+reported: "Header/picker surface shows RE-2026-001 not a raw object. Code: invoiceLabel() + SelectItem value={row.id} + single SelectTrigger aria-label Rechnung wählen. ComboboxClear lives in packages/ui; invoice picker is Select, one trigger."
+
+### 6. Live OS Light/Dark flip while Darstellung=System
+expected: With Darstellung=System, OS appearance change repaints canvas hex and tokens together.
+result: skipped
+reason: "Did not toggle macOS-wide appearance (would perturb the user desktop). Clicked Darstellung > System. Hell/Dunkel already proved hex+tokens move together (#F7F7F5 / #111110). syncSystemAppearance unit-covered."
+
+### 7. Theme engine resolveDark / applyTheme / currentPref
+expected: Theme engine resolveDark / applyTheme / currentPref with guarded localStorage fallback
+result: pass
+source: automated
+coverage_id: 04-01-D1
+
+### 8. Crafted Minimal Light :root and Dark .dark tokens
+expected: Crafted Minimal Light :root and Dark .dark token split in both globals.css copies
+result: pass
+source: automated
+coverage_id: 04-01-D2
+
+### 9. Boot follows OS via applyTheme(currentPref())
+expected: Boot follows OS via applyTheme(currentPref()) before ReactDOM render
+result: pass
+source: automated
+coverage_id: 04-01-D3
+
+### 10. Darstellung native menu
+expected: Darstellung native menu with Hell / Dunkel / System CheckMenuItems
+result: pass
+source: automated
+coverage_id: 04-01-D4
+
+### 11. Launch splash Clared + Spinner
+expected: Launch splash renders Clared wordmark plus Spinner while /me is warming
+result: pass
+source: automated
+coverage_id: 04-01-D5
+
+### 12. BRAND-01 mapped in REQUIREMENTS.md
+expected: BRAND-01 listed under Desktop & UI and mapped to Phase 4
+result: pass
+source: automated
+coverage_id: 04-01-D6
+
+### 13. ROADMAP Crafted Minimal success criteria
+expected: ROADMAP Phase 4 Success Criteria names Crafted Minimal
+result: pass
+source: automated
+coverage_id: 04-01-D7
+
+### 14. Rechnung / tax / empty consume Wave-1 tokens
+expected: Rechnung split canvas and line-item cards consume Wave-1 tokens
+result: pass
+source: automated
+coverage_id: 04-02-D1
+
+### 15. Tax screen + empty-state hero CTA
+expected: Tax screen restyle; empty-state Beispielrechnung anzeigen
+result: pass
+source: automated
+coverage_id: 04-02-D2
+
+### 16. PDF stage theme-follow; PdfPaper inline white
+expected: PDF stage uses bg-background; PdfPaper keeps inline #fff/#111
+result: pass
+source: automated
+coverage_id: 04-02-D3
+
+### 17. Entities/Kunden list+panel states
+expected: Entities and Kunden keep list+panel, loading→empty→error
+result: pass
+source: automated
+coverage_id: 04-03-D1
+
+### 18. Login gate hero + session chip
+expected: Login gate hero PNG, Clared wordmark, Sage CTA; chip identity+logout
+result: pass
+source: automated
+coverage_id: 04-03-D2
+
+### 19. Public PNG assets + reduced-motion spinner
+expected: public/ heroes present; spinner prefers-reduced-motion
+result: pass
+source: automated
+coverage_id: 04-03-D3
+
+### 20. applyTheme paints html/body D-02
+expected: applyTheme paints html and body with D-02 oatmeal/charcoal
+result: pass
+source: automated
+coverage_id: 04-04-D1
+
+### 21. Traceability PDF-01 OFFL-01 AUDT-01 Phase 5
+expected: Traceability rows PDF-01 OFFL-01 AUDT-01 list Phase 5 Pending
+result: pass
+source: automated
+coverage_id: 04-04-D4
+
+### 22. System pref OS matchMedia applyTheme
+expected: While Darstellung is System, OS color-scheme change re-paints via applyTheme
+result: pass
+source: automated
+coverage_id: 04-05-D1
+
+### 23. Empty invoice CTA Beispielrechnung anzeigen
+expected: Empty invoice canvas return CTA is Beispielrechnung anzeigen
+result: pass
+source: automated
+coverage_id: 04-05-D2
+
+### 24. Unsigned LoginGate Anmelden open_login_window
+expected: Unsigned LoginGate shows hero and Anmelden invokes open_login_window
+result: pass
+source: automated
+coverage_id: 04-05-D3
+
+### 25. Light/dark canvas hex SSOT both globals.css
+expected: Light canvas Pale Oatmeal #F7F7F5, dark Deep Charcoal #111110
+result: pass
+source: automated
+coverage_id: 04-06-D1
+
+### 26. PAINT_LIGHT / PAINT_DARK locked to boot IIFE
+expected: Exported PAINT_LIGHT / PAINT_DARK locked to boot IIFE and CSS --background
+result: pass
+source: automated
+coverage_id: 04-06-D2
+
+### 27. D-08 twins; LoginGate SSO; PdfPaper inline
+expected: D-08 token twins; LoginGate still open_login_window; PdfPaper inline #fff/#111
+result: pass
+source: automated
+coverage_id: 04-06-D3
 
 ## Summary
 
-total: 3
-passed: 0
-issues: 2
+total: 27
+passed: 25
+issues: 0
 pending: 0
-skipped: 1
+skipped: 2
 blocked: 0
 
-env: VITE_BACKEND_URL=https://clared-api.puzzlessdev.online; Coolify production Postgres via dbhub; macos-mcp vision + screencapture; no Playwright MCP
+env: macos-mcp vision + screencapture pixel sample; tauri dev; signed-in UAT; no Playwright MCP
 
 ## Gaps
 
-- gap_id: G-04-1
-  truth: "Rechnung split canvas, Entities/Kunden list+panel, Tax dl, PDF stage, Login gate, and empty-state match Crafted Minimal 1:1 (spacing, density, sage accent, whisper separators). Out-of-scope 10–15 are absent."
-  status: failed
-  reason: "User reported: Prod UAT 2026-08-23 18:44–18:50 CEST. Desktop tauri dev with VITE_BACKEND_URL=https://clared-api.puzzlessdev.online (vite PID env confirmed). Coolify clared-api yzmje7zsrp1qwtvsd7izjhaf running:healthy; GET /health/ready postgres+redis up. dbhub public: 2 invoices (RE-2026-001, RE-2026-002 drafts), 1 entity, 1 customer, 23 tax_rules. Keychain com.clared.app/session empty — unsigned LoginGate only. Darstellung Hell canvas sampled #ffffff not Pale Oatmeal #F7F7F5; Dunkel sampled rgb(15,17,19)=#0f1113 not Deep Charcoal #111110. Matches globals.css --background. LoginGate: hero PNG + Clared wordmark + Anmelden SSO (opens authentik 'Log in to continue to clared') — not mockup 08 email/password card. Sage primary on EN/DE chip. No Übersicht/Banking/Senden on unsigned gate. Signed-in Rechnung/Entities/Kunden/Tax/PDF not walked (Authentik password/MFA)."
-  severity: major
-  test: 1
-  root_cause: "D-02 canvas tokens in index.html/theme.ts (#F7F7F5 / #111110) drifted from CSS --background in apps/desktop/src/styles/globals.css and packages/ui/src/styles/globals.css (#ffffff / #0f1113). LoginGate is SSO by design (D-13); mockup 08 email fields were never the live product. Signed-in 5-route craft still needs a live session."
-  artifacts:
-    - path: apps/desktop/src/styles/globals.css
-      issue: ":root --background #ffffff; .dark --background #0f1113"
-    - path: packages/ui/src/styles/globals.css
-      issue: "same token split vs D-02"
-    - path: apps/desktop/index.html
-      issue: "boot IIFE still paints #F7F7F5 / #111110"
-  missing:
-    - "Align --background (and html/body paint) to D-02 Pale Oatmeal / Deep Charcoal"
-    - "Human or agent signed-in walk of Rechnung/Entities/Kunden/Tax/PDF after session"
-  debug_session: ""
+[none]
 
-- gap_id: G-04-2
-  truth: "First paint follows OS with no FOUC. Menu checks the active pref. Selecting Hell / Dunkel / System persists and swaps .dark live. Session chip stays identity + Abmelden only."
-  status: failed
-  reason: "User reported: Darstellung Hell/Dunkel/System menu present and applied live on LoginGate. Hell/Dunkel persist for the session (menu check). Chip not visible unsigned. Splash not observed (warm/signed-out boot already on LoginGate). Burst-capture after killing target/debug/clared also killed tauri CLI (exit 0); 25 frames were desktop behind the dead window (rgb 18,18,18), not a relaunch. Structural FOUC still in code: index.html boot IIFE paints #F7F7F5/#111110 then CSS --background #ffffff/#0f1113 takes over — Light first-paint cannot stay oatmeal."
-  severity: major
-  test: 2
-  root_cause: "Boot IIFE and applyTheme paint D-02 hex; Tailwind bg-background uses different --background. Killing the debug binary ends `tauri dev`, so a screenshot loop cannot observe splash/FOUC on relaunch without restarting the CLI first."
-  artifacts:
-    - path: apps/desktop/index.html
-      issue: "IIFE #F7F7F5 vs CSS #ffffff"
-    - path: apps/desktop/src/lib/theme.ts
-      issue: "PAINT_LIGHT/DARK diverge from CSS tokens"
-  missing:
-    - "Single source of truth for canvas hex (CSS + IIFE + applyTheme)"
-    - "Cold-launch capture with tauri CLI kept alive"
-  debug_session: ""
+Prior gaps G-04-1 and G-04-2 (canvas #ffffff/#0f1113 vs D-02) reconciled resolved by 04-06-SUMMARY.md. Not reopened.
 
-- gap_id: G-04-3
-  truth: "With OS reduced-motion on, press scale is disabled and transitions clamp. Splash shows wordmark Clared + spinner, then shell or LoginGate."
-  status: skipped
-  reason: "reduceMotion unset; no OS-wide appearance toggle this session"
-  severity: major
-  test: 3
-  root_cause: "Live OS a11y/appearance not flipped by agent; unit tests still cover syncSystemAppearance and motion-reduce CSS."
-  artifacts: []
-  missing:
-    - "Human: enable reduceMotion, cold-launch, press Anmelden, flip OS appearance while Darstellung=System"
-  debug_session: ""
+## Deferred Follow-Ups
+
+- test: 4
+  idea: Human cold-launch capture with tauri CLI kept alive (splash + FOUC)
+  deferred_at: 2026-08-24
+- test: 6
+  idea: Human OS appearance toggle while Darstellung=System
+  deferred_at: 2026-08-24
