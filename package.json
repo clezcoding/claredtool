@@ -7,10 +7,5 @@
   "scripts": {
     "dev": "pnpm --filter ./apps/desktop tauri dev",
     "build": "pnpm --filter ./apps/desktop tauri build"
-  },
-  "pnpm": {
-    "overrides": {
-      "deepmerge-ts": ">=8.0.2"
-    }
   }
 }
