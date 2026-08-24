@@ -17,7 +17,7 @@ export function CreateDisabledButton({
         type="button"
         disabled={!enabled}
         onClick={enabled ? onClick : undefined}
-        className="min-h-11 font-semibold"
+        className="btn-primary min-h-11 font-semibold bg-foreground text-background hover:bg-foreground/90"
       >
         Anlegen
       </Button>

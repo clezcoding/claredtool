@@ -5,6 +5,53 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clared</title>
+    <script>
+      (function () {
+        var light = "#F7F7F5";
+        var darkBg = "#0F0F0F";
+        function paint(dark) {
+          var bg = dark ? darkBg : light;
+          var scheme = dark ? "dark" : "light";
+          document.documentElement.classList.toggle("dark", dark);
+          document.documentElement.style.background = bg;
+          document.documentElement.style.colorScheme = scheme;
+          var css = document.getElementById("clared-boot-paint");
+          if (!css) {
+            css = document.createElement("style");
+            css.id = "clared-boot-paint";
+            document.head.appendChild(css);
+          }
+          css.textContent =
+            "html,body{background:" + bg + ";color-scheme:" + scheme + "}";
+          function paintBody() {
+            if (!document.body) return;
+            document.body.style.background = bg;
+            document.body.style.colorScheme = scheme;
+          }
+          paintBody();
+          if (!document.body) {
+            document.addEventListener("DOMContentLoaded", paintBody);
+          }
+        }
+        try {
+          var key = "clared-theme";
+          var stored = localStorage.getItem(key);
+          var pref =
+            stored === "light" || stored === "dark" || stored === "system"
+              ? stored
+              : "system";
+          var dark =
+            pref === "dark" ||
+            (pref === "system" &&
+              window.matchMedia("(prefers-color-scheme: dark)").matches);
+          paint(dark);
+        } catch (e) {
+          try {
+            paint(window.matchMedia("(prefers-color-scheme: dark)").matches);
+          } catch (_) {}
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -36,8 +36,8 @@ describe("sidebar routes", () => {
   it.each([
     ["Entities", "Entities"],
     ["Kunden", "Kunden"],
-    ["Tax", "Tax"],
-    ["PDF", "PDF"],
+    ["Tax", "Tax Rules"],
+    ["PDF", "PDF Viewer / Export"],
   ] as const)("navigates to %s without a blank page", async (linkLabel, heading) => {
     await renderSignedIn();
     fireEvent.click(screen.getByRole("link", { name: linkLabel }));

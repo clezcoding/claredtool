@@ -30,7 +30,7 @@ describe("phase02-auth", () => {
     render(<ErrorState onRetry={() => undefined} />);
     expect(
       screen.getByText(
-        "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.",
+        /Ein Fehler ist aufgetreten\. Überprüfen Sie Ihre Internetverbindung/,
       ),
     ).toBeTruthy();
   });

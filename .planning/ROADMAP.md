@@ -2,7 +2,7 @@
 
 ## Overview
 
-Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. It is **paid subscription SaaS**: backend, Postgres, Redis, and Authentik run on the **founder's Coolify**, not on the customer's machine, not as open source, not for free. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to the vendor Coolify API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 closes the loop with PDF, tax-decision audit, and offline sync. Stripe/seats (`SAAS-01`) stay v2.
+Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. It is **paid subscription SaaS**: backend, Postgres, Redis, and Authentik run on the **founder's Coolify**, not on the customer's machine, not as open source, not for free. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to the vendor Coolify API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 is a full premium redesign (Crafted Minimal) — every page rebuilt mockup-first with a new brand, new graphics, and motion. Phase 5 closes the loop with PDF, tax-decision audit, and offline sync. Stripe/seats (`SAAS-01`) stay v2.
 
 ## Phases
 
@@ -15,8 +15,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Tauri Desktop & Mockup-First UI** - Launch Clared in a Tauri window; invoice+tax+PDF mockups exist before implementation (completed 2026-08-20)
 - [x] **Phase 2: Self-Hosted Backend & Authentik SSO** - Sign in via Authentik; desktop talks HTTPS+OIDC to vendor Coolify (founder's cluster) (completed 2026-08-22)
-- [ ] **Phase 3: Entities, Invoices & Live Tax** - Create invoice, see live tax from modular engine
-- [ ] **Phase 4: PDF, Audit & Offline Sync** - Download PDF, inspect tax audit trail, work offline and sync
+- [x] **Phase 3: Entities, Invoices & Live Tax** - Create invoice, see live tax from modular engine (completed 2026-08-22)
+- [ ] **Phase 4: Premium UI & Brand Redesign** - Crafted Minimal; every page mockup-first with new brand, graphics, and motion
+- [ ] **Phase 5: PDF, Audit & Offline Sync** - Download PDF, inspect tax audit trail, work offline and sync
 
 ## Phase Details
 
@@ -124,10 +125,48 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **UI hint**: yes
 
-### Phase 4: PDF, Audit & Offline Sync
+### Phase 4: Premium UI & Brand Redesign
+
+**Goal**: Clared gets a complete premium fintech redesign ("Crafted Minimal") — a new brand system (color, type, motion), new graphics via Higgsfield, and every page redesigned mockup-first including animations, loading/splash, and empty/error states
+**Depends on**: Phase 3
+**Requirements**: UI-01, BRAND-01 (new)
+**Success Criteria** (what must be TRUE):
+
+  1. A "Crafted Minimal" design system (color tokens, type scale, spacing, depth, radius, motion) exists as SSOT and is approved
+  2. User-approved image mockups exist for every page before it is coded (mockup-first, per Phase 1 precedent)
+  3. All existing surfaces (app shell, Rechnung, Entities, Kunden, Tax, PDF, Login/Session) are rebuilt in the new system, each with empty / error / loading states
+  4. New graphics (hero art, illustrations, empty-state art) are generated via Higgsfield CLI and wired in
+  5. Motion is implemented per interface-design rules (durations <300ms, custom ease-out, `prefers-reduced-motion` respected), including a loading/splash experience
+
+**Plans**: 6 plans
+
+**Wave 1**
+
+- [x] 04-01-PLAN.md — Crafted Minimal token split + OS-follow theme engine + Darstellung menu + splash (blocks all)
+
+**Wave 2** *(blocked on Wave 1; 04-02 and 04-03 parallel)*
+
+- [x] 04-02-PLAN.md — Rechnung / Tax / PDF restyle (tabular money, Sage press, PdfPaper D-09 guard)
+- [x] 04-03-PLAN.md — Entities / Kunden / Auth restyle + shared states + Crafted asset swap + Login-Gate hero
+
+**Wave 3** *(gap closure; blocked on Wave 2)*
+
+- [x] 04-04-PLAN.md — FOUC inline paint + splash hold + invoice picker / Combobox unnest (G-04-1–3)
+
+**Wave 4** *(gap closure; blocked on Wave 3)*
+
+- [x] 04-05-PLAN.md — Empty CTA + login hero + OS applyTheme paint (G-04-4–6)
+
+**Wave 5** *(gap closure; blocked on Wave 4)*
+
+- [x] 04-06-PLAN.md — D-02 canvas token SSOT + FOUC (G-04-1, G-04-2)
+
+**UI hint**: yes
+
+### Phase 5: PDF, Audit & Offline Sync
 
 **Goal**: User finishes the two-minute loop with a PDF, can explain a tax decision from the audit trail, and can keep working when offline
-**Depends on**: Phase 3
+**Depends on**: Phase 4
 **Requirements**: PDF-01, OFFL-01, AUDT-01
 **Success Criteria** (what must be TRUE):
 
@@ -142,11 +181,23 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Tauri Desktop & Mockup-First UI | 5/5 | Complete    | 2026-08-20 |
 | 2. Self-Hosted Backend & Authentik SSO | 7/7 | Complete    | 2026-08-22 |
-| 3. Entities, Invoices & Live Tax | 6/6 | In Progress|  |
-| 4. PDF, Audit & Offline Sync | 0/? | Not started | - |
+| 3. Entities, Invoices & Live Tax | 6/6 | Complete    | 2026-08-22 |
+| 4. Premium UI & Brand Redesign | 5/5 | In Progress|  |
+| 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
+
+### Phase 6: Mockup 1:1 Fidelity Closure — all 5 routes pixel-match approved mockups 02–07
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 5
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 6 to break down)

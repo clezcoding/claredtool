@@ -92,7 +92,7 @@ describe("kunden screen", () => {
 
 describe("tax screen", () => {
   it("renders canonical TaxDecision field labels including applied_rule_id", async () => {
-    await openScreen("Tax", "Tax");
+    await openScreen("Tax", "Tax Rules");
     const panel = within(screen.getByTestId("tax-decision"));
     expect(panel.getByText("applied_rule_id")).toBeTruthy();
     expect(panel.getByText("legal_reference")).toBeTruthy();
