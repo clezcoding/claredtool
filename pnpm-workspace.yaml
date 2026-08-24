@@ -1,6 +1,8 @@
 packages:
   - "apps/*"
   - "packages/*"
+overrides:
+  deepmerge-ts: ">=8.0.2"
 allowBuilds:
   esbuild: true
   prisma: true
