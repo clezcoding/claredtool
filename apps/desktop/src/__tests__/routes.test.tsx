@@ -24,9 +24,13 @@ describe("sidebar routes", () => {
     expect(labels).toEqual(["Rechnung", "Entities", "Kunden", "Tax", "PDF"]);
   });
 
-  it("lands on the sample invoice number on the index route", async () => {
+  it("lands on the first-run empty invoice on the index route", async () => {
     await renderSignedIn();
-    expect(screen.getByText("RE-2026-001")).toBeTruthy();
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "Noch keine Rechnung erstellt" }),
+      ).toBeTruthy();
+    });
   });
 
   it.each([

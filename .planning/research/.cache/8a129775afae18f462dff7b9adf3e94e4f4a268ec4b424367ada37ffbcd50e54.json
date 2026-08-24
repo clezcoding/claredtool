@@ -1,0 +1,1 @@
+{"content":"Coolify Dockerfile build pack exists (not Nixpacks). Docs page is JS-spa and returned title-only. Put migrate&&node in image CMD so local docker matches Coolify. Monorepo: build context repo root, Dockerfile at apps/backend/Dockerfile.","source":"web","provider":"websearch","confidence":"LOW","fetched_at":"2026-08-22T00:22:49.978Z","ttl":86400000,"kind":"web"}

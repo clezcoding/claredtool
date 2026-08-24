@@ -1,0 +1,28 @@
+{
+  "rule_id": "EU_TO_US_B2B_SERVICE",
+  "version": "1.0.0",
+  "description": "Matrix class EU_TO_US_B2B_SERVICE (phase 03-04 exemplar)",
+  "conditions": {
+    "supplier_country": "AT",
+    "customer_country": "US",
+    "supplier_is_business": true,
+    "customer_is_business": true,
+    "supplier_vat_registered": true,
+    "customer_vat_registered": true,
+    "supply_type": "service",
+    "channel": "direct"
+  },
+  "effect": {
+    "place_of_supply_country": "{{customer_country}}",
+    "tax_liability_party": "supplier",
+    "invoice_tax_rate": 0,
+    "invoice_tax_shown": false,
+    "reverse_charge_flag": false,
+    "legal_reference": "US sales tax / nexus rules",
+    "invoice_text_block_id": "US_B2B_SERVICE_FROM_EU"
+  },
+  "source_citation": [],
+  "tags": [
+    "service"
+  ]
+}

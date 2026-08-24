@@ -44,14 +44,16 @@ describe("phase02-auth", () => {
     });
   });
 
-  it("boot with keychain token shows Wird geladen then the sample invoice", async () => {
+  it("boot with keychain token shows Wird geladen then the first-run empty invoice", async () => {
     window.location.hash = "#/";
     const { default: App } = await import("../App");
     render(<App />);
     expect(screen.getByText("Wird geladen")).toBeTruthy();
     expect(screen.queryByRole("navigation")).toBeNull();
     await waitFor(() => {
-      expect(screen.getByText("RE-2026-001")).toBeTruthy();
+      expect(
+        screen.getByRole("heading", { name: "Noch keine Rechnung erstellt" }),
+      ).toBeTruthy();
     });
     expect(screen.getByRole("navigation")).toBeTruthy();
   });
@@ -93,7 +95,9 @@ describe("phase02-auth", () => {
     ).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Erneut versuchen" }));
     await waitFor(() => {
-      expect(screen.getByText("RE-2026-001")).toBeTruthy();
+      expect(
+        screen.getByRole("heading", { name: "Noch keine Rechnung erstellt" }),
+      ).toBeTruthy();
     });
   });
 });

@@ -7,47 +7,106 @@ import {
 } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import App from "../App";
-import { SAMPLE_INVOICE } from "../data/sample-invoice";
+import { fetchMock, resetAuthMocks } from "./auth-test-doubles";
+import { signedInOwner } from "./auth-signed-in";
 
 afterEach(() => {
   cleanup();
+  resetAuthMocks();
 });
 
-async function renderRechnung() {
-  window.location.hash = "#/";
-  render(<App />);
-  await waitFor(() => {
-    expect(screen.getByRole("navigation")).toBeTruthy();
+function mockInvoiceLoadSequence(options: { fail?: boolean } = {}) {
+  fetchMock.mockImplementation(async (input: RequestInfo | URL) => {
+    const url = String(input);
+    if (url.includes("/me")) {
+      return new Response(JSON.stringify(signedInOwner), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    if (options.fail) {
+      return new Response("error", { status: 500 });
+    }
+    if (url.includes("/api/entities")) {
+      return new Response(JSON.stringify([]), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    if (url.endsWith("/api/invoices")) {
+      return new Response(JSON.stringify([]), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    return new Response("not found", { status: 404 });
   });
 }
 
-describe("demo states", () => {
-  it("loading demo shows skeleton + spinner and hides line-item cards", async () => {
-    await renderRechnung();
-    fireEvent.click(screen.getByRole("button", { name: "Demo: Laden" }));
+describe("invoice load states", () => {
+  it("shows skeleton placeholders while drafts load", async () => {
+    let releaseInvoices: (value: Response) => void = () => undefined;
+    const invoicesPending = new Promise<Response>((resolve) => {
+      releaseInvoices = resolve;
+    });
 
-    expect(screen.getByTestId("invoice-skeleton")).toBeTruthy();
-    expect(screen.getByTestId("spinner")).toBeTruthy();
-    expect(screen.queryAllByTestId("line-item-card")).toHaveLength(0);
+    fetchMock.mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.includes("/me")) {
+        return new Response(JSON.stringify(signedInOwner), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      if (url.includes("/api/entities") && (!init?.method || init.method === "GET")) {
+        return new Response(JSON.stringify([]), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      if (url.includes("/api/invoices") && (!init?.method || init.method === "GET")) {
+        return invoicesPending;
+      }
+      return new Response("not found", { status: 404 });
+    });
+
+    window.location.hash = "#/";
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByRole("navigation")).toBeTruthy();
+      expect(screen.getByTestId("invoice-skeleton")).toBeTruthy();
+    });
+
+    releaseInvoices(
+      new Response(JSON.stringify([]), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("invoice-skeleton")).toBeNull();
+    });
   });
 
-  it("error demo shows exact copy and retry restores cards", async () => {
-    await renderRechnung();
-    fireEvent.click(screen.getByRole("button", { name: "Demo: Fehler" }));
+  it("shows ErrorState and retry reloads drafts", async () => {
+    mockInvoiceLoadSequence({ fail: true });
+    window.location.hash = "#/";
+    render(<App />);
 
-    const errorText = screen.getByText(
-      "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.",
-    );
-    expect(errorText).toBeTruthy();
-
-    const retryButton = screen.getByRole("button", {
-      name: "Erneut versuchen",
+    await waitFor(() => {
+      expect(screen.getByTestId("error-state")).toBeTruthy();
     });
-    expect(retryButton).toBeTruthy();
 
-    fireEvent.click(retryButton);
-    expect(screen.getAllByTestId("line-item-card")).toHaveLength(
-      SAMPLE_INVOICE.lineItems.length,
-    );
+    mockInvoiceLoadSequence();
+    fireEvent.click(screen.getByRole("button", { name: "Erneut versuchen" }));
+
+    await waitFor(() => {
+      expect(screen.queryByTestId("error-state")).toBeNull();
+      expect(
+        screen.getByRole("heading", { name: "Noch keine Rechnung erstellt" }),
+      ).toBeTruthy();
+    });
   });
 });

@@ -1,8 +1,34 @@
 import { Link } from "react-router";
-import { SAMPLE_INVOICE } from "../data/sample-invoice";
+import type { StagedTaxDecision } from "../data/sample-invoice";
 
-export function TaxRail() {
-  const tax = SAMPLE_INVOICE.taxDecision;
+const RAIL_KEYS = [
+  "invoice_tax_rate",
+  "reverse_charge_flag",
+  "legal_reference",
+  "applied_rule_id",
+] as const;
+
+type RailTax = Pick<StagedTaxDecision, (typeof RAIL_KEYS)[number]>;
+
+const EMPTY_VALUE = "—";
+const TAX_ERROR_COPY =
+  "Steuerberechnung fehlgeschlagen. Letzte gültige Werte bleiben sichtbar.";
+
+export function TaxRail({
+  tax,
+  evaluateError,
+  onRetry,
+}: {
+  tax: RailTax | null;
+  evaluateError?: string | null;
+  onRetry?: () => void;
+}) {
+  function displayValue(key: keyof RailTax): string {
+    if (!tax) return EMPTY_VALUE;
+    const value = tax[key];
+    if (value === undefined || value === null) return EMPTY_VALUE;
+    return String(value);
+  }
 
   return (
     <aside
@@ -11,23 +37,27 @@ export function TaxRail() {
     >
       <h2 className="text-sm font-semibold">Live Steuerberechnung</h2>
       <dl className="flex flex-col gap-3 text-sm">
-        <div>
-          <dt className="text-muted-foreground">invoice_tax_rate</dt>
-          <dd className="break-words whitespace-normal">{String(tax.invoice_tax_rate)}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">reverse_charge_flag</dt>
-          <dd className="break-words whitespace-normal">{String(tax.reverse_charge_flag)}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">legal_reference</dt>
-          <dd className="break-words whitespace-normal">{tax.legal_reference}</dd>
-        </div>
-        <div>
-          <dt className="text-muted-foreground">applied_rule_id</dt>
-          <dd className="break-words whitespace-normal">{tax.applied_rule_id}</dd>
-        </div>
+        {RAIL_KEYS.map((field) => (
+          <div key={field}>
+            <dt className="text-muted-foreground">{field}</dt>
+            <dd className="break-words whitespace-normal">
+              {displayValue(field)}
+            </dd>
+          </div>
+        ))}
       </dl>
+      {evaluateError ? (
+        <p className="text-sm text-destructive">{TAX_ERROR_COPY}</p>
+      ) : null}
+      {evaluateError && onRetry ? (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="self-start text-sm text-primary underline"
+        >
+          Erneut versuchen
+        </button>
+      ) : null}
       <Link
         to="/pdf"
         className="mt-auto flex flex-col gap-2 text-sm text-primary"

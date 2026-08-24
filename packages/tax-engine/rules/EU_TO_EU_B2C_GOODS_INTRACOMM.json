@@ -1,0 +1,28 @@
+{
+  "rule_id": "EU_TO_EU_B2C_GOODS_INTRACOMM",
+  "version": "1.0.0",
+  "description": "Matrix class EU_TO_EU_B2C_GOODS_INTRACOMM (phase 03-04 exemplar)",
+  "conditions": {
+    "supplier_country": "AT",
+    "customer_country": "DE",
+    "supplier_is_business": true,
+    "customer_is_business": false,
+    "supplier_vat_registered": true,
+    "customer_vat_registered": false,
+    "supply_type": "goods",
+    "channel": "direct"
+  },
+  "effect": {
+    "place_of_supply_country": "{{customer_country}}",
+    "tax_liability_party": "supplier",
+    "invoice_tax_rate": 19,
+    "invoice_tax_shown": true,
+    "reverse_charge_flag": false,
+    "legal_reference": "Distance selling / OSS rules",
+    "invoice_text_block_id": "EU_DISTANT_SELLING_GOODS_B2C"
+  },
+  "source_citation": [],
+  "tags": [
+    "goods"
+  ]
+}

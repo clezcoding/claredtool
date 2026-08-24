@@ -7,3 +7,90 @@ generator client {
   output       = "../src/generated/prisma"
   moduleFormat = "cjs"
 }
+
+model Entity {
+  id              String     @id @default(uuid())
+  name            String
+  country         String
+  legalForm       String     @map("legal_form")
+  address         String
+  vatId           String?    @map("vat_id")
+  currencyDefault String     @default("EUR") @map("currency_default")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+  customers       Customer[]
+  invoices        Invoice[]
+  invoiceCounters InvoiceCounter[]
+
+  @@map("entities")
+}
+
+model Customer {
+  id        String    @id @default(uuid())
+  entityId  String    @map("entity_id")
+  name      String
+  country   String
+  address   String
+  vatId     String?   @map("vat_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  entity    Entity    @relation(fields: [entityId], references: [id])
+  invoices  Invoice[]
+
+  @@map("customers")
+}
+
+model Invoice {
+  id         String        @id @default(uuid())
+  entityId   String        @map("entity_id")
+  customerId String?       @map("customer_id")
+  number     String
+  date       DateTime?     @db.Date @map("date")
+  dueDate    DateTime?     @db.Date @map("due_date")
+  currency   String        @default("EUR")
+  supplyType String        @default("service") @map("supply_type")
+  status     String        @default("draft")
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+  entity     Entity        @relation(fields: [entityId], references: [id])
+  customer   Customer?     @relation(fields: [customerId], references: [id])
+  items      InvoiceItem[]
+
+  @@unique([entityId, number])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id          String  @id @default(uuid())
+  invoiceId   String  @map("invoice_id")
+  position    Int
+  bezeichnung String
+  menge       Decimal @db.Decimal(12, 2)
+  einzelpreis Decimal @db.Decimal(12, 2)
+  netto       Decimal @db.Decimal(12, 2)
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("invoice_items")
+}
+
+model TaxRule {
+  id        String @id @default(uuid())
+  ruleId    String @map("rule_id")
+  version   String
+  payload   Json
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([ruleId, version])
+  @@map("tax_rules")
+}
+
+model InvoiceCounter {
+  entityId String @map("entity_id")
+  year     Int
+  last     Int    @default(0)
+  entity   Entity @relation(fields: [entityId], references: [id])
+
+  @@id([entityId, year])
+  @@map("invoice_counters")
+}

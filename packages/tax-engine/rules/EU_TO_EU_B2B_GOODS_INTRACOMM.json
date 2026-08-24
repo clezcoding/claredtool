@@ -1,0 +1,28 @@
+{
+  "rule_id": "EU_TO_EU_B2B_GOODS_INTRACOMM",
+  "version": "1.0.0",
+  "description": "Matrix class EU_TO_EU_B2B_GOODS_INTRACOMM (phase 03-04 exemplar)",
+  "conditions": {
+    "supplier_country": "AT",
+    "customer_country": "DE",
+    "supplier_is_business": true,
+    "customer_is_business": true,
+    "supplier_vat_registered": true,
+    "customer_vat_registered": true,
+    "supply_type": "goods",
+    "channel": "direct"
+  },
+  "effect": {
+    "place_of_supply_country": "{{customer_country}}",
+    "tax_liability_party": "customer",
+    "invoice_tax_rate": 0,
+    "invoice_tax_shown": false,
+    "reverse_charge_flag": true,
+    "legal_reference": "EU VAT intra-EU acquisition rules",
+    "invoice_text_block_id": "EU_RC_INTRACOMM_GOODS_B2B"
+  },
+  "source_citation": [],
+  "tags": [
+    "goods"
+  ]
+}

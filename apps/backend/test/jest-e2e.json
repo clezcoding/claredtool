@@ -3,7 +3,7 @@
   "rootDir": "..",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
-  "setupFiles": ["reflect-metadata"],
+  "setupFiles": ["reflect-metadata", "<rootDir>/test/setup-e2e-env.ts"],
   "forceExit": true,
   "detectOpenHandles": false,
   "transform": {

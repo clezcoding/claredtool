@@ -15,6 +15,18 @@ export const fetchMock = vi.fn(
       headers: { "Content-Type": "application/json" },
     });
   }
+  if (url.includes("/api/entities")) {
+    return new Response(JSON.stringify([]), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+  if (url.endsWith("/api/invoices")) {
+    return new Response(JSON.stringify([]), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
   return new Response("not found", { status: 404 });
 });
 
@@ -34,6 +46,18 @@ export function resetAuthMocks(): void {
     const url = String(input);
     if (url.includes("/me")) {
       return new Response(JSON.stringify(signedInOwner), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    if (url.includes("/api/entities")) {
+      return new Response(JSON.stringify([]), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    if (url.endsWith("/api/invoices")) {
+      return new Response(JSON.stringify([]), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       });

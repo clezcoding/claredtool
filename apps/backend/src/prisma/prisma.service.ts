@@ -14,7 +14,7 @@ export class PrismaService extends PrismaClient implements OnModuleDestroy {
         connectionString,
         connectionTimeoutMillis: 400,
         idleTimeoutMillis: 200,
-        max: 1,
+        max: 10,
         allowExitOnIdle: true,
       }),
     });
