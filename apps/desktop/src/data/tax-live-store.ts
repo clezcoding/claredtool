@@ -1,4 +1,4 @@
-import type { StagedTaxDecision } from "./data/sample-invoice";
+import type { StagedTaxDecision } from "./sample-invoice";
 
 type Listener = () => void;
 
