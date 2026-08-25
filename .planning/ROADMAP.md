@@ -2,7 +2,7 @@
 
 ## Overview
 
-Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. It is **paid subscription SaaS**: backend, Postgres, Redis, and Authentik run on the **founder's Coolify**, not on the customer's machine, not as open source, not for free. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to the vendor Coolify API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 is a full premium redesign (Crafted Minimal) — every page rebuilt mockup-first with a new brand, new graphics, and motion. Phase 5 closes the loop with PDF, tax-decision audit, and offline sync. Stripe/seats (`SAAS-01`) stay v2.
+Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. It is **paid subscription SaaS**: backend, Postgres, Redis, and Authentik run on the **founder's Coolify**, not on the customer's machine, not as open source, not for free. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to the vendor Coolify API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 is a full premium redesign (Crafted Minimal) — brand tokens, theme, motion. Phase 4.1 converts approved Google Stitch HTML for the 5 v1 routes into Tauri TSX/React via stitch-build. Phase 5 closes the loop with PDF, tax-decision audit, and offline sync. Phase 5.1 converts the remaining Stitch catalog. Phase 6 closes 1:1 fidelity on the 5 routes. Stripe/seats (`SAAS-01`) stay v2.
 
 ## Phases
 
@@ -16,8 +16,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Tauri Desktop & Mockup-First UI** - Launch Clared in a Tauri window; invoice+tax+PDF mockups exist before implementation (completed 2026-08-20)
 - [x] **Phase 2: Self-Hosted Backend & Authentik SSO** - Sign in via Authentik; desktop talks HTTPS+OIDC to vendor Coolify (founder's cluster) (completed 2026-08-22)
 - [x] **Phase 3: Entities, Invoices & Live Tax** - Create invoice, see live tax from modular engine (completed 2026-08-22)
-- [ ] **Phase 4: Premium UI & Brand Redesign** - Crafted Minimal; every page mockup-first with new brand, graphics, and motion
+- [x] **Phase 4: Premium UI & Brand Redesign** - Crafted Minimal; every page mockup-first with new brand, graphics, and motion (completed 2026-08-25)
+- [ ] **Phase 4.1: Stitch→React 5-route conversion** (INSERTED) - stitch-build HTML→TSX for Rechnung · Entities · Kunden · Tax · PDF
 - [ ] **Phase 5: PDF, Audit & Offline Sync** - Download PDF, inspect tax audit trail, work offline and sync
+- [ ] **Phase 5.1: Stitch→React extended catalog** (INSERTED) - remaining Stitch screens after PDF loop ships
+- [ ] **Phase 6: Mockup 1:1 Fidelity Closure** - pixel-match approved mockups 02–07 on the 5 routes
 
 ## Phase Details
 
@@ -163,14 +166,40 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **UI hint**: yes
 
+### Phase 04.1: Stitch→React 5-route conversion (INSERTED)
+
+**Goal:** Convert approved Google Stitch HTML for the v1 5-item nav (Rechnung · Entities · Kunden · Tax · PDF) into production TSX/React in the Tauri desktop app using the stitch-build plugin/skills; close P1 repair backlog items during conversion
+**Requirements**: UI-01, BRAND-01, D-11/D-13 scope lock
+**Depends on:** Phase 4
+**Success Criteria** (what must be TRUE):
+
+  1. Shared AppShell (5-item nav only) extracted once; sidebar width/persona normalized (R-01, R-02)
+  2. Routes Rechnung, Entities, Kunden, Tax, PDF are real React/TSX components driven from Stitch HTML SSOT (not leftover HTML iframes)
+  3. Related v1 modals/empty states from the Screen→Route map are converted or explicitly deferred with backlog IDs
+  4. Crafted Minimal tokens (Phase 4) + German primary copy (D-15); conversion acceptance in `.stitch/qa/STITCH-APPROVAL-BACKLOG.md` met
+  5. P1 backlog R-01–R-04 addressed or filed with residual notes; stitch-build skills used as the conversion path
+
+**Plans:** 7 plans
+**UI hint**: yes
+
+Plans:
+
+- [ ] 04.1-01-PLAN.md — Wave 0: package legitimacy + i18n/Material/pixel scaffold
+- [ ] 04.1-02-PLAN.md — AppShell tracer (260px, F-01, R-01 superseded, D-06 sync)
+- [ ] 04.1-03-PLAN.md — Rechnung Stitch conversion + EmptyState 09 + Dialog modals (F-02/F-07)
+- [ ] 04.1-04-PLAN.md — Shared List+Panel Entities+Kunden (F-03/F-04/F-08)
+- [ ] 04.1-05-PLAN.md — Tax Stitch UI + tax-live-store (F-05)
+- [ ] 04.1-06-PLAN.md — PDF viewer + 15-export (F-06)
+- [ ] 04.1-07-PLAN.md — Pixel harness QA close + P1 backlog + end UAT
+
 ### Phase 5: PDF, Audit & Offline Sync
 
 **Goal**: User finishes the two-minute loop with a PDF, can explain a tax decision from the audit trail, and can keep working when offline
-**Depends on**: Phase 4
+**Depends on**: Phase 4.1
 **Requirements**: PDF-01, OFFL-01, AUDT-01
 **Success Criteria** (what must be TRUE):
 
-  1. Interactive mockups / UI-SPEC for PDF viewer and offline/sync states exist before implementation
+  1. Interactive mockups / UI-SPEC for PDF viewer and offline/sync states exist before implementation (satisfied by Phase 4.1 Stitch→React surfaces + remaining offline/sync mockups)
   2. User can generate, download, and view a multilingual (DE/EN) invoice PDF that includes TaxDecision text blocks
   3. Each tax evaluation leaves a persisted `audit_logs` row (applied rule, audit_trace); backend application logs exist; operator can add Grafana/Prometheus on Coolify
   4. User can open recently used entities, customers, and invoices offline (IndexedDB/SQLite) and sync when the connection returns
@@ -181,22 +210,44 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 5 → 5.1 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Tauri Desktop & Mockup-First UI | 5/5 | Complete    | 2026-08-20 |
-| 2. Self-Hosted Backend & Authentik SSO | 7/7 | Complete    | 2026-08-22 |
-| 3. Entities, Invoices & Live Tax | 6/6 | Complete    | 2026-08-22 |
-| 4. Premium UI & Brand Redesign | 5/5 | In Progress|  |
+| 1. Tauri Desktop & Mockup-First UI | 5/5 | Complete | 2026-08-20 |
+| 2. Self-Hosted Backend & Authentik SSO | 7/7 | Complete | 2026-08-22 |
+| 3. Entities, Invoices & Live Tax | 6/6 | Complete | 2026-08-22 |
+| 4. Premium UI & Brand Redesign | 6/6 | Complete | 2026-08-25 |
+| 4.1 Stitch→React 5-route conversion | 0/7 | Planned | - |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
+| 5.1 Stitch→React extended catalog | 0/? | Not started | - |
+| 6. Mockup 1:1 Fidelity Closure | 0/? | Not started | - |
+
+### Phase 05.1: Stitch→React extended catalog (INSERTED)
+
+**Goal:** Convert remaining approved Stitch screens (out-of-nav: login/onboarding/lists/overlays/settings/splash/etc.) into TSX/React via stitch-build; close P2 repair backlog
+**Requirements**: UI-01, BRAND-01
+**Depends on:** Phase 5
+**Success Criteria** (what must be TRUE):
+
+  1. Screens listed under “Out of v1 nav (D-13)” in `.stitch/qa/STITCH-APPROVAL-BACKLOG.md` are converted or explicitly deferred with IDs
+  2. P2 backlog R-10–R-14 closed during conversion
+  3. No regression to the 5-route shell from Phase 4.1
+
+**Plans:** 0 plans
+**UI hint**: yes
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 05.1 to break down)
 
 ### Phase 6: Mockup 1:1 Fidelity Closure — all 5 routes pixel-match approved mockups 02–07
 
-**Goal:** [To be planned]
-**Requirements**: TBD
-**Depends on:** Phase 5
+**Goal:** Close remaining visual/IA gaps (F-01–F-09) so Tauri screens pixel-match approved mockups 02–07 for the 5 v1 routes
+**Requirements**: UI-01
+**Depends on:** Phase 4.1 (and Phase 5 for PDF/audit live data where needed)
 **Plans:** 0 plans
+**UI hint**: yes
 
 Plans:
 
