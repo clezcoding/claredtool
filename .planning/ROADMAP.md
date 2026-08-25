@@ -183,13 +183,32 @@ Decimal phases appear between their surrounding integers in numeric order.
 **UI hint**: yes
 
 Plans:
+**Wave 1**
 
 - [ ] 04.1-01-PLAN.md — Wave 0: package legitimacy + i18n/Material/pixel scaffold
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 04.1-02-PLAN.md — AppShell tracer (260px, F-01, R-01 superseded, D-06 sync)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 04.1-03-PLAN.md — Rechnung Stitch conversion + EmptyState 09 + Dialog modals (F-02/F-07)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 04.1-04-PLAN.md — Shared List+Panel Entities+Kunden (F-03/F-04/F-08)
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
 - [ ] 04.1-05-PLAN.md — Tax Stitch UI + tax-live-store (F-05)
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
 - [ ] 04.1-06-PLAN.md — PDF viewer + 15-export (F-06)
+
+**Wave 7** *(blocked on Wave 6 completion)*
+
 - [ ] 04.1-07-PLAN.md — Pixel harness QA close + P1 backlog + end UAT
 
 ### Phase 5: PDF, Audit & Offline Sync
