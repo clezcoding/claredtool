@@ -1,16 +1,17 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 04
-current_phase_name: Premium UI & Brand Redesign
-status: "Phase 04 shipped — PR #25"
-stopped_at: Completed 04-06-PLAN.md
-last_updated: "2026-08-24T21:08:17.219Z"
-last_activity: 2026-08-24
-state_head: 0bdbabe446fbd38ca893fe934fb71cbc00d02fb6
+current_phase: 04.1
+current_phase_name: Stitch→React 5-route conversion
+status: Ready to discuss Phase 04.1
+stopped_at: Phase 04.1 context gathered
+last_updated: "2026-08-25T00:25:20.351Z"
+last_activity: 2026-08-25
+last_activity_desc: Phase null execution resumed (wave continue)
+state_head: ca12f2832d21ce110df8dd017e8c7bbcfdc20426
 progress:
-  total_phases: 5
-  completed_phases: 3
+  total_phases: 8
+  completed_phases: 4
   total_plans: 24
   completed_plans: 24
 milestone_name: milestone
@@ -23,17 +24,19 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 04 — Premium UI & Brand Redesign
+**Current focus:** Phase 04.1 — Stitch→React 5-route conversion
 
 ## Current Position
 
-Status: Phase 04 shipped — PR #25
-Phase: 04 (Premium UI & Brand Redesign) — EXECUTING
-Plan: 6 of 6
-Phase 04 (Premium UI & Brand Redesign) — **NEXT** human UAT (G-04-3 motion/OS + signed-in craft)
-Phase 05 (PDF, Audit & Offline Sync) — deferred until after redesign
-Decided: workflow = image-gen mockups until approved then code; redesign before PDF; brand = Crafted Minimal
-Last activity: 2026-08-24
+Status: Ready to discuss Phase 04.1
+Phase: 04.1 (Stitch→React 5-route conversion) — PLANNING
+Plan: 0 of ? (not planned)
+Phase 04 (Premium UI & Brand Redesign) — complete 2026-08-25
+Phase 04.1 (Stitch→React 5-route) — **NEXT** discuss/plan
+Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.1
+Phase 05.1 (Stitch→React extended catalog) — after Phase 5
+Decided: Option A — 4.1 = 5-route stitch-build before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
+Last activity: 2026-08-25 — inserted 4.1 + 5.1
 
 Progress: [██████░░░░] 60%
 
@@ -41,7 +44,7 @@ Progress: [██████░░░░] 60%
 
 **Velocity:**
 
-- Total plans completed: 12
+- Total plans completed: 18
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -51,6 +54,9 @@ Progress: [██████░░░░] 60%
 |-------|-------|-------|----------|
 | 01 | 5 | - | - |
 | 02 | 7 | - | - |
+| 03 | 6 | - | - |
+| 04 | 6 | - | - |
+| 06 | 0 | - | - |
 
 **Recent Trend:**
 
@@ -141,6 +147,7 @@ Recent decisions affecting current work:
 - [Phase 04]: Empty CTA copy restored to UI-SPEC; startNewDraft and showRail = !showHero unchanged
 - [Phase 04]: Login hero reuses 04-03 public PNG; no Higgsfield; canvas bg-background
 - [Phase 04-06]: Canvas --background SSOT is Pale Oatmeal #F7F7F5 / Deep Charcoal #111110 across IIFE, PAINT_*, and both globals.css (G-04-1, G-04-2)
+- [Phase ?]: Option A: Phase 4.1 stitch-build 5 routes before PDF; Phase 5.1 extended catalog after Phase 5
 
 ### Pending Todos
 
@@ -157,6 +164,11 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260822-u6p | Räume das Projektverzeichniss auf. | 2026-08-22 | 7c30d5e | [260822-u6p-r-ume-das-projektverzeichniss-auf](./quick/260822-u6p-r-ume-das-projektverzeichniss-auf/) |
 
+### Roadmap Evolution
+
+- Phase 4.1 inserted after Phase 4: Stitch→React 5-route conversion (D-13 v1 nav; stitch-build; P1 backlog R-01–R-04) (URGENT)
+- Phase 5.1 inserted after Phase 5: Stitch→React extended catalog (out-of-nav + P2 R-10–R-14) (URGENT)
+
 ## Deferred Items
 
 Items acknowledged and carried forward from previous milestone close:
@@ -167,6 +179,15 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-23T21:40:00.000Z
-Stopped at: Completed 04-06-PLAN.md; G-04-3 + signed-in craft still human UAT
-Resume file: None
+Last session: 2026-08-25T00:25:20.256Z
+Stopped at: Phase 04.1 context gathered
+Resume file: .planning/phases/04.1-stitch-react-5-route-conversion/04.1-CONTEXT.md
+
+## Rebuild Log
+
+- timestamp: 2026-08-24T22:50:17.581Z
+  kind: by-phase-table-reconciled
+  section: ## Performance Metrics
+  before: | Phase | Plans | Total | Avg/Plan | \n |-------|-------|-------|----------| \n | 01 | 5 | - | - | \n | 02 | 7 | - | - | \n | 4 | 6 | - | - |
+  after: | Phase | Plans | Total | Avg/Plan | \n |-------|-------|-------|----------| \n | 01 | 5 | - | - | \n | 02 | 7 | - | - | \n | 03 | 6 | - | - | \n | 04 | 6 | - | - | \n | 06 | 0 | - | - |
+  reason: phase dirs on disk are canonical; rows for missing phases dropped, missing phases added
