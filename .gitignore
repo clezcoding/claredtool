@@ -35,7 +35,7 @@ apps/backend/src/generated/
 stitch-output/
 
 # Stitch QA scripts + root mockup symlinks (canonical: .planning/phases/.../mockups/)
-scripts/
+/scripts/
 mockups/
 
 # Python (stitch-*.py helpers)

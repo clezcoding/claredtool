@@ -8,19 +8,23 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "test": "vitest run"
+    "test": "vitest run",
+    "stitch:validate": "node /Users/puzzless/.cursor/plugins/cache/google-labs-code-stitch-skills/stitch-build/0337446dadde6f8c94210444e2aa9d546126480f/skills/react-components/scripts/validate.js"
   },
   "dependencies": {
     "@clared/ui": "workspace:*",
     "@fontsource-variable/inter": "^5.3.0",
+    "@fontsource-variable/material-symbols-outlined": "5.3.3",
     "@fontsource/instrument-serif": "^5.3.0",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-deep-link": "2.4.9",
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-os": "^2.3.2",
+    "i18next": "26.4.0",
     "lucide-react": "^1.33.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-i18next": "17.0.12",
     "react-router": "8.3.0",
     "shadcn": "^4.19.0",
     "tw-animate-css": "^1.4.0"
@@ -34,6 +38,8 @@
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^6.1.0",
     "jsdom": "^30.0.1",
+    "pixelmatch": "7.2.0",
+    "pngjs": "7.0.0",
     "tailwindcss": "^4.1.13",
     "typescript": "~7.0.2",
     "vite": "^8.2.2",

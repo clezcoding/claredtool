@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "rechnung": "Invoice",
+    "entities": "Entities",
+    "kunden": "Customers",
+    "tax": "Tax",
+    "pdf": "PDF"
+  },
+  "empty": {
+    "generic": {
+      "title": "Nothing here yet",
+      "body": "As soon as you add data, it will show up here."
+    },
+    "entities": {
+      "title": "No business entities",
+      "body": "Create your first business entity to start invoicing.",
+      "cta": "Create business entity"
+    }
+  },
+  "error": {
+    "retry": {
+      "title": "Something went wrong.",
+      "action": "Try again"
+    }
+  },
+  "cmdk": {
+    "bald": "Coming soon"
+  },
+  "persona": {
+    "name": "Alexander Wagner",
+    "email": "aw@clared.de",
+    "company": "Greenfield Studio GmbH"
+  },
+  "counter_one": "{{count}} entry",
+  "counter_other": "{{count}} entries"
+}

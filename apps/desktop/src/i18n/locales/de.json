@@ -1,0 +1,36 @@
+{
+  "nav": {
+    "rechnung": "Rechnung",
+    "entities": "Entities",
+    "kunden": "Kunden",
+    "tax": "Tax",
+    "pdf": "PDF"
+  },
+  "empty": {
+    "generic": {
+      "title": "Noch nichts vorhanden",
+      "body": "Sobald du Daten anlegst, erscheinen sie hier."
+    },
+    "entities": {
+      "title": "Keine Geschäftseinheiten",
+      "body": "Lege deine erste Geschäftseinheit an, um Rechnungen zu erstellen.",
+      "cta": "Geschäftseinheit anlegen"
+    }
+  },
+  "error": {
+    "retry": {
+      "title": "Etwas ist schiefgelaufen.",
+      "action": "Erneut versuchen"
+    }
+  },
+  "cmdk": {
+    "bald": "Bald"
+  },
+  "persona": {
+    "name": "Alexander Wagner",
+    "email": "aw@clared.de",
+    "company": "Greenfield Studio GmbH"
+  },
+  "counter_one": "{{count}} Eintrag",
+  "counter_other": "{{count}} Einträge"
+}
