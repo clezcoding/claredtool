@@ -35,7 +35,7 @@ describe("sidebar routes", () => {
   });
 
   it.each([
-    ["Entities", "Entities"],
+    ["Entities", "Geschäftseinheiten"],
     ["Kunden", "Kunden"],
     ["Tax", "Tax Rules"],
     ["PDF", "PDF Viewer / Export"],

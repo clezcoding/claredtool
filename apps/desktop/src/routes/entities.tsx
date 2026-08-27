@@ -10,6 +10,7 @@ import {
   Label,
 } from "@clared/ui";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { apiFetch } from "../auth/api";
 import { useSession } from "../auth/session-provider";
 import {
@@ -62,7 +63,10 @@ function toRegistryRow(row: EntityRow): RegistryListRow {
   };
 }
 
-export function EntitiesScreen() {
+export interface EntitiesScreenProps {}
+
+export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
+  const { t } = useTranslation();
   const { me } = useSession();
   const canCreate = me?.permissions.includes("entity.create") ?? false;
   const [entities, setEntities] = useState<EntityRow[]>([]);
@@ -302,12 +306,10 @@ export function EntitiesScreen() {
 
   return (
     <RegistryListPanel
-      title="Entities"
+      title={t("registry.entitiesTitle")}
       count={entities.length}
-      countSingular="Entity"
-      countPlural="Entities"
-      searchPlaceholder="Search entities..."
-      newButtonLabel="+ New Entity"
+      searchPlaceholder={t("registry.search")}
+      newButtonLabel={t("registry.newEntity")}
       canCreate={canCreate}
       createHint="Nur Inhaber können Entities anlegen."
       onNew={openCreate}
@@ -316,14 +318,16 @@ export function EntitiesScreen() {
       loading={loading}
       loadError={loadError}
       onRetry={() => void loadEntities()}
-      emptyTitle="Noch keine Entity angelegt"
-      emptyDescription="Legen Sie Ihre erste Firma an, um Rechnungen zu stellen."
+      emptyTitle={t("empty.entities.title")}
+      emptyDescription={t("empty.entities.body")}
+      emptyCtaLabel={t("empty.entities.cta")}
       selectedId={selectedId}
       onSelectRow={selectRow}
       panelMode={panelMode}
       onClosePanel={closePanel}
       selectedRow={selectedRow}
-      pillColumnHeader="Rechtsform"
+      nameColumnHeader={t("registry.entitiesTitle")}
+      pillColumnHeader={t("registry.legalForm")}
       createPanel={createPanel}
       detailTestId="entity-detail"
     />

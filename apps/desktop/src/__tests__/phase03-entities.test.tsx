@@ -51,10 +51,10 @@ describe("phase03-product", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Anlegen" })).toBeTruthy();
+      expect(screen.getByRole("button", { name: /Neue Geschäftseinheit/ })).toBeTruthy();
     });
 
-    const anlegen = screen.getByRole("button", { name: "Anlegen" });
+    const anlegen = screen.getByRole("button", { name: /Neue Geschäftseinheit/ });
     expect(anlegen.hasAttribute("disabled")).toBe(true);
     expect(
       screen.getByText("Nur Inhaber können Entities anlegen."),
@@ -102,10 +102,10 @@ describe("phase03-product", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Anlegen" })).toBeTruthy();
+      expect(screen.getByRole("button", { name: /Neue Geschäftseinheit/ })).toBeTruthy();
     });
 
-    const anlegen = screen.getByRole("button", { name: "Anlegen" });
+    const anlegen = screen.getByRole("button", { name: /Neue Geschäftseinheit/ });
     expect(anlegen.hasAttribute("disabled")).toBe(false);
     fireEvent.click(anlegen);
 

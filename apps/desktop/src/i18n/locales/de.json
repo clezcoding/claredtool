@@ -101,5 +101,50 @@
     "company": "Greenfield Studio GmbH"
   },
   "counter_one": "{{count}} Eintrag",
-  "counter_other": "{{count}} Einträge"
+  "counter_other": "{{count}} Einträge",
+  "registry": {
+    "entitiesTitle": "Geschäftseinheiten",
+    "kundenTitle": "Kunden",
+    "newEntity": "Neue Geschäftseinheit",
+    "newKunde": "Neuer Kunde",
+    "search": "Suchen...",
+    "searchKunden": "Firma, USt-Id oder Ort...",
+    "filter": "Filter",
+    "filterAll": "Alle",
+    "columns": "Spalten",
+    "columnsHint": "Spalten wie in der Tabelle angezeigt.",
+    "selectAll": "Alle auswählen",
+    "selectRow": "{{name}} auswählen",
+    "rowActions": "Aktionen für {{name}}",
+    "country": "Land",
+    "taxId": "Steuer-ID",
+    "legalForm": "Rechtsform",
+    "entity": "Entity",
+    "legalName": "Unternehmensname",
+    "address": "Adresse",
+    "vatId": "USt-Id",
+    "taxNumber": "Steuernummer",
+    "accountHolder": "Kontoinhaber",
+    "bankName": "Bankname",
+    "iban": "IBAN",
+    "bic": "BIC",
+    "edit": "Bearbeiten",
+    "close": "Schließen",
+    "statusActive": "Aktiv",
+    "statusInactive": "Inaktiv",
+    "prevPage": "Vorherige Seite",
+    "nextPage": "Nächste Seite",
+    "pagination": "{{from}}–{{to}} von {{total}}",
+    "tabs": {
+      "master": "Stammdaten",
+      "tax": "Steuer",
+      "bank": "Bank"
+    },
+    "sections": {
+      "general": "Allgemeine Informationen",
+      "address": "Adresse",
+      "management": "Management",
+      "bank": "Bankverbindung"
+    }
+  }
 }

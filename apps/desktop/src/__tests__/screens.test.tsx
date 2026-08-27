@@ -60,13 +60,13 @@ async function openScreen(linkLabel: string, heading: string) {
 
 describe("entities screen", () => {
   it("shows empty copy when no entities exist", async () => {
-    await openScreen("Entities", "Entities");
-    expect(screen.getByText("Noch keine Entity angelegt")).toBeTruthy();
+    await openScreen("Entities", "Geschäftseinheiten");
+    expect(screen.getByText("Keine Geschäftseinheiten")).toBeTruthy();
   });
 
   it("shows a disabled Anlegen button with the Inhaber RBAC hint", async () => {
-    await openScreen("Entities", "Entities");
-    const anlegen = screen.getByRole("button", { name: "Anlegen" });
+    await openScreen("Entities", "Geschäftseinheiten");
+    const anlegen = screen.getByRole("button", { name: /Neue Geschäftseinheit/ });
     expect(anlegen.hasAttribute("disabled")).toBe(true);
     expect(
       screen.getByText("Nur Inhaber können Entities anlegen."),
@@ -77,12 +77,12 @@ describe("entities screen", () => {
 describe("kunden screen", () => {
   it("shows empty copy when no customers exist", async () => {
     await openScreen("Kunden", "Kunden");
-    expect(screen.getByText("Noch keine Kunden angelegt")).toBeTruthy();
+    expect(screen.getByText("Noch nichts vorhanden")).toBeTruthy();
   });
 
   it("shows a disabled Anlegen button with the kunde.write RBAC hint", async () => {
     await openScreen("Kunden", "Kunden");
-    const anlegen = screen.getByRole("button", { name: "Anlegen" });
+    const anlegen = screen.getByRole("button", { name: /Neuer Kunde/ });
     expect(anlegen.hasAttribute("disabled")).toBe(true);
     expect(
       screen.getByText("Keine Berechtigung zum Anlegen von Kunden."),

@@ -193,11 +193,18 @@ describe("Entities List+Panel", () => {
       expect(screen.getAllByTestId("entity-row")).toHaveLength(2);
     });
     const detail = screen.getByTestId("entity-detail");
-    expect(within(detail).getByText("Seller GmbH")).toBeTruthy();
+    expect(within(detail).getByRole("heading", { name: "Seller GmbH" })).toBeTruthy();
     expect(screen.getByText("2 Einträge")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Stammdaten" })).toBeTruthy();
-    expect(screen.getByText("search")).toBeTruthy();
-    const selected = screen.getByTestId("entity-row").closest("tr");
+    expect(
+      [...document.querySelectorAll("main .material-symbols-outlined")].some((node) =>
+        (node.textContent ?? "").includes("search"),
+      ),
+    ).toBe(true);
+    const selected = screen
+      .getAllByTestId("entity-row")
+      .find((row) => row.getAttribute("aria-current") === "true")
+      ?.closest("tr");
     expect(selected?.className).toMatch(/brand-soft/);
     expect(screen.queryByText("Overview")).toBeNull();
   });
@@ -299,7 +306,7 @@ describe("Kunden List+Panel", () => {
     await waitFor(() => {
       expect(screen.getByTestId("kunden-row")).toBeTruthy();
     });
-    expect(within(screen.getByTestId("kunden-detail")).getByText("Buyer US LLC")).toBeTruthy();
+    expect(within(screen.getByTestId("kunden-detail")).getByRole("heading", { name: "Buyer US LLC" })).toBeTruthy();
     expect(screen.getByText("1 Eintrag")).toBeTruthy();
   });
 

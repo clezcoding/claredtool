@@ -101,5 +101,50 @@
     "company": "Greenfield Studio GmbH"
   },
   "counter_one": "{{count}} entry",
-  "counter_other": "{{count}} entries"
+  "counter_other": "{{count}} entries",
+  "registry": {
+    "entitiesTitle": "Business entities",
+    "kundenTitle": "Customers",
+    "newEntity": "New business entity",
+    "newKunde": "New customer",
+    "search": "Search...",
+    "searchKunden": "Company, VAT ID or city...",
+    "filter": "Filter",
+    "filterAll": "All",
+    "columns": "Columns",
+    "columnsHint": "Columns as shown in the table.",
+    "selectAll": "Select all",
+    "selectRow": "Select {{name}}",
+    "rowActions": "Actions for {{name}}",
+    "country": "Country",
+    "taxId": "Tax ID",
+    "legalForm": "Legal form",
+    "entity": "Entity",
+    "legalName": "Legal name",
+    "address": "Address",
+    "vatId": "VAT ID",
+    "taxNumber": "Tax number",
+    "accountHolder": "Account holder",
+    "bankName": "Bank name",
+    "iban": "IBAN",
+    "bic": "BIC",
+    "edit": "Edit",
+    "close": "Close",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "pagination": "{{from}}–{{to}} of {{total}}",
+    "tabs": {
+      "master": "Master data",
+      "tax": "Tax",
+      "bank": "Bank"
+    },
+    "sections": {
+      "general": "General information",
+      "address": "Address",
+      "management": "Management",
+      "bank": "Bank details"
+    }
+  }
 }

@@ -3,11 +3,18 @@ import { MaterialIcon } from "./material-icon";
 export interface EmptyStateProps {
   title: string;
   description: string;
-  ctaLabel: string;
-  onCta: () => void;
+  ctaLabel?: string;
+  onCta?: () => void;
+  ctaDisabled?: boolean;
 }
 
-export function EmptyState({ title, description, ctaLabel, onCta }: EmptyStateProps) {
+export function EmptyState({
+  title,
+  description,
+  ctaLabel,
+  onCta,
+  ctaDisabled = false,
+}: EmptyStateProps) {
   return (
     <div className="flex h-full min-h-[28rem] flex-col items-center justify-center px-8 py-16 text-center">
       <div className="mb-10 flex w-full max-w-[480px] items-center justify-center overflow-hidden rounded-2xl aspect-[4/3]">
@@ -23,14 +30,17 @@ export function EmptyState({ title, description, ctaLabel, onCta }: EmptyStatePr
       <p className="mb-10 max-w-sm whitespace-normal break-words text-sm text-muted-foreground">
         {description}
       </p>
-      <button
-        type="button"
-        className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-foreground px-6 text-sm font-medium text-background shadow-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        onClick={onCta}
-      >
-        <MaterialIcon ligature="add" className="text-[20px]" />
-        {ctaLabel}
-      </button>
+      {ctaLabel && onCta ? (
+        <button
+          type="button"
+          className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-foreground px-6 text-sm font-medium text-background shadow-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          disabled={ctaDisabled}
+          onClick={ctaDisabled ? undefined : onCta}
+        >
+          <MaterialIcon ligature="add" className="text-[20px]" />
+          {ctaLabel}
+        </button>
+      ) : null}
     </div>
   );
 }

@@ -10,6 +10,7 @@ import {
   Label,
 } from "@clared/ui";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { apiFetch } from "../auth/api";
 import { useSession } from "../auth/session-provider";
 import {
@@ -67,7 +68,10 @@ function toRegistryRow(row: CustomerRow): RegistryListRow {
   };
 }
 
-export function KundenScreen() {
+export interface KundenScreenProps {}
+
+export function KundenScreen(_props: KundenScreenProps = {}) {
+  const { t } = useTranslation();
   const { me } = useSession();
   const canCreate = me?.permissions.includes("kunde.write") ?? false;
   const [entities, setEntities] = useState<EntityRow[]>([]);
@@ -317,12 +321,10 @@ export function KundenScreen() {
 
   return (
     <RegistryListPanel
-      title="Kunden"
+      title={t("registry.kundenTitle")}
       count={customers.length}
-      countSingular="Kunde"
-      countPlural="Kunden"
-      searchPlaceholder="Search kunden..."
-      newButtonLabel="+ New Kunde"
+      searchPlaceholder={t("registry.searchKunden")}
+      newButtonLabel={t("registry.newKunde")}
       canCreate={canCreate}
       createHint="Keine Berechtigung zum Anlegen von Kunden."
       onNew={openCreate}
@@ -331,14 +333,15 @@ export function KundenScreen() {
       loading={loading}
       loadError={loadError}
       onRetry={() => void loadData()}
-      emptyTitle="Noch keine Kunden angelegt"
-      emptyDescription="Legen Sie einen Kunden für die gewählte Entity an."
+      emptyTitle={t("empty.generic.title")}
+      emptyDescription={t("empty.generic.body")}
       selectedId={selectedId}
       onSelectRow={selectRow}
       panelMode={panelMode}
       onClosePanel={closePanel}
       selectedRow={selectedRow}
-      pillColumnHeader="Entity"
+      nameColumnHeader={t("registry.kundenTitle")}
+      pillColumnHeader={t("registry.entity")}
       createPanel={createPanel}
       detailTestId="kunden-detail"
     />
