@@ -170,6 +170,18 @@
     "options": "Options",
     "customer": "Customer",
     "service": "Service",
-    "taxAction": "Tax"
+    "taxAction": "Tax",
+    "editRule": "Edit tax rule",
+    "ruleName": "Rule name",
+    "taxRate": "Tax rate (%)",
+    "conditions": "Conditions",
+    "conditionsHint": "Define when this tax rate should apply.",
+    "status": "Status",
+    "statusHint": "Active rules are included in tax calculation.",
+    "saveRule": "Save rule",
+    "customerIs": "Customer is",
+    "serviceIs": "Service is",
+    "close": "Close",
+    "modalBody": "Create or edit a tax rule."
   }
 }

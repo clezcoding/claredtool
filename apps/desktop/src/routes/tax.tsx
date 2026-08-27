@@ -1,9 +1,40 @@
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@clared/ui";
 import { useCallback, useState, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 import { MaterialIcon } from "../components/material-icon";
 import type { StagedTaxDecision } from "../data/sample-invoice";
 import { DEMO_RULES, type TaxDemoRule } from "../data/tax-demo-rules";
 import { getTaxLiveState, subscribeTaxLive } from "../data/tax-live-store";
+
+type RuleModal = { mode: "create" } | { mode: "edit"; ruleId: string };
+
+type RuleDraft = {
+  name: string;
+  rate: string;
+  active: boolean;
+  condField: string;
+  condValue: string;
+  cond2Field: string;
+  cond2Value: string;
+};
+
+const EMPTY_DRAFT: RuleDraft = {
+  name: "",
+  rate: "19",
+  active: true,
+  condField: "customer",
+  condValue: "Inland",
+  cond2Field: "service",
+  cond2Value: "Standard (Waren)",
+};
 
 export interface TaxScreenProps {}
 
@@ -109,7 +140,7 @@ function LogicChip({
     <span
       className={`inline-flex items-center gap-1.5 rounded border px-2 py-1 text-sm shadow-sm ${
         accent
-          ? "border-primary-container/30 bg-brand-soft font-medium text-primary-container dark:bg-primary-container/30 dark:text-foreground"
+          ? "border-warning-border bg-warning-soft font-medium text-warning"
           : "border-border bg-card text-muted-foreground dark:bg-surface-elevated-dark"
       }`}
     >
@@ -133,10 +164,30 @@ export function TaxScreen(_props: TaxScreenProps = {}) {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [dragId, setDragId] = useState<string | null>(null);
   const [extraConditions, setExtraConditions] = useState(0);
+  const [modal, setModal] = useState<RuleModal | null>(null);
+  const [draft, setDraft] = useState<RuleDraft>(EMPTY_DRAFT);
 
   const showBald = useCallback(() => {
     setFeedback(t("cmdk.bald"));
   }, [t]);
+
+  function openCreate() {
+    setDraft(EMPTY_DRAFT);
+    setModal({ mode: "create" });
+  }
+
+  function openEdit(rule: TaxDemoRule) {
+    setDraft({
+      name: rule.title,
+      rate: rule.thenTax.replace(/[^\d]/g, "") || "0",
+      active: rule.active,
+      condField: "customer",
+      condValue: rule.ifCustomer,
+      cond2Field: "service",
+      cond2Value: rule.andService,
+    });
+    setModal({ mode: "edit", ruleId: rule.id });
+  }
 
   const activeRuleId = taxDecision?.applied_rule_id ?? null;
 
@@ -169,6 +220,7 @@ export function TaxScreen(_props: TaxScreenProps = {}) {
   }
 
   return (
+    <>
     <div className="flex h-full flex-col overflow-auto bg-background">
       <div className="mx-auto w-full max-w-5xl px-8 pb-24 pt-8 lg:px-12 xl:px-16">
         <header className="mb-8 flex items-start justify-between gap-4">
@@ -180,7 +232,7 @@ export function TaxScreen(_props: TaxScreenProps = {}) {
           </div>
           <button
             type="button"
-            onClick={showBald}
+            onClick={openCreate}
             className={`mt-2 inline-flex items-center gap-2 rounded-md bg-primary-container px-4 py-2 text-sm font-medium text-card shadow-sm hover:opacity-90 dark:text-foreground ${FOCUS_RING}`}
           >
             <MaterialIcon ligature="add" className="text-[16px]" />
@@ -327,7 +379,7 @@ export function TaxScreen(_props: TaxScreenProps = {}) {
                         <div className="flex flex-1 items-center gap-2">
                           <select
                             aria-label={t("tax.taxAction")}
-                            className="w-[180px] rounded-md border border-primary-container/30 bg-brand-soft py-2 pl-3 pr-10 text-sm font-medium text-primary-container dark:bg-primary-container/30 dark:text-foreground"
+                            className="w-[180px] rounded-md border border-warning-border bg-warning-soft py-2 pl-3 pr-10 text-sm font-medium text-warning"
                             value={rule.thenTax}
                             onChange={(event) =>
                               updateRule(rule.id, {
@@ -416,7 +468,7 @@ export function TaxScreen(_props: TaxScreenProps = {}) {
                           className={`p-1 text-muted-foreground hover:text-foreground ${FOCUS_RING}`}
                           onClick={(event) => {
                             event.stopPropagation();
-                            showBald();
+                            openEdit(rule);
                           }}
                         >
                           <MaterialIcon ligature="more_vert" className="text-[20px]" />
@@ -508,5 +560,201 @@ export function TaxScreen(_props: TaxScreenProps = {}) {
         </footer>
       </div>
     </div>
+    {/* D-35/D-36: Escape/Close dismiss; history.back does not — dialog-smoke.test.tsx */}
+    <Dialog
+      open={modal !== null}
+      onOpenChange={(open) => {
+        if (!open) setModal(null);
+      }}
+    >
+      <DialogContent
+        className="max-h-[90vh] overflow-y-auto rounded-[16px] sm:max-w-[640px]"
+        showCloseButton
+      >
+        <DialogHeader className="px-2 pt-2">
+          <DialogTitle className="text-[28px] leading-[34px] font-semibold">
+            {t("tax.editRule")}
+          </DialogTitle>
+          <DialogDescription>{t("tax.modalBody")}</DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-8 px-2 pb-2">
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium" htmlFor="tax-rule-name">
+                {t("tax.ruleName")}
+              </label>
+              <input
+                id="tax-rule-name"
+                className="h-[44px] w-full rounded-[8px] border border-border bg-card px-3 text-sm text-foreground shadow-sm outline-none focus:border-ring focus:ring-1 focus:ring-ring"
+                value={draft.name}
+                onChange={(event) =>
+                  setDraft((prev) => ({ ...prev, name: event.target.value }))
+                }
+              />
+            </div>
+            <div className="flex w-[160px] flex-col gap-2">
+              <label className="text-sm font-medium" htmlFor="tax-rule-rate">
+                {t("tax.taxRate")}
+              </label>
+              <div className="relative">
+                <input
+                  id="tax-rule-rate"
+                  className="h-[44px] w-full rounded-[8px] border border-border bg-card py-0 pr-8 pl-3 text-right text-sm tabular-nums text-foreground shadow-sm outline-none focus:border-ring focus:ring-1 focus:ring-ring"
+                  value={draft.rate}
+                  onChange={(event) =>
+                    setDraft((prev) => ({ ...prev, rate: event.target.value }))
+                  }
+                />
+                <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-muted-foreground">
+                  %
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-4 border-t border-border pt-8">
+            <div className="mb-2">
+              <h3 className="mb-1 text-sm font-semibold">{t("tax.conditions")}</h3>
+              <p className="text-xs text-muted-foreground">{t("tax.conditionsHint")}</p>
+            </div>
+            <div className="flex items-center gap-3 rounded-[12px] border border-border bg-muted/40 p-4">
+              <div className="w-12 shrink-0 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+                {t("tax.if")}
+              </div>
+              <div className="flex flex-1 gap-3">
+                <select
+                  className="h-[40px] w-[180px] rounded-[8px] border border-border bg-card px-3 text-sm shadow-sm"
+                  value={draft.condField}
+                  onChange={(event) =>
+                    setDraft((prev) => ({
+                      ...prev,
+                      condField: event.target.value,
+                    }))
+                  }
+                >
+                  <option value="customer">{t("tax.customerIs")}</option>
+                  <option value="service">{t("tax.serviceIs")}</option>
+                </select>
+                <select
+                  className="h-[40px] flex-1 rounded-[8px] border border-border bg-card px-3 text-sm shadow-sm"
+                  value={draft.condValue}
+                  onChange={(event) =>
+                    setDraft((prev) => ({
+                      ...prev,
+                      condValue: event.target.value,
+                    }))
+                  }
+                >
+                  <option>Inland</option>
+                  <option>EU-Ausland (B2B)</option>
+                  <option>EU-Ausland (B2C)</option>
+                  <option>Drittland</option>
+                  <option>EU (B2B/B2C)</option>
+                </select>
+              </div>
+              <button
+                type="button"
+                className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-destructive"
+                onClick={showBald}
+                aria-label={t("tax.options")}
+              >
+                <MaterialIcon ligature="delete" className="text-[20px]" />
+              </button>
+            </div>
+            <div className="relative z-10 -my-3 flex items-center justify-center">
+              <div className="rounded-full border border-border bg-card px-4 py-1.5 text-[10px] font-semibold tracking-wider text-muted-foreground shadow-sm">
+                {t("tax.and")}
+              </div>
+            </div>
+            <div className="flex items-center gap-3 rounded-[12px] border border-border bg-muted/40 p-4">
+              <div className="w-12 shrink-0 text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+                {t("tax.if")}
+              </div>
+              <div className="flex flex-1 gap-3">
+                <select
+                  className="h-[40px] w-[180px] rounded-[8px] border border-border bg-card px-3 text-sm shadow-sm"
+                  value={draft.cond2Field}
+                  onChange={(event) =>
+                    setDraft((prev) => ({
+                      ...prev,
+                      cond2Field: event.target.value,
+                    }))
+                  }
+                >
+                  <option value="customer">{t("tax.customerIs")}</option>
+                  <option value="service">{t("tax.serviceIs")}</option>
+                </select>
+                <select
+                  className="h-[40px] flex-1 rounded-[8px] border border-border bg-card px-3 text-sm shadow-sm"
+                  value={draft.cond2Value}
+                  onChange={(event) =>
+                    setDraft((prev) => ({
+                      ...prev,
+                      cond2Value: event.target.value,
+                    }))
+                  }
+                >
+                  <option>Standard (Waren)</option>
+                  <option>Dienstleistung (Elektronisch)</option>
+                  <option>Ermäßigt</option>
+                  <option>Digital</option>
+                  <option>Export</option>
+                  <option>Standard</option>
+                </select>
+              </div>
+              <button
+                type="button"
+                className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-destructive"
+                onClick={showBald}
+                aria-label={t("tax.options")}
+              >
+                <MaterialIcon ligature="delete" className="text-[20px]" />
+              </button>
+            </div>
+            <button
+              type="button"
+              className="mt-2 -ml-3 inline-flex self-start items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-primary-container hover:bg-brand-soft/50"
+              onClick={showBald}
+            >
+              <MaterialIcon ligature="add" className="text-[20px]" />
+              {t("tax.addCondition")}
+            </button>
+          </div>
+          <div className="mt-2 flex items-center justify-between border-t border-border pt-8">
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium">{t("tax.status")}</span>
+              <ActiveSwitch
+                active={draft.active}
+                label={t("tax.active")}
+                onToggle={() =>
+                  setDraft((prev) => ({ ...prev, active: !prev.active }))
+                }
+              />
+              <span className="hidden text-xs text-muted-foreground sm:inline">
+                {t("tax.statusHint")}
+              </span>
+            </div>
+          </div>
+        </div>
+        <DialogFooter className="gap-3">
+          <DialogClose
+            className={`inline-flex h-[40px] items-center rounded-[8px] border border-border bg-card px-5 text-sm font-medium text-foreground shadow-sm ${FOCUS_RING}`}
+          >
+            {t("tax.cancel")}
+          </DialogClose>
+          <button
+            type="button"
+            className={`inline-flex h-[40px] items-center gap-2 rounded-[8px] bg-primary-container px-5 text-sm font-medium text-card shadow-sm dark:text-foreground ${FOCUS_RING}`}
+            onClick={() => {
+              showBald();
+              setModal(null);
+            }}
+          >
+            <MaterialIcon ligature="check" className="text-[18px]" />
+            {t("tax.saveRule")}
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

@@ -170,6 +170,18 @@
     "options": "Optionen",
     "customer": "Kunde",
     "service": "Service",
-    "taxAction": "Steuer"
+    "taxAction": "Steuer",
+    "editRule": "Steuerregel bearbeiten",
+    "ruleName": "Name der Regel",
+    "taxRate": "Steuersatz (%)",
+    "conditions": "Bedingungen",
+    "conditionsHint": "Definieren Sie, wann dieser Steuersatz angewendet werden soll.",
+    "status": "Status",
+    "statusHint": "Aktivierte Regeln werden in der Steuerberechnung berücksichtigt.",
+    "saveRule": "Regel speichern",
+    "customerIs": "Kunde ist",
+    "serviceIs": "Leistung ist",
+    "close": "Schließen",
+    "modalBody": "Steuerregel anlegen oder bearbeiten."
   }
 }

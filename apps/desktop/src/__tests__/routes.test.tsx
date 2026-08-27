@@ -37,7 +37,7 @@ describe("sidebar routes", () => {
   it.each([
     ["Entities", "Geschäftseinheiten"],
     ["Kunden", "Kunden"],
-    ["Tax", "Tax Rules"],
+    ["Tax", "Steuerregeln"],
     ["PDF", "PDF Viewer / Export"],
   ] as const)("navigates to %s without a blank page", async (linkLabel, heading) => {
     await renderSignedIn();

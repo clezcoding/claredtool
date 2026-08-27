@@ -33,6 +33,9 @@
   --color-surface-dark: var(--surface-dark);
   --color-surface-elevated-dark: var(--surface-elevated-dark);
   --color-primary-container: var(--primary-container);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-border: var(--warning-border);
   --color-entity-avatar: var(--entity-avatar);
   --color-customer-avatar: var(--customer-avatar);
   --color-customer-avatar-soft: var(--customer-avatar-soft);
@@ -79,6 +82,9 @@
   --customer-avatar-soft: #ffebee;
   --success: #2E7342;
   --danger: #D74D3F;
+  --warning: #B96C00;
+  --warning-soft: #FFF1D8;
+  --warning-border: #f3e1b6;
 }
 
 .dark {
@@ -115,6 +121,9 @@
   --customer-avatar-soft: #ffebee;
   --success: #2E7342;
   --danger: #D74D3F;
+  --warning: #B96C00;
+  --warning-soft: #3d2e10;
+  --warning-border: #B96C00;
 }
 
 .tabular-nums {
