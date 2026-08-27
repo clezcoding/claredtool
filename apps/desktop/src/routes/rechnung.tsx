@@ -8,25 +8,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@clared/ui";
-import {
-  Calendar,
-  ChevronDown,
-  Copy,
-  Eye,
-  FileText,
-  Info,
-  MoreHorizontal,
-  Send,
-  Settings,
-  Trash2,
-} from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { apiFetch } from "../auth/api";
 import { useSession } from "../auth/session-provider";
 import { ErrorState } from "../components/error-state";
 import { InvoiceEmptyState } from "../components/invoice-empty-state";
 import { LineItemCard } from "../components/line-item-card";
+import { MaterialIcon } from "../components/material-icon";
 import { Skeleton } from "../components/skeleton";
 import { Spinner } from "../components/spinner";
 import { TaxRail } from "../components/tax-rail";
@@ -97,11 +87,10 @@ function entityInitial(name: string): string {
   return name.trim().charAt(0).toUpperCase() || "?";
 }
 
-function formatSavedAgo(timestamp: number): string {
+function formatSavedAgo(timestamp: number, justNow: string, minutesAgo: (mins: number) => string): string {
   const mins = Math.floor((Date.now() - timestamp) / 60000);
-  if (mins < 1) return "Gerade eben";
-  if (mins === 1) return "vor 1 Min";
-  return `vor ${mins} Min`;
+  if (mins < 1) return justNow;
+  return minutesAgo(mins);
 }
 
 function dueDateFromTerms(isoDate: string, days: number): string {
@@ -145,7 +134,10 @@ function invoiceLabel(invoice: InvoiceRow | null, isCurrentUnnumbered: boolean):
   return invoice.number;
 }
 
-export function RechnungScreen() {
+export interface RechnungScreenProps {}
+
+export function RechnungScreen(_props: RechnungScreenProps = {}) {
+  const { t } = useTranslation();
   const { me } = useSession();
   const canRead = me?.permissions.includes("invoice.read") ?? false;
   const canWrite = me?.permissions.includes("invoice.write") ?? false;
@@ -186,6 +178,7 @@ export function RechnungScreen() {
   const lastGoodTaxRef = useRef<StagedTaxDecision | null>(null);
   const persistDraftRef = useRef<() => Promise<void>>(async () => {});
   const evaluateDraftRef = useRef<() => Promise<void>>(async () => {});
+  const focusEntityRef = useRef(false);
 
   const selectedEntity = entities.find((row) => row.id === entityId);
   const selectedCustomer = customers.find((row) => row.id === customerId);
@@ -416,6 +409,12 @@ export function RechnungScreen() {
   persistDraftRef.current = persistDraft;
   evaluateDraftRef.current = evaluateDraft;
 
+  useLayoutEffect(() => {
+    if (!focusEntityRef.current || showHero || loading) return;
+    focusEntityRef.current = false;
+    document.getElementById("entity-picker")?.focus();
+  }, [loading, showHero]);
+
   useEffect(() => {
     if (!canWrite || skipAutosaveRef.current) return;
 
@@ -463,6 +462,7 @@ export function RechnungScreen() {
     setCustomerId("");
     setShowHero(false);
     setAutosaveStatus("hidden");
+    focusEntityRef.current = true;
     resetTaxLiveState();
     lastGoodTaxRef.current = null;
     setRailTax(null);
@@ -550,7 +550,7 @@ export function RechnungScreen() {
                 </>
               )}
               <span className="shrink-0 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                Entwurf
+                {t("invoice.draft")}
               </span>
             </h1>
             {drafts.length > 1 ? (
@@ -562,7 +562,7 @@ export function RechnungScreen() {
                 }}
               >
                 <SelectTrigger
-                  aria-label="Rechnung wählen"
+                  aria-label={t("invoice.pickInvoice")}
                   className="h-8 w-auto max-w-[10rem] bg-transparent text-xs font-normal"
                   title={pickerLabel}
                 >
@@ -584,24 +584,31 @@ export function RechnungScreen() {
                 {autosaveStatus === "saving" ? (
                   <>
                     <Spinner />
-                    <span>Speichert…</span>
+                    <span>{t("invoice.saving")}</span>
                   </>
                 ) : null}
                 {autosaveStatus === "saved" && savedAt ? (
-                  <span>Gespeichert {formatSavedAgo(savedAt)}</span>
+                  <span>
+                    {t("invoice.saved")}{" "}
+                    {formatSavedAgo(
+                      savedAt,
+                      t("invoice.justNow"),
+                      (mins) => t("invoice.minutesAgo", { count: mins }),
+                    )}
+                  </span>
                 ) : null}
                 {autosaveStatus === "error" ? (
-                  <span>Speichern fehlgeschlagen.</span>
+                  <span>{t("invoice.saveFailed")}</span>
                 ) : null}
               </div>
             ) : null}
             <button
               type="button"
               disabled
-              aria-label="Weitere Optionen"
+              aria-label={t("invoice.moreOptions")}
               className="inline-flex size-9 items-center justify-center rounded-md border border-border text-muted-foreground"
             >
-              <MoreHorizontal size={16} />
+              <MaterialIcon ligature="more_horiz" className="text-[16px]" />
             </button>
             {canWrite ? (
               <button
@@ -609,45 +616,47 @@ export function RechnungScreen() {
                 onClick={() => void persistDraft()}
                 className={`${OUTLINE_BTN} hidden dark:inline-flex`}
               >
-                Speichern
+                {t("invoice.save")}
               </button>
             ) : null}
             {showRail ? (
               <Link to="/pdf" className={OUTLINE_BTN}>
-                <Eye size={16} />
-                Vorschau
+                <MaterialIcon ligature="visibility" className="text-[16px]" />
+                {t("invoice.preview")}
               </Link>
             ) : null}
             {canWrite ? (
               <Button type="button" onClick={startNewDraft} className={NEUE_RECHNUNG_BTN}>
-                Neue Rechnung
+                {t("invoice.new")}
               </Button>
             ) : null}
             {showRail ? (
               <div className="inline-flex overflow-hidden rounded-md">
                 <Link to="/pdf" className={SEND_CTA}>
-                  <Send size={14} />
-                  Senden
+                  <MaterialIcon ligature="send" className="text-[14px]" />
+                  {t("invoice.send")}
                 </Link>
                 <button
                   type="button"
                   disabled
-                  aria-label="Senden Optionen"
+                  aria-label={t("invoice.sendOptions")}
                   className="inline-flex min-h-11 items-center border-l border-white/20 bg-[var(--cta-send)] px-2 text-white"
                 >
-                  <ChevronDown size={14} />
+                  <MaterialIcon ligature="expand_more" className="text-[14px]" />
                 </button>
               </div>
             ) : null}
           </div>
         </header>
 
-        <div className="flex flex-col gap-6 px-8 py-6 pb-28">
-          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-lg border border-border bg-background/50 p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Von
+        <div
+          data-testid="invoice-canvas"
+          className="mx-auto flex w-full max-w-[1000px] flex-col gap-8 px-8 py-6 pb-28"
+        >
+          <div className="grid gap-x-12 gap-y-6 lg:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t("invoice.from")}
               </p>
               <Label htmlFor="entity-picker" className="sr-only">
                 Entity
@@ -662,20 +671,20 @@ export function RechnungScreen() {
               >
                 <SelectTrigger
                   id="entity-picker"
-                  className="mt-2 min-h-11 w-full bg-transparent font-normal"
+                  className="h-11 w-full bg-muted/40 font-normal"
                 >
                   {selectedEntity ? (
                     <div className="flex min-w-0 flex-1 items-center gap-3">
-                      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-[#3d5240] text-sm font-semibold text-white">
+                      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary text-sm font-semibold text-primary-foreground">
                         {entityInitial(selectedEntity.name)}
                       </span>
                       <span className="truncate text-left font-medium">
                         {selectedEntity.name}
                       </span>
-                      <ChevronDown size={16} className="ml-auto shrink-0 text-muted-foreground" />
+                      <MaterialIcon ligature="unfold_more" className="ml-auto shrink-0 text-[20px] text-muted-foreground" />
                     </div>
                   ) : (
-                    <SelectValue placeholder="Entity wählen" />
+                    <SelectValue placeholder={t("invoice.entityPlaceholder")} />
                   )}
                 </SelectTrigger>
                 <SelectContent>
@@ -688,24 +697,24 @@ export function RechnungScreen() {
               </Select>
               {selectedEntity ? (
                 <>
-                  <p className="mt-2 whitespace-normal break-words text-sm text-muted-foreground">
+                  <p className="mt-1 whitespace-normal break-words text-xs text-muted-foreground">
                     {selectedEntity.address}
                   </p>
-                  <div className="mt-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
                     <span>
                       St.-Nr. {selectedEntity.vatId ?? "—"}
                     </span>
-                    <Info size={14} className="shrink-0" />
+                    <MaterialIcon ligature="info" className="text-[14px]" />
                   </div>
                 </>
               ) : null}
             </div>
-            <div className="rounded-lg border border-border bg-background/50 p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Kunde
+            <div className="flex flex-col gap-2">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t("invoice.customer")}
               </p>
               <Label htmlFor="customer-picker" className="sr-only">
-                Kunde
+                {t("invoice.customer")}
               </Label>
               <Select
                 value={customerId}
@@ -717,20 +726,20 @@ export function RechnungScreen() {
               >
                 <SelectTrigger
                   id="customer-picker"
-                  className="mt-2 min-h-11 w-full bg-transparent font-normal"
+                  className="h-11 w-full bg-card font-normal"
                 >
                   {selectedCustomer ? (
                     <div className="flex min-w-0 flex-1 items-center gap-3">
-                      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-red-600 text-xs font-bold tracking-wide text-white">
-                        ACME
+                      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-destructive text-xs font-bold tracking-wide text-background">
+                        {entityInitial(selectedCustomer.name)}
                       </span>
                       <span className="truncate text-left font-medium">
                         {selectedCustomer.name}
                       </span>
-                      <ChevronDown size={16} className="ml-auto shrink-0 text-muted-foreground" />
+                      <MaterialIcon ligature="unfold_more" className="ml-auto shrink-0 text-[20px] text-muted-foreground" />
                     </div>
                   ) : (
-                    <SelectValue placeholder="Kunde wählen" />
+                    <SelectValue placeholder={t("invoice.customerPlaceholder")} />
                   )}
                 </SelectTrigger>
                 <SelectContent>
@@ -743,13 +752,13 @@ export function RechnungScreen() {
               </Select>
               {selectedCustomer ? (
                 <>
-                  <p className="mt-2 whitespace-normal break-words text-sm text-muted-foreground">
+                  <p className="mt-1 whitespace-normal break-words text-xs text-muted-foreground">
                     {selectedCustomer.address}
                   </p>
                   {selectedCustomer.vatId ? (
-                    <div className="mt-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
                       <span>USt-IdNr. {selectedCustomer.vatId}</span>
-                      <Info size={14} className="shrink-0" />
+                      <MaterialIcon ligature="info" className="text-[14px]" />
                     </div>
                   ) : null}
                 </>
@@ -757,29 +766,33 @@ export function RechnungScreen() {
             </div>
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-4">
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="rechnungsnummer">Rechnungsnummer</Label>
+          <div className="grid gap-4 sm:grid-cols-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="rechnungsnummer" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t("invoice.number")}
+              </Label>
               <div className="relative flex items-center">
                 <Input
                   id="rechnungsnummer"
                   readOnly
-                  placeholder="Wird vergeben…"
+                  placeholder={t("invoice.numberPending")}
                   value={rechnungsnummer}
-                  className="bg-background pr-10"
+                  className="h-11 bg-card pr-10"
                 />
                 <button
                   type="button"
                   disabled={!canWrite}
-                  aria-label="Rechnungsnummer Einstellungen"
+                  aria-label={t("invoice.numberSettings")}
                   className="absolute right-2 inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground disabled:opacity-50"
                 >
-                  <Settings size={16} />
+                  <MaterialIcon ligature="settings" className="text-[16px]" />
                 </button>
               </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="datum">Datum</Label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="datum" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t("invoice.date")}
+              </Label>
               <div className="relative">
                 <Input
                   id="datum"
@@ -790,17 +803,18 @@ export function RechnungScreen() {
                     setDatum(event.target.value);
                     if (canWrite) setAutosaveStatus("saving");
                   }}
-                  className="bg-background pr-10"
+                  className="h-11 bg-card pr-10"
                 />
-                <Calendar
-                  size={16}
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  aria-hidden
+                <MaterialIcon
+                  ligature="calendar_today"
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[20px] text-muted-foreground"
                 />
               </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="faellig">Fällig</Label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="faellig" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t("invoice.due")}
+              </Label>
               <div className="relative">
                 <Input
                   id="faellig"
@@ -811,17 +825,18 @@ export function RechnungScreen() {
                     setFaellig(event.target.value);
                     if (canWrite) setAutosaveStatus("saving");
                   }}
-                  className="bg-background pr-10"
+                  className="h-11 bg-card pr-10"
                 />
-                <Calendar
-                  size={16}
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  aria-hidden
+                <MaterialIcon
+                  ligature="calendar_today"
+                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[20px] text-muted-foreground"
                 />
               </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="zahlungsbedingung">Zahlungsbedingung</Label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="zahlungsbedingung" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t("invoice.terms")}
+              </Label>
               <Select
                 value={zahlungsbedingung}
                 onValueChange={handleZahlungsbedingung}
@@ -829,45 +844,37 @@ export function RechnungScreen() {
               >
                 <SelectTrigger
                   id="zahlungsbedingung"
-                  className="min-h-11 w-full bg-background font-normal"
+                  className="h-11 w-full bg-card font-normal"
                 >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="14">14 Tage netto</SelectItem>
-                  <SelectItem value="30">30 Tage netto</SelectItem>
+                  <SelectItem value="14">{t("invoice.terms14")}</SelectItem>
+                  <SelectItem value="30">{t("invoice.terms30")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col gap-1">
-            <Label htmlFor="betreff">Betreff</Label>
+          <div className="flex flex-col gap-2 border-b border-border/70 pb-8">
+            <Label htmlFor="betreff" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              {t("invoice.subject")}
+            </Label>
             <Input
               id="betreff"
               value={betreff}
               readOnly={!canWrite}
-              placeholder="Betreff der Rechnung"
+              placeholder={t("invoice.subjectPlaceholder")}
               onChange={(event) => setBetreff(event.target.value)}
-              className="bg-background"
-            />
-          </div>
-          <div className="mt-4 flex flex-col gap-1">
-            <Label htmlFor="notiz">Notiz</Label>
-            <textarea
-              id="notiz"
-              value={notiz}
-              readOnly={!canWrite}
-              placeholder="Notiz (wird auf der Rechnung angezeigt)"
-              onChange={(event) => setNotiz(event.target.value)}
-              rows={2}
-              className="min-h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="border-none bg-transparent px-0 text-lg font-semibold shadow-none focus-visible:ring-0"
             />
           </div>
 
-          <table className="mt-6 w-full text-left text-sm">
+          <div className="flex flex-col gap-4">
+            <h2 className="text-sm font-medium text-foreground">{t("invoice.services")}</h2>
+          <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-border text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <tr className="border-b border-border text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                 <th className="py-2 pr-2 font-medium">Pos.</th>
                 <th className="py-2 pr-2 font-medium">Beschreibung</th>
                 <th className="py-2 pr-2 font-medium">Kategorie</th>
@@ -924,62 +931,78 @@ export function RechnungScreen() {
                 setLineItems((current) => [...current, { ...BLANK_LINE }]);
                 if (canWrite) setAutosaveStatus("saving");
               }}
-              className="mt-3 self-start rounded-md border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+              className="inline-flex items-center gap-2 self-start text-sm text-primary hover:underline"
             >
-              + Zeile hinzufügen
+              <MaterialIcon ligature="add_circle" className="text-[18px]" />
+              {t("invoice.addLine")}
             </button>
           ) : null}
           </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="notiz" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              {t("invoice.note")}
+            </Label>
+            <textarea
+              id="notiz"
+              value={notiz}
+              readOnly={!canWrite}
+              placeholder={t("invoice.notePlaceholder")}
+              onChange={(event) => setNotiz(event.target.value)}
+              rows={3}
+              className="min-h-11 w-full rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            />
+          </div>
         </div>
 
-        <div className="sticky bottom-0 z-10 flex items-center justify-between gap-4 border-t border-border/70 bg-background/95 px-8 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-          <div className="flex flex-wrap items-center gap-4">
+        <div className="sticky bottom-0 z-10 flex h-20 items-center justify-between gap-4 border-t border-border/70 bg-background/90 px-8 backdrop-blur">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
               disabled
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground disabled:opacity-50"
+              className="inline-flex h-11 items-center gap-2 rounded-lg border border-border/50 px-4 text-sm disabled:opacity-50"
             >
-              <FileText size={14} />
-              Als Vorlage speichern
+              <MaterialIcon ligature="save" className="text-[18px]" />
+              {t("invoice.saveTemplate")}
             </button>
             <button
               type="button"
               disabled
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground disabled:opacity-50"
+              aria-label={t("invoice.duplicate")}
+              className="inline-flex size-11 items-center justify-center rounded-lg border border-border/50 text-muted-foreground disabled:opacity-50"
             >
-              <Copy size={14} />
-              Duplizieren
+              <MaterialIcon ligature="content_copy" className="text-[20px]" />
             </button>
             <button
               type="button"
               disabled
-              className="inline-flex items-center gap-2 text-sm text-destructive disabled:opacity-50"
+              aria-label={t("invoice.delete")}
+              className="inline-flex size-11 items-center justify-center rounded-lg border border-border/50 text-destructive disabled:opacity-50"
             >
-              <Trash2 size={14} />
-              Löschen
+              <MaterialIcon ligature="delete" className="text-[20px]" />
             </button>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               type="button"
               disabled
-              className={`${OUTLINE_BTN} disabled:opacity-50`}
+              className="inline-flex h-11 items-center gap-2 px-4 text-sm text-muted-foreground disabled:opacity-50"
             >
-              Weitere Aktionen
-              <ChevronDown size={14} />
+              {t("invoice.moreActions")}
+              <MaterialIcon ligature="expand_less" className="text-[18px]" />
             </button>
             <div className="inline-flex overflow-hidden rounded-md">
               <Link to="/pdf" className={SEND_CTA}>
-                <Send size={14} />
-                Senden
+                <MaterialIcon ligature="send" className="text-[18px]" />
+                {t("invoice.send")}
               </Link>
               <button
                 type="button"
                 disabled
-                aria-label="Senden Optionen"
+                aria-label={t("invoice.sendOptions")}
                 className="inline-flex min-h-11 items-center border-l border-white/20 bg-[var(--cta-send)] px-2 text-white disabled:opacity-50"
               >
-                <ChevronDown size={14} />
+                <MaterialIcon ligature="expand_more" className="text-[14px]" />
               </button>
             </div>
           </div>
