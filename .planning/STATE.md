@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.1
 current_phase_name: Stitch→React 5-route conversion
 status: executing
-stopped_at: Completed 04.1-02-PLAN.md
-last_updated: "2026-08-27T03:33:14.406Z"
+stopped_at: Completed 04.1-03-PLAN.md
+last_updated: "2026-08-27T03:54:29.171Z"
 last_activity: 2026-08-27
 last_activity_desc: Phase 04.1 execution started
-state_head: c4458081092aa2033ec0163fef974db9518e80b6
+state_head: b5fa0eadfa592574c5aeb954b68fd631fafd3dd4
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 31
-  completed_plans: 26
+  completed_plans: 27
 milestone_name: milestone
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 Status: Ready to execute
 Phase: 04.1 (Stitch→React 5-route conversion) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Phase 04 (Premium UI & Brand Redesign) — complete 2026-08-25
 Phase 04.1 (Stitch→React 5-route) — **NEXT** execute (7 plans finalized)
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.1
@@ -87,6 +87,7 @@ Progress: [██████░░░░] 60%
 | Phase 04-premium-ui-brand-redesign P06 | 6min | 3 tasks | 4 files |
 | Phase 04.1-stitch-react-5-route-conversion P01 | 5min | 2 tasks | 12 files |
 | Phase 04.1 P02 | 10min | 2 tasks | 12 files |
+| Phase 04.1 P03 | 18 | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -157,6 +158,8 @@ Recent decisions affecting current work:
 - [Phase 04.1]: Five nav items only; Stitch catalog sidebar items stay out (D-11/D-13)
 - [Phase 04.1]: R-01 360px was tax rail LAYOUT_TAX_RAIL_WIDTH; nav SSOT is 260px from 02-rechnung-light
 - [Phase 04.1]: Entities ligature domain and PDF ligature picture_as_pdf are D-45 nearest matches
+- [Phase 04.1]: Header Neue Rechnung stays startNewDraft(); Stitch 23 opens from Weitere Aktionen
+- [Phase 04.1]: 29/40 overlays use Dialog so D-35/D-36 smoke covers all Rechnung modals
 
 ### Pending Todos
 
@@ -188,8 +191,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-27T03:33:14.343Z
-Stopped at: Completed 04.1-02-PLAN.md
+Last session: 2026-08-27T03:54:29.047Z
+Stopped at: Completed 04.1-03-PLAN.md
 Resume file: None
 
 ## Rebuild Log

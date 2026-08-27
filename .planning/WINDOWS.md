@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 13
+open_count: 16
 waived_count: 1
 fixed_count: 2
-total_count: 16
-last_updated: 2026-08-27T03:32:20.656Z
+total_count: 19
+last_updated: 2026-08-27T03:54:19.112Z
 ---
 
 # Broken Windows Ledger
@@ -31,6 +31,9 @@ last_updated: 2026-08-27T03:32:20.656Z
 | 14 | 04 | unrun-verify | apps/desktop/index.html |  | Human cold-launch FOUC/splash check (04-UAT tests 1–3) not run in this executor | open |  | 2026-08-23T03:37:27.623Z |  |
 | 15 | 04.1 | stub | apps/desktop/src/components/app-shell.tsx |  | Upgrade CTA is local Bald toast only (D-53, T-04.1-03); no billing route | open |  | 2026-08-27T03:32:20.564Z |  |
 | 16 | 04.1 | stub | apps/desktop/src/components/app-shell.tsx |  | ⌘K chrome is Bald-only; full command palette deferred to Phase 5.1 (D-51/D-28) | open |  | 2026-08-27T03:32:20.656Z |  |
+| 17 | 04.1 | stub | apps/desktop/src/routes/rechnung.tsx | 1199 | Send dialog Senden closes overlay only; no email API this wave | open |  | 2026-08-27T03:54:18.913Z |  |
+| 18 | 04.1 | stub | apps/desktop/src/routes/rechnung.tsx | 1281 | Delete AlertDialog confirm closes overlay only; invoice DELETE not in this plan | open |  | 2026-08-27T03:54:19.019Z |  |
+| 19 | 04.1 | stub | apps/desktop/src/routes/rechnung.tsx | 1217 | Save-template and duplicate menu items close menu only; persist APIs out of scope | open |  | 2026-08-27T03:54:19.112Z |  |
 
 ````json
 [
@@ -224,6 +227,42 @@ last_updated: 2026-08-27T03:32:20.656Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-27T03:32:20.656Z",
+    "resolved_at": null
+  },
+  {
+    "id": 17,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/rechnung.tsx",
+    "line": 1199,
+    "description": "Send dialog Senden closes overlay only; no email API this wave",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T03:54:18.913Z",
+    "resolved_at": null
+  },
+  {
+    "id": 18,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/rechnung.tsx",
+    "line": 1281,
+    "description": "Delete AlertDialog confirm closes overlay only; invoice DELETE not in this plan",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T03:54:19.019Z",
+    "resolved_at": null
+  },
+  {
+    "id": 19,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/rechnung.tsx",
+    "line": 1217,
+    "description": "Save-template and duplicate menu items close menu only; persist APIs out of scope",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T03:54:19.112Z",
     "resolved_at": null
   }
 ]
