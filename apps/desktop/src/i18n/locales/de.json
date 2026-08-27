@@ -150,5 +150,26 @@
       "management": "Management",
       "bank": "Bankverbindung"
     }
+  },
+  "tax": {
+    "title": "Steuerregeln",
+    "subtitle": "Definieren Sie, wie Steuern basierend auf Ihrer Geschäftslogik ermittelt werden.",
+    "newRule": "Neue Regel",
+    "reorder": "Neu ordnen",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "if": "WENN",
+    "and": "UND",
+    "then": "DANN",
+    "description": "Beschreibung",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "addCondition": "Bedingung hinzufügen",
+    "live": "Live Steuerberechnung",
+    "evaluateHint": "Regeln werden von oben nach unten ausgewertet. Der erste Treffer gilt.",
+    "options": "Optionen",
+    "customer": "Kunde",
+    "service": "Service",
+    "taxAction": "Steuer"
   }
 }

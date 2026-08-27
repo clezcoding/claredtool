@@ -150,5 +150,26 @@
       "management": "Management",
       "bank": "Bank details"
     }
+  },
+  "tax": {
+    "title": "Tax rules",
+    "subtitle": "Define how tax is determined based on your business logic.",
+    "newRule": "New Rule",
+    "reorder": "Reorder",
+    "active": "Active",
+    "inactive": "Inactive",
+    "if": "IF",
+    "and": "AND",
+    "then": "THEN",
+    "description": "Description",
+    "cancel": "Cancel",
+    "save": "Save",
+    "addCondition": "Add condition",
+    "live": "Live tax calculation",
+    "evaluateHint": "Rules are evaluated from top to bottom. First match is applied.",
+    "options": "Options",
+    "customer": "Customer",
+    "service": "Service",
+    "taxAction": "Tax"
   }
 }
