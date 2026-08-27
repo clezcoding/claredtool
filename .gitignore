@@ -38,6 +38,9 @@ stitch-output/
 /scripts/
 mockups/
 
+# Pixel-harness captures (large PNGs; paths live in 04.1-QA.md)
+/artifacts/
+
 # Python (stitch-*.py helpers)
 __pycache__/
 *.py[cod]
