@@ -1,22 +1,27 @@
 import { SAMPLE_INVOICE } from "../data/sample-invoice";
 
-export function PdfPaper() {
+type PdfPaperProps = {
+  lang?: "en" | "de";
+};
+
+export function PdfPaper({ lang = "de" }: PdfPaperProps) {
   const invoice = SAMPLE_INVOICE;
+  const title = lang === "en" ? "INVOICE" : "RECHNUNG";
 
   return (
     <article
       data-testid="pdf-paper"
-      className="rounded-sm border border-black/10 shadow-2xl"
+      className="rounded-sm border border-black/10 shadow-[0_4px_24px_rgba(0,0,0,0.15)]"
       style={{
         background: "#fff",
         color: "#111",
-        width: 595,
-        minHeight: 842,
-        padding: "48px 56px",
+        width: 794,
+        minHeight: 1123,
+        padding: 60,
       }}
     >
-      <header className="mb-8">
-        <p className="font-serif text-3xl tracking-tight">INVOICE</p>
+      <header className="mb-16">
+        <p className="font-serif text-[44px] leading-[48px] tracking-tight">{title}</p>
       </header>
 
       <p className="mb-6 text-sm">

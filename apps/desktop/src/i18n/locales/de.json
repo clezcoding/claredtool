@@ -183,5 +183,22 @@
     "serviceIs": "Leistung ist",
     "close": "Schließen",
     "modalBody": "Steuerregel anlegen oder bearbeiten."
+  },
+  "pdf": {
+    "title": "PDF-Vorschau / Export",
+    "back": "Zurück",
+    "empty": "Kein Dokument ausgewählt",
+    "loading": "PDF wird erstellt…",
+    "actions": "PDF-Aktionen",
+    "download": "PDF herunterladen",
+    "email": "Per E-Mail senden",
+    "print": "Drucken",
+    "docLang": "Dokumentensprache",
+    "audit": "Prüfpfad",
+    "auditHint": "Tax decision history for this document.",
+    "auditFull": "Vollständigen Prüfpfad anzeigen",
+    "zoomOut": "Herauszoomen",
+    "zoomIn": "Hineinzoomen",
+    "fullscreen": "Vollbild"
   }
 }

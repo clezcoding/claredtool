@@ -183,5 +183,22 @@
     "serviceIs": "Service is",
     "close": "Close",
     "modalBody": "Create or edit a tax rule."
+  },
+  "pdf": {
+    "title": "PDF Preview / Export",
+    "back": "Back",
+    "empty": "No document selected",
+    "loading": "Creating PDF…",
+    "actions": "PDF actions",
+    "download": "Download PDF",
+    "email": "Send via email",
+    "print": "Print",
+    "docLang": "Document language",
+    "audit": "Audit trail",
+    "auditHint": "Tax decision history for this document.",
+    "auditFull": "View full audit trail",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in",
+    "fullscreen": "Fullscreen"
   }
 }
