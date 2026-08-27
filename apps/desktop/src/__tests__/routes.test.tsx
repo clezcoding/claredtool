@@ -48,4 +48,17 @@ describe("sidebar routes", () => {
       ).toBeTruthy();
     });
   });
+
+  it("enforces D-11/D-13 scope lock: exactly 5 nav items, no iframe route leftovers", async () => {
+    await renderSignedIn();
+    const nav = screen.getByRole("navigation");
+    const links = within(nav).getAllByRole("link");
+    expect(links).toHaveLength(5);
+    expect(document.querySelector("iframe")).toBeNull();
+
+    for (const linkLabel of ["Entities", "Kunden", "Tax", "PDF"]) {
+      fireEvent.click(within(nav).getByRole("link", { name: linkLabel }));
+      expect(document.querySelector("iframe")).toBeNull();
+    }
+  });
 });
