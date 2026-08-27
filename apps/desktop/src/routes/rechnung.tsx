@@ -1,5 +1,20 @@
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Button,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   Input,
   Label,
   Select,
@@ -77,7 +92,7 @@ const BLANK_LINE: LineItem = {
 
 const AUTOSAVE_DELAY_MS = 600;
 const SEND_CTA =
-  "btn-primary inline-flex min-h-11 items-center gap-2 rounded-none px-4 font-semibold bg-[var(--cta-send)] text-white hover:bg-[var(--cta-send)]/90";
+  "btn-primary inline-flex min-h-11 items-center gap-2 rounded-none px-4 font-semibold bg-primary-container text-white hover:bg-primary-container/90";
 const OUTLINE_BTN =
   "inline-flex min-h-11 items-center gap-2 rounded-md border border-border px-3 text-sm font-medium hover:bg-muted/50";
 const NEUE_RECHNUNG_BTN =
@@ -107,6 +122,42 @@ function addDaysIso(days: number): string {
   const date = new Date();
   date.setDate(date.getDate() + days);
   return date.toISOString().slice(0, 10);
+}
+
+function shiftMonth(iso: string, delta: number): string {
+  const date = new Date(`${iso}T00:00:00`);
+  date.setMonth(date.getMonth() + delta);
+  return date.toISOString().slice(0, 10);
+}
+
+function monthLabel(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString("de-DE", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function monthCells(iso: string): { key: string; day: number; value: string | null }[] {
+  const date = new Date(`${iso}T00:00:00`);
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const pad = (new Date(year, month, 1).getDay() + 6) % 7;
+  const days = new Date(year, month + 1, 0).getDate();
+  const prevDays = new Date(year, month, 0).getDate();
+  const cells: { key: string; day: number; value: string | null }[] = [];
+  for (let i = 0; i < pad; i += 1) {
+    cells.push({ key: `p-${i}`, day: prevDays - pad + i + 1, value: null });
+  }
+  for (let day = 1; day <= days; day += 1) {
+    const value = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    cells.push({ key: value, day, value });
+  }
+  let next = 1;
+  while (cells.length % 7 !== 0) {
+    cells.push({ key: `n-${next}`, day: next, value: null });
+    next += 1;
+  }
+  return cells;
 }
 
 function toDateInput(value: string | null | undefined): string {
@@ -168,6 +219,18 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
   const [isUnnumberedDraft, setIsUnnumberedDraft] = useState(false);
   const [autosaveStatus, setAutosaveStatus] = useState<AutosaveStatus>("hidden");
   const [taxEvaluateError, setTaxEvaluateError] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [sendOpen, setSendOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [dateField, setDateField] = useState<"datum" | "faellig" | null>(null);
+  const [dateCursor, setDateCursor] = useState(todayIso);
+  const [createCustomerQuery, setCreateCustomerQuery] = useState("");
+  const [createTemplate, setCreateTemplate] = useState("standard");
+  const [sendTo, setSendTo] = useState("");
+  const [sendCc, setSendCc] = useState("");
+  const [sendSubject, setSendSubject] = useState("");
+  const [sendBody, setSendBody] = useState("");
   const [railTax, setRailTax] = useState<Pick<
     StagedTaxDecision,
     "invoice_tax_rate" | "reverse_charge_flag" | "legal_reference" | "applied_rule_id"
@@ -479,6 +542,28 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
     skipAutosaveRef.current = false;
   }
 
+  function openCreateModal() {
+    setCreateCustomerQuery("");
+    setCreateTemplate("standard");
+    setCreateOpen(true);
+  }
+
+  function openSendModal() {
+    setSendTo("");
+    setSendCc("");
+    setSendSubject(`Ihre Rechnung ${rechnungsnummer || pickerLabel}`);
+    setSendBody(
+      `Guten Tag,\n\nanbei erhalten Sie unsere Rechnung ${rechnungsnummer || pickerLabel}.\n\nMit freundlichen Grüßen`,
+    );
+    setSendOpen(true);
+  }
+
+  function openDatePicker(field: "datum" | "faellig") {
+    const current = field === "datum" ? datum : faellig;
+    setDateCursor(current);
+    setDateField(field);
+  }
+
   function handlePickerSelect(invoice: InvoiceRow) {
     applyInvoice(invoice, entities);
     resetTaxLiveState();
@@ -604,9 +689,9 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
             ) : null}
             <button
               type="button"
-              disabled
               aria-label={t("invoice.moreOptions")}
               className="inline-flex size-9 items-center justify-center rounded-md border border-border text-muted-foreground"
+              onClick={() => setMenuOpen(true)}
             >
               <MaterialIcon ligature="more_horiz" className="text-[16px]" />
             </button>
@@ -632,15 +717,15 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
             ) : null}
             {showRail ? (
               <div className="inline-flex overflow-hidden rounded-md">
-                <Link to="/pdf" className={SEND_CTA}>
+                <button type="button" className={SEND_CTA} onClick={openSendModal}>
                   <MaterialIcon ligature="send" className="text-[14px]" />
                   {t("invoice.send")}
-                </Link>
+                </button>
                 <button
                   type="button"
-                  disabled
                   aria-label={t("invoice.sendOptions")}
-                  className="inline-flex min-h-11 items-center border-l border-white/20 bg-[var(--cta-send)] px-2 text-white"
+                  className="inline-flex min-h-11 items-center border-l border-white/20 bg-primary-container px-2 text-white"
+                  onClick={openSendModal}
                 >
                   <MaterialIcon ligature="expand_more" className="text-[14px]" />
                 </button>
@@ -675,7 +760,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
                 >
                   {selectedEntity ? (
                     <div className="flex min-w-0 flex-1 items-center gap-3">
-                      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-primary text-sm font-semibold text-primary-foreground">
+                      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-entity-avatar text-sm font-semibold text-white">
                         {entityInitial(selectedEntity.name)}
                       </span>
                       <span className="truncate text-left font-medium">
@@ -730,7 +815,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
                 >
                   {selectedCustomer ? (
                     <div className="flex min-w-0 flex-1 items-center gap-3">
-                      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-destructive text-xs font-bold tracking-wide text-background">
+                      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-customer-avatar-soft text-xs font-bold tracking-wide text-customer-avatar">
                         {entityInitial(selectedCustomer.name)}
                       </span>
                       <span className="truncate text-left font-medium">
@@ -784,6 +869,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
                   disabled={!canWrite}
                   aria-label={t("invoice.numberSettings")}
                   className="absolute right-2 inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground disabled:opacity-50"
+                  onClick={() => setMenuOpen(true)}
                 >
                   <MaterialIcon ligature="settings" className="text-[16px]" />
                 </button>
@@ -805,10 +891,14 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
                   }}
                   className="h-11 bg-card pr-10"
                 />
-                <MaterialIcon
-                  ligature="calendar_today"
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[20px] text-muted-foreground"
-                />
+                <button
+                  type="button"
+                  aria-label="Datum wählen"
+                  className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-muted-foreground"
+                  onClick={() => openDatePicker("datum")}
+                >
+                  <MaterialIcon ligature="calendar_today" className="text-[20px]" />
+                </button>
               </div>
             </div>
             <div className="flex flex-col gap-2">
@@ -827,10 +917,14 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
                   }}
                   className="h-11 bg-card pr-10"
                 />
-                <MaterialIcon
-                  ligature="calendar_today"
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[20px] text-muted-foreground"
-                />
+                <button
+                  type="button"
+                  aria-label="Fälligkeit wählen"
+                  className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-muted-foreground"
+                  onClick={() => openDatePicker("faellig")}
+                >
+                  <MaterialIcon ligature="calendar_today" className="text-[20px]" />
+                </button>
               </div>
             </div>
             <div className="flex flex-col gap-2">
@@ -959,25 +1053,25 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
-              disabled
-              className="inline-flex h-11 items-center gap-2 rounded-lg border border-border/50 px-4 text-sm disabled:opacity-50"
+              className="inline-flex h-11 items-center gap-2 rounded-lg border border-border/50 px-4 text-sm"
+              onClick={() => setMenuOpen(true)}
             >
               <MaterialIcon ligature="save" className="text-[18px]" />
               {t("invoice.saveTemplate")}
             </button>
             <button
               type="button"
-              disabled
               aria-label={t("invoice.duplicate")}
-              className="inline-flex size-11 items-center justify-center rounded-lg border border-border/50 text-muted-foreground disabled:opacity-50"
+              className="inline-flex size-11 items-center justify-center rounded-lg border border-border/50 text-muted-foreground"
+              onClick={() => setMenuOpen(true)}
             >
               <MaterialIcon ligature="content_copy" className="text-[20px]" />
             </button>
             <button
               type="button"
-              disabled
               aria-label={t("invoice.delete")}
-              className="inline-flex size-11 items-center justify-center rounded-lg border border-border/50 text-destructive disabled:opacity-50"
+              className="inline-flex size-11 items-center justify-center rounded-lg border border-border/50 text-destructive"
+              onClick={() => setDeleteOpen(true)}
             >
               <MaterialIcon ligature="delete" className="text-[20px]" />
             </button>
@@ -985,22 +1079,22 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              disabled
-              className="inline-flex h-11 items-center gap-2 px-4 text-sm text-muted-foreground disabled:opacity-50"
+              className="inline-flex h-11 items-center gap-2 px-4 text-sm text-muted-foreground"
+              onClick={() => setMenuOpen(true)}
             >
               {t("invoice.moreActions")}
               <MaterialIcon ligature="expand_less" className="text-[18px]" />
             </button>
             <div className="inline-flex overflow-hidden rounded-md">
-              <Link to="/pdf" className={SEND_CTA}>
+              <button type="button" className={SEND_CTA} onClick={openSendModal}>
                 <MaterialIcon ligature="send" className="text-[18px]" />
                 {t("invoice.send")}
-              </Link>
+              </button>
               <button
                 type="button"
-                disabled
                 aria-label={t("invoice.sendOptions")}
-                className="inline-flex min-h-11 items-center border-l border-white/20 bg-[var(--cta-send)] px-2 text-white disabled:opacity-50"
+                className="inline-flex min-h-11 items-center border-l border-white/20 bg-primary-container px-2 text-white"
+                onClick={openSendModal}
               >
                 <MaterialIcon ligature="expand_more" className="text-[14px]" />
               </button>
@@ -1018,6 +1112,176 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
           dueDate={faellig}
         />
       ) : null}
+
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="sm:max-w-md" showCloseButton>
+          <DialogHeader>
+            <DialogTitle>Neue Rechnung erstellen</DialogTitle>
+            <DialogDescription>Kunde und optionale Vorlage wählen.</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="create-customer">Kunde <span className="text-destructive">*</span></Label>
+              <Input
+                id="create-customer"
+                value={createCustomerQuery}
+                onChange={(event) => setCreateCustomerQuery(event.target.value)}
+                placeholder="Kunde suchen oder neu anlegen..."
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="create-template">Vorlage (Optional)</Label>
+              <Select value={createTemplate} onValueChange={setCreateTemplate}>
+                <SelectTrigger id="create-template" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="standard">Keine Vorlage (Standard)</SelectItem>
+                  <SelectItem value="dienstleistung">Dienstleistung</SelectItem>
+                  <SelectItem value="produkt">Produktverkauf</SelectItem>
+                  <SelectItem value="beratung">Beratung (Stundenbasiert)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose className="inline-flex h-11 items-center rounded-lg border px-5 text-sm">Abbrechen</DialogClose>
+            <Button
+              type="button"
+              className="h-11 bg-primary-container text-white"
+              onClick={() => {
+                setCreateOpen(false);
+                startNewDraft();
+              }}
+            >
+              Erstellen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={sendOpen} onOpenChange={setSendOpen}>
+        <DialogContent className="sm:max-w-xl" showCloseButton>
+          <DialogHeader>
+            <DialogTitle>Rechnung senden</DialogTitle>
+            <DialogDescription>E-Mail an den Kunden vorbereiten.</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="email-an">An</Label>
+              <Input id="email-an" type="email" value={sendTo} onChange={(event) => setSendTo(event.target.value)} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="email-cc">CC (optional)</Label>
+              <Input id="email-cc" value={sendCc} onChange={(event) => setSendCc(event.target.value)} placeholder="Weitere Empfänger..." />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="email-betreff">Betreff</Label>
+              <Input id="email-betreff" value={sendSubject} onChange={(event) => setSendSubject(event.target.value)} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="email-nachricht">Nachricht</Label>
+              <textarea
+                id="email-nachricht"
+                rows={5}
+                value={sendBody}
+                onChange={(event) => setSendBody(event.target.value)}
+                className="min-h-11 w-full rounded-lg border border-input bg-muted/40 px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Link to="/pdf" className="mr-auto inline-flex h-11 items-center gap-2 text-sm" onClick={() => setSendOpen(false)}>
+              <MaterialIcon ligature="visibility" className="text-[20px]" />
+              Vorschau
+            </Link>
+            <DialogClose className="inline-flex h-11 items-center rounded-lg border px-6 text-sm">Abbrechen</DialogClose>
+            <Button type="button" className="h-11 bg-primary-container text-white" onClick={() => setSendOpen(false)}>
+              Senden
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
+        <DialogContent className="sm:max-w-xs" showCloseButton>
+          <DialogHeader>
+            <DialogTitle>Weitere Aktionen</DialogTitle>
+            <DialogDescription>Aktionen für den aktuellen Entwurf.</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-1">
+            <button type="button" className="rounded-md px-3 py-2 text-left text-sm hover:bg-muted" onClick={() => { setMenuOpen(false); openCreateModal(); }}>
+              Neue Rechnung erstellen
+            </button>
+            <button type="button" className="rounded-md px-3 py-2 text-left text-sm hover:bg-muted" onClick={() => setMenuOpen(false)}>
+              {t("invoice.saveTemplate")}
+            </button>
+            <button type="button" className="rounded-md px-3 py-2 text-left text-sm hover:bg-muted" onClick={() => setMenuOpen(false)}>
+              {t("invoice.duplicate")}
+            </button>
+            <button type="button" className="rounded-md px-3 py-2 text-left text-sm text-destructive hover:bg-muted" onClick={() => { setMenuOpen(false); setDeleteOpen(true); }}>
+              {t("invoice.delete")}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={dateField !== null} onOpenChange={(open) => { if (!open) setDateField(null); }}>
+        <DialogContent className="sm:max-w-[280px]" showCloseButton>
+          <DialogHeader>
+            <DialogTitle>{dateField === "faellig" ? t("invoice.due") : t("invoice.date")}</DialogTitle>
+            <DialogDescription>Kalendertag wählen.</DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center justify-between">
+            <button type="button" aria-label="Vorheriger Monat" onClick={() => setDateCursor((current) => shiftMonth(current, -1))}>
+              <MaterialIcon ligature="chevron_left" className="text-[20px]" />
+            </button>
+            <span className="text-sm font-medium capitalize">{monthLabel(dateCursor)}</span>
+            <button type="button" aria-label="Nächster Monat" onClick={() => setDateCursor((current) => shiftMonth(current, 1))}>
+              <MaterialIcon ligature="chevron_right" className="text-[20px]" />
+            </button>
+          </div>
+          <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground">
+            {["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((label) => (
+              <div key={label}>{label}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1 text-center text-sm">
+            {monthCells(dateCursor).map((cell) => (
+              <button
+                key={cell.key}
+                type="button"
+                disabled={!cell.value}
+                className={`rounded p-1 ${cell.value === (dateField === "faellig" ? faellig : datum) ? "bg-brand-soft font-semibold" : ""} ${cell.value ? "hover:bg-muted" : "text-muted-foreground/40"}`}
+                onClick={() => {
+                  if (!cell.value) return;
+                  if (dateField === "faellig") setFaellig(cell.value);
+                  else setDatum(cell.value);
+                  if (canWrite) setAutosaveStatus("saving");
+                  setDateField(null);
+                }}
+              >
+                {cell.day}
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Rechnung löschen?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Die Rechnung wird aus der Liste entfernt. Diese Aktion kann nicht rückgängig gemacht werden.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+            <AlertDialogAction onClick={() => setDeleteOpen(false)}>Löschen</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

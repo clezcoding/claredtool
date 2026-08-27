@@ -29,6 +29,10 @@
   --color-surface-container-low: var(--surface-container-low);
   --color-surface-dark: var(--surface-dark);
   --color-surface-elevated-dark: var(--surface-elevated-dark);
+  --color-primary-container: var(--primary-container);
+  --color-entity-avatar: var(--entity-avatar);
+  --color-customer-avatar: var(--customer-avatar);
+  --color-customer-avatar-soft: var(--customer-avatar-soft);
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -66,6 +70,10 @@
   --surface-container-low: #f4f4f2;
   --surface-dark: #111413;
   --surface-elevated-dark: #171A18;
+  --primary-container: #365b43;
+  --entity-avatar: #1b3d45;
+  --customer-avatar: #d32f2f;
+  --customer-avatar-soft: #ffebee;
 }
 
 .dark {
@@ -96,6 +104,10 @@
   --surface-container-low: #171A18;
   --surface-dark: #111413;
   --surface-elevated-dark: #171A18;
+  --primary-container: #365b43;
+  --entity-avatar: #1b3d45;
+  --customer-avatar: #d32f2f;
+  --customer-avatar-soft: #ffebee;
 }
 
 .tabular-nums {
