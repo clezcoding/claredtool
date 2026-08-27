@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04.1
 current_phase_name: Stitch→React 5-route conversion
-status: Ready to discuss Phase 04.1
-stopped_at: Phase 04.1 UI-SPEC approved
-last_updated: "2026-08-25T02:43:45.422Z"
-last_activity: 2026-08-25
-last_activity_desc: Phase null execution resumed (wave continue)
-state_head: 7ff9d2144fce9afbf949a3f776b4131fce9ce264
+status: executing
+stopped_at: Completed 04.1-01-PLAN.md
+last_updated: "2026-08-27T03:20:25.170Z"
+last_activity: 2026-08-27
+last_activity_desc: Phase 04.1 execution started
+state_head: 66be5d6390d162b1e4772e0e0441c74e5d9823c0
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 31
-  completed_plans: 24
+  completed_plans: 25
 milestone_name: milestone
 ---
 
@@ -28,15 +28,15 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 ## Current Position
 
-Status: Ready to discuss Phase 04.1
-Phase: 04.1 (Stitch→React 5-route conversion) — READY TO EXECUTE
-Plan: 0 of ? (not planned)
+Status: Ready to execute
+Phase: 04.1 (Stitch→React 5-route conversion) — EXECUTING
+Plan: 2 of 7
 Phase 04 (Premium UI & Brand Redesign) — complete 2026-08-25
-Phase 04.1 (Stitch→React 5-route) — **NEXT** discuss/plan
+Phase 04.1 (Stitch→React 5-route) — **NEXT** execute (7 plans finalized)
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.1
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-08-25 — inserted 4.1 + 5.1
+Last activity: 2026-08-27 — Phase 04.1 execution started
 
 Progress: [██████░░░░] 60%
 
@@ -85,6 +85,7 @@ Progress: [██████░░░░] 60%
 | Phase 04 P04 | 4min | 3 tasks | 8 files |
 | Phase 04-premium-ui-brand-redesign P05 | 3 | 3 tasks | 7 files |
 | Phase 04-premium-ui-brand-redesign P06 | 6min | 3 tasks | 4 files |
+| Phase 04.1-stitch-react-5-route-conversion P01 | 5min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -148,6 +149,10 @@ Recent decisions affecting current work:
 - [Phase 04]: Login hero reuses 04-03 public PNG; no Higgsfield; canvas bg-background
 - [Phase 04-06]: Canvas --background SSOT is Pale Oatmeal #F7F7F5 / Deep Charcoal #111110 across IIFE, PAINT_*, and both globals.css (G-04-1, G-04-2)
 - [Phase ?]: Option A: Phase 4.1 stitch-build 5 routes before PDF; Phase 5.1 extended catalog after Phase 5
+- [Phase 04.1]: Packages installed only after human typed packages verified (Task 1 blocking-human closed 2026-08-27)
+- [Phase 04.1]: No @types/pngjs — pixel-diff.mjs is Node ESM; tsc include is src only
+- [Phase 04.1]: gitignore scripts/ scoped to /scripts/ so apps/desktop/scripts/pixel-diff.mjs can be tracked
+- [Phase 04.1]: stitch:validate wraps stitch-build validate.js at the resolved plugin cache path
 
 ### Pending Todos
 
@@ -179,9 +184,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-25T00:54:08.054Z
-Stopped at: Phase 04.1 UI-SPEC approved
-Resume file: /Users/puzzless/Desktop/claredtool/.planning/phases/04.1-stitch-react-5-route-conversion/04.1-UI-SPEC.md
+Last session: 2026-08-27T03:20:25.101Z
+Stopped at: Completed 04.1-01-PLAN.md
+Resume file: None
 
 ## Rebuild Log
 
