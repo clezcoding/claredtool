@@ -135,6 +135,10 @@
     "prevPage": "Vorherige Seite",
     "nextPage": "Nächste Seite",
     "pagination": "{{from}}–{{to}} von {{total}}",
+    "cancel": "Abbrechen",
+    "createSubmit": "Anlegen",
+    "entityModalBody": "Name, Land und Rechtsform der Geschäftseinheit.",
+    "kundeModalBody": "Firma und Stammdaten des Kunden.",
     "tabs": {
       "master": "Stammdaten",
       "tax": "Steuer",

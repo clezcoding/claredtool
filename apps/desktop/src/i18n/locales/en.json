@@ -135,6 +135,10 @@
     "prevPage": "Previous page",
     "nextPage": "Next page",
     "pagination": "{{from}}–{{to}} of {{total}}",
+    "cancel": "Cancel",
+    "createSubmit": "Create",
+    "entityModalBody": "Name, country, and legal form for the business entity.",
+    "kundeModalBody": "Company and master data for the customer.",
     "tabs": {
       "master": "Master data",
       "tax": "Tax",

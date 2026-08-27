@@ -74,6 +74,8 @@
   --entity-avatar: #1b3d45;
   --customer-avatar: #d32f2f;
   --customer-avatar-soft: #ffebee;
+  --success: #2E7342;
+  --danger: #D74D3F;
 }
 
 .dark {
@@ -108,6 +110,8 @@
   --entity-avatar: #1b3d45;
   --customer-avatar: #d32f2f;
   --customer-avatar-soft: #ffebee;
+  --success: #2E7342;
+  --danger: #D74D3F;
 }
 
 .tabular-nums {

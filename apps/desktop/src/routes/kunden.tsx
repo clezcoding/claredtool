@@ -6,6 +6,13 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   Input,
   Label,
 } from "@clared/ui";
@@ -39,7 +46,7 @@ type CustomerRow = {
   entityName: string;
 };
 
-type PanelMode = "none" | "detail" | "create";
+type PanelMode = "none" | "detail";
 
 const CREATE_DEFAULTS = {
   entityId: "",
@@ -80,6 +87,7 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
   const [loadError, setLoadError] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [panelMode, setPanelMode] = useState<PanelMode>("none");
+  const [createOpen, setCreateOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [createForm, setCreateForm] = useState(CREATE_DEFAULTS);
   const [fieldError, setFieldError] = useState<string | null>(null);
@@ -117,7 +125,7 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
   }, [loadData]);
 
   useEffect(() => {
-    if (loading || customers.length === 0 || panelMode === "create") return;
+    if (loading || customers.length === 0) return;
     if (selectedId == null || !customers.some((row) => row.id === selectedId)) {
       setSelectedId(customers[0].id);
       setPanelMode("detail");
@@ -162,6 +170,7 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
       }
       const created = (await res.json()) as Omit<CustomerRow, "entityName">;
       await loadData();
+      setCreateOpen(false);
       setSelectedId(created.id);
       setPanelMode("detail");
       setCreateForm(CREATE_DEFAULTS);
@@ -171,8 +180,7 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
   }
 
   function openCreate() {
-    setSelectedId(null);
-    setPanelMode("create");
+    setCreateOpen(true);
     setFieldError(null);
     setCreateForm(CREATE_DEFAULTS);
   }
@@ -184,11 +192,6 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
   }
 
   function closePanel() {
-    if (panelMode === "create" && customers[0]) {
-      setSelectedId(customers[0].id);
-      setPanelMode("detail");
-      return;
-    }
     setPanelMode("none");
     setSelectedId(null);
   }
@@ -314,12 +317,13 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
         disabled={submitting}
         className={PRIMARY_SUBMIT_CLASS}
       >
-        {submitting ? <Spinner /> : "Kunden anlegen"}
+        {submitting ? <Spinner /> : t("registry.createSubmit")}
       </Button>
     </form>
   );
 
   return (
+    <>
     <RegistryListPanel
       title={t("registry.kundenTitle")}
       count={customers.length}
@@ -342,8 +346,23 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
       selectedRow={selectedRow}
       nameColumnHeader={t("registry.kundenTitle")}
       pillColumnHeader={t("registry.entity")}
-      createPanel={createPanel}
+      createPanel={null}
       detailTestId="kunden-detail"
     />
+    <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+      <DialogContent className="sm:max-w-[560px]" showCloseButton>
+        <DialogHeader>
+          <DialogTitle>{t("registry.newKunde")}</DialogTitle>
+          <DialogDescription>{t("registry.kundeModalBody")}</DialogDescription>
+        </DialogHeader>
+        {createPanel}
+        <DialogFooter>
+          <DialogClose className="inline-flex h-11 items-center rounded-lg border px-5 text-sm">
+            {t("registry.cancel")}
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

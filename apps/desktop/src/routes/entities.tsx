@@ -6,6 +6,13 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   Input,
   Label,
 } from "@clared/ui";
@@ -35,7 +42,7 @@ type EntityRow = {
   vatId: string | null;
 };
 
-type PanelMode = "none" | "detail" | "create";
+type PanelMode = "none" | "detail";
 
 const CREATE_DEFAULTS = {
   name: "",
@@ -74,6 +81,7 @@ export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
   const [loadError, setLoadError] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [panelMode, setPanelMode] = useState<PanelMode>("none");
+  const [createOpen, setCreateOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [createForm, setCreateForm] = useState(CREATE_DEFAULTS);
   const [fieldError, setFieldError] = useState<string | null>(null);
@@ -98,7 +106,7 @@ export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
   }, [loadEntities]);
 
   useEffect(() => {
-    if (loading || entities.length === 0 || panelMode === "create") return;
+    if (loading || entities.length === 0) return;
     if (selectedId == null || !entities.some((row) => row.id === selectedId)) {
       setSelectedId(entities[0].id);
       setPanelMode("detail");
@@ -146,6 +154,7 @@ export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
       }
       const created = (await res.json()) as EntityRow;
       await loadEntities();
+      setCreateOpen(false);
       setSelectedId(created.id);
       setPanelMode("detail");
       setCreateForm(CREATE_DEFAULTS);
@@ -155,8 +164,7 @@ export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
   }
 
   function openCreate() {
-    setSelectedId(null);
-    setPanelMode("create");
+    setCreateOpen(true);
     setFieldError(null);
     setCreateForm(CREATE_DEFAULTS);
   }
@@ -168,11 +176,6 @@ export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
   }
 
   function closePanel() {
-    if (panelMode === "create" && entities[0]) {
-      setSelectedId(entities[0].id);
-      setPanelMode("detail");
-      return;
-    }
     setPanelMode("none");
     setSelectedId(null);
   }
@@ -299,12 +302,13 @@ export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
         disabled={submitting}
         className={PRIMARY_SUBMIT_CLASS}
       >
-        {submitting ? <Spinner /> : "Entity anlegen"}
+        {submitting ? <Spinner /> : t("registry.createSubmit")}
       </Button>
     </form>
   );
 
   return (
+    <>
     <RegistryListPanel
       title={t("registry.entitiesTitle")}
       count={entities.length}
@@ -328,8 +332,25 @@ export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
       selectedRow={selectedRow}
       nameColumnHeader={t("registry.entitiesTitle")}
       pillColumnHeader={t("registry.legalForm")}
-      createPanel={createPanel}
+      createPanel={null}
       detailTestId="entity-detail"
     />
+    <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+      <DialogContent className="sm:max-w-[560px]" showCloseButton>
+        <DialogHeader>
+          <DialogTitle className="text-[32px] leading-tight">
+            {t("registry.newEntity")}
+          </DialogTitle>
+          <DialogDescription>{t("registry.entityModalBody")}</DialogDescription>
+        </DialogHeader>
+        {createPanel}
+        <DialogFooter>
+          <DialogClose className="inline-flex h-11 items-center rounded-lg border px-6 text-sm">
+            {t("registry.cancel")}
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
