@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 17
+open_count: 21
 waived_count: 1
 fixed_count: 2
-total_count: 20
-last_updated: 2026-08-27T04:10:57.947Z
+total_count: 24
+last_updated: 2026-08-27T04:24:43.075Z
 ---
 
 # Broken Windows Ledger
@@ -35,6 +35,10 @@ last_updated: 2026-08-27T04:10:57.947Z
 | 18 | 04.1 | stub | apps/desktop/src/routes/rechnung.tsx | 1281 | Delete AlertDialog confirm closes overlay only; invoice DELETE not in this plan | open |  | 2026-08-27T03:54:19.019Z |  |
 | 19 | 04.1 | stub | apps/desktop/src/routes/rechnung.tsx | 1217 | Save-template and duplicate menu items close menu only; persist APIs out of scope | open |  | 2026-08-27T03:54:19.112Z |  |
 | 20 | 04.1 | stub | apps/desktop/src/components/registry-list-panel.tsx | 558 | Bank IBAN/BIC/Bankname render — until an API exists (D-14) | open |  | 2026-08-27T04:10:57.947Z |  |
+| 21 | 04.1 | stub | apps/desktop/src/routes/tax.tsx |  | Neu ordnen Bald toast — no rule-reorder API (A5) | open |  | 2026-08-27T04:24:42.814Z |  |
+| 22 | 04.1 | stub | apps/desktop/src/routes/tax.tsx |  | Dialog Regel speichern Bald + close — no rule-write API (A5) | open |  | 2026-08-27T04:24:42.903Z |  |
+| 23 | 04.1 | stub | apps/desktop/src/routes/tax.tsx |  | modal Bedingung hinzufügen / delete Bald — chrome only until data plan | open |  | 2026-08-27T04:24:42.988Z |  |
+| 24 | 04.1 | deviation | apps/desktop/src/__tests__/routes.test.tsx |  | Updated Tax heading Tax Rules → Steuerregeln so sidebar tests match i18n H1 | open |  | 2026-08-27T04:24:43.075Z |  |
 
 ````json
 [
@@ -276,6 +280,54 @@ last_updated: 2026-08-27T04:10:57.947Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-27T04:10:57.947Z",
+    "resolved_at": null
+  },
+  {
+    "id": 21,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/tax.tsx",
+    "line": null,
+    "description": "Neu ordnen Bald toast — no rule-reorder API (A5)",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T04:24:42.814Z",
+    "resolved_at": null
+  },
+  {
+    "id": 22,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/tax.tsx",
+    "line": null,
+    "description": "Dialog Regel speichern Bald + close — no rule-write API (A5)",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T04:24:42.903Z",
+    "resolved_at": null
+  },
+  {
+    "id": 23,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/tax.tsx",
+    "line": null,
+    "description": "modal Bedingung hinzufügen / delete Bald — chrome only until data plan",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T04:24:42.988Z",
+    "resolved_at": null
+  },
+  {
+    "id": 24,
+    "kind": "deviation",
+    "phase": "04.1",
+    "file": "apps/desktop/src/__tests__/routes.test.tsx",
+    "line": null,
+    "description": "Updated Tax heading Tax Rules → Steuerregeln so sidebar tests match i18n H1",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T04:24:43.075Z",
     "resolved_at": null
   }
 ]

@@ -179,7 +179,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Crafted Minimal tokens (Phase 4) + German primary copy (D-15); conversion acceptance in `.stitch/qa/STITCH-APPROVAL-BACKLOG.md` met
   5. P1 backlog R-01–R-04 addressed or filed with residual notes; stitch-build skills used as the conversion path
 
-**Plans:** 4/7 plans executed
+**Plans:** 5/7 plans executed
 **UI hint**: yes
 
 Plans:
@@ -201,7 +201,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 04.1-05-PLAN.md — Tax Stitch UI + tax-live-store (F-05)
+- [x] 04.1-05-PLAN.md — Tax Stitch UI + tax-live-store (F-05)
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
@@ -237,7 +237,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 5 → 5.1 → 6
 | 2. Self-Hosted Backend & Authentik SSO | 7/7 | Complete | 2026-08-22 |
 | 3. Entities, Invoices & Live Tax | 6/6 | Complete | 2026-08-22 |
 | 4. Premium UI & Brand Redesign | 6/6 | Complete | 2026-08-25 |
-| 4.1 Stitch→React 5-route conversion | 4/7 | In Progress|  |
+| 4.1 Stitch→React 5-route conversion | 5/7 | In Progress|  |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |
 | 6. Mockup 1:1 Fidelity Closure | 0/? | Not started | - |
