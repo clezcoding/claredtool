@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 21
+open_count: 23
 waived_count: 1
 fixed_count: 2
-total_count: 24
-last_updated: 2026-08-27T04:24:43.075Z
+total_count: 26
+last_updated: 2026-08-27T05:15:02.518Z
 ---
 
 # Broken Windows Ledger
@@ -39,6 +39,8 @@ last_updated: 2026-08-27T04:24:43.075Z
 | 22 | 04.1 | stub | apps/desktop/src/routes/tax.tsx |  | Dialog Regel speichern Bald + close — no rule-write API (A5) | open |  | 2026-08-27T04:24:42.903Z |  |
 | 23 | 04.1 | stub | apps/desktop/src/routes/tax.tsx |  | modal Bedingung hinzufügen / delete Bald — chrome only until data plan | open |  | 2026-08-27T04:24:42.988Z |  |
 | 24 | 04.1 | deviation | apps/desktop/src/__tests__/routes.test.tsx |  | Updated Tax heading Tax Rules → Steuerregeln so sidebar tests match i18n H1 | open |  | 2026-08-27T04:24:43.075Z |  |
+| 25 | 04.1 | stub | apps/desktop/src/routes/pdf.tsx |  | download/email/print/full audit Bald toast — D-39 Phase 5 | open |  | 2026-08-27T05:15:02.431Z |  |
+| 26 | 04.1 | stub | apps/desktop/src/components/export-panel.tsx |  | DATEV generate/row download/show-all/advisor Bald toast — D-40 Phase 5 | open |  | 2026-08-27T05:15:02.518Z |  |
 
 ````json
 [
@@ -328,6 +330,30 @@ last_updated: 2026-08-27T04:24:43.075Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-27T04:24:43.075Z",
+    "resolved_at": null
+  },
+  {
+    "id": 25,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/pdf.tsx",
+    "line": null,
+    "description": "download/email/print/full audit Bald toast — D-39 Phase 5",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T05:15:02.431Z",
+    "resolved_at": null
+  },
+  {
+    "id": 26,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/components/export-panel.tsx",
+    "line": null,
+    "description": "DATEV generate/row download/show-all/advisor Bald toast — D-40 Phase 5",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T05:15:02.518Z",
     "resolved_at": null
   }
 ]
