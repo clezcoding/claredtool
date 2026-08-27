@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.1
 current_phase_name: Stitch→React 5-route conversion
 status: executing
-stopped_at: Completed 04.1-03-PLAN.md
-last_updated: "2026-08-27T03:54:29.171Z"
+stopped_at: Completed 04.1-04-PLAN.md
+last_updated: "2026-08-27T04:10:59.087Z"
 last_activity: 2026-08-27
 last_activity_desc: Phase 04.1 execution started
-state_head: b5fa0eadfa592574c5aeb954b68fd631fafd3dd4
+state_head: 94ff28eca3c35750df079ff84154ca288e210a0f
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 31
-  completed_plans: 27
+  completed_plans: 28
 milestone_name: milestone
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 Status: Ready to execute
 Phase: 04.1 (Stitch→React 5-route conversion) — EXECUTING
-Plan: 4 of 7
+Plan: 5 of 7
 Phase 04 (Premium UI & Brand Redesign) — complete 2026-08-25
 Phase 04.1 (Stitch→React 5-route) — **NEXT** execute (7 plans finalized)
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.1
@@ -88,6 +88,7 @@ Progress: [██████░░░░] 60%
 | Phase 04.1-stitch-react-5-route-conversion P01 | 5min | 2 tasks | 12 files |
 | Phase 04.1 P02 | 10min | 2 tasks | 12 files |
 | Phase 04.1 P03 | 18 | 3 tasks | 13 files |
+| Phase 04.1 P04 | 12min | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -160,6 +161,10 @@ Recent decisions affecting current work:
 - [Phase 04.1]: Entities ligature domain and PDF ligature picture_as_pdf are D-45 nearest matches
 - [Phase 04.1]: Header Neue Rechnung stays startNewDraft(); Stitch 23 opens from Weitere Aktionen
 - [Phase 04.1]: 29/40 overlays use Dialog so D-35/D-36 smoke covers all Rechnung modals
+- [Phase 04.1]: Single registry-list-panel module; no forked List+Panel trees
+- [Phase 04.1]: Create is Dialog overlay (24/26), not the inspector create panel; F-08 detail stays behind the modal
+- [Phase 04.1]: Sage selected row uses bg-brand-soft/30 + 3px primary-container rail; CTA uses primary-container not Stitch #1f432d primary (BRAND-01 sage reserved)
+- [Phase 04.1]: Bank IBAN/BIC render — until an API exists (D-14); no fake 12-entity volume (D-28)
 
 ### Pending Todos
 
@@ -191,8 +196,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-27T03:54:29.047Z
-Stopped at: Completed 04.1-03-PLAN.md
+Last session: 2026-08-27T04:10:58.993Z
+Stopped at: Completed 04.1-04-PLAN.md
 Resume file: None
 
 ## Rebuild Log

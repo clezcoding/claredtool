@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 16
+open_count: 17
 waived_count: 1
 fixed_count: 2
-total_count: 19
-last_updated: 2026-08-27T03:54:19.112Z
+total_count: 20
+last_updated: 2026-08-27T04:10:57.947Z
 ---
 
 # Broken Windows Ledger
@@ -34,6 +34,7 @@ last_updated: 2026-08-27T03:54:19.112Z
 | 17 | 04.1 | stub | apps/desktop/src/routes/rechnung.tsx | 1199 | Send dialog Senden closes overlay only; no email API this wave | open |  | 2026-08-27T03:54:18.913Z |  |
 | 18 | 04.1 | stub | apps/desktop/src/routes/rechnung.tsx | 1281 | Delete AlertDialog confirm closes overlay only; invoice DELETE not in this plan | open |  | 2026-08-27T03:54:19.019Z |  |
 | 19 | 04.1 | stub | apps/desktop/src/routes/rechnung.tsx | 1217 | Save-template and duplicate menu items close menu only; persist APIs out of scope | open |  | 2026-08-27T03:54:19.112Z |  |
+| 20 | 04.1 | stub | apps/desktop/src/components/registry-list-panel.tsx | 558 | Bank IBAN/BIC/Bankname render — until an API exists (D-14) | open |  | 2026-08-27T04:10:57.947Z |  |
 
 ````json
 [
@@ -263,6 +264,18 @@ last_updated: 2026-08-27T03:54:19.112Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-27T03:54:19.112Z",
+    "resolved_at": null
+  },
+  {
+    "id": 20,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/components/registry-list-panel.tsx",
+    "line": 558,
+    "description": "Bank IBAN/BIC/Bankname render — until an API exists (D-14)",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T04:10:57.947Z",
     "resolved_at": null
   }
 ]
