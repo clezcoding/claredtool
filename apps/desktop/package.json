@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "test": "vitest run",
-    "stitch:validate": "node /Users/puzzless/.cursor/plugins/cache/google-labs-code-stitch-skills/stitch-build/0337446dadde6f8c94210444e2aa9d546126480f/skills/react-components/scripts/validate.js"
+    "stitch:validate": "node ./scripts/stitch-validate.mjs"
   },
   "dependencies": {
     "@clared/ui": "workspace:*",

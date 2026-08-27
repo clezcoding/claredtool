@@ -17,9 +17,9 @@ const NAV_ITEMS = [
 ] as const;
 
 const ACTIVE_NAV_CLASS =
-  "relative flex h-12 items-center gap-3 rounded-lg bg-primary/20 px-3 font-semibold text-foreground after:absolute after:inset-y-1.5 after:left-0 after:w-[3px] after:rounded-full after:bg-[var(--nav-active-bar)] after:content-[''] dark:bg-primary/15";
+  "relative flex h-12 items-center gap-3 rounded-lg bg-brand-soft px-3 font-semibold text-foreground after:absolute after:inset-y-1.5 after:left-0 after:w-[3px] after:rounded-full after:bg-[var(--nav-active-bar)] after:content-[''] dark:bg-brand-soft";
 const INACTIVE_NAV_CLASS =
-  "relative flex h-12 items-center gap-3 rounded-lg px-3 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground dark:hover:bg-card";
+  "relative flex h-12 items-center gap-3 rounded-lg px-3 text-muted-foreground transition-colors hover:bg-surface-container-low hover:text-foreground dark:hover:bg-surface-elevated-dark";
 
 export function AppShell(_props: AppShellProps = {}) {
   const { t } = useTranslation();
@@ -47,7 +47,7 @@ export function AppShell(_props: AppShellProps = {}) {
 
   return (
     <div className="flex h-screen bg-background text-foreground">
-      <nav className="flex h-full w-[260px] shrink-0 flex-col border-r border-border bg-background px-4 py-8 dark:bg-card">
+      <nav className="flex h-full w-[260px] shrink-0 flex-col border-r border-border bg-background px-4 py-8 dark:bg-surface-dark">
         <div className="mb-8 flex items-center gap-3 px-2 text-foreground">
           <span
             aria-hidden
@@ -92,7 +92,7 @@ export function AppShell(_props: AppShellProps = {}) {
         </div>
 
         <div className="mt-auto flex flex-col gap-2 border-t border-border pt-4">
-          <div className="rounded-lg border border-border bg-muted px-3 py-3 dark:bg-card">
+          <div className="rounded-lg border border-border bg-surface-container-low px-3 py-3 dark:bg-surface-elevated-dark">
             <p className="text-sm font-medium text-foreground">
               {t("shell.upgradeTitle")}
             </p>
@@ -136,11 +136,11 @@ export function AppShell(_props: AppShellProps = {}) {
       </nav>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex h-[72px] shrink-0 items-center justify-end border-b border-border bg-background px-8 dark:bg-card">
+        <header className="flex h-[72px] shrink-0 items-center justify-end border-b border-border bg-background px-8 dark:bg-surface-dark">
           <button
             type="button"
             aria-label={t("cmdk.label")}
-            className="flex h-10 items-center gap-3 rounded-lg border border-border bg-muted px-3 text-sm text-muted-foreground dark:bg-card"
+            className="flex h-10 items-center gap-3 rounded-lg border border-border bg-surface-container-low px-3 text-sm text-muted-foreground dark:bg-surface-elevated-dark"
             onClick={showBald}
           >
             <MaterialIcon ligature="search" className="text-[20px]" />
