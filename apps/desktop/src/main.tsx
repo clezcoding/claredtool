@@ -1,6 +1,6 @@
 import "@fontsource-variable/inter";
 import "@fontsource/instrument-serif";
-import "@fontsource-variable/material-symbols-outlined";
+import "@fontsource-variable/material-symbols-outlined/full.css";
 import "./i18n";
 import React from "react";
 import ReactDOM from "react-dom/client";

@@ -197,4 +197,23 @@
     font-weight: 400;
     line-height: 1.5;
   }
+
+  /* Fontsource only ships @font-face. Without this, body Inter wins and ligatures render as receipt_long. */
+  .material-symbols-outlined {
+    font-family: "Material Symbols Outlined Variable", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "liga";
+  }
+
+  .material-symbols-outlined * {
+    font-family: inherit;
+    font-feature-settings: inherit;
+  }
 }
