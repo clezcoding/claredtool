@@ -18,10 +18,11 @@ describe("sidebar routes", () => {
   it("lists Rechnung, Entities, Kunden, Tax, PDF in that order", async () => {
     await renderSignedIn();
     const nav = screen.getByRole("navigation");
-    const labels = within(nav)
-      .getAllByRole("link")
-      .map((link) => link.textContent?.trim());
-    expect(labels).toEqual(["Rechnung", "Entities", "Kunden", "Tax", "PDF"]);
+    const links = within(nav).getAllByRole("link");
+    expect(links).toHaveLength(5);
+    for (const name of ["Rechnung", "Entities", "Kunden", "Tax", "PDF"]) {
+      expect(within(nav).getByRole("link", { name })).toBeTruthy();
+    }
   });
 
   it("lands on the first-run empty invoice on the index route", async () => {

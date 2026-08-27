@@ -75,10 +75,18 @@ describe("AppShell", () => {
   it("renders exactly five nav links: Rechnung, Entities, Kunden, Tax, PDF", () => {
     renderShell();
     const nav = screen.getByRole("navigation");
-    const labels = within(nav)
-      .getAllByRole("link")
-      .map((link) => link.textContent?.replace(/\s+/g, " ").trim());
-    expect(labels).toEqual(["Rechnung", "Entities", "Kunden", "Tax", "PDF"]);
+    const links = within(nav).getAllByRole("link");
+    expect(links).toHaveLength(5);
+    expect(links.map((link) => link.getAttribute("href"))).toEqual([
+      "/",
+      "/entities",
+      "/kunden",
+      "/tax",
+      "/pdf",
+    ]);
+    for (const name of ["Rechnung", "Entities", "Kunden", "Tax", "PDF"]) {
+      expect(within(nav).getByRole("link", { name })).toBeTruthy();
+    }
   });
 
   it("sidebar uses w-[260px] and header uses h-[72px]", () => {

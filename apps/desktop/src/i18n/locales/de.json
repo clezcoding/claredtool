@@ -24,7 +24,16 @@
     }
   },
   "cmdk": {
-    "bald": "Bald"
+    "bald": "Bald",
+    "label": "Befehlspalette",
+    "hint": "Suchen",
+    "shortcut": "⌘K"
+  },
+  "shell": {
+    "tagline": "Buchhaltung",
+    "upgradeTitle": "Clared Pro",
+    "upgradeBody": "Mehr Sitze, Audit-Export und Prioritäts-Support.",
+    "upgradeCta": "Upgrade"
   },
   "persona": {
     "name": "Alexander Wagner",

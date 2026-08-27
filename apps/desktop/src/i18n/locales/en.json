@@ -24,7 +24,16 @@
     }
   },
   "cmdk": {
-    "bald": "Coming soon"
+    "bald": "Coming soon",
+    "label": "Command palette",
+    "hint": "Search",
+    "shortcut": "⌘K"
+  },
+  "shell": {
+    "tagline": "Accounting",
+    "upgradeTitle": "Clared Pro",
+    "upgradeBody": "More seats, audit export, and priority support.",
+    "upgradeCta": "Upgrade"
   },
   "persona": {
     "name": "Alexander Wagner",
