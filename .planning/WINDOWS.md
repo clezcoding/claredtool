@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 11
+open_count: 13
 waived_count: 1
 fixed_count: 2
-total_count: 14
-last_updated: 2026-08-23T03:37:27.623Z
+total_count: 16
+last_updated: 2026-08-27T03:32:20.656Z
 ---
 
 # Broken Windows Ledger
@@ -29,6 +29,8 @@ last_updated: 2026-08-23T03:37:27.623Z
 | 12 | 02 | deviation | apps/backend/test/auth.e2e-spec.ts |  | e2e seeds tickets and listen(0) for parallel GETDEL | open |  | 2026-08-22T01:46:25.164Z |  |
 | 13 | 04 | deviation | apps/desktop/src/components/invoice-empty-state.tsx |  | CTA Beispielrechnung anzeigen restored; focuses form instead of sample restore (Phase 3) | open |  | 2026-08-23T01:18:49.549Z |  |
 | 14 | 04 | unrun-verify | apps/desktop/index.html |  | Human cold-launch FOUC/splash check (04-UAT tests 1–3) not run in this executor | open |  | 2026-08-23T03:37:27.623Z |  |
+| 15 | 04.1 | stub | apps/desktop/src/components/app-shell.tsx |  | Upgrade CTA is local Bald toast only (D-53, T-04.1-03); no billing route | open |  | 2026-08-27T03:32:20.564Z |  |
+| 16 | 04.1 | stub | apps/desktop/src/components/app-shell.tsx |  | ⌘K chrome is Bald-only; full command palette deferred to Phase 5.1 (D-51/D-28) | open |  | 2026-08-27T03:32:20.656Z |  |
 
 ````json
 [
@@ -198,6 +200,30 @@ last_updated: 2026-08-23T03:37:27.623Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-23T03:37:27.623Z",
+    "resolved_at": null
+  },
+  {
+    "id": 15,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/components/app-shell.tsx",
+    "line": null,
+    "description": "Upgrade CTA is local Bald toast only (D-53, T-04.1-03); no billing route",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T03:32:20.564Z",
+    "resolved_at": null
+  },
+  {
+    "id": 16,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/components/app-shell.tsx",
+    "line": null,
+    "description": "⌘K chrome is Bald-only; full command palette deferred to Phase 5.1 (D-51/D-28)",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T03:32:20.656Z",
     "resolved_at": null
   }
 ]

@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.1
 current_phase_name: Stitch→React 5-route conversion
 status: executing
-stopped_at: Completed 04.1-01-PLAN.md
-last_updated: "2026-08-27T03:20:25.170Z"
+stopped_at: Completed 04.1-02-PLAN.md
+last_updated: "2026-08-27T03:33:14.406Z"
 last_activity: 2026-08-27
 last_activity_desc: Phase 04.1 execution started
-state_head: 66be5d6390d162b1e4772e0e0441c74e5d9823c0
+state_head: c4458081092aa2033ec0163fef974db9518e80b6
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 31
-  completed_plans: 25
+  completed_plans: 26
 milestone_name: milestone
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 Status: Ready to execute
 Phase: 04.1 (Stitch→React 5-route conversion) — EXECUTING
-Plan: 2 of 7
+Plan: 3 of 7
 Phase 04 (Premium UI & Brand Redesign) — complete 2026-08-25
 Phase 04.1 (Stitch→React 5-route) — **NEXT** execute (7 plans finalized)
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.1
@@ -86,6 +86,7 @@ Progress: [██████░░░░] 60%
 | Phase 04-premium-ui-brand-redesign P05 | 3 | 3 tasks | 7 files |
 | Phase 04-premium-ui-brand-redesign P06 | 6min | 3 tasks | 4 files |
 | Phase 04.1-stitch-react-5-route-conversion P01 | 5min | 2 tasks | 12 files |
+| Phase 04.1 P02 | 10min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -153,6 +154,9 @@ Recent decisions affecting current work:
 - [Phase 04.1]: No @types/pngjs — pixel-diff.mjs is Node ESM; tsc include is src only
 - [Phase 04.1]: gitignore scripts/ scoped to /scripts/ so apps/desktop/scripts/pixel-diff.mjs can be tracked
 - [Phase 04.1]: stitch:validate wraps stitch-build validate.js at the resolved plugin cache path
+- [Phase 04.1]: Five nav items only; Stitch catalog sidebar items stay out (D-11/D-13)
+- [Phase 04.1]: R-01 360px was tax rail LAYOUT_TAX_RAIL_WIDTH; nav SSOT is 260px from 02-rechnung-light
+- [Phase 04.1]: Entities ligature domain and PDF ligature picture_as_pdf are D-45 nearest matches
 
 ### Pending Todos
 
@@ -184,8 +188,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-27T03:20:25.101Z
-Stopped at: Completed 04.1-01-PLAN.md
+Last session: 2026-08-27T03:33:14.343Z
+Stopped at: Completed 04.1-02-PLAN.md
 Resume file: None
 
 ## Rebuild Log
