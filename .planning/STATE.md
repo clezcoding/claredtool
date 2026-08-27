@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04.1
 current_phase_name: Stitch→React 5-route conversion
-status: executing
-stopped_at: Completed 04.1-06-PLAN.md
-last_updated: "2026-08-27T05:15:03.841Z"
-last_activity: 2026-08-27
+status: verifying
+stopped_at: Completed 04.1-07-PLAN.md
+last_updated: "2026-08-27T23:41:30.266Z"
+last_activity: 2026-08-28
 last_activity_desc: Phase 04.1 execution started
-state_head: d2ffd0076c190205a6cd3bec9d8a3b3fef20afb5
+state_head: 66ae2f96c387879a009d494635831493e9ed36a0
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 31
-  completed_plans: 30
+  completed_plans: 31
 milestone_name: milestone
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 ## Current Position
 
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Phase: 04.1 (Stitch→React 5-route conversion) — EXECUTING
 Plan: 7 of 7
 Phase 04 (Premium UI & Brand Redesign) — complete 2026-08-25
@@ -36,7 +36,7 @@ Phase 04.1 (Stitch→React 5-route) — **NEXT** execute (7 plans finalized)
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.1
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-08-27 — Phase 04.1 execution started
+Last activity: 2026-08-28 — Phase 04.1 execution started
 
 Progress: [██████░░░░] 60%
 
@@ -91,6 +91,7 @@ Progress: [██████░░░░] 60%
 | Phase 04.1 P04 | 12min | 2 tasks | 14 files |
 | Phase 04.1-stitch-react-5-route-conversion P05 | 11min | 2 tasks | 10 files |
 | Phase 04.1-stitch-react-5-route-conversion P06 | 48 | 2 tasks | 11 files |
+| Phase 04.1 P07 | 25min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -174,6 +175,8 @@ Recent decisions affecting current work:
 - [Phase 04.1]: EN/DE is Dokumentensprache on PdfPaper, not i18n.changeLanguage
 - [Phase 04.1]: 15-export mounts below the 07 viewer on /pdf (D-12); NAV_ITEMS stays 5
 - [Phase 04.1]: DATEV #00AA13 is --datev for the brand chip only; generate CTA uses primary-container
+- [Phase 04.1]: Human 2026-08-28 phase6: transfer F-09 threshold-0 FAIL (02–07) to Phase 06. D-11 five-nav vs catalog mockups. Pixel gate residual-closed, not PASS. — Named residual D-09/D-27; Kaneo #70.
+- [Phase 04.1]: Capture inner 1536x1024 requires fullscreen first; WKWebView native shot is 2x even-pixel CSS subsample. — Windowed availHeight ~1005 cannot fit inner 1536x1024.
 
 ### Pending Todos
 
@@ -205,8 +208,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-27T05:15:03.768Z
-Stopped at: Completed 04.1-06-PLAN.md
+Last session: 2026-08-27T23:40:58.621Z
+Stopped at: Completed 04.1-07-PLAN.md
 Resume file: None
 
 ## Rebuild Log
