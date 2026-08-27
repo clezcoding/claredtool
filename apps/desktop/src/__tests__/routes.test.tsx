@@ -38,7 +38,7 @@ describe("sidebar routes", () => {
     ["Entities", "Geschäftseinheiten"],
     ["Kunden", "Kunden"],
     ["Tax", "Steuerregeln"],
-    ["PDF", "PDF Viewer / Export"],
+    ["PDF", "PDF-Vorschau / Export"],
   ] as const)("navigates to %s without a blank page", async (linkLabel, heading) => {
     await renderSignedIn();
     fireEvent.click(screen.getByRole("link", { name: linkLabel }));

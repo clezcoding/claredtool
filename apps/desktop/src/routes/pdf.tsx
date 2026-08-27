@@ -2,6 +2,7 @@ import { useCallback, useState, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { ErrorState } from "../components/error-state";
+import { ExportPanel } from "../components/export-panel";
 import { MaterialIcon } from "../components/material-icon";
 import { PdfPaper } from "../components/pdf-paper";
 import { SAMPLE_INVOICE } from "../data/sample-invoice";
@@ -59,7 +60,8 @@ export function PdfScreen({ demoState = "populated" }: PdfScreenProps = {}) {
   }, [t]);
 
   return (
-    <div className="flex h-full min-h-0 bg-background">
+    <div className="flex min-h-full flex-col bg-background">
+      <div className="flex min-h-full min-w-0 flex-1">
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex h-[72px] shrink-0 items-center justify-between border-b border-border px-8">
           <div className="flex items-center gap-6">
@@ -117,7 +119,7 @@ export function PdfScreen({ demoState = "populated" }: PdfScreenProps = {}) {
           </p>
         ) : null}
 
-        <div className="relative flex min-h-0 flex-1 items-start justify-center overflow-auto bg-muted/40 p-8 dark:bg-[#090B0B]">
+        <div className="relative flex min-h-0 flex-1 items-start justify-center overflow-auto bg-muted/40 p-8 dark:bg-canvas-dark">
           {demoState === "loading" ? (
             <div
               role="progressbar"
@@ -145,8 +147,8 @@ export function PdfScreen({ demoState = "populated" }: PdfScreenProps = {}) {
       </div>
 
       {fullscreen ? null : (
-        <aside className="flex w-[360px] shrink-0 flex-col overflow-auto border-l border-border bg-card p-6 dark:bg-[#111413]">
-          <div className="mb-6 rounded-xl border border-border bg-background p-5 dark:bg-[#171A18]">
+        <aside className="flex w-[360px] shrink-0 flex-col overflow-auto border-l border-border bg-card p-6 dark:bg-surface-dark">
+          <div className="mb-6 rounded-xl border border-border bg-background p-5 dark:bg-surface-elevated-dark">
             <h3 className="mb-4 text-sm font-semibold text-foreground">{t("pdf.actions")}</h3>
             <div className="flex flex-col gap-3">
               <button
@@ -249,6 +251,8 @@ export function PdfScreen({ demoState = "populated" }: PdfScreenProps = {}) {
           </div>
         </aside>
       )}
+      </div>
+      <ExportPanel />
     </div>
   );
 }

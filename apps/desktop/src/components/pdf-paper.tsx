@@ -1,8 +1,8 @@
 import { SAMPLE_INVOICE } from "../data/sample-invoice";
 
-type PdfPaperProps = {
+export interface PdfPaperProps {
   lang?: "en" | "de";
-};
+}
 
 export function PdfPaper({ lang = "de" }: PdfPaperProps) {
   const invoice = SAMPLE_INVOICE;

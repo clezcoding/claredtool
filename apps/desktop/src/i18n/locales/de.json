@@ -200,5 +200,26 @@
     "zoomOut": "Herauszoomen",
     "zoomIn": "Hineinzoomen",
     "fullscreen": "Vollbild"
+  },
+  "export": {
+    "title": "Export / Buchhaltung",
+    "subtitle": "Monatliche Abschlüsse und Daten für Ihre Buchhaltung.",
+    "datevTitle": "DATEV Export",
+    "datevBody": "Exportieren Sie Ihre Buchungsdaten für DATEV Unternehmen online.",
+    "from": "Zeitraum von",
+    "to": "Zeitraum bis",
+    "generate": "Export generieren",
+    "hint": "Der Export enthält alle relevanten Buchungen, Konten und Belegdaten im DATEV-Format.",
+    "recent": "Letzte Exporte",
+    "period": "Zeitraum",
+    "file": "Export-Datei",
+    "created": "Erstellt am",
+    "status": "Status",
+    "success": "Erfolgreich",
+    "downloadRow": "Export herunterladen",
+    "showAll": "Alle Exporte anzeigen",
+    "advisorTitle": "Steuerberater-Zugang",
+    "advisorBody": "Gewähren Sie Ihrem Steuerberater einfachen und sicheren Zugriff auf Ihre Buchhaltungsdaten.",
+    "advisorCta": "Zugang verwalten"
   }
 }

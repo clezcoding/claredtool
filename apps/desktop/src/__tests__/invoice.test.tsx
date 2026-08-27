@@ -168,7 +168,7 @@ describe("invoice canvas", () => {
     await waitFor(() => {
       expect(
         within(screen.getByRole("main")).getByRole("heading", {
-          name: "PDF Viewer / Export",
+          name: "PDF-Vorschau / Export",
         }),
       ).toBeTruthy();
     });

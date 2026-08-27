@@ -36,6 +36,10 @@
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
   --color-warning-border: var(--warning-border);
+  --color-canvas-dark: var(--canvas-dark);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-secondary-container: var(--secondary-container);
+  --color-datev: var(--datev);
   --color-entity-avatar: var(--entity-avatar);
   --color-customer-avatar: var(--customer-avatar);
   --color-customer-avatar-soft: var(--customer-avatar-soft);
@@ -85,6 +89,10 @@
   --warning: #B96C00;
   --warning-soft: #FFF1D8;
   --warning-border: #f3e1b6;
+  --canvas-dark: #090B0B;
+  --on-secondary-container: #636261;
+  --secondary-container: #E2DFDD;
+  --datev: #00AA13;
 }
 
 .dark {
@@ -124,6 +132,10 @@
   --warning: #B96C00;
   --warning-soft: #3d2e10;
   --warning-border: #B96C00;
+  --canvas-dark: #090B0B;
+  --on-secondary-container: #c9c6c4;
+  --secondary-container: #2A2A28;
+  --datev: #00AA13;
 }
 
 .tabular-nums {

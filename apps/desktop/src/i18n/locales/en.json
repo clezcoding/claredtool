@@ -200,5 +200,26 @@
     "zoomOut": "Zoom out",
     "zoomIn": "Zoom in",
     "fullscreen": "Fullscreen"
+  },
+  "export": {
+    "title": "Export / Bookkeeping",
+    "subtitle": "Monthly closings and data for your bookkeeping.",
+    "datevTitle": "DATEV export",
+    "datevBody": "Export your booking data for DATEV Unternehmen online.",
+    "from": "Period from",
+    "to": "Period to",
+    "generate": "Generate export",
+    "hint": "The export includes all relevant bookings, accounts, and receipt data in DATEV format.",
+    "recent": "Recent exports",
+    "period": "Period",
+    "file": "Export file",
+    "created": "Created",
+    "status": "Status",
+    "success": "Successful",
+    "downloadRow": "Download export",
+    "showAll": "Show all exports",
+    "advisorTitle": "Tax advisor access",
+    "advisorBody": "Give your tax advisor simple and secure access to your bookkeeping data.",
+    "advisorCta": "Manage access"
   }
 }
