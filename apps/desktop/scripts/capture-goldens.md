@@ -9,9 +9,10 @@ Mac-pinned pixel gate. Product window may stay 1280×800 (`tauri.conf.json`). Ca
 
 ## Viewport
 
-1. Force **content size 1536×1024** before each shot (`manage_window` resize, logical pixels).
-2. **Pin `window.devicePixelRatio`** for the session: read it once, record it, do not change scale/zoom between shots. Do not emulate a second DPR. A3 does not retarget the product default window.
-3. If backing-store pixels ≠ 1536×1024, dimension check fails (A1). Do not downscale to fake a PASS.
+1. On a 1728×1117 logical display, windowed `availHeight` (~1005) cannot fit 1536×1024 inner plus titlebar. **Ctrl+Cmd+F** (macOS fullscreen) first, then resize.
+2. Force **content size 1536×1024** (`innerWidth`/`innerHeight`) via `resize_window` logical pixels. Confirm in `execute_js` before each shot.
+3. **Pin `window.devicePixelRatio`** for the session: read it once, record it, do not change scale/zoom between shots. Do not emulate a second DPR. A3 does not retarget the product default window.
+4. WKWebView `capture_native_screenshot` on Retina is 2× CSS. `capture-via-bridge.mjs` keeps the even-pixel CSS grid (3072×2048 → 1536×1024). That is not bilinear shrink of a wrong-size OS grab. Bilinear/`maxWidth` downscale of a mismatched shot remains forbidden (A1).
 
 ## Capture
 
