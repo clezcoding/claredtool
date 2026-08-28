@@ -38,6 +38,11 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
 
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri
+          cache-on-failure: true
+
       - run: pnpm install
 
       - run: pnpm --filter ./apps/desktop tauri build
