@@ -2,9 +2,9 @@
 schema_version: 1
 open_count: 30
 waived_count: 1
-fixed_count: 2
-total_count: 33
-last_updated: 2026-08-28T03:54:59.759Z
+fixed_count: 3
+total_count: 34
+last_updated: 2026-08-28T14:54:50.667Z
 ---
 
 # Broken Windows Ledger
@@ -48,6 +48,7 @@ last_updated: 2026-08-28T03:54:59.759Z
 | 31 | 04.2 | stub | apps/desktop/src/lib/link-guard.ts | 5 | decideLinkAction stub returns block until Plan 03 | open |  | 2026-08-28T03:40:48.167Z |  |
 | 32 | 04.2 | stub | apps/desktop/src/lib/link-guard.ts | 5 | decideLinkAction stub returns block until Plan 03 | open |  | 2026-08-28T03:40:48.272Z |  |
 | 33 | 04.2 | deviation | .planning/phases/04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent/04.2-VALIDATION.md |  | 04.2-03-T3 dragout skipped — human blocked tauri-plugin-dragout; Phase 5 CrabNebula drag | open |  | 2026-08-28T03:54:59.759Z |  |
+| 34 | 04.2 | unrun-verify | apps/desktop/package.json |  | Full desktop vitest suite: clipboard.test.ts fails on pre-existing clipboard.ts stub | fixed |  | 2026-08-28T04:54:25.264Z | 2026-08-28T14:54:50.667Z |
 
 ````json
 [
@@ -446,6 +447,18 @@ last_updated: 2026-08-28T03:54:59.759Z
     "reason": "",
     "recorded_at": "2026-08-28T03:54:59.759Z",
     "resolved_at": null
+  },
+  {
+    "id": 34,
+    "kind": "unrun-verify",
+    "phase": "04.2",
+    "file": "apps/desktop/package.json",
+    "line": null,
+    "description": "Full desktop vitest suite: clipboard.test.ts fails on pre-existing clipboard.ts stub",
+    "status": "fixed",
+    "reason": "",
+    "recorded_at": "2026-08-28T04:54:25.264Z",
+    "resolved_at": "2026-08-28T14:54:50.667Z"
   }
 ]
 ````
