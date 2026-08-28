@@ -1,8 +1,11 @@
 import {
   CheckMenuItem,
   Menu,
+  MenuItem,
   Submenu,
 } from "@tauri-apps/api/menu";
+import i18n from "../i18n";
+import { checkForUpdates } from "./updater";
 import { setThemePref } from "./desktop-store";
 import { applyTheme, currentPref, type ThemePref } from "./theme";
 
@@ -41,8 +44,17 @@ export async function installThemeMenu(): Promise<void> {
       items: [hell, dunkel, system],
     });
 
+    const checkUpdates = await MenuItem.new({
+      id: "check-updates",
+      text: i18n.t("update.menuCheck"),
+      action: () => {
+        void checkForUpdates(true);
+      },
+    });
+
     const menu = await Menu.default();
     await menu.append(darstellung);
+    await menu.append(checkUpdates);
     await menu.setAsAppMenu();
   } catch (err) {
     console.warn("[theme-menu] Darstellung menu install failed:", err);

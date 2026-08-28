@@ -34,4 +34,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 
 requestAnimationFrame(() => {
   void import("./lib/sentry").then(({ initDesktopSentry }) => initDesktopSentry());
+  void import("./lib/updater").then(({ startUpdateScheduler }) =>
+    startUpdateScheduler(),
+  );
 });
