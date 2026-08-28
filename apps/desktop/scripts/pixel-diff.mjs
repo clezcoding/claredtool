@@ -232,7 +232,11 @@ function runManifest(flags) {
     const result = compareResult(expectedPath, actualPath, diffPath, threshold);
     if (result.code > worst) worst = result.code;
     const status =
-      result.code === 0 ? "PASS" : result.error === "missing capture" || result.error?.startsWith("missing") ? "MISSING" : "FAIL";
+      result.code === 0
+        ? "PASS"
+        : result.error === "missing capture" || result.error?.startsWith("missing")
+          ? "MISSING"
+          : "FAIL";
     if (!existsSync(actualPath)) {
       process.stderr.write(`missing capture: ${actualPath}\n`);
       worst = Math.max(worst, 2);
@@ -253,11 +257,10 @@ function runManifest(flags) {
           ? `${result.actualWidth}x${result.actualHeight}`
           : null,
       diffCount: result.diffCount ?? null,
-      result: existsSync(actualPath) ? (result.code === 0 ? "PASS" : "FAIL") : "MISSING",
+      result: existsSync(actualPath) ? status : "MISSING",
       code: existsSync(actualPath) ? result.code : 2,
       error: existsSync(actualPath) ? result.error ?? null : "missing capture",
     });
-    void status;
   }
   const reportPath = join(capturesDir, "pixel-diff-report.json");
   writeFileSync(reportPath, `${JSON.stringify({ threshold, rows }, null, 2)}\n`);
