@@ -80,6 +80,7 @@
   "error": {
     "retry": {
       "title": "Etwas ist schiefgelaufen.",
+      "body": "Ein Fehler ist aufgetreten. Überprüfen Sie Ihre Internetverbindung und laden Sie die Seite neu.",
       "action": "Erneut versuchen"
     }
   },

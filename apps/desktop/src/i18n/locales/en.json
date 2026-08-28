@@ -80,6 +80,7 @@
   "error": {
     "retry": {
       "title": "Something went wrong.",
+      "body": "An error occurred. Check your internet connection and reload the page.",
       "action": "Try again"
     }
   },
