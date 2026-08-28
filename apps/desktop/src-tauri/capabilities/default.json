@@ -13,6 +13,8 @@
     "allow-keychain-set-session",
     "allow-keychain-get-session",
     "allow-keychain-delete-session",
-    "allow-open-login-window"
+    "allow-open-login-window",
+    "window-state:default",
+    "notification:default"
   ]
 }
