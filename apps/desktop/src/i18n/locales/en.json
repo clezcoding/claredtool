@@ -91,6 +91,9 @@
     "hint": "Search",
     "shortcut": "⌘K"
   },
+  "clipboard": {
+    "failed": "Copy failed"
+  },
   "shell": {
     "tagline": "Accounting",
     "upgradeTitle": "Clared Pro",

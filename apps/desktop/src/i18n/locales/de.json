@@ -91,6 +91,9 @@
     "hint": "Suchen",
     "shortcut": "⌘K"
   },
+  "clipboard": {
+    "failed": "Kopieren fehlgeschlagen"
+  },
   "shell": {
     "tagline": "Buchhaltung",
     "upgradeTitle": "Clared Pro",

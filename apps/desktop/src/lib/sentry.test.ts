@@ -1,0 +1,38 @@
+import { describe, expect, it } from "vitest";
+import { scrubSentryEvent } from "./sentry";
+
+describe("sentry scrub (D-40)", () => {
+  it("strips Authorization headers", () => {
+    const scrubbed = scrubSentryEvent({
+      request: { headers: { Authorization: "Bearer secret-token" } },
+    });
+    expect(scrubbed.request?.headers?.Authorization).toBeUndefined();
+  });
+
+  it("redacts token-like strings in extras", () => {
+    const scrubbed = scrubSentryEvent({
+      extra: { access_token: "abc123", note: "ok" },
+    });
+    expect(scrubbed.extra?.access_token).not.toBe("abc123");
+    expect(scrubbed.extra?.note).toBe("ok");
+  });
+
+  it("redacts email addresses", () => {
+    const scrubbed = scrubSentryEvent({
+      extra: { contact: "user@example.com" },
+    });
+    expect(String(scrubbed.extra?.contact)).not.toContain("@");
+  });
+
+  it("redacts invoice customer names in breadcrumbs", () => {
+    const scrubbed = scrubSentryEvent({
+      breadcrumbs: [
+        {
+          message: "invoice viewed",
+          data: { customerName: "Acme GmbH" },
+        },
+      ],
+    });
+    expect(scrubbed.breadcrumbs?.[0]?.data?.customerName).not.toBe("Acme GmbH");
+  });
+});
