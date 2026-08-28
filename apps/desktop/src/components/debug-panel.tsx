@@ -35,12 +35,10 @@ import {
   getUpdateDialogState,
   getUpdateInfo,
 } from "../lib/updater";
+import { UPDATER_ENDPOINT_DEV } from "../lib/updater-endpoint";
 
 /** D-46: panel module is DEV-only — release builds must not mount this component. */
 export const DEBUG_PANEL_ENABLED = import.meta.env.DEV;
-
-const UPDATER_ENDPOINT =
-  "https://updates-staging.puzzlessdev.online/checkVersion?app_name=clared&version={{current_version}}&platform={{target}}&arch={{arch}}&channel=stable&updater=tauri&owner=admin";
 
 const CLIPBOARD_TEST_VALUE = "Clared Debug-Zwischenablage-Test";
 
@@ -306,7 +304,7 @@ export function DebugPanel({
             <Row label="Letzte Prüfung" value={lastCheck} />
             <Row
               label="Endpunkt"
-              value={maskUpdaterEndpoint(UPDATER_ENDPOINT)}
+              value={maskUpdaterEndpoint(UPDATER_ENDPOINT_DEV)}
             />
             <Button
               type="button"
