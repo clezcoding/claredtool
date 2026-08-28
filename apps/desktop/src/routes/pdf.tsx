@@ -7,6 +7,7 @@ import { MaterialIcon } from "../components/material-icon";
 import { PdfPaper } from "../components/pdf-paper";
 import { SAMPLE_INVOICE } from "../data/sample-invoice";
 import { getTaxLiveState, subscribeTaxLive } from "../data/tax-live-store";
+import { taxPercent } from "../lib/money";
 
 export type PdfDemoState = "loading" | "error" | "empty" | "populated";
 
@@ -19,17 +20,13 @@ type AuditStep = { title: string; timestamp: string; actor: string };
 const FOCUS_RING =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
-function vatPct(rate: number): number {
-  return rate <= 1 ? Math.round(rate * 100) : Math.round(rate);
-}
-
 function auditSteps(vatRate: number): AuditStep[] {
   return [
     { title: "Document received", timestamp: "21 Apr 2024, 10:15", actor: "System" },
     { title: "Tax data extracted", timestamp: "21 Apr 2024, 10:15", actor: "AI Engine" },
     { title: "Tax rules applied", timestamp: "21 Apr 2024, 10:15", actor: "Tax Engine" },
     {
-      title: `VAT ${vatPct(vatRate)}% applied`,
+      title: `VAT ${taxPercent(vatRate)}% applied`,
       timestamp: "21 Apr 2024, 10:15",
       actor: "Tax Engine",
     },
