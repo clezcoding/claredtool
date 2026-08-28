@@ -35,6 +35,7 @@ import { MaterialIcon } from "../components/material-icon";
 import { Skeleton } from "../components/skeleton";
 import { Spinner } from "../components/spinner";
 import { TaxRail } from "../components/tax-rail";
+import { taxPercent as taxPercentFromRate } from "../lib/money";
 import {
   resetTaxLiveState,
   setTaxLiveState,
@@ -108,26 +109,33 @@ function formatSavedAgo(timestamp: number, justNow: string, minutesAgo: (mins: n
   return minutesAgo(mins);
 }
 
+function formatIsoLocal(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 function dueDateFromTerms(isoDate: string, days: number): string {
   const date = new Date(isoDate);
   date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
+  return formatIsoLocal(date);
 }
 
 function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
+  return formatIsoLocal(new Date());
 }
 
 function addDaysIso(days: number): string {
   const date = new Date();
   date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
+  return formatIsoLocal(date);
 }
 
 function shiftMonth(iso: string, delta: number): string {
   const date = new Date(`${iso}T00:00:00`);
   date.setMonth(date.getMonth() + delta);
-  return date.toISOString().slice(0, 10);
+  return formatIsoLocal(date);
 }
 
 function monthLabel(iso: string): string {
@@ -564,6 +572,55 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
     setDateField(field);
   }
 
+  async function handleDeleteInvoice() {
+    if (!draftId) {
+      setDeleteOpen(false);
+      return;
+    }
+    const idToDelete = draftId;
+    try {
+      const res = await apiFetch(`/api/invoices/${idToDelete}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("delete failed");
+      const remaining = drafts.filter((row) => row.id !== idToDelete);
+      setDrafts(remaining);
+      setDeleteOpen(false);
+      if (remaining.length === 0) {
+        skipAutosaveRef.current = true;
+        setShowHero(true);
+        setDraftId(null);
+        setIsUnnumberedDraft(false);
+        setRechnungsnummer("");
+        setEntityId(entities.length === 1 ? entities[0].id : "");
+        setCustomerId("");
+        setDatum(todayIso());
+        setFaellig(addDaysIso(30));
+        setCurrency(
+          entities.length === 1
+            ? (entities[0].currencyDefault ?? "EUR")
+            : "EUR",
+        );
+        setLineItems([{ ...BLANK_LINE }]);
+        if (entities.length === 1) {
+          entityDefaultRef.current = entities[0].currencyDefault ?? "EUR";
+          void loadCustomers(entities[0].id);
+        }
+        resetTaxLiveState();
+        lastGoodTaxRef.current = null;
+        setRailTax(null);
+        setTaxEvaluateError(null);
+        queueMicrotask(() => {
+          skipAutosaveRef.current = false;
+        });
+      } else {
+        applyInvoice(remaining[0], entities);
+      }
+    } catch {
+      setDeleteOpen(false);
+    }
+  }
+
   function handlePickerSelect(invoice: InvoiceRow) {
     applyInvoice(invoice, entities);
     resetTaxLiveState();
@@ -575,7 +632,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
   if (!canRead) {
     return (
       <div className="p-6">
-        <ErrorState onRetry={() => undefined} />
+        <ErrorState />
       </div>
     );
   }
@@ -610,8 +667,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
     (sum, item) => sum + item.menge * item.einzelpreis,
     0,
   );
-  const rate = railTax?.invoice_tax_rate ?? 0;
-  const taxPercent = rate <= 1 ? Math.round(rate * 100) : Math.round(rate);
+  const lineTaxPercent = taxPercentFromRate(railTax?.invoice_tax_rate ?? 0);
 
   if (showHero) {
     return <InvoiceEmptyState onStart={startNewDraft} />;
@@ -985,7 +1041,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
                   key={`line-${index}`}
                   item={item}
                   index={index}
-                  taxPercent={taxPercent}
+                  taxPercent={lineTaxPercent}
                   kategorie={
                     (lineItemCategories[index] as
                       | "beratung"
@@ -1278,7 +1334,9 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-            <AlertDialogAction onClick={() => setDeleteOpen(false)}>Löschen</AlertDialogAction>
+            <AlertDialogAction onClick={() => void handleDeleteInvoice()}>
+              Löschen
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
