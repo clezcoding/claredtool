@@ -33,6 +33,8 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 );
 
 requestAnimationFrame(() => {
+  // D-50: WebView DevTools follow Tauri debug_assertions default — enabled in dev,
+  // disabled in release. tauri.conf.json omits window.devtools intentionally.
   void import("./lib/sentry").then(({ initDesktopSentry }) => initDesktopSentry());
   void import("./lib/updater").then(({ startUpdateScheduler }) =>
     startUpdateScheduler(),

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ComponentType } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet, useOutletContext } from "react-router";
 import { useSession } from "../auth/session-provider";
@@ -32,20 +32,56 @@ const ACTIVE_NAV_CLASS =
 const INACTIVE_NAV_CLASS =
   "relative flex h-12 items-center gap-3 rounded-lg px-3 text-muted-foreground transition-colors hover:bg-surface-container-low hover:text-foreground dark:hover:bg-surface-elevated-dark";
 
+type DebugPanelProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+};
+
+function isEditableShortcutTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  const tag = target.tagName;
+  if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return true;
+  if (target.isContentEditable) return true;
+  return Boolean(target.closest("[contenteditable='true']"));
+}
+
 export function AppShell(_props: AppShellProps = {}) {
   const { t } = useTranslation();
   const { me, bannerKind, login, logout, openingLogin } = useSession();
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [debugPanelOpen, setDebugPanelOpen] = useState(false);
+  const [DebugPanel, setDebugPanel] = useState<ComponentType<DebugPanelProps> | null>(
+    null,
+  );
 
   const showBald = useCallback(() => {
     setFeedback(t("cmdk.bald"));
   }, [t]);
 
   useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    void import("./debug-panel").then((mod) => {
+      setDebugPanel(() => mod.DebugPanel);
+    });
+  }, []);
+
+  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (isEditableShortcutTarget(event.target)) return;
+
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         showBald();
+        return;
+      }
+
+      if (
+        import.meta.env.DEV &&
+        (event.metaKey || event.ctrlKey) &&
+        event.key.toLowerCase() === "d"
+      ) {
+        event.preventDefault();
+        setDebugPanelOpen(true);
       }
     };
     window.addEventListener("keydown", onKeyDown);
@@ -65,6 +101,9 @@ export function AppShell(_props: AppShellProps = {}) {
   return (
     <div className="flex h-screen bg-background text-foreground">
       <UpdateDialog />
+      {DebugPanel ? (
+        <DebugPanel open={debugPanelOpen} onOpenChange={setDebugPanelOpen} />
+      ) : null}
       <nav className="flex h-full w-[260px] shrink-0 flex-col border-r border-border bg-background px-4 py-8 dark:bg-surface-dark">
         <div className="mb-8 flex items-center gap-3 px-2 text-foreground">
           <span
