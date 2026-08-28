@@ -3,12 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04.3
 current_phase_name: Infra & Prep for PDF, Offline & Audit
-status: planning
+status: "Phase 04.2 shipped — PR #42"
 stopped_at: Phase 04.2 complete, ready to plan Phase 04.3
-last_updated: "2026-08-28T19:53:43.148Z"
+last_updated: "2026-08-28T21:54:55.827Z"
 last_activity: 2026-08-28
-last_activity_desc: Phase 04.2 complete, transitioned to Phase 04.3
-state_head: 05cdd1ad6511f00b74d35f43db9bf1e7d024ddb4
+state_head: 7a1fbd2e6e9a446e5099057e000d22120f49b6f4
 progress:
   total_phases: 10
   completed_phases: 6
@@ -28,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 ## Current Position
 
-Status: Ready to plan
+Status: Phase 04.2 shipped — PR #42
 Phase: 04.3 — Infra & Prep for PDF, Offline & Audit
 Phase 04.1 merged: PR #39 (`30e331a`)
 Plan: Not started
@@ -39,7 +38,7 @@ Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — after 04.2
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.3
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-08-28 — Phase 04.2 complete, transitioned to Phase 04.3
+Last activity: 2026-08-28
 
 Progress: [█████░░░░░] 50%
 
