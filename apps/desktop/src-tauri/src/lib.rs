@@ -220,9 +220,11 @@ fn sentry_environment() -> String {
     if cfg!(debug_assertions) {
         "dev".into()
     } else {
-        std::env::var("SENTRY_ENVIRONMENT")
-            .or_else(|_| std::env::var("VITE_SENTRY_ENVIRONMENT"))
-            .unwrap_or_else(|_| "prod".into())
+        let explicit = env_optional(&["SENTRY_ENVIRONMENT", "VITE_SENTRY_ENVIRONMENT"]);
+        match explicit.as_str() {
+            "dev" | "staging" | "prod" => explicit,
+            _ => "prod".into(),
+        }
     }
 }
 

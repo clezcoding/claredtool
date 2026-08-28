@@ -77,6 +77,12 @@ export function sentryDsn(): string {
 }
 
 export function sentryEnvironment(): "dev" | "staging" | "prod" {
+  const explicit = (
+    import.meta.env.VITE_SENTRY_ENVIRONMENT as string | undefined
+  )?.trim();
+  if (explicit === "dev" || explicit === "staging" || explicit === "prod") {
+    return explicit;
+  }
   const mode = import.meta.env.MODE;
   if (mode === "production") return "prod";
   if (mode === "staging") return "staging";
