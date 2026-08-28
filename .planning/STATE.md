@@ -5,10 +5,10 @@ current_phase: 04.2
 current_phase_name: Desktop Platform Hardening
 status: verifying
 stopped_at: Completed 04.2-07-PLAN.md
-last_updated: "2026-08-28T05:04:23.114Z"
+last_updated: "2026-08-28T14:34:15.938Z"
 last_activity: 2026-08-28
-last_activity_desc: Phase 04.2 execution started
-state_head: e4cf3ff96a69a7900d02cfb7752e06c00132975b
+last_activity_desc: Completed quick task 260828-mn3: skip PR signed tauri build
+state_head: 667385b913e8416efef1a3f70cdb7fa96712de47
 progress:
   total_phases: 10
   completed_phases: 5
@@ -39,7 +39,7 @@ Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — after 04.2
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.3
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-08-28 — Phase 04.2 execution started
+Last activity: 2026-08-28 - Completed quick task 260828-mn3: Optimize desktop-build GitHub Actions: skip PR signed tauri build; trigger on v* tags
 
 Progress: [█████░░░░░] 50%
 
@@ -203,6 +203,7 @@ Recent decisions affecting current work:
 - [Phase 04.2]: useAppShellFeedback no-op fallback for route tests outside AppShell Outlet
 - [Phase 04.2]: Omit tauri.conf window.devtools — Tauri debug_assertions default keeps DevTools in dev only (D-50)
 - [Phase 04.2]: maskUpdaterEndpoint masks subdomain + registrable label for safe updater display
+- [Phase 04.2]: [quick-260828-mn3]: desktop-build skips PRs; v* tags trigger FaynoSync publish if; explicit pnpm tauri CLI kept
 
 ### Pending Todos
 
@@ -219,6 +220,7 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260822-u6p | Räume das Projektverzeichniss auf. | 2026-08-22 | 7c30d5e | [260822-u6p-r-ume-das-projektverzeichniss-auf](./quick/260822-u6p-r-ume-das-projektverzeichniss-auf/) |
 | 260828-5c8 | Optimize GitHub Actions CI: parallel jobs, path filters, rust-cache, vitest parallel | 2026-08-28 | 41ec7f6 | [260828-5c8-optimize-github-actions-ci-parallel-jobs](./quick/260828-5c8-optimize-github-actions-ci-parallel-jobs/) |
+| 260828-mn3 | Optimize desktop-build GitHub Actions: skip PR signed tauri build; trigger on v* tags | 2026-08-28 | 667385b | [260828-mn3-optimize-desktop-build-github-actions-ke](./quick/260828-mn3-optimize-desktop-build-github-actions-ke/) |
 
 ### Roadmap Evolution
 
