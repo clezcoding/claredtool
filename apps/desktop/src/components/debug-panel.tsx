@@ -40,7 +40,7 @@ import {
 export const DEBUG_PANEL_ENABLED = import.meta.env.DEV;
 
 const UPDATER_ENDPOINT =
-  "https://updates.puzzlessdev.online/checkVersion?app_name=clared&version={{current_version}}&platform={{target}}&arch={{arch}}&channel=stable&updater=tauri&owner=admin";
+  "https://updates-staging.puzzlessdev.online/checkVersion?app_name=clared&version={{current_version}}&platform={{target}}&arch={{arch}}&channel=stable&updater=tauri&owner=admin";
 
 const CLIPBOARD_TEST_VALUE = "Clared Debug-Zwischenablage-Test";
 
@@ -73,8 +73,8 @@ export function maskUpdaterEndpoint(url: string): string {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-4 text-sm">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="truncate text-right font-mono text-xs text-foreground">
+      <span className="shrink-0 text-muted-foreground">{label}</span>
+      <span className="min-w-0 flex-1 break-all text-right font-mono text-xs text-foreground">
         {value}
       </span>
     </div>
@@ -250,7 +250,7 @@ export function DebugPanel({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
+      <DialogContent className="max-h-[85vh] w-[calc(100%-2rem)] overflow-x-hidden overflow-y-auto pr-10 sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Debug-Panel</DialogTitle>
           <DialogDescription>
