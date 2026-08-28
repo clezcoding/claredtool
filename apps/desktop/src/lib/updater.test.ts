@@ -97,6 +97,32 @@ describe("updater (D-17/D-23)", () => {
     expect(getUpdateDialogState()).toBe("ready");
   });
 
+  it("skips manual check while download is in progress", async () => {
+    const download = vi.fn(() => new Promise<void>(() => {}));
+    const install = vi.fn(async () => undefined);
+    vi.mocked(check).mockResolvedValueOnce({
+      version: "1.2.0",
+      body: "Notes",
+      date: "2026-01-01",
+      download,
+      install,
+    } as never);
+
+    await checkForUpdates(true);
+    expect(vi.mocked(check)).toHaveBeenCalledTimes(1);
+
+    void downloadUpdate();
+    await vi.waitFor(() => expect(getUpdateDialogState()).toBe("downloading"));
+
+    const toasts: string[] = [];
+    subscribeUpdateToasts((key) => toasts.push(key));
+    vi.mocked(check).mockClear();
+
+    await checkForUpdates(true);
+    expect(vi.mocked(check)).not.toHaveBeenCalled();
+    expect(toasts).toContain("update.downloading");
+  });
+
   it("does not relaunch automatically after download", async () => {
     const download = vi.fn(async (onEvent?: (event: { event: string; data: Record<string, number> }) => void) => {
       onEvent?.({ event: "Started", data: { contentLength: 100 } });
