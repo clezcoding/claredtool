@@ -228,6 +228,181 @@ fn sentry_environment() -> String {
     }
 }
 
+const SENTRY_REDACTED: &str = "[redacted]";
+
+fn sentry_key_is_sensitive(key: &str) -> bool {
+    let key = key.to_ascii_lowercase();
+    key == "authorization"
+        || key.contains("token")
+        || key.contains("password")
+        || key.contains("secret")
+        || key.contains("keychain")
+        || key.contains("session")
+        || key.contains("bearer")
+        || key.contains("api_key")
+        || key.contains("apikey")
+}
+
+fn sentry_key_is_name(key: &str) -> bool {
+    let key = key.to_ascii_lowercase();
+    key.contains("customername")
+        || key.contains("customer_name")
+        || key.contains("recipient")
+        || key.contains("kunde")
+        || key.contains("rechnungsempf")
+}
+
+fn sentry_redact_emails(text: &str) -> String {
+    if !text.contains('@') {
+        return text.to_string();
+    }
+    let chars: Vec<char> = text.chars().collect();
+    let mut out = String::with_capacity(text.len());
+    let mut i = 0;
+    while i < chars.len() {
+        if chars[i] == '@' {
+            let mut start = i;
+            while start > 0 && !chars[start - 1].is_whitespace() {
+                start -= 1;
+            }
+            let mut end = i + 1;
+            while end < chars.len() && !chars[end].is_whitespace() {
+                end += 1;
+            }
+            if end > start + 1 {
+                out.push_str(SENTRY_REDACTED);
+                i = end;
+                continue;
+            }
+        }
+        out.push(chars[i]);
+        i += 1;
+    }
+    out
+}
+
+fn sentry_redact_string(value: &str, key: Option<&str>) -> String {
+    if let Some(key) = key {
+        if sentry_key_is_sensitive(key) || sentry_key_is_name(key) {
+            return SENTRY_REDACTED.to_string();
+        }
+    }
+    if value.to_ascii_lowercase().contains("bearer ") {
+        return SENTRY_REDACTED.to_string();
+    }
+    sentry_redact_emails(value)
+}
+
+fn sentry_scrub_value(
+    value: sentry::protocol::Value,
+    key: Option<&str>,
+) -> sentry::protocol::Value {
+    use sentry::protocol::Value;
+    match value {
+        Value::String(text) => Value::String(sentry_redact_string(&text, key)),
+        Value::Array(items) => Value::Array(
+            items
+                .into_iter()
+                .map(|item| sentry_scrub_value(item, key))
+                .collect(),
+        ),
+        Value::Object(map) => Value::Object(sentry_scrub_json_map(map)),
+        other => other,
+    }
+}
+
+fn sentry_scrub_json_map(
+    map: serde_json::Map<String, sentry::protocol::Value>,
+) -> serde_json::Map<String, sentry::protocol::Value> {
+    let mut out = serde_json::Map::new();
+    for (key, value) in map {
+        if key.to_ascii_lowercase() == "authorization" {
+            continue;
+        }
+        if sentry_key_is_sensitive(&key) {
+            out.insert(key, sentry::protocol::Value::String(SENTRY_REDACTED.into()));
+            continue;
+        }
+        out.insert(key.clone(), sentry_scrub_value(value, Some(&key)));
+    }
+    out
+}
+
+fn sentry_scrub_map(
+    map: sentry::protocol::Map<String, sentry::protocol::Value>,
+) -> sentry::protocol::Map<String, sentry::protocol::Value> {
+    let mut out = sentry::protocol::Map::new();
+    for (key, value) in map {
+        if key.to_ascii_lowercase() == "authorization" {
+            continue;
+        }
+        if sentry_key_is_sensitive(&key) {
+            out.insert(key, sentry::protocol::Value::String(SENTRY_REDACTED.into()));
+            continue;
+        }
+        out.insert(key.clone(), sentry_scrub_value(value, Some(&key)));
+    }
+    out
+}
+
+fn sentry_scrub_user(mut user: sentry::protocol::User) -> sentry::protocol::User {
+    if user.email.is_some() {
+        user.email = Some(SENTRY_REDACTED.to_string());
+    }
+    user.other = sentry_scrub_map(user.other);
+    user
+}
+
+fn sentry_scrub_request(mut request: sentry::protocol::Request) -> sentry::protocol::Request {
+    request.headers.retain(|key, _| key.to_ascii_lowercase() != "authorization");
+    for value in request.headers.values_mut() {
+        *value = sentry_redact_string(value, None);
+    }
+    request.env = request
+        .env
+        .into_iter()
+        .filter(|(key, _)| key.to_ascii_lowercase() != "authorization")
+        .map(|(key, value)| {
+            let redacted = sentry_redact_string(&value, Some(&key));
+            (key, redacted)
+        })
+        .collect();
+    request
+}
+
+fn sentry_scrub_event(mut event: sentry::protocol::Event<'static>) -> sentry::protocol::Event<'static> {
+    if let Some(message) = event.message.as_mut() {
+        *message = sentry_redact_string(message, None);
+    }
+    for exception in event.exception.iter_mut() {
+        if let Some(value) = exception.value.as_mut() {
+            *value = sentry_redact_string(value, None);
+        }
+    }
+    if let Some(request) = event.request.take() {
+        event.request = Some(sentry_scrub_request(request));
+    }
+    if let Some(user) = event.user.take() {
+        event.user = Some(sentry_scrub_user(user));
+    }
+    event.extra = sentry_scrub_map(event.extra);
+    event.tags = event
+        .tags
+        .into_iter()
+        .map(|(key, value)| {
+            let redacted = sentry_redact_string(&value, Some(&key));
+            (key, redacted)
+        })
+        .collect();
+    for crumb in event.breadcrumbs.as_mut() {
+        if let Some(message) = crumb.message.as_mut() {
+            *message = sentry_redact_string(message, None);
+        }
+        crumb.data = sentry_scrub_map(std::mem::take(&mut crumb.data));
+    }
+    event
+}
+
 fn sentry_plugin() -> Option<tauri::plugin::TauriPlugin<tauri::Wry>> {
     use std::sync::OnceLock;
 
@@ -242,6 +417,7 @@ fn sentry_plugin() -> Option<tauri::plugin::TauriPlugin<tauri::Wry>> {
     options.release = Some(format!("clared@{}", env!("APP_VERSION")).into());
     options.environment = Some(sentry_environment().into());
     options.send_default_pii = false;
+    options.before_send = Some(std::sync::Arc::new(|event| Some(sentry_scrub_event(event))));
 
     let guard = sentry::init((dsn.as_str(), options));
     SENTRY_GUARD.set(guard).ok()?;
