@@ -87,4 +87,17 @@ describe("sentry scrub (D-40)", () => {
     expect(String(scrubbed.exception?.values?.[0]?.value)).not.toContain("@");
     expect(String(scrubbed.exception?.values?.[0]?.value)).toContain("[redacted]");
   });
+
+  it("redacts sensitive tag values", () => {
+    const scrubbed = scrubSentryEvent({
+      tags: {
+        customerName: "Acme GmbH",
+        access_token: "secret-token",
+        release: "1.0.0",
+      },
+    });
+    expect(scrubbed.tags?.customerName).toBe("[redacted]");
+    expect(scrubbed.tags?.access_token).toBe("[redacted]");
+    expect(scrubbed.tags?.release).toBe("1.0.0");
+  });
 });

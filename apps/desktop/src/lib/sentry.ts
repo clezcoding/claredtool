@@ -15,6 +15,7 @@ export type SentryEvent = {
   request?: { headers?: Record<string, string> };
   extra?: Record<string, unknown>;
   user?: Record<string, unknown>;
+  tags?: Record<string, string>;
   breadcrumbs?: Array<{ message?: string; data?: Record<string, unknown> }>;
 };
 
@@ -86,6 +87,14 @@ export function scrubSentryEvent(event: SentryEvent): SentryEvent {
   }
   scrubbed.extra = scrubRecord(scrubbed.extra);
   scrubbed.user = scrubRecord(scrubbed.user);
+  if (scrubbed.tags) {
+    scrubbed.tags = Object.fromEntries(
+      Object.entries(scrubbed.tags).map(([key, value]) => [
+        key,
+        typeof value === "string" ? redactString(value, key) : value,
+      ]),
+    );
+  }
   scrubbed.breadcrumbs = scrubbed.breadcrumbs?.map((crumb) => ({
     ...crumb,
     message: crumb.message ? redactMessage(crumb.message) : crumb.message,
