@@ -8,9 +8,9 @@ import { defineConfig } from "vite";
 const host = process.env.TAURI_DEV_HOST;
 const root = path.dirname(fileURLToPath(import.meta.url));
 const appVersion = (
-  JSON.parse(readFileSync(path.join(root, "package.json"), "utf8")) as {
-    version: string;
-  }
+  JSON.parse(
+    readFileSync(path.join(root, "src-tauri/tauri.conf.json"), "utf8"),
+  ) as { version: string }
 ).version;
 
 export default defineConfig({

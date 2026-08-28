@@ -239,7 +239,7 @@ fn sentry_plugin() -> Option<tauri::plugin::TauriPlugin<tauri::Wry>> {
     }
 
     let mut options = sentry::ClientOptions::default();
-    options.release = sentry::release_name!();
+    options.release = Some(format!("clared@{}", env!("APP_VERSION")).into());
     options.environment = Some(sentry_environment().into());
     options.send_default_pii = false;
 
