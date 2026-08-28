@@ -122,6 +122,21 @@ function dueDateFromTerms(isoDate: string, days: number): string {
   return formatIsoLocal(date);
 }
 
+function dueDateFromPaymentTerms(isoDate: string, terms: string): string | null {
+  const days = Number(terms);
+  if (!isoDate || !Number.isFinite(days)) return null;
+  return dueDateFromTerms(isoDate, days);
+}
+
+function inferPaymentTerms(datum: string, faellig: string): string {
+  const start = new Date(`${datum.slice(0, 10)}T00:00:00`).getTime();
+  const end = new Date(`${faellig.slice(0, 10)}T00:00:00`).getTime();
+  const days = Math.round((end - start) / 86400000);
+  if (days === 14) return "14";
+  if (days === 30) return "30";
+  return "";
+}
+
 function todayIso(): string {
   return formatIsoLocal(new Date());
 }
@@ -281,8 +296,15 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
       setCustomerId(invoice.customerId ?? "");
       setDatum(toDateInput(invoice.date));
       setFaellig(toDateInput(invoice.dueDate));
+      setZahlungsbedingung(
+        inferPaymentTerms(
+          toDateInput(invoice.date),
+          toDateInput(invoice.dueDate),
+        ),
+      );
       setCurrency(invoice.currency);
       setLineItems(mapItemsFromApi(invoice.items));
+      resetLocalInvoiceFields();
       setShowHero(false);
       const entity = entityRows.find((row) => row.id === invoice.entityId);
       entityDefaultRef.current = entity?.currencyDefault ?? "EUR";
@@ -320,12 +342,14 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
         setCustomerId("");
         setDatum(todayIso());
         setFaellig(addDaysIso(30));
+        setZahlungsbedingung("30");
         setCurrency(
           entityRows.length === 1
             ? (entityRows[0].currencyDefault ?? "EUR")
             : "EUR",
         );
         setLineItems([{ ...BLANK_LINE }]);
+        resetLocalInvoiceFields();
         if (entityRows.length === 1) {
           entityDefaultRef.current = entityRows[0].currencyDefault ?? "EUR";
           void loadCustomers(entityRows[0].id);
@@ -338,7 +362,11 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
           skipAutosaveRef.current = false;
         });
       } else {
-        applyInvoice(invoiceRows[0], entityRows);
+        const sorted = [...invoiceRows].sort(
+          (a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+        );
+        applyInvoice(sorted[0], entityRows);
       }
     } catch {
       setLoadError(true);
@@ -514,12 +542,26 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
     }
   }
 
+  function resetLocalInvoiceFields() {
+    setBetreff("");
+    setNotiz("");
+    setLineItemCategories({});
+  }
+
+  function syncDueFromTerms(nextDatum: string, terms: string) {
+    if (!terms) return;
+    const nextDue = dueDateFromPaymentTerms(nextDatum, terms);
+    if (nextDue) setFaellig(nextDue);
+  }
+
+  function applyFaellig(value: string) {
+    setFaellig(value);
+    setZahlungsbedingung(inferPaymentTerms(datum, value));
+  }
+
   function handleZahlungsbedingung(value: string) {
     setZahlungsbedingung(value);
-    const days = Number(value);
-    if (datum && Number.isFinite(days)) {
-      setFaellig(dueDateFromTerms(datum, days));
-    }
+    syncDueFromTerms(datum, value);
     if (canWrite) setAutosaveStatus("saving");
   }
 
@@ -530,7 +572,9 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
     setRechnungsnummer("");
     setDatum(todayIso());
     setFaellig(addDaysIso(30));
+    setZahlungsbedingung("30");
     setLineItems([{ ...BLANK_LINE }]);
+    resetLocalInvoiceFields();
     setCustomerId("");
     setShowHero(false);
     setAutosaveStatus("hidden");
@@ -586,6 +630,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
       if (!res.ok) throw new Error("delete failed");
       const remaining = drafts.filter((row) => row.id !== idToDelete);
       setDrafts(remaining);
+      setDeleteError(null);
       setDeleteOpen(false);
       if (remaining.length === 0) {
         skipAutosaveRef.current = true;
@@ -597,12 +642,14 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
         setCustomerId("");
         setDatum(todayIso());
         setFaellig(addDaysIso(30));
+        setZahlungsbedingung("30");
         setCurrency(
           entities.length === 1
             ? (entities[0].currencyDefault ?? "EUR")
             : "EUR",
         );
         setLineItems([{ ...BLANK_LINE }]);
+        resetLocalInvoiceFields();
         if (entities.length === 1) {
           entityDefaultRef.current = entities[0].currencyDefault ?? "EUR";
           void loadCustomers(entities[0].id);
@@ -947,7 +994,9 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
                   value={datum}
                   readOnly={!canWrite}
                   onChange={(event) => {
-                    setDatum(event.target.value);
+                    const value = event.target.value;
+                    setDatum(value);
+                    syncDueFromTerms(value, zahlungsbedingung);
                     if (canWrite) setAutosaveStatus("saving");
                   }}
                   className="h-11 bg-card pr-10"
@@ -973,7 +1022,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
                   value={faellig}
                   readOnly={!canWrite}
                   onChange={(event) => {
-                    setFaellig(event.target.value);
+                    applyFaellig(event.target.value);
                     if (canWrite) setAutosaveStatus("saving");
                   }}
                   className="h-11 bg-card pr-10"
@@ -993,7 +1042,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
                 {t("invoice.terms")}
               </Label>
               <Select
-                value={zahlungsbedingung}
+                value={zahlungsbedingung || undefined}
                 onValueChange={handleZahlungsbedingung}
                 disabled={!canWrite}
               >
@@ -1326,8 +1375,11 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
                 className={`rounded p-1 ${cell.value === (dateField === "faellig" ? faellig : datum) ? "bg-brand-soft font-semibold" : ""} ${cell.value ? "hover:bg-muted" : "text-muted-foreground/40"}`}
                 onClick={() => {
                   if (!cell.value) return;
-                  if (dateField === "faellig") setFaellig(cell.value);
-                  else setDatum(cell.value);
+                  if (dateField === "faellig") applyFaellig(cell.value);
+                  else {
+                    setDatum(cell.value);
+                    syncDueFromTerms(cell.value, zahlungsbedingung);
+                  }
                   if (canWrite) setAutosaveStatus("saving");
                   setDateField(null);
                 }}
@@ -1358,7 +1410,12 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void handleDeleteInvoice()}>
+            <AlertDialogAction
+              onClick={(event) => {
+                event.preventDefault();
+                void handleDeleteInvoice();
+              }}
+            >
               Löschen
             </AlertDialogAction>
           </AlertDialogFooter>

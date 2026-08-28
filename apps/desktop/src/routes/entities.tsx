@@ -282,6 +282,9 @@ export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
           }
         />
       </div>
+      {fieldError ? (
+        <p className="text-xs text-destructive">{fieldError}</p>
+      ) : null}
       {isEuCountry(createForm.country) ? (
         <div className="flex flex-col gap-1">
           <Label htmlFor="entity-vat">USt-IdNr.</Label>
@@ -296,9 +299,6 @@ export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
               }))
             }
           />
-          {fieldError ? (
-            <p className="text-xs text-destructive">{fieldError}</p>
-          ) : null}
         </div>
       ) : null}
       <Button

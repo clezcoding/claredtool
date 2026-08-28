@@ -90,7 +90,8 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
   const [createOpen, setCreateOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [createForm, setCreateForm] = useState(CREATE_DEFAULTS);
-  const [fieldError, setFieldError] = useState<string | null>(null);
+  const [entityError, setEntityError] = useState<string | null>(null);
+  const [vatError, setVatError] = useState<string | null>(null);
   const userClosedRef = useRef(false);
 
   const loadData = useCallback(async () => {
@@ -145,9 +146,10 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
 
   async function handleCreate(event: React.FormEvent) {
     event.preventDefault();
-    setFieldError(null);
+    setEntityError(null);
+    setVatError(null);
     if (!createForm.entityId) {
-      setFieldError(t("registry.entityRequired"));
+      setEntityError(t("registry.entityRequired"));
       return;
     }
     setSubmitting(true);
@@ -169,7 +171,7 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
       });
       if (!res.ok) {
         if (res.status === 400 && isEuCountry(createForm.country)) {
-          setFieldError("USt-IdNr. ist für EU-Länder Pflicht.");
+          setVatError("USt-IdNr. ist für EU-Länder Pflicht.");
         }
         throw new Error("create failed");
       }
@@ -186,7 +188,8 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
 
   function openCreate() {
     setCreateOpen(true);
-    setFieldError(null);
+    setEntityError(null);
+    setVatError(null);
     setCreateForm(CREATE_DEFAULTS);
   }
 
@@ -194,7 +197,8 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
     userClosedRef.current = false;
     setSelectedId(id);
     setPanelMode("detail");
-    setFieldError(null);
+    setEntityError(null);
+    setVatError(null);
   }
 
   function closePanel() {
@@ -205,6 +209,7 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
 
   function onEntityChange(entity: EntityRow | null) {
     if (!entity) return;
+    setEntityError(null);
     setCreateForm((current) => ({ ...current, entityId: entity.id }));
   }
 
@@ -244,8 +249,8 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
             </ComboboxList>
           </ComboboxContent>
         </Combobox>
-        {fieldError ? (
-          <p className="text-xs text-destructive">{fieldError}</p>
+        {entityError ? (
+          <p className="text-xs text-destructive">{entityError}</p>
         ) : null}
       </div>
       <div className="flex flex-col gap-1">
@@ -304,6 +309,9 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
           }
         />
       </div>
+      {vatError ? (
+        <p className="text-xs text-destructive">{vatError}</p>
+      ) : null}
       {isEuCountry(createForm.country) ? (
         <div className="flex flex-col gap-1">
           <Label htmlFor="kunde-vat">USt-IdNr.</Label>
