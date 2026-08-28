@@ -29,6 +29,7 @@
     "saving": "Saving…",
     "saved": "Saved",
     "saveFailed": "Save failed.",
+    "deleteFailed": "Delete failed.",
     "justNow": "Just now",
     "minutesAgo_one": "{{count}} min ago",
     "minutesAgo_other": "{{count}} min ago",
@@ -138,6 +139,7 @@
     "pagination": "{{from}}–{{to}} of {{total}}",
     "cancel": "Cancel",
     "createSubmit": "Create",
+    "entityRequired": "Please choose an entity.",
     "entityModalBody": "Name, country, and legal form for the business entity.",
     "kundeModalBody": "Company and master data for the customer.",
     "tabs": {

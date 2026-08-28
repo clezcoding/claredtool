@@ -29,6 +29,7 @@
     "saving": "Speichert…",
     "saved": "Gespeichert",
     "saveFailed": "Speichern fehlgeschlagen.",
+    "deleteFailed": "Löschen fehlgeschlagen.",
     "justNow": "Gerade eben",
     "minutesAgo_one": "vor {{count}} Min",
     "minutesAgo_other": "vor {{count}} Min",
@@ -138,6 +139,7 @@
     "pagination": "{{from}}–{{to}} von {{total}}",
     "cancel": "Abbrechen",
     "createSubmit": "Anlegen",
+    "entityRequired": "Bitte Entity wählen.",
     "entityModalBody": "Name, Land und Rechtsform der Geschäftseinheit.",
     "kundeModalBody": "Firma und Stammdaten des Kunden.",
     "tabs": {
