@@ -33,29 +33,45 @@ function formatEta(seconds: number): string {
 function useDownloadEta(progress: UpdateProgress | null): string | null {
   const startedAt = useRef<number | null>(null);
   const lastBytes = useRef(0);
+  const [eta, setEta] = useState<string | null>(null);
 
-  if (!progress || progress.phase !== "download") {
-    startedAt.current = null;
-    lastBytes.current = 0;
-    return null;
-  }
+  useEffect(() => {
+    if (!progress || progress.phase !== "download") {
+      startedAt.current = null;
+      lastBytes.current = 0;
+      setEta(null);
+      return;
+    }
 
-  if (startedAt.current === null) startedAt.current = Date.now();
-  if (progress.downloadedBytes < lastBytes.current) {
-    startedAt.current = Date.now();
-  }
-  lastBytes.current = progress.downloadedBytes;
+    if (startedAt.current === null) startedAt.current = Date.now();
+    if (progress.downloadedBytes < lastBytes.current) {
+      startedAt.current = Date.now();
+    }
+    lastBytes.current = progress.downloadedBytes;
 
-  if (!progress.totalBytes || progress.downloadedBytes <= 0) return null;
+    if (!progress.totalBytes || progress.downloadedBytes <= 0) {
+      setEta(null);
+      return;
+    }
 
-  const elapsedSec = (Date.now() - startedAt.current) / 1000;
-  if (elapsedSec < 1) return null;
+    const elapsedSec = (Date.now() - startedAt.current) / 1000;
+    if (elapsedSec < 1) {
+      setEta(null);
+      return;
+    }
 
-  const bytesPerSec = progress.downloadedBytes / elapsedSec;
-  if (bytesPerSec <= 0) return null;
+    const bytesPerSec = progress.downloadedBytes / elapsedSec;
+    if (bytesPerSec <= 0) {
+      setEta(null);
+      return;
+    }
 
-  const remaining = (progress.totalBytes - progress.downloadedBytes) / bytesPerSec;
-  return formatEta(remaining);
+    const remaining =
+      (progress.totalBytes - progress.downloadedBytes) / bytesPerSec;
+    setEta(formatEta(remaining));
+  }, [progress?.downloadedBytes, progress?.phase, progress?.totalBytes]);
+
+  return eta;
 }
 
 async function notifyUpdateReady(
