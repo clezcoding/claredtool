@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Self-Hosted Backend & Authentik SSO** - Sign in via Authentik; desktop talks HTTPS+OIDC to vendor Coolify (founder's cluster) (completed 2026-08-22)
 - [x] **Phase 3: Entities, Invoices & Live Tax** - Create invoice, see live tax from modular engine (completed 2026-08-22)
 - [x] **Phase 4: Premium UI & Brand Redesign** - Crafted Minimal; every page mockup-first with new brand, graphics, and motion (completed 2026-08-25)
-- [ ] **Phase 4.1: Stitch→React 5-route conversion** (INSERTED) - stitch-build HTML→TSX for Rechnung · Entities · Kunden · Tax · PDF
+- [x] **Phase 4.1: Stitch→React 5-route conversion** (INSERTED) - stitch-build HTML→TSX for Rechnung · Entities · Kunden · Tax · PDF (completed 2026-08-28)
 - [ ] **Phase 5: PDF, Audit & Offline Sync** - Download PDF, inspect tax audit trail, work offline and sync
 - [ ] **Phase 5.1: Stitch→React extended catalog** (INSERTED) - remaining Stitch screens after PDF loop ships
 - [ ] **Phase 6: Mockup 1:1 Fidelity Closure** - pixel-match approved mockups 02–07 on the 5 routes
@@ -179,7 +179,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Crafted Minimal tokens (Phase 4) + German primary copy (D-15); conversion acceptance in `.stitch/qa/STITCH-APPROVAL-BACKLOG.md` met
   5. P1 backlog R-01–R-04 addressed or filed with residual notes; stitch-build skills used as the conversion path
 
-**Plans:** 7/7 plans executed
+**Plans:** 7/7 plans complete
 **UI hint**: yes
 
 Plans:
@@ -237,7 +237,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 5 → 5.1 → 6
 | 2. Self-Hosted Backend & Authentik SSO | 7/7 | Complete | 2026-08-22 |
 | 3. Entities, Invoices & Live Tax | 6/6 | Complete | 2026-08-22 |
 | 4. Premium UI & Brand Redesign | 6/6 | Complete | 2026-08-25 |
-| 4.1 Stitch→React 5-route conversion | 7/7 | In Progress|  |
+| 4.1 Stitch→React 5-route conversion | 7/7 | Complete    | 2026-08-28 |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |
 | 6. Mockup 1:1 Fidelity Closure | 0/? | Not started | - |
