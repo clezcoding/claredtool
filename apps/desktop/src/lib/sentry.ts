@@ -64,6 +64,9 @@ export function scrubSentryEvent(event: SentryEvent): SentryEvent {
     user: scrubRecord(event.user),
     breadcrumbs: event.breadcrumbs?.map((crumb) => ({
       ...crumb,
+      message: crumb.message
+        ? redactString(crumb.message)
+        : crumb.message,
       data: scrubRecord(crumb.data),
     })),
   };

@@ -35,4 +35,11 @@ describe("sentry scrub (D-40)", () => {
     });
     expect(scrubbed.breadcrumbs?.[0]?.data?.customerName).not.toBe("Acme GmbH");
   });
+
+  it("redacts email addresses in breadcrumb messages", () => {
+    const scrubbed = scrubSentryEvent({
+      breadcrumbs: [{ message: "contact user@example.com for invoice" }],
+    });
+    expect(String(scrubbed.breadcrumbs?.[0]?.message)).not.toContain("@");
+  });
 });
