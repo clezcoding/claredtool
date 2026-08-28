@@ -31,3 +31,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <App />
   </React.StrictMode>,
 );
+
+requestAnimationFrame(() => {
+  void import("./lib/sentry").then(({ initDesktopSentry }) => initDesktopSentry());
+});

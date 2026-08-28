@@ -210,6 +210,44 @@ fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
     tauri_plugin_prevent_default::init()
 }
 
+fn env_optional(keys: &[&str]) -> String {
+    keys.iter()
+        .find_map(|key| std::env::var(key).ok().filter(|value| !value.is_empty()))
+        .unwrap_or_default()
+}
+
+fn sentry_environment() -> String {
+    if cfg!(debug_assertions) {
+        "dev".into()
+    } else {
+        std::env::var("SENTRY_ENVIRONMENT")
+            .or_else(|_| std::env::var("VITE_SENTRY_ENVIRONMENT"))
+            .unwrap_or_else(|_| "prod".into())
+    }
+}
+
+fn sentry_plugin() -> Option<tauri::plugin::TauriPlugin<tauri::Wry>> {
+    use std::sync::OnceLock;
+
+    static SENTRY_GUARD: OnceLock<sentry::ClientInitGuard> = OnceLock::new();
+
+    let dsn = env_optional(&["SENTRY_DSN", "VITE_SENTRY_DSN"]);
+    if dsn.is_empty() {
+        return None;
+    }
+
+    let mut options = sentry::ClientOptions::default();
+    options.release = sentry::release_name!();
+    options.environment = Some(sentry_environment().into());
+    options.send_default_pii = false;
+
+    let guard = sentry::init((dsn.as_str(), options));
+    SENTRY_GUARD.set(guard).ok()?;
+
+    let client = sentry::Hub::current().client()?;
+    Some(tauri_plugin_sentry::init_with_no_injection(client.as_ref()))
+}
+
 fn log_plugin() -> tauri::plugin::TauriPlugin<tauri::Wry> {
     use log::LevelFilter;
     use tauri_plugin_log::{Builder, Target, TargetKind};
@@ -231,7 +269,13 @@ fn log_plugin() -> tauri::plugin::TauriPlugin<tauri::Wry> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let mut builder = tauri::Builder::default()
+    let mut builder = tauri::Builder::default();
+
+    if let Some(sentry) = sentry_plugin() {
+        builder = builder.plugin(sentry);
+    }
+
+    builder = builder
         .plugin(log_plugin())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_window_state::Builder::new().build())
