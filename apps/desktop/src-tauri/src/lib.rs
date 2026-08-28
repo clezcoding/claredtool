@@ -281,6 +281,81 @@ fn sentry_redact_emails(text: &str) -> String {
     out
 }
 
+fn find_ascii_insensitive(haystack: &str, needle: &str) -> Option<usize> {
+    if needle.is_empty() || haystack.len() < needle.len() {
+        return None;
+    }
+    haystack
+        .char_indices()
+        .filter(|(i, _)| haystack[*i..].len() >= needle.len())
+        .find(|(i, _)| {
+            haystack[*i..]
+                .chars()
+                .zip(needle.chars())
+                .all(|(a, b)| a.eq_ignore_ascii_case(&b))
+        })
+        .map(|(i, _)| i)
+}
+
+fn sentry_redact_customer_names_in_text(text: &str) -> String {
+    const MARKERS: &[&str] = &[
+        "Kunde:", "Kunde ", "Kundin:", "Kundin ",
+        "customer:", "customer ", "Customer:", "Customer ",
+        "Rechnungsempfänger:", "Rechnungsempfänger ",
+        "recipient:", "recipient ",
+    ];
+    const LEGAL_SUFFIXES: &[&str] = &[" GmbH", " AG", " KG", " OHG", " UG", " e.V."];
+
+    let mut out = text.to_string();
+    loop {
+        let mut replacement: Option<(usize, usize)> = None;
+        for marker in MARKERS {
+            let Some(start) = find_ascii_insensitive(&out, marker) else {
+                continue;
+            };
+            let mut end = start + marker.len();
+            while end < out.len() {
+                let Some(ch) = out[end..].chars().next() else {
+                    break;
+                };
+                if !ch.is_whitespace() {
+                    break;
+                }
+                end += ch.len_utf8();
+            }
+            let name_begin = end;
+            while end < out.len() {
+                let ch = out[end..].chars().next().unwrap();
+                if ch.is_whitespace() {
+                    break;
+                }
+                end += ch.len_utf8();
+            }
+            for suffix in LEGAL_SUFFIXES {
+                if out[end..].starts_with(suffix) {
+                    end += suffix.len();
+                    break;
+                }
+            }
+            if end > name_begin && &out[name_begin..end] != SENTRY_REDACTED {
+                replacement = Some((name_begin, end));
+                break;
+            }
+        }
+        match replacement {
+            Some((name_begin, name_end)) => {
+                out.replace_range(name_begin..name_end, SENTRY_REDACTED);
+            }
+            None => break,
+        }
+    }
+    out
+}
+
+fn sentry_redact_message(text: &str) -> String {
+    sentry_redact_customer_names_in_text(&sentry_redact_string(text, None))
+}
+
 fn sentry_redact_string(value: &str, key: Option<&str>) -> String {
     if let Some(key) = key {
         if sentry_key_is_sensitive(key) || sentry_key_is_name(key) {
@@ -372,11 +447,11 @@ fn sentry_scrub_request(mut request: sentry::protocol::Request) -> sentry::proto
 
 fn sentry_scrub_event(mut event: sentry::protocol::Event<'static>) -> sentry::protocol::Event<'static> {
     if let Some(message) = event.message.as_mut() {
-        *message = sentry_redact_string(message, None);
+        *message = sentry_redact_message(message);
     }
     for exception in event.exception.iter_mut() {
         if let Some(value) = exception.value.as_mut() {
-            *value = sentry_redact_string(value, None);
+            *value = sentry_redact_message(value);
         }
     }
     if let Some(request) = event.request.take() {
@@ -396,7 +471,7 @@ fn sentry_scrub_event(mut event: sentry::protocol::Event<'static>) -> sentry::pr
         .collect();
     for crumb in event.breadcrumbs.as_mut() {
         if let Some(message) = crumb.message.as_mut() {
-            *message = sentry_redact_string(message, None);
+            *message = sentry_redact_message(message);
         }
         crumb.data = sentry_scrub_map(std::mem::take(&mut crumb.data));
     }
@@ -495,4 +570,24 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[cfg(test)]
+mod sentry_scrub_tests {
+    use super::{sentry_redact_message, SENTRY_REDACTED};
+
+    #[test]
+    fn redacts_customer_name_in_message_text() {
+        let out = sentry_redact_message("Kunde: Acme GmbH viewed invoice");
+        assert!(!out.contains("Acme"));
+        assert!(out.contains(SENTRY_REDACTED));
+    }
+
+    #[test]
+    fn redacts_customer_name_and_email_in_exception_text() {
+        let out = sentry_redact_message("Kunde: Acme GmbH failed for user@example.com");
+        assert!(!out.contains("Acme"));
+        assert!(!out.contains('@'));
+        assert!(out.contains(SENTRY_REDACTED));
+    }
 }
