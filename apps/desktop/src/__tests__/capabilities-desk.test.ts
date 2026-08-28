@@ -27,10 +27,10 @@ describe("capabilities default.json (D-04/D-49/D-51)", () => {
     expect(Array.isArray(caps.permissions)).toBe(true);
   });
 
-  // End-state: Plan 02+ grants clipboard write-only (D-04).
-  it.todo(
-    "must include clipboard-manager:allow-write-text once plugin is wired",
-  );
+  it("must include clipboard-manager:allow-write-text (D-04 write-only)", () => {
+    const caps = readDefaultCapabilities();
+    expect(caps.permissions).toContain("clipboard-manager:allow-write-text");
+  });
 
   it("must not grant clipboard-manager:allow-read-text", () => {
     const caps = readDefaultCapabilities();

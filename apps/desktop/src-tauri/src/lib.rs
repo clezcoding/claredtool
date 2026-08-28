@@ -261,15 +261,13 @@ fn log_plugin() -> tauri::plugin::TauriPlugin<tauri::Wry> {
 
     Builder::new()
         .level(level)
-        .target(Target::new(TargetKind::LogDir {
-            file_name: None,
-        }))
+        .target(Target::new(TargetKind::LogDir { file_name: None }))
         .build()
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let mut builder = tauri::Builder::default();
+    let mut builder = tauri::Builder::default().plugin(tauri_plugin_clipboard_manager::init());
 
     if let Some(sentry) = sentry_plugin() {
         builder = builder.plugin(sentry);
