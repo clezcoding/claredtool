@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.2
 current_phase_name: Desktop Platform Hardening
 status: executing
-stopped_at: Completed 04.2-02-PLAN.md
-last_updated: "2026-08-28T03:46:04.483Z"
+stopped_at: Completed 04.2-03-PLAN.md
+last_updated: "2026-08-28T03:55:00.752Z"
 last_activity: 2026-08-28
 last_activity_desc: Phase 04.2 execution started
-state_head: 4add6b5c965077363874bc39944172a152a74e98
+state_head: 5da1c700be8c5c2d76af2a386b7bf16c48dbf650
 progress:
   total_phases: 10
   completed_phases: 5
   total_plans: 39
-  completed_plans: 33
+  completed_plans: 34
 milestone_name: milestone
 ---
 
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 Status: Ready to execute
 Phase: 04.2 (Desktop Platform Hardening) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 3 of 8
+Plan: 4 of 8
 Phase 04 (Premium UI & Brand Redesign) — complete 2026-08-25
 Phase 04.1 (Stitch→React 5-route) — complete 2026-08-28
 Phase 04.2 (Desktop Platform Hardening) — **NEXT** re-check / execute (clipboard wave 7 before debug wave 8)
@@ -98,6 +98,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04.1 P07 | 25min | 3 tasks | 7 files |
 | Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P01 | 4 | 3 tasks | 20 files |
 | Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P02 | 4min | 3 tasks | 10 files |
+| Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P03 | 12 | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -187,6 +188,8 @@ Recent decisions affecting current work:
 - [Phase 04.2]: clipboard.failed i18n keys seeded in Wave 0 for RED toast-path test
 - [Phase 04.2]: desktop-store calls load() per access — no module cache (Vitest mock compatibility)
 - [Phase 04.2]: CSP object allowlists Vite :5174, backend, Authentik, Sentry connect-src
+- [Phase 04.2]: Human blocked tauri-plugin-dragout at SUS gate — Phase 5 uses CrabNebula tauri-plugin-drag cross-platform with temp-file PDF path instead
+- [Phase 04.2]: link-guard installed via requestAnimationFrame after boot IIFE — external https via opener only on main WebView (D-34)
 
 ### Pending Todos
 
@@ -221,8 +224,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-28T03:46:04.389Z
-Stopped at: Completed 04.2-02-PLAN.md
+Last session: 2026-08-28T03:55:00.625Z
+Stopped at: Completed 04.2-03-PLAN.md
 Resume file: None
 
 ## Rebuild Log

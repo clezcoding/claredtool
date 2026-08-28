@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 23
+open_count: 30
 waived_count: 1
 fixed_count: 2
-total_count: 26
-last_updated: 2026-08-27T05:15:02.518Z
+total_count: 33
+last_updated: 2026-08-28T03:54:59.759Z
 ---
 
 # Broken Windows Ledger
@@ -41,6 +41,13 @@ last_updated: 2026-08-27T05:15:02.518Z
 | 24 | 04.1 | deviation | apps/desktop/src/__tests__/routes.test.tsx |  | Updated Tax heading Tax Rules → Steuerregeln so sidebar tests match i18n H1 | open |  | 2026-08-27T04:24:43.075Z |  |
 | 25 | 04.1 | stub | apps/desktop/src/routes/pdf.tsx |  | download/email/print/full audit Bald toast — D-39 Phase 5 | open |  | 2026-08-27T05:15:02.431Z |  |
 | 26 | 04.1 | stub | apps/desktop/src/components/export-panel.tsx |  | DATEV generate/row download/show-all/advisor Bald toast — D-40 Phase 5 | open |  | 2026-08-27T05:15:02.518Z |  |
+| 27 | 04.2 | stub | apps/desktop/src/lib/link-guard.ts | 5 | decideLinkAction stub returns block until Plan 03 | open |  | 2026-08-28T03:40:47.736Z |  |
+| 28 | 04.2 | stub | apps/desktop/src/lib/link-guard.ts | 5 | decideLinkAction stub returns block until Plan 03 | open |  | 2026-08-28T03:40:47.844Z |  |
+| 29 | 04.2 | stub | apps/desktop/src/lib/link-guard.ts | 5 | decideLinkAction stub returns block until Plan 03 | open |  | 2026-08-28T03:40:47.964Z |  |
+| 30 | 04.2 | stub | apps/desktop/src/lib/link-guard.ts | 5 | decideLinkAction stub returns block until Plan 03 | open |  | 2026-08-28T03:40:48.068Z |  |
+| 31 | 04.2 | stub | apps/desktop/src/lib/link-guard.ts | 5 | decideLinkAction stub returns block until Plan 03 | open |  | 2026-08-28T03:40:48.167Z |  |
+| 32 | 04.2 | stub | apps/desktop/src/lib/link-guard.ts | 5 | decideLinkAction stub returns block until Plan 03 | open |  | 2026-08-28T03:40:48.272Z |  |
+| 33 | 04.2 | deviation | .planning/phases/04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent/04.2-VALIDATION.md |  | 04.2-03-T3 dragout skipped — human blocked tauri-plugin-dragout; Phase 5 CrabNebula drag | open |  | 2026-08-28T03:54:59.759Z |  |
 
 ````json
 [
@@ -354,6 +361,90 @@ last_updated: 2026-08-27T05:15:02.518Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-27T05:15:02.518Z",
+    "resolved_at": null
+  },
+  {
+    "id": 27,
+    "kind": "stub",
+    "phase": "04.2",
+    "file": "apps/desktop/src/lib/link-guard.ts",
+    "line": 5,
+    "description": "decideLinkAction stub returns block until Plan 03",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-28T03:40:47.736Z",
+    "resolved_at": null
+  },
+  {
+    "id": 28,
+    "kind": "stub",
+    "phase": "04.2",
+    "file": "apps/desktop/src/lib/link-guard.ts",
+    "line": 5,
+    "description": "decideLinkAction stub returns block until Plan 03",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-28T03:40:47.844Z",
+    "resolved_at": null
+  },
+  {
+    "id": 29,
+    "kind": "stub",
+    "phase": "04.2",
+    "file": "apps/desktop/src/lib/link-guard.ts",
+    "line": 5,
+    "description": "decideLinkAction stub returns block until Plan 03",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-28T03:40:47.964Z",
+    "resolved_at": null
+  },
+  {
+    "id": 30,
+    "kind": "stub",
+    "phase": "04.2",
+    "file": "apps/desktop/src/lib/link-guard.ts",
+    "line": 5,
+    "description": "decideLinkAction stub returns block until Plan 03",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-28T03:40:48.068Z",
+    "resolved_at": null
+  },
+  {
+    "id": 31,
+    "kind": "stub",
+    "phase": "04.2",
+    "file": "apps/desktop/src/lib/link-guard.ts",
+    "line": 5,
+    "description": "decideLinkAction stub returns block until Plan 03",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-28T03:40:48.167Z",
+    "resolved_at": null
+  },
+  {
+    "id": 32,
+    "kind": "stub",
+    "phase": "04.2",
+    "file": "apps/desktop/src/lib/link-guard.ts",
+    "line": 5,
+    "description": "decideLinkAction stub returns block until Plan 03",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-28T03:40:48.272Z",
+    "resolved_at": null
+  },
+  {
+    "id": 33,
+    "kind": "deviation",
+    "phase": "04.2",
+    "file": ".planning/phases/04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent/04.2-VALIDATION.md",
+    "line": null,
+    "description": "04.2-03-T3 dragout skipped — human blocked tauri-plugin-dragout; Phase 5 CrabNebula drag",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-28T03:54:59.759Z",
     "resolved_at": null
   }
 ]
