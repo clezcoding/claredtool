@@ -40,7 +40,7 @@ import {
 export const DEBUG_PANEL_ENABLED = import.meta.env.DEV;
 
 const UPDATER_ENDPOINT =
-  "https://updates.puzzlessdev.online/checkVersion?app_name=clared&version={{current_version}}&target={{target}}&arch={{arch}}&channel=stable&updater=tauri";
+  "https://updates.puzzlessdev.online/checkVersion?app_name=clared&version={{current_version}}&target={{target}}&arch={{arch}}&channel=stable&updater=tauri&owner=admin";
 
 const CLIPBOARD_TEST_VALUE = "Clared Debug-Zwischenablage-Test";
 
@@ -54,7 +54,11 @@ export function maskUpdaterEndpoint(url: string): string {
     const parsed = new URL(url);
     const segments = parsed.hostname.split(".");
     if (segments.length >= 2) {
-      parsed.hostname = [segments[0].slice(0, 2) + "***", "***", segments.at(-1) ?? "***"]
+      parsed.hostname = [
+        segments[0].slice(0, 2) + "***",
+        "***",
+        segments[segments.length - 1] ?? "***",
+      ]
         .filter(Boolean)
         .join(".");
     } else {

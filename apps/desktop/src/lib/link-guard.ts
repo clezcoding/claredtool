@@ -89,14 +89,18 @@ export function installLinkGuard(): void {
   document.addEventListener("auxclick", onPointer, true);
 
   const nativeOpen = window.open.bind(window);
-  window.open = (url?: string | URL, ...rest: unknown[]) => {
+  window.open = (
+    url?: string | URL,
+    target?: string,
+    features?: string,
+  ): Window | null => {
     if (url == null || url === "") {
-      return nativeOpen(url, ...(rest as [string?, string?, string?]));
+      return nativeOpen(url, target, features);
     }
     const href = typeof url === "string" ? url : url.href;
     const action = decideLinkAction(href);
     if (action === "in-app") {
-      return nativeOpen(url, ...(rest as [string?, string?, string?]));
+      return nativeOpen(url, target, features);
     }
     if (action === "opener") {
       void openUrl(href).catch(() => logBlocked(href));

@@ -115,7 +115,6 @@ export function UpdateDialog() {
               <Button
                 type="button"
                 onClick={() => void downloadUpdate()}
-                disabled={state === "downloading"}
               >
                 {t("update.install")}
               </Button>
