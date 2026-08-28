@@ -14,6 +14,7 @@ pnpm-debug.log*
 target
 **/target
 apps/desktop/src-tauri/gen/schemas
+apps/desktop/src-tauri/tauri.conf.build.json
 
 # Local agent/runtime (never commit secrets or GSD scratch)
 TXTOS.txt

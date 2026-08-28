@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
+    "tauri:build": "node scripts/patch-tauri-config.mjs && tauri build --config src-tauri/tauri.conf.build.json",
     "test": "vitest run",
     "stitch:validate": "node ./scripts/stitch-validate.mjs"
   },
