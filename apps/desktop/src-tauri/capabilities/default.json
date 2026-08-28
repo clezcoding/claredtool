@@ -15,6 +15,7 @@
     "allow-keychain-delete-session",
     "allow-open-login-window",
     "window-state:default",
-    "notification:default"
+    "notification:default",
+    "log:default"
   ]
 }

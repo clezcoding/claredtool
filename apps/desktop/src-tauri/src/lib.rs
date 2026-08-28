@@ -210,9 +210,29 @@ fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
     tauri_plugin_prevent_default::init()
 }
 
+fn log_plugin() -> tauri::plugin::TauriPlugin<tauri::Wry> {
+    use log::LevelFilter;
+    use tauri_plugin_log::{Builder, Target, TargetKind};
+
+    // D-42/D-43/D-44: LogDir + plugin rotation defaults; debug in dev, info in release.
+    let level = if cfg!(debug_assertions) {
+        LevelFilter::Debug
+    } else {
+        LevelFilter::Info
+    };
+
+    Builder::new()
+        .level(level)
+        .target(Target::new(TargetKind::LogDir {
+            file_name: None,
+        }))
+        .build()
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let mut builder = tauri::Builder::default()
+        .plugin(log_plugin())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_store::Builder::new().build())
