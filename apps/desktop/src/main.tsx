@@ -9,6 +9,7 @@ import {
   getThemePref,
   migrateThemeToStore,
 } from "./lib/desktop-store";
+import { installLinkGuard } from "./lib/link-guard";
 import { installThemeMenu } from "./lib/theme-menu";
 import { applyTheme, syncSystemAppearance } from "./lib/theme";
 import "./styles/globals.css";
@@ -17,6 +18,7 @@ void (async () => {
   await migrateThemeToStore();
   applyTheme(await getThemePref());
   void installThemeMenu();
+  requestAnimationFrame(() => installLinkGuard());
 })();
 window
   .matchMedia("(prefers-color-scheme: dark)")
