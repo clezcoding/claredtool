@@ -18,10 +18,11 @@ describe("sidebar routes", () => {
   it("lists Rechnung, Entities, Kunden, Tax, PDF in that order", async () => {
     await renderSignedIn();
     const nav = screen.getByRole("navigation");
-    const labels = within(nav)
-      .getAllByRole("link")
-      .map((link) => link.textContent?.trim());
-    expect(labels).toEqual(["Rechnung", "Entities", "Kunden", "Tax", "PDF"]);
+    const links = within(nav).getAllByRole("link");
+    expect(links).toHaveLength(5);
+    for (const name of ["Rechnung", "Entities", "Kunden", "Tax", "PDF"]) {
+      expect(within(nav).getByRole("link", { name })).toBeTruthy();
+    }
   });
 
   it("lands on the first-run empty invoice on the index route", async () => {
@@ -34,10 +35,10 @@ describe("sidebar routes", () => {
   });
 
   it.each([
-    ["Entities", "Entities"],
+    ["Entities", "Geschäftseinheiten"],
     ["Kunden", "Kunden"],
-    ["Tax", "Tax Rules"],
-    ["PDF", "PDF Viewer / Export"],
+    ["Tax", "Steuerregeln"],
+    ["PDF", "PDF-Vorschau / Export"],
   ] as const)("navigates to %s without a blank page", async (linkLabel, heading) => {
     await renderSignedIn();
     fireEvent.click(screen.getByRole("link", { name: linkLabel }));
@@ -46,5 +47,18 @@ describe("sidebar routes", () => {
         within(screen.getByRole("main")).getByRole("heading", { name: heading }),
       ).toBeTruthy();
     });
+  });
+
+  it("enforces D-11/D-13 scope lock: exactly 5 nav items, no iframe route leftovers", async () => {
+    await renderSignedIn();
+    const nav = screen.getByRole("navigation");
+    const links = within(nav).getAllByRole("link");
+    expect(links).toHaveLength(5);
+    expect(document.querySelector("iframe")).toBeNull();
+
+    for (const linkLabel of ["Entities", "Kunden", "Tax", "PDF"]) {
+      fireEvent.click(within(nav).getByRole("link", { name: linkLabel }));
+      expect(document.querySelector("iframe")).toBeNull();
+    }
   });
 });

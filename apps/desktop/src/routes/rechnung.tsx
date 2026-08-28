@@ -1,5 +1,20 @@
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
   Button,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   Input,
   Label,
   Select,
@@ -8,28 +23,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@clared/ui";
-import {
-  Calendar,
-  ChevronDown,
-  Copy,
-  Eye,
-  FileText,
-  Info,
-  MoreHorizontal,
-  Send,
-  Settings,
-  Trash2,
-} from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { apiFetch } from "../auth/api";
 import { useSession } from "../auth/session-provider";
 import { ErrorState } from "../components/error-state";
 import { InvoiceEmptyState } from "../components/invoice-empty-state";
 import { LineItemCard } from "../components/line-item-card";
+import { MaterialIcon } from "../components/material-icon";
 import { Skeleton } from "../components/skeleton";
 import { Spinner } from "../components/spinner";
 import { TaxRail } from "../components/tax-rail";
+import { taxPercent as taxPercentFromRate } from "../lib/money";
 import {
   resetTaxLiveState,
   setTaxLiveState,
@@ -87,7 +93,7 @@ const BLANK_LINE: LineItem = {
 
 const AUTOSAVE_DELAY_MS = 600;
 const SEND_CTA =
-  "btn-primary inline-flex min-h-11 items-center gap-2 rounded-none px-4 font-semibold bg-[var(--cta-send)] text-white hover:bg-[var(--cta-send)]/90";
+  "btn-primary inline-flex min-h-11 items-center gap-2 rounded-none px-4 font-semibold bg-primary-container text-white hover:bg-primary-container/90";
 const OUTLINE_BTN =
   "inline-flex min-h-11 items-center gap-2 rounded-md border border-border px-3 text-sm font-medium hover:bg-muted/50";
 const NEUE_RECHNUNG_BTN =
@@ -97,27 +103,84 @@ function entityInitial(name: string): string {
   return name.trim().charAt(0).toUpperCase() || "?";
 }
 
-function formatSavedAgo(timestamp: number): string {
+function formatSavedAgo(timestamp: number, justNow: string, minutesAgo: (mins: number) => string): string {
   const mins = Math.floor((Date.now() - timestamp) / 60000);
-  if (mins < 1) return "Gerade eben";
-  if (mins === 1) return "vor 1 Min";
-  return `vor ${mins} Min`;
+  if (mins < 1) return justNow;
+  return minutesAgo(mins);
+}
+
+function formatIsoLocal(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 function dueDateFromTerms(isoDate: string, days: number): string {
-  const date = new Date(isoDate);
+  const date = new Date(`${isoDate.slice(0, 10)}T00:00:00`);
   date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
+  return formatIsoLocal(date);
+}
+
+function dueDateFromPaymentTerms(isoDate: string, terms: string): string | null {
+  const days = Number(terms);
+  if (!isoDate || !Number.isFinite(days)) return null;
+  return dueDateFromTerms(isoDate, days);
+}
+
+function inferPaymentTerms(datum: string, faellig: string): string {
+  const start = new Date(`${datum.slice(0, 10)}T00:00:00`).getTime();
+  const end = new Date(`${faellig.slice(0, 10)}T00:00:00`).getTime();
+  const days = Math.round((end - start) / 86400000);
+  if (days === 14) return "14";
+  if (days === 30) return "30";
+  return "";
 }
 
 function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
+  return formatIsoLocal(new Date());
 }
 
 function addDaysIso(days: number): string {
   const date = new Date();
   date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
+  return formatIsoLocal(date);
+}
+
+function shiftMonth(iso: string, delta: number): string {
+  const date = new Date(`${iso}T00:00:00`);
+  date.setMonth(date.getMonth() + delta);
+  return formatIsoLocal(date);
+}
+
+function monthLabel(iso: string): string {
+  return new Date(`${iso}T00:00:00`).toLocaleDateString("de-DE", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function monthCells(iso: string): { key: string; day: number; value: string | null }[] {
+  const date = new Date(`${iso}T00:00:00`);
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const pad = (new Date(year, month, 1).getDay() + 6) % 7;
+  const days = new Date(year, month + 1, 0).getDate();
+  const prevDays = new Date(year, month, 0).getDate();
+  const cells: { key: string; day: number; value: string | null }[] = [];
+  for (let i = 0; i < pad; i += 1) {
+    cells.push({ key: `p-${i}`, day: prevDays - pad + i + 1, value: null });
+  }
+  for (let day = 1; day <= days; day += 1) {
+    const value = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    cells.push({ key: value, day, value });
+  }
+  let next = 1;
+  while (cells.length % 7 !== 0) {
+    cells.push({ key: `n-${next}`, day: next, value: null });
+    next += 1;
+  }
+  return cells;
 }
 
 function toDateInput(value: string | null | undefined): string {
@@ -145,7 +208,10 @@ function invoiceLabel(invoice: InvoiceRow | null, isCurrentUnnumbered: boolean):
   return invoice.number;
 }
 
-export function RechnungScreen() {
+export interface RechnungScreenProps {}
+
+export function RechnungScreen(_props: RechnungScreenProps = {}) {
+  const { t } = useTranslation();
   const { me } = useSession();
   const canRead = me?.permissions.includes("invoice.read") ?? false;
   const canWrite = me?.permissions.includes("invoice.write") ?? false;
@@ -176,6 +242,19 @@ export function RechnungScreen() {
   const [isUnnumberedDraft, setIsUnnumberedDraft] = useState(false);
   const [autosaveStatus, setAutosaveStatus] = useState<AutosaveStatus>("hidden");
   const [taxEvaluateError, setTaxEvaluateError] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [sendOpen, setSendOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [dateField, setDateField] = useState<"datum" | "faellig" | null>(null);
+  const [dateCursor, setDateCursor] = useState(todayIso);
+  const [createCustomerQuery, setCreateCustomerQuery] = useState("");
+  const [createTemplate, setCreateTemplate] = useState("standard");
+  const [sendTo, setSendTo] = useState("");
+  const [sendCc, setSendCc] = useState("");
+  const [sendSubject, setSendSubject] = useState("");
+  const [sendBody, setSendBody] = useState("");
   const [railTax, setRailTax] = useState<Pick<
     StagedTaxDecision,
     "invoice_tax_rate" | "reverse_charge_flag" | "legal_reference" | "applied_rule_id"
@@ -186,6 +265,7 @@ export function RechnungScreen() {
   const lastGoodTaxRef = useRef<StagedTaxDecision | null>(null);
   const persistDraftRef = useRef<() => Promise<void>>(async () => {});
   const evaluateDraftRef = useRef<() => Promise<void>>(async () => {});
+  const focusEntityRef = useRef(false);
 
   const selectedEntity = entities.find((row) => row.id === entityId);
   const selectedCustomer = customers.find((row) => row.id === customerId);
@@ -216,8 +296,15 @@ export function RechnungScreen() {
       setCustomerId(invoice.customerId ?? "");
       setDatum(toDateInput(invoice.date));
       setFaellig(toDateInput(invoice.dueDate));
+      setZahlungsbedingung(
+        inferPaymentTerms(
+          toDateInput(invoice.date),
+          toDateInput(invoice.dueDate),
+        ),
+      );
       setCurrency(invoice.currency);
       setLineItems(mapItemsFromApi(invoice.items));
+      resetLocalInvoiceFields();
       setShowHero(false);
       const entity = entityRows.find((row) => row.id === invoice.entityId);
       entityDefaultRef.current = entity?.currencyDefault ?? "EUR";
@@ -255,12 +342,14 @@ export function RechnungScreen() {
         setCustomerId("");
         setDatum(todayIso());
         setFaellig(addDaysIso(30));
+        setZahlungsbedingung("30");
         setCurrency(
           entityRows.length === 1
             ? (entityRows[0].currencyDefault ?? "EUR")
             : "EUR",
         );
         setLineItems([{ ...BLANK_LINE }]);
+        resetLocalInvoiceFields();
         if (entityRows.length === 1) {
           entityDefaultRef.current = entityRows[0].currencyDefault ?? "EUR";
           void loadCustomers(entityRows[0].id);
@@ -273,7 +362,11 @@ export function RechnungScreen() {
           skipAutosaveRef.current = false;
         });
       } else {
-        applyInvoice(invoiceRows[0], entityRows);
+        const sorted = [...invoiceRows].sort(
+          (a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+        );
+        applyInvoice(sorted[0], entityRows);
       }
     } catch {
       setLoadError(true);
@@ -416,6 +509,12 @@ export function RechnungScreen() {
   persistDraftRef.current = persistDraft;
   evaluateDraftRef.current = evaluateDraft;
 
+  useLayoutEffect(() => {
+    if (!focusEntityRef.current || showHero || loading) return;
+    focusEntityRef.current = false;
+    document.getElementById("entity-picker")?.focus();
+  }, [loading, showHero]);
+
   useEffect(() => {
     if (!canWrite || skipAutosaveRef.current) return;
 
@@ -443,12 +542,26 @@ export function RechnungScreen() {
     }
   }
 
+  function resetLocalInvoiceFields() {
+    setBetreff("");
+    setNotiz("");
+    setLineItemCategories({});
+  }
+
+  function syncDueFromTerms(nextDatum: string, terms: string) {
+    if (!terms) return;
+    const nextDue = dueDateFromPaymentTerms(nextDatum, terms);
+    if (nextDue) setFaellig(nextDue);
+  }
+
+  function applyFaellig(value: string) {
+    setFaellig(value);
+    setZahlungsbedingung(inferPaymentTerms(datum, value));
+  }
+
   function handleZahlungsbedingung(value: string) {
     setZahlungsbedingung(value);
-    const days = Number(value);
-    if (datum && Number.isFinite(days)) {
-      setFaellig(dueDateFromTerms(datum, days));
-    }
+    syncDueFromTerms(datum, value);
     if (canWrite) setAutosaveStatus("saving");
   }
 
@@ -459,10 +572,13 @@ export function RechnungScreen() {
     setRechnungsnummer("");
     setDatum(todayIso());
     setFaellig(addDaysIso(30));
+    setZahlungsbedingung("30");
     setLineItems([{ ...BLANK_LINE }]);
+    resetLocalInvoiceFields();
     setCustomerId("");
     setShowHero(false);
     setAutosaveStatus("hidden");
+    focusEntityRef.current = true;
     resetTaxLiveState();
     lastGoodTaxRef.current = null;
     setRailTax(null);
@@ -479,6 +595,84 @@ export function RechnungScreen() {
     skipAutosaveRef.current = false;
   }
 
+  function openCreateModal() {
+    setCreateCustomerQuery("");
+    setCreateTemplate("standard");
+    setCreateOpen(true);
+  }
+
+  function openSendModal() {
+    setSendTo("");
+    setSendCc("");
+    setSendSubject(`Ihre Rechnung ${rechnungsnummer || pickerLabel}`);
+    setSendBody(
+      `Guten Tag,\n\nanbei erhalten Sie unsere Rechnung ${rechnungsnummer || pickerLabel}.\n\nMit freundlichen Grüßen`,
+    );
+    setSendOpen(true);
+  }
+
+  function openDatePicker(field: "datum" | "faellig") {
+    const current = field === "datum" ? datum : faellig;
+    setDateCursor(current);
+    setDateField(field);
+  }
+
+  async function handleDeleteInvoice() {
+    if (!draftId) {
+      setDeleteOpen(false);
+      return;
+    }
+    const idToDelete = draftId;
+    try {
+      const res = await apiFetch(`/api/invoices/${idToDelete}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("delete failed");
+      const remaining = drafts.filter((row) => row.id !== idToDelete);
+      setDrafts(remaining);
+      setDeleteError(null);
+      setDeleteOpen(false);
+      if (remaining.length === 0) {
+        skipAutosaveRef.current = true;
+        setShowHero(true);
+        setDraftId(null);
+        setIsUnnumberedDraft(false);
+        setRechnungsnummer("");
+        setEntityId(entities.length === 1 ? entities[0].id : "");
+        setCustomerId("");
+        setDatum(todayIso());
+        setFaellig(addDaysIso(30));
+        setZahlungsbedingung("30");
+        setCurrency(
+          entities.length === 1
+            ? (entities[0].currencyDefault ?? "EUR")
+            : "EUR",
+        );
+        setLineItems([{ ...BLANK_LINE }]);
+        resetLocalInvoiceFields();
+        if (entities.length === 1) {
+          entityDefaultRef.current = entities[0].currencyDefault ?? "EUR";
+          void loadCustomers(entities[0].id);
+        }
+        resetTaxLiveState();
+        lastGoodTaxRef.current = null;
+        setRailTax(null);
+        setTaxEvaluateError(null);
+        queueMicrotask(() => {
+          skipAutosaveRef.current = false;
+        });
+      } else {
+        const next = [...remaining].sort(
+          (a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+        )[0];
+        if (next) applyInvoice(next, entities);
+      }
+    } catch {
+      setDeleteError(t("invoice.deleteFailed"));
+    }
+  }
+
   function handlePickerSelect(invoice: InvoiceRow) {
     applyInvoice(invoice, entities);
     resetTaxLiveState();
@@ -490,7 +684,7 @@ export function RechnungScreen() {
   if (!canRead) {
     return (
       <div className="p-6">
-        <ErrorState onRetry={() => undefined} />
+        <ErrorState />
       </div>
     );
   }
@@ -525,8 +719,7 @@ export function RechnungScreen() {
     (sum, item) => sum + item.menge * item.einzelpreis,
     0,
   );
-  const rate = railTax?.invoice_tax_rate ?? 0;
-  const taxPercent = rate <= 1 ? Math.round(rate * 100) : Math.round(rate);
+  const lineTaxPercent = taxPercentFromRate(railTax?.invoice_tax_rate ?? 0);
 
   if (showHero) {
     return <InvoiceEmptyState onStart={startNewDraft} />;
@@ -550,7 +743,7 @@ export function RechnungScreen() {
                 </>
               )}
               <span className="shrink-0 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-                Entwurf
+                {t("invoice.draft")}
               </span>
             </h1>
             {drafts.length > 1 ? (
@@ -562,7 +755,7 @@ export function RechnungScreen() {
                 }}
               >
                 <SelectTrigger
-                  aria-label="Rechnung wählen"
+                  aria-label={t("invoice.pickInvoice")}
                   className="h-8 w-auto max-w-[10rem] bg-transparent text-xs font-normal"
                   title={pickerLabel}
                 >
@@ -584,24 +777,31 @@ export function RechnungScreen() {
                 {autosaveStatus === "saving" ? (
                   <>
                     <Spinner />
-                    <span>Speichert…</span>
+                    <span>{t("invoice.saving")}</span>
                   </>
                 ) : null}
                 {autosaveStatus === "saved" && savedAt ? (
-                  <span>Gespeichert {formatSavedAgo(savedAt)}</span>
+                  <span>
+                    {t("invoice.saved")}{" "}
+                    {formatSavedAgo(
+                      savedAt,
+                      t("invoice.justNow"),
+                      (mins) => t("invoice.minutesAgo", { count: mins }),
+                    )}
+                  </span>
                 ) : null}
                 {autosaveStatus === "error" ? (
-                  <span>Speichern fehlgeschlagen.</span>
+                  <span>{t("invoice.saveFailed")}</span>
                 ) : null}
               </div>
             ) : null}
             <button
               type="button"
-              disabled
-              aria-label="Weitere Optionen"
+              aria-label={t("invoice.moreOptions")}
               className="inline-flex size-9 items-center justify-center rounded-md border border-border text-muted-foreground"
+              onClick={() => setMenuOpen(true)}
             >
-              <MoreHorizontal size={16} />
+              <MaterialIcon ligature="more_horiz" className="text-[16px]" />
             </button>
             {canWrite ? (
               <button
@@ -609,45 +809,47 @@ export function RechnungScreen() {
                 onClick={() => void persistDraft()}
                 className={`${OUTLINE_BTN} hidden dark:inline-flex`}
               >
-                Speichern
+                {t("invoice.save")}
               </button>
             ) : null}
             {showRail ? (
               <Link to="/pdf" className={OUTLINE_BTN}>
-                <Eye size={16} />
-                Vorschau
+                <MaterialIcon ligature="visibility" className="text-[16px]" />
+                {t("invoice.preview")}
               </Link>
             ) : null}
             {canWrite ? (
               <Button type="button" onClick={startNewDraft} className={NEUE_RECHNUNG_BTN}>
-                Neue Rechnung
+                {t("invoice.new")}
               </Button>
             ) : null}
             {showRail ? (
               <div className="inline-flex overflow-hidden rounded-md">
-                <Link to="/pdf" className={SEND_CTA}>
-                  <Send size={14} />
-                  Senden
-                </Link>
+                <button type="button" className={SEND_CTA} onClick={openSendModal}>
+                  <MaterialIcon ligature="send" className="text-[14px]" />
+                  {t("invoice.send")}
+                </button>
                 <button
                   type="button"
-                  disabled
-                  aria-label="Senden Optionen"
-                  className="inline-flex min-h-11 items-center border-l border-white/20 bg-[var(--cta-send)] px-2 text-white"
+                  aria-label={t("invoice.sendOptions")}
+                  className="inline-flex min-h-11 items-center border-l border-white/20 bg-primary-container px-2 text-white"
+                  onClick={openSendModal}
                 >
-                  <ChevronDown size={14} />
+                  <MaterialIcon ligature="expand_more" className="text-[14px]" />
                 </button>
               </div>
             ) : null}
           </div>
         </header>
 
-        <div className="flex flex-col gap-6 px-8 py-6 pb-28">
-          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-lg border border-border bg-background/50 p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Von
+        <div
+          data-testid="invoice-canvas"
+          className="mx-auto flex w-full max-w-[1000px] flex-col gap-8 px-8 py-6 pb-28"
+        >
+          <div className="grid gap-x-12 gap-y-6 lg:grid-cols-2">
+            <div className="flex flex-col gap-2">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t("invoice.from")}
               </p>
               <Label htmlFor="entity-picker" className="sr-only">
                 Entity
@@ -662,20 +864,20 @@ export function RechnungScreen() {
               >
                 <SelectTrigger
                   id="entity-picker"
-                  className="mt-2 min-h-11 w-full bg-transparent font-normal"
+                  className="h-11 w-full bg-muted/40 font-normal"
                 >
                   {selectedEntity ? (
                     <div className="flex min-w-0 flex-1 items-center gap-3">
-                      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-[#3d5240] text-sm font-semibold text-white">
+                      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-entity-avatar text-sm font-semibold text-white">
                         {entityInitial(selectedEntity.name)}
                       </span>
                       <span className="truncate text-left font-medium">
                         {selectedEntity.name}
                       </span>
-                      <ChevronDown size={16} className="ml-auto shrink-0 text-muted-foreground" />
+                      <MaterialIcon ligature="unfold_more" className="ml-auto shrink-0 text-[20px] text-muted-foreground" />
                     </div>
                   ) : (
-                    <SelectValue placeholder="Entity wählen" />
+                    <SelectValue placeholder={t("invoice.entityPlaceholder")} />
                   )}
                 </SelectTrigger>
                 <SelectContent>
@@ -688,24 +890,24 @@ export function RechnungScreen() {
               </Select>
               {selectedEntity ? (
                 <>
-                  <p className="mt-2 whitespace-normal break-words text-sm text-muted-foreground">
+                  <p className="mt-1 whitespace-normal break-words text-xs text-muted-foreground">
                     {selectedEntity.address}
                   </p>
-                  <div className="mt-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
                     <span>
                       St.-Nr. {selectedEntity.vatId ?? "—"}
                     </span>
-                    <Info size={14} className="shrink-0" />
+                    <MaterialIcon ligature="info" className="text-[14px]" />
                   </div>
                 </>
               ) : null}
             </div>
-            <div className="rounded-lg border border-border bg-background/50 p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                Kunde
+            <div className="flex flex-col gap-2">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t("invoice.customer")}
               </p>
               <Label htmlFor="customer-picker" className="sr-only">
-                Kunde
+                {t("invoice.customer")}
               </Label>
               <Select
                 value={customerId}
@@ -717,20 +919,20 @@ export function RechnungScreen() {
               >
                 <SelectTrigger
                   id="customer-picker"
-                  className="mt-2 min-h-11 w-full bg-transparent font-normal"
+                  className="h-11 w-full bg-card font-normal"
                 >
                   {selectedCustomer ? (
                     <div className="flex min-w-0 flex-1 items-center gap-3">
-                      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-red-600 text-xs font-bold tracking-wide text-white">
-                        ACME
+                      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-customer-avatar-soft text-xs font-bold tracking-wide text-customer-avatar">
+                        {entityInitial(selectedCustomer.name)}
                       </span>
                       <span className="truncate text-left font-medium">
                         {selectedCustomer.name}
                       </span>
-                      <ChevronDown size={16} className="ml-auto shrink-0 text-muted-foreground" />
+                      <MaterialIcon ligature="unfold_more" className="ml-auto shrink-0 text-[20px] text-muted-foreground" />
                     </div>
                   ) : (
-                    <SelectValue placeholder="Kunde wählen" />
+                    <SelectValue placeholder={t("invoice.customerPlaceholder")} />
                   )}
                 </SelectTrigger>
                 <SelectContent>
@@ -743,13 +945,13 @@ export function RechnungScreen() {
               </Select>
               {selectedCustomer ? (
                 <>
-                  <p className="mt-2 whitespace-normal break-words text-sm text-muted-foreground">
+                  <p className="mt-1 whitespace-normal break-words text-xs text-muted-foreground">
                     {selectedCustomer.address}
                   </p>
                   {selectedCustomer.vatId ? (
-                    <div className="mt-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
                       <span>USt-IdNr. {selectedCustomer.vatId}</span>
-                      <Info size={14} className="shrink-0" />
+                      <MaterialIcon ligature="info" className="text-[14px]" />
                     </div>
                   ) : null}
                 </>
@@ -757,29 +959,34 @@ export function RechnungScreen() {
             </div>
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-4">
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="rechnungsnummer">Rechnungsnummer</Label>
+          <div className="grid gap-4 sm:grid-cols-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="rechnungsnummer" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t("invoice.number")}
+              </Label>
               <div className="relative flex items-center">
                 <Input
                   id="rechnungsnummer"
                   readOnly
-                  placeholder="Wird vergeben…"
+                  placeholder={t("invoice.numberPending")}
                   value={rechnungsnummer}
-                  className="bg-background pr-10"
+                  className="h-11 bg-card pr-10"
                 />
                 <button
                   type="button"
                   disabled={!canWrite}
-                  aria-label="Rechnungsnummer Einstellungen"
+                  aria-label={t("invoice.numberSettings")}
                   className="absolute right-2 inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground disabled:opacity-50"
+                  onClick={() => setMenuOpen(true)}
                 >
-                  <Settings size={16} />
+                  <MaterialIcon ligature="settings" className="text-[16px]" />
                 </button>
               </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="datum">Datum</Label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="datum" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t("invoice.date")}
+              </Label>
               <div className="relative">
                 <Input
                   id="datum"
@@ -787,20 +994,27 @@ export function RechnungScreen() {
                   value={datum}
                   readOnly={!canWrite}
                   onChange={(event) => {
-                    setDatum(event.target.value);
+                    const value = event.target.value;
+                    setDatum(value);
+                    syncDueFromTerms(value, zahlungsbedingung);
                     if (canWrite) setAutosaveStatus("saving");
                   }}
-                  className="bg-background pr-10"
+                  className="h-11 bg-card pr-10"
                 />
-                <Calendar
-                  size={16}
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  aria-hidden
-                />
+                <button
+                  type="button"
+                  aria-label="Datum wählen"
+                  className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-muted-foreground"
+                  onClick={() => openDatePicker("datum")}
+                >
+                  <MaterialIcon ligature="calendar_today" className="text-[20px]" />
+                </button>
               </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="faellig">Fällig</Label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="faellig" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t("invoice.due")}
+              </Label>
               <div className="relative">
                 <Input
                   id="faellig"
@@ -808,66 +1022,63 @@ export function RechnungScreen() {
                   value={faellig}
                   readOnly={!canWrite}
                   onChange={(event) => {
-                    setFaellig(event.target.value);
+                    applyFaellig(event.target.value);
                     if (canWrite) setAutosaveStatus("saving");
                   }}
-                  className="bg-background pr-10"
+                  className="h-11 bg-card pr-10"
                 />
-                <Calendar
-                  size={16}
-                  className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  aria-hidden
-                />
+                <button
+                  type="button"
+                  aria-label="Fälligkeit wählen"
+                  className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-muted-foreground"
+                  onClick={() => openDatePicker("faellig")}
+                >
+                  <MaterialIcon ligature="calendar_today" className="text-[20px]" />
+                </button>
               </div>
             </div>
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="zahlungsbedingung">Zahlungsbedingung</Label>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="zahlungsbedingung" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t("invoice.terms")}
+              </Label>
               <Select
-                value={zahlungsbedingung}
+                value={zahlungsbedingung || undefined}
                 onValueChange={handleZahlungsbedingung}
                 disabled={!canWrite}
               >
                 <SelectTrigger
                   id="zahlungsbedingung"
-                  className="min-h-11 w-full bg-background font-normal"
+                  className="h-11 w-full bg-card font-normal"
                 >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="14">14 Tage netto</SelectItem>
-                  <SelectItem value="30">30 Tage netto</SelectItem>
+                  <SelectItem value="14">{t("invoice.terms14")}</SelectItem>
+                  <SelectItem value="30">{t("invoice.terms30")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col gap-1">
-            <Label htmlFor="betreff">Betreff</Label>
+          <div className="flex flex-col gap-2 border-b border-border/70 pb-8">
+            <Label htmlFor="betreff" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              {t("invoice.subject")}
+            </Label>
             <Input
               id="betreff"
               value={betreff}
               readOnly={!canWrite}
-              placeholder="Betreff der Rechnung"
+              placeholder={t("invoice.subjectPlaceholder")}
               onChange={(event) => setBetreff(event.target.value)}
-              className="bg-background"
-            />
-          </div>
-          <div className="mt-4 flex flex-col gap-1">
-            <Label htmlFor="notiz">Notiz</Label>
-            <textarea
-              id="notiz"
-              value={notiz}
-              readOnly={!canWrite}
-              placeholder="Notiz (wird auf der Rechnung angezeigt)"
-              onChange={(event) => setNotiz(event.target.value)}
-              rows={2}
-              className="min-h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="border-none bg-transparent px-0 text-lg font-semibold shadow-none focus-visible:ring-0"
             />
           </div>
 
-          <table className="mt-6 w-full text-left text-sm">
+          <div className="flex flex-col gap-4">
+            <h2 className="text-sm font-medium text-foreground">{t("invoice.services")}</h2>
+          <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-border text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              <tr className="border-b border-border text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                 <th className="py-2 pr-2 font-medium">Pos.</th>
                 <th className="py-2 pr-2 font-medium">Beschreibung</th>
                 <th className="py-2 pr-2 font-medium">Kategorie</th>
@@ -884,7 +1095,7 @@ export function RechnungScreen() {
                   key={`line-${index}`}
                   item={item}
                   index={index}
-                  taxPercent={taxPercent}
+                  taxPercent={lineTaxPercent}
                   kategorie={
                     (lineItemCategories[index] as
                       | "beratung"
@@ -911,6 +1122,16 @@ export function RechnungScreen() {
                     setLineItems((current) =>
                       current.filter((_, rowIndex) => rowIndex !== index),
                     );
+                    setLineItemCategories((current) => {
+                      const next: Record<number, string> = {};
+                      let target = 0;
+                      for (let i = 0; i < lineItems.length; i += 1) {
+                        if (i === index) continue;
+                        if (current[i] !== undefined) next[target] = current[i];
+                        target += 1;
+                      }
+                      return next;
+                    });
                     if (canWrite) setAutosaveStatus("saving");
                   }}
                 />
@@ -924,62 +1145,78 @@ export function RechnungScreen() {
                 setLineItems((current) => [...current, { ...BLANK_LINE }]);
                 if (canWrite) setAutosaveStatus("saving");
               }}
-              className="mt-3 self-start rounded-md border border-dashed border-border px-4 py-2 text-sm text-muted-foreground hover:border-foreground/30 hover:text-foreground"
+              className="inline-flex items-center gap-2 self-start text-sm text-primary hover:underline"
             >
-              + Zeile hinzufügen
+              <MaterialIcon ligature="add_circle" className="text-[18px]" />
+              {t("invoice.addLine")}
             </button>
           ) : null}
           </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="notiz" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+              {t("invoice.note")}
+            </Label>
+            <textarea
+              id="notiz"
+              value={notiz}
+              readOnly={!canWrite}
+              placeholder={t("invoice.notePlaceholder")}
+              onChange={(event) => setNotiz(event.target.value)}
+              rows={3}
+              className="min-h-11 w-full rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+            />
+          </div>
         </div>
 
-        <div className="sticky bottom-0 z-10 flex items-center justify-between gap-4 border-t border-border/70 bg-background/95 px-8 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-          <div className="flex flex-wrap items-center gap-4">
+        <div className="sticky bottom-0 z-10 flex h-20 items-center justify-between gap-4 border-t border-border/70 bg-background/90 px-8 backdrop-blur">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
-              disabled
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground disabled:opacity-50"
+              className="inline-flex h-11 items-center gap-2 rounded-lg border border-border/50 px-4 text-sm"
+              onClick={() => setMenuOpen(true)}
             >
-              <FileText size={14} />
-              Als Vorlage speichern
+              <MaterialIcon ligature="save" className="text-[18px]" />
+              {t("invoice.saveTemplate")}
             </button>
             <button
               type="button"
-              disabled
-              className="inline-flex items-center gap-2 text-sm text-muted-foreground disabled:opacity-50"
+              aria-label={t("invoice.duplicate")}
+              className="inline-flex size-11 items-center justify-center rounded-lg border border-border/50 text-muted-foreground"
+              onClick={() => setMenuOpen(true)}
             >
-              <Copy size={14} />
-              Duplizieren
+              <MaterialIcon ligature="content_copy" className="text-[20px]" />
             </button>
             <button
               type="button"
-              disabled
-              className="inline-flex items-center gap-2 text-sm text-destructive disabled:opacity-50"
+              aria-label={t("invoice.delete")}
+              className="inline-flex size-11 items-center justify-center rounded-lg border border-border/50 text-destructive"
+              onClick={() => setDeleteOpen(true)}
             >
-              <Trash2 size={14} />
-              Löschen
+              <MaterialIcon ligature="delete" className="text-[20px]" />
             </button>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <button
               type="button"
-              disabled
-              className={`${OUTLINE_BTN} disabled:opacity-50`}
+              className="inline-flex h-11 items-center gap-2 px-4 text-sm text-muted-foreground"
+              onClick={() => setMenuOpen(true)}
             >
-              Weitere Aktionen
-              <ChevronDown size={14} />
+              {t("invoice.moreActions")}
+              <MaterialIcon ligature="expand_less" className="text-[18px]" />
             </button>
             <div className="inline-flex overflow-hidden rounded-md">
-              <Link to="/pdf" className={SEND_CTA}>
-                <Send size={14} />
-                Senden
-              </Link>
+              <button type="button" className={SEND_CTA} onClick={openSendModal}>
+                <MaterialIcon ligature="send" className="text-[18px]" />
+                {t("invoice.send")}
+              </button>
               <button
                 type="button"
-                disabled
-                aria-label="Senden Optionen"
-                className="inline-flex min-h-11 items-center border-l border-white/20 bg-[var(--cta-send)] px-2 text-white disabled:opacity-50"
+                aria-label={t("invoice.sendOptions")}
+                className="inline-flex min-h-11 items-center border-l border-white/20 bg-primary-container px-2 text-white"
+                onClick={openSendModal}
               >
-                <ChevronDown size={14} />
+                <MaterialIcon ligature="expand_more" className="text-[14px]" />
               </button>
             </div>
           </div>
@@ -995,6 +1232,195 @@ export function RechnungScreen() {
           dueDate={faellig}
         />
       ) : null}
+
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="sm:max-w-md" showCloseButton>
+          <DialogHeader>
+            <DialogTitle>Neue Rechnung erstellen</DialogTitle>
+            <DialogDescription>Kunde und optionale Vorlage wählen.</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="create-customer">Kunde <span className="text-destructive">*</span></Label>
+              <Input
+                id="create-customer"
+                value={createCustomerQuery}
+                onChange={(event) => setCreateCustomerQuery(event.target.value)}
+                placeholder="Kunde suchen oder neu anlegen..."
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="create-template">Vorlage (Optional)</Label>
+              <Select value={createTemplate} onValueChange={setCreateTemplate}>
+                <SelectTrigger id="create-template" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="standard">Keine Vorlage (Standard)</SelectItem>
+                  <SelectItem value="dienstleistung">Dienstleistung</SelectItem>
+                  <SelectItem value="produkt">Produktverkauf</SelectItem>
+                  <SelectItem value="beratung">Beratung (Stundenbasiert)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose className="inline-flex h-11 items-center rounded-lg border px-5 text-sm">Abbrechen</DialogClose>
+            <Button
+              type="button"
+              className="h-11 bg-primary-container text-white"
+              onClick={() => {
+                setCreateOpen(false);
+                startNewDraft();
+              }}
+            >
+              Erstellen
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={sendOpen} onOpenChange={setSendOpen}>
+        <DialogContent className="sm:max-w-xl" showCloseButton>
+          <DialogHeader>
+            <DialogTitle>Rechnung senden</DialogTitle>
+            <DialogDescription>E-Mail an den Kunden vorbereiten.</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="email-an">An</Label>
+              <Input id="email-an" type="email" value={sendTo} onChange={(event) => setSendTo(event.target.value)} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="email-cc">CC (optional)</Label>
+              <Input id="email-cc" value={sendCc} onChange={(event) => setSendCc(event.target.value)} placeholder="Weitere Empfänger..." />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="email-betreff">Betreff</Label>
+              <Input id="email-betreff" value={sendSubject} onChange={(event) => setSendSubject(event.target.value)} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="email-nachricht">Nachricht</Label>
+              <textarea
+                id="email-nachricht"
+                rows={5}
+                value={sendBody}
+                onChange={(event) => setSendBody(event.target.value)}
+                className="min-h-11 w-full rounded-lg border border-input bg-muted/40 px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Link to="/pdf" className="mr-auto inline-flex h-11 items-center gap-2 text-sm" onClick={() => setSendOpen(false)}>
+              <MaterialIcon ligature="visibility" className="text-[20px]" />
+              Vorschau
+            </Link>
+            <DialogClose className="inline-flex h-11 items-center rounded-lg border px-6 text-sm">Abbrechen</DialogClose>
+            <Button type="button" className="h-11 bg-primary-container text-white" onClick={() => setSendOpen(false)}>
+              Senden
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={menuOpen} onOpenChange={setMenuOpen}>
+        <DialogContent className="sm:max-w-xs" showCloseButton>
+          <DialogHeader>
+            <DialogTitle>Weitere Aktionen</DialogTitle>
+            <DialogDescription>Aktionen für den aktuellen Entwurf.</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-1">
+            <button type="button" className="rounded-md px-3 py-2 text-left text-sm hover:bg-muted" onClick={() => { setMenuOpen(false); openCreateModal(); }}>
+              Neue Rechnung erstellen
+            </button>
+            <button type="button" className="rounded-md px-3 py-2 text-left text-sm hover:bg-muted" onClick={() => setMenuOpen(false)}>
+              {t("invoice.saveTemplate")}
+            </button>
+            <button type="button" className="rounded-md px-3 py-2 text-left text-sm hover:bg-muted" onClick={() => setMenuOpen(false)}>
+              {t("invoice.duplicate")}
+            </button>
+            <button type="button" className="rounded-md px-3 py-2 text-left text-sm text-destructive hover:bg-muted" onClick={() => { setMenuOpen(false); setDeleteOpen(true); }}>
+              {t("invoice.delete")}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={dateField !== null} onOpenChange={(open) => { if (!open) setDateField(null); }}>
+        <DialogContent className="sm:max-w-[280px]" showCloseButton>
+          <DialogHeader>
+            <DialogTitle>{dateField === "faellig" ? t("invoice.due") : t("invoice.date")}</DialogTitle>
+            <DialogDescription>Kalendertag wählen.</DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center justify-between">
+            <button type="button" aria-label="Vorheriger Monat" onClick={() => setDateCursor((current) => shiftMonth(current, -1))}>
+              <MaterialIcon ligature="chevron_left" className="text-[20px]" />
+            </button>
+            <span className="text-sm font-medium capitalize">{monthLabel(dateCursor)}</span>
+            <button type="button" aria-label="Nächster Monat" onClick={() => setDateCursor((current) => shiftMonth(current, 1))}>
+              <MaterialIcon ligature="chevron_right" className="text-[20px]" />
+            </button>
+          </div>
+          <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground">
+            {["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((label) => (
+              <div key={label}>{label}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1 text-center text-sm">
+            {monthCells(dateCursor).map((cell) => (
+              <button
+                key={cell.key}
+                type="button"
+                disabled={!cell.value}
+                className={`rounded p-1 ${cell.value === (dateField === "faellig" ? faellig : datum) ? "bg-brand-soft font-semibold" : ""} ${cell.value ? "hover:bg-muted" : "text-muted-foreground/40"}`}
+                onClick={() => {
+                  if (!cell.value) return;
+                  if (dateField === "faellig") applyFaellig(cell.value);
+                  else {
+                    setDatum(cell.value);
+                    syncDueFromTerms(cell.value, zahlungsbedingung);
+                  }
+                  if (canWrite) setAutosaveStatus("saving");
+                  setDateField(null);
+                }}
+              >
+                {cell.day}
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog
+        open={deleteOpen}
+        onOpenChange={(open) => {
+          setDeleteOpen(open);
+          if (!open) setDeleteError(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Rechnung löschen?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Die Rechnung wird aus der Liste entfernt. Diese Aktion kann nicht rückgängig gemacht werden.
+              {deleteError ? (
+                <span className="mt-2 block text-destructive">{deleteError}</span>
+              ) : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(event) => {
+                event.preventDefault();
+                void handleDeleteInvoice();
+              }}
+            >
+              Löschen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

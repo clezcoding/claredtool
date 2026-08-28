@@ -1,18 +1,18 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 04
-current_phase_name: Premium UI & Brand Redesign
-status: "Phase 04 shipped — PR #25"
-stopped_at: Completed 04-06-PLAN.md
-last_updated: "2026-08-24T21:08:17.219Z"
-last_activity: 2026-08-24
-state_head: 0bdbabe446fbd38ca893fe934fb71cbc00d02fb6
+current_phase: 05.1
+current_phase_name: Stitch→React extended catalog
+status: "Phase 04.1 shipped — PR #39"
+stopped_at: Phase 04.1 complete, ready to plan Phase 05.1
+last_updated: "2026-08-28T01:27:04.037Z"
+last_activity: 2026-08-28
+state_head: 8c8ec340134d6a28061dac19cd3483129d0007ce
 progress:
-  total_phases: 5
-  completed_phases: 3
-  total_plans: 24
-  completed_plans: 24
+  total_phases: 8
+  completed_phases: 5
+  total_plans: 31
+  completed_plans: 31
 milestone_name: milestone
 ---
 
@@ -23,17 +23,19 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 04 — Premium UI & Brand Redesign
+**Current focus:** Phase 04.1 — Stitch→React 5-route conversion
 
 ## Current Position
 
-Status: Phase 04 shipped — PR #25
-Phase: 04 (Premium UI & Brand Redesign) — EXECUTING
-Plan: 6 of 6
-Phase 04 (Premium UI & Brand Redesign) — **NEXT** human UAT (G-04-3 motion/OS + signed-in craft)
-Phase 05 (PDF, Audit & Offline Sync) — deferred until after redesign
-Decided: workflow = image-gen mockups until approved then code; redesign before PDF; brand = Crafted Minimal
-Last activity: 2026-08-24
+Status: Phase 04.1 shipped — PR #39
+Phase: 05.1 — Stitch→React extended catalog
+Plan: Not started
+Phase 04 (Premium UI & Brand Redesign) — complete 2026-08-25
+Phase 04.1 (Stitch→React 5-route) — **NEXT** execute (7 plans finalized)
+Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.1
+Phase 05.1 (Stitch→React extended catalog) — after Phase 5
+Decided: Option A — 4.1 = 5-route stitch-build before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
+Last activity: 2026-08-28
 
 Progress: [██████░░░░] 60%
 
@@ -41,7 +43,7 @@ Progress: [██████░░░░] 60%
 
 **Velocity:**
 
-- Total plans completed: 12
+- Total plans completed: 31
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -51,6 +53,10 @@ Progress: [██████░░░░] 60%
 |-------|-------|-------|----------|
 | 01 | 5 | - | - |
 | 02 | 7 | - | - |
+| 03 | 6 | - | - |
+| 04 | 6 | - | - |
+| 06 | 0 | - | - |
+| 04.1 | 7 | - | - |
 
 **Recent Trend:**
 
@@ -79,6 +85,13 @@ Progress: [██████░░░░] 60%
 | Phase 04 P04 | 4min | 3 tasks | 8 files |
 | Phase 04-premium-ui-brand-redesign P05 | 3 | 3 tasks | 7 files |
 | Phase 04-premium-ui-brand-redesign P06 | 6min | 3 tasks | 4 files |
+| Phase 04.1-stitch-react-5-route-conversion P01 | 5min | 2 tasks | 12 files |
+| Phase 04.1 P02 | 10min | 2 tasks | 12 files |
+| Phase 04.1 P03 | 18 | 3 tasks | 13 files |
+| Phase 04.1 P04 | 12min | 2 tasks | 14 files |
+| Phase 04.1-stitch-react-5-route-conversion P05 | 11min | 2 tasks | 10 files |
+| Phase 04.1-stitch-react-5-route-conversion P06 | 48 | 2 tasks | 11 files |
+| Phase 04.1 P07 | 25min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -141,6 +154,29 @@ Recent decisions affecting current work:
 - [Phase 04]: Empty CTA copy restored to UI-SPEC; startNewDraft and showRail = !showHero unchanged
 - [Phase 04]: Login hero reuses 04-03 public PNG; no Higgsfield; canvas bg-background
 - [Phase 04-06]: Canvas --background SSOT is Pale Oatmeal #F7F7F5 / Deep Charcoal #111110 across IIFE, PAINT_*, and both globals.css (G-04-1, G-04-2)
+- [Phase ?]: Option A: Phase 4.1 stitch-build 5 routes before PDF; Phase 5.1 extended catalog after Phase 5
+- [Phase 04.1]: Packages installed only after human typed packages verified (Task 1 blocking-human closed 2026-08-27)
+- [Phase 04.1]: No @types/pngjs — pixel-diff.mjs is Node ESM; tsc include is src only
+- [Phase 04.1]: gitignore scripts/ scoped to /scripts/ so apps/desktop/scripts/pixel-diff.mjs can be tracked
+- [Phase 04.1]: stitch:validate wraps stitch-build validate.js at the resolved plugin cache path
+- [Phase 04.1]: Five nav items only; Stitch catalog sidebar items stay out (D-11/D-13)
+- [Phase 04.1]: R-01 360px was tax rail LAYOUT_TAX_RAIL_WIDTH; nav SSOT is 260px from 02-rechnung-light
+- [Phase 04.1]: Entities ligature domain and PDF ligature picture_as_pdf are D-45 nearest matches
+- [Phase 04.1]: Header Neue Rechnung stays startNewDraft(); Stitch 23 opens from Weitere Aktionen
+- [Phase 04.1]: 29/40 overlays use Dialog so D-35/D-36 smoke covers all Rechnung modals
+- [Phase 04.1]: Single registry-list-panel module; no forked List+Panel trees
+- [Phase 04.1]: Create is Dialog overlay (24/26), not the inspector create panel; F-08 detail stays behind the modal
+- [Phase 04.1]: Sage selected row uses bg-brand-soft/30 + 3px primary-container rail; CTA uses primary-container not Stitch #1f432d primary (BRAND-01 sage reserved)
+- [Phase 04.1]: Bank IBAN/BIC render — until an API exists (D-14); no fake 12-entity volume (D-28)
+- [Phase 04.1]: Five Stitch 06 cards including inactive Inland Ermäßigt 7%; DEMO_RULES German titles
+- [Phase 04.1]: 47 not mounted as a page — expanded card from 06, edit overlay from 39
+- [Phase 04.1]: Neu ordnen stays Bald (A5); Neue Regel opens Dialog 39
+- [Phase 04.1]: Paper body stays SAMPLE_INVOICE preview (D-39); Stitch Acme/payment footer not copied
+- [Phase 04.1]: EN/DE is Dokumentensprache on PdfPaper, not i18n.changeLanguage
+- [Phase 04.1]: 15-export mounts below the 07 viewer on /pdf (D-12); NAV_ITEMS stays 5
+- [Phase 04.1]: DATEV #00AA13 is --datev for the brand chip only; generate CTA uses primary-container
+- [Phase 04.1]: Human 2026-08-28 phase6: transfer F-09 threshold-0 FAIL (02–07) to Phase 06. D-11 five-nav vs catalog mockups. Pixel gate residual-closed, not PASS. — Named residual D-09/D-27; Kaneo #70.
+- [Phase 04.1]: Capture inner 1536x1024 requires fullscreen first; WKWebView native shot is 2x even-pixel CSS subsample. — Windowed availHeight ~1005 cannot fit inner 1536x1024.
 
 ### Pending Todos
 
@@ -157,6 +193,11 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260822-u6p | Räume das Projektverzeichniss auf. | 2026-08-22 | 7c30d5e | [260822-u6p-r-ume-das-projektverzeichniss-auf](./quick/260822-u6p-r-ume-das-projektverzeichniss-auf/) |
 
+### Roadmap Evolution
+
+- Phase 4.1 inserted after Phase 4: Stitch→React 5-route conversion (D-13 v1 nav; stitch-build; P1 backlog R-01–R-04) (URGENT)
+- Phase 5.1 inserted after Phase 5: Stitch→React extended catalog (out-of-nav + P2 R-10–R-14) (URGENT)
+
 ## Deferred Items
 
 Items acknowledged and carried forward from previous milestone close:
@@ -167,6 +208,15 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-23T21:40:00.000Z
-Stopped at: Completed 04-06-PLAN.md; G-04-3 + signed-in craft still human UAT
+Last session: 2026-08-27T23:40:58.621Z
+Stopped at: Phase 04.1 complete, ready to plan Phase 05.1
 Resume file: None
+
+## Rebuild Log
+
+- timestamp: 2026-08-24T22:50:17.581Z
+  kind: by-phase-table-reconciled
+  section: ## Performance Metrics
+  before: | Phase | Plans | Total | Avg/Plan | \n |-------|-------|-------|----------| \n | 01 | 5 | - | - | \n | 02 | 7 | - | - | \n | 4 | 6 | - | - |
+  after: | Phase | Plans | Total | Avg/Plan | \n |-------|-------|-------|----------| \n | 01 | 5 | - | - | \n | 02 | 7 | - | - | \n | 03 | 6 | - | - | \n | 04 | 6 | - | - | \n | 06 | 0 | - | - |
+  reason: phase dirs on disk are canonical; rows for missing phases dropped, missing phases added

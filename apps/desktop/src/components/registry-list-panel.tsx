@@ -1,18 +1,11 @@
 import { Button, Card, CardContent, Input } from "@clared/ui";
-import {
-  ChevronDown,
-  ChevronRight,
-  FileText,
-  Filter,
-  Mail,
-  MoreHorizontal,
-  Search,
-  X,
-} from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ErrorState } from "./error-state";
-import { Skeleton } from "./skeleton";
+import { useTranslation } from "react-i18next";
 import { getCountryLabel } from "../data/legal-forms";
+import { EmptyState } from "./empty-state";
+import { ErrorState } from "./error-state";
+import { MaterialIcon } from "./material-icon";
+import { Skeleton } from "./skeleton";
 
 export type RegistryPerson = {
   name: string;
@@ -48,11 +41,11 @@ export type RegistryListRow = {
   activity?: RegistryActivity[];
 };
 
-type RegistryListPanelProps = {
+export type RegistryDetailTab = "master" | "tax" | "bank";
+
+export interface RegistryListPanelProps {
   title: string;
   count: number;
-  countSingular: string;
-  countPlural: string;
   searchPlaceholder: string;
   newButtonLabel: string;
   canCreate: boolean;
@@ -65,23 +58,17 @@ type RegistryListPanelProps = {
   onRetry: () => void;
   emptyTitle: string;
   emptyDescription: string;
+  emptyCtaLabel?: string;
   selectedId: string | null;
   onSelectRow: (id: string) => void;
   panelMode: "none" | "detail" | "create";
   onClosePanel: () => void;
   selectedRow: RegistryListRow | undefined;
+  nameColumnHeader: string;
   pillColumnHeader: string;
   createPanel: ReactNode;
   detailTestId: string;
-};
-
-const DETAIL_TABS = [
-  "Overview",
-  "Details",
-  "People",
-  "Documents",
-  "Activity",
-] as const;
+}
 
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -98,64 +85,6 @@ function countryFlag(iso: string): string {
   );
 }
 
-function defaultPeople(row: RegistryListRow): RegistryPerson[] {
-  if (row.people?.length) return row.people;
-  return [
-    {
-      name: "Anna Schmidt",
-      title: "Managing Director",
-      email: "anna.schmidt@example.de",
-    },
-    {
-      name: "Thomas Weber",
-      title: "Managing Director",
-      email: "thomas.weber@example.de",
-    },
-    {
-      name: "Laura Müller",
-      title: "Managing Director",
-      email: "laura.mueller@example.de",
-    },
-  ];
-}
-
-function defaultDocuments(row: RegistryListRow): RegistryDocument[] {
-  if (row.documents?.length) return row.documents;
-  return [{ name: "Invoice template" }, { name: "Trade register extract" }];
-}
-
-function defaultActivity(
-  row: RegistryListRow,
-  subjectLabel: string,
-): RegistryActivity[] {
-  if (row.activity?.length) return row.activity;
-  return [
-    { label: `${subjectLabel} created`, date: "12.01.2024" },
-    { label: "VAT ID verified", date: "18.02.2024" },
-    { label: "Address updated", date: "03.06.2024" },
-  ];
-}
-
-function ActiveBadge({ status }: { status: "Active" | "Inactive" }) {
-  if (status === "Inactive") {
-    return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-        <span className="size-1.5 rounded-full bg-muted-foreground" aria-hidden />
-        Inactive
-      </span>
-    );
-  }
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-300">
-      <span
-        className="size-1.5 rounded-full bg-green-600 dark:bg-green-400"
-        aria-hidden
-      />
-      Active
-    </span>
-  );
-}
-
 function CollapsibleSection({
   title,
   defaultOpen = true,
@@ -167,29 +96,39 @@ function CollapsibleSection({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <section className="border-b border-border/70 pb-4">
+    <div className="overflow-hidden rounded-lg border border-border/70 bg-card shadow-sm">
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="flex w-full items-center gap-2 py-2 text-left text-sm font-medium text-foreground"
+        className="flex w-full items-center justify-between bg-muted/30 p-4 text-left text-sm font-medium text-foreground hover:bg-muted/50"
       >
-        {open ? (
-          <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-        ) : (
-          <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
-        )}
         {title}
+        <MaterialIcon
+          ligature="expand_more"
+          className={`text-[20px] text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`}
+        />
       </button>
-      {open ? <div className="flex flex-col gap-3 pt-1">{children}</div> : null}
-    </section>
+      {open ? (
+        <div className="space-y-4 border-t border-border/70 p-4 pt-2">{children}</div>
+      ) : null}
+    </div>
+  );
+}
+
+function Field({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="mb-1.5 text-[12px] text-muted-foreground">{label}</p>
+      <p className="min-h-11 rounded-lg border border-border/70 bg-card px-3 py-2.5 text-sm text-foreground">
+        {value}
+      </p>
+    </div>
   );
 }
 
 export function RegistryListPanel({
   title,
   count,
-  countSingular,
-  countPlural,
   searchPlaceholder,
   newButtonLabel,
   canCreate,
@@ -202,421 +141,424 @@ export function RegistryListPanel({
   onRetry,
   emptyTitle,
   emptyDescription,
+  emptyCtaLabel,
   selectedId,
   onSelectRow,
   panelMode,
   onClosePanel,
   selectedRow,
+  nameColumnHeader,
   pillColumnHeader,
   createPanel,
   detailTestId,
 }: RegistryListPanelProps) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
-  const [activeTab, setActiveTab] =
-    useState<(typeof DETAIL_TABS)[number]>("Overview");
+  const [filterValue, setFilterValue] = useState("all");
+  const [activeTab, setActiveTab] = useState<RegistryDetailTab>("master");
+  const [columnsOpen, setColumnsOpen] = useState(false);
+  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    setActiveTab("Overview");
+    setActiveTab("master");
   }, [selectedRow?.id]);
+
+  const filterOptions = useMemo(() => {
+    const labels = [...new Set(rows.map((row) => row.pillLabel).filter(Boolean))];
+    return labels.sort();
+  }, [rows]);
 
   const filteredRows = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return rows;
-    return rows.filter(
-      (row) =>
+    return rows.filter((row) => {
+      if (filterValue !== "all" && row.pillLabel !== filterValue) return false;
+      if (!query) return true;
+      return (
         row.name.toLowerCase().includes(query) ||
         row.subtitle.toLowerCase().includes(query) ||
         row.pillLabel.toLowerCase().includes(query) ||
-        getCountryLabel(row.countryIso).toLowerCase().includes(query),
-    );
-  }, [rows, search]);
+        getCountryLabel(row.countryIso).toLowerCase().includes(query)
+      );
+    });
+  }, [rows, search, filterValue]);
 
-  const countLabel = count === 1 ? `1 ${countSingular}` : `${count} ${countPlural}`;
+  const countLabel = t("counter", { count });
   const pageEnd = filteredRows.length;
   const showPanel =
     panelMode === "create" || (panelMode === "detail" && selectedRow != null);
-  const detailPeople = selectedRow ? defaultPeople(selectedRow) : [];
-  const detailDocuments = selectedRow ? defaultDocuments(selectedRow) : [];
-  const detailActivity = selectedRow
-    ? defaultActivity(selectedRow, countSingular)
-    : [];
   const detailStatus = selectedRow?.status ?? "Active";
+  const allChecked =
+    filteredRows.length > 0 && filteredRows.every((row) => checkedIds.has(row.id));
+
+  function toggleAll() {
+    if (allChecked) setCheckedIds(new Set());
+    else setCheckedIds(new Set(filteredRows.map((row) => row.id)));
+  }
+
+  function toggleRow(id: string) {
+    setCheckedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  const DETAIL_TABS: { id: RegistryDetailTab; label: string }[] = [
+    { id: "master", label: t("registry.tabs.master") },
+    { id: "tax", label: t("registry.tabs.tax") },
+    { id: "bank", label: t("registry.tabs.bank") },
+  ];
 
   return (
     <div className="flex h-full min-h-0">
-      <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-auto p-8">
-        <header className="flex flex-col gap-4">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex flex-col gap-1">
-              <h1 className="font-serif text-[28px] font-semibold leading-tight text-foreground">
-                {title}
-              </h1>
-              <p className="text-sm text-muted-foreground">{countLabel}</p>
-            </div>
+      <div className="flex min-w-0 flex-1 flex-col overflow-auto p-8">
+        <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <h1 className="text-[28px] font-semibold leading-[34px] text-foreground">
+              {title}
+            </h1>
+            <span className="rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[12px] text-muted-foreground">
+              {countLabel}
+            </span>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {rows.length > 0 ? (
-              <>
-                <div className="relative min-w-[220px] flex-1">
-                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                    placeholder={searchPlaceholder}
-                    className="min-h-11 border-border/70 bg-card pl-9 pr-16"
-                  />
-                  <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-border/70 bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-                    ⌘K
-                  </kbd>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="min-h-11 border-border/70 bg-card px-3"
-                  aria-label="Filter"
-                >
-                  <Filter className="size-4" />
-                </Button>
-              </>
+          <div className="flex flex-col items-end gap-1">
+            <Button
+              type="button"
+              disabled={!canCreate}
+              onClick={canCreate ? onNew : undefined}
+              className="flex h-10 items-center gap-2 bg-primary-container px-4 font-medium text-white hover:bg-primary-container/90"
+            >
+              <MaterialIcon ligature="add" className="text-[18px]" />
+              {newButtonLabel}
+            </Button>
+            {!canCreate ? (
+              <p className="text-xs text-muted-foreground">{createHint}</p>
             ) : null}
-            <div className="ml-auto flex flex-col items-end gap-1">
-              <Button
-                type="button"
-                disabled={!canCreate}
-                onClick={canCreate ? onNew : undefined}
-                aria-label="Anlegen"
-                className="min-h-11 font-semibold bg-foreground text-background hover:bg-foreground/90 dark:border dark:border-border/70 dark:bg-transparent dark:text-foreground dark:hover:bg-muted"
-              >
-                {newButtonLabel}
-              </Button>
-              {!canCreate ? (
-                <p className="text-xs text-muted-foreground">{createHint}</p>
-              ) : null}
-            </div>
           </div>
         </header>
 
         {loadError ? (
           <ErrorState onRetry={onRetry} />
         ) : loading ? (
-          <div className="flex flex-col gap-2">
+          <div data-testid="list-panel-loading" className="flex flex-col gap-2">
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-12 w-full" />
             <Skeleton className="h-12 w-full" />
           </div>
         ) : rows.length === 0 ? (
-          <div className="flex max-w-xl flex-col gap-4 text-sm">
-            <img
-              src="/empty-entities.png"
-              alt=""
-              className="w-full max-w-xl rounded-md"
-            />
-            <p className="font-semibold text-foreground">{emptyTitle}</p>
-            <p className="text-muted-foreground">{emptyDescription}</p>
-          </div>
+          <EmptyState
+            title={emptyTitle}
+            description={emptyDescription}
+            ctaLabel={emptyCtaLabel}
+            onCta={emptyCtaLabel ? onNew : undefined}
+            ctaDisabled={!canCreate}
+          />
         ) : (
-          <>
-            <div className="overflow-hidden rounded-md border border-border/70">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm">
+            <div className="flex items-center justify-between border-b border-border/70 bg-muted/20 p-4">
+              <div className="flex items-center gap-3">
+                <div className="relative min-w-[220px]">
+                  <MaterialIcon
+                    ligature="search"
+                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-muted-foreground"
+                  />
+                  <Input
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder={searchPlaceholder}
+                    className="h-9 border-border/70 bg-background pl-9 text-[13px]"
+                  />
+                </div>
+                <label className="sr-only" htmlFor="registry-filter">
+                  {t("registry.filter")}
+                </label>
+                <select
+                  id="registry-filter"
+                  aria-label={t("registry.filter")}
+                  value={filterValue}
+                  onChange={(event) => setFilterValue(event.target.value)}
+                  className="h-8 rounded border border-border/70 bg-card px-3 text-[12px] font-medium text-muted-foreground"
+                >
+                  <option value="all">{t("registry.filterAll")}</option>
+                  {filterOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  aria-expanded={columnsOpen}
+                  onClick={() => setColumnsOpen((current) => !current)}
+                  className="flex h-8 items-center gap-1.5 rounded border border-border/70 bg-card px-3 text-[12px] font-medium text-muted-foreground"
+                >
+                  <MaterialIcon ligature="view_column" className="text-[16px]" />
+                  {t("registry.columns")}
+                </button>
+              </div>
+              <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+                <span>
+                  {pageEnd === 0
+                    ? t("registry.pagination", { from: 0, to: 0, total: 0 })
+                    : t("registry.pagination", {
+                        from: 1,
+                        to: pageEnd,
+                        total: filteredRows.length,
+                      })}
+                </span>
+                <div className="flex overflow-hidden rounded border border-border/70">
+                  <button
+                    type="button"
+                    disabled
+                    className="flex size-8 items-center justify-center disabled:opacity-50"
+                    aria-label={t("registry.prevPage")}
+                  >
+                    <MaterialIcon ligature="chevron_left" className="text-[16px]" />
+                  </button>
+                  <button
+                    type="button"
+                    disabled
+                    className="flex size-8 items-center justify-center border-l border-border/70 disabled:opacity-50"
+                    aria-label={t("registry.nextPage")}
+                  >
+                    <MaterialIcon ligature="chevron_right" className="text-[16px]" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {columnsOpen ? (
+              <p className="border-b border-border/70 px-4 py-2 text-xs text-muted-foreground">
+                {t("registry.columnsHint")}
+              </p>
+            ) : null}
+
+            <div className="flex-1 overflow-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-border/70 bg-muted/30 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    <th className="w-10 px-3 py-3">
+                  <tr className="border-b border-border/70 bg-muted/30 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                    <th className="w-12 px-4 py-3 text-center">
                       <input
                         type="checkbox"
-                        aria-label="Select all"
+                        aria-label={t("registry.selectAll")}
+                        checked={allChecked}
+                        onChange={toggleAll}
                         className="size-4 rounded border-border/70"
                       />
                     </th>
-                    <th className="px-3 py-3 font-medium">Name</th>
-                    <th className="px-3 py-3 font-medium">{pillColumnHeader}</th>
-                    <th className="px-3 py-3 font-medium">Country</th>
-                    <th className="px-3 py-3 font-medium">Tax ID</th>
-                    <th className="w-10 px-3 py-3" />
+                    <th className="px-4 py-3 font-medium">{nameColumnHeader}</th>
+                    <th className="px-4 py-3 font-medium">{pillColumnHeader}</th>
+                    <th className="px-4 py-3 font-medium">{t("registry.country")}</th>
+                    <th className="px-4 py-3 text-right font-medium">{t("registry.taxId")}</th>
+                    <th className="w-12 px-4 py-3" />
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredRows.map((row) => (
-                    <tr
-                      key={row.id}
-                      className={`border-b border-border/70 last:border-b-0 ${
-                        selectedId === row.id ? "bg-primary/20" : "hover:bg-muted/40"
-                      }`}
-                    >
-                      <td className="px-3 py-3">
-                        <input
-                          type="checkbox"
-                          aria-label={`Select ${row.name}`}
-                          className="size-4 rounded border-border/70"
-                          onClick={(event) => event.stopPropagation()}
-                        />
-                      </td>
-                      <td className="px-3 py-3">
-                        <button
-                          type="button"
-                          data-testid={rowTestId}
-                          aria-current={selectedId === row.id ? "true" : undefined}
-                          onClick={() => onSelectRow(row.id)}
-                          className="flex w-full items-center gap-3 text-left"
-                        >
-                          <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-semibold text-foreground">
-                            {initials(row.name)}
-                          </span>
-                          <span className="min-w-0">
-                            <span className="block font-medium text-foreground">
-                              {row.name}
+                  {filteredRows.map((row) => {
+                    const selected = selectedId === row.id;
+                    return (
+                      <tr
+                        key={row.id}
+                        className={`group h-16 cursor-pointer border-b border-border/70 last:border-b-0 ${
+                          selected
+                            ? "relative bg-brand-soft/30 hover:bg-brand-soft/40 after:absolute after:inset-y-0 after:left-0 after:w-[3px] after:rounded-r after:bg-primary-container after:content-['']"
+                            : "hover:bg-muted/40"
+                        }`}
+                        onClick={() => onSelectRow(row.id)}
+                      >
+                        <td className="px-4 py-2 text-center">
+                          <input
+                            type="checkbox"
+                            aria-label={t("registry.selectRow", { name: row.name })}
+                            checked={checkedIds.has(row.id)}
+                            onChange={() => toggleRow(row.id)}
+                            onClick={(event) => event.stopPropagation()}
+                            className="size-4 rounded border-border/70"
+                          />
+                        </td>
+                        <td className="px-4 py-2">
+                          <button
+                            type="button"
+                            data-testid={rowTestId}
+                            aria-current={selected ? "true" : undefined}
+                            onClick={() => onSelectRow(row.id)}
+                            className="flex w-full items-center gap-3 text-left"
+                          >
+                            <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/70 bg-muted text-xs font-semibold text-foreground">
+                              {initials(row.name)}
                             </span>
-                            <span className="block truncate text-xs text-muted-foreground">
-                              {row.subtitle || "—"}
+                            <span className="min-w-0">
+                              <span className="block font-medium text-foreground">
+                                {row.name}
+                              </span>
+                              <span className="block truncate text-[12px] text-muted-foreground">
+                                {row.subtitle || "—"}
+                              </span>
+                            </span>
+                          </button>
+                        </td>
+                        <td className="px-4 py-2">
+                          <span className="inline-flex rounded-md border border-border/70 bg-muted/40 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                            {row.pillLabel}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2 text-muted-foreground">
+                          <span className="inline-flex items-center gap-2">
+                            <span aria-hidden className="text-[16px] leading-none">
+                              {countryFlag(row.countryIso)}
+                            </span>
+                            <span className="text-[13px]">
+                              {getCountryLabel(row.countryIso)}
                             </span>
                           </span>
-                        </button>
-                      </td>
-                      <td className="px-3 py-3">
-                        <span className="inline-flex rounded-full bg-primary/20 px-2.5 py-0.5 text-xs font-medium text-foreground">
-                          {row.pillLabel}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3 text-muted-foreground">
-                        <span className="inline-flex items-center gap-1.5">
-                          <span aria-hidden>{countryFlag(row.countryIso)}</span>
-                          {getCountryLabel(row.countryIso)}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3 tabular-nums text-muted-foreground">
-                        {row.taxId ?? "—"}
-                      </td>
-                      <td className="px-3 py-3">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="size-8 text-muted-foreground"
-                          aria-label={`Actions for ${row.name}`}
-                          onClick={(event) => event.stopPropagation()}
-                        >
-                          <MoreHorizontal className="size-4" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">
+                          {row.taxId ?? "—"}
+                        </td>
+                        <td className="px-4 py-2 text-right">
+                          <button
+                            type="button"
+                            className="rounded p-1 text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted"
+                            aria-label={t("registry.rowActions", { name: row.name })}
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            <MaterialIcon ligature="more_vert" className="text-[20px]" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {pageEnd === 0
-                ? "0 of 0"
-                : `1-${pageEnd} of ${filteredRows.length}`}
-            </p>
-          </>
+          </div>
         )}
       </div>
 
       {showPanel ? (
         <Card
           data-testid={detailTestId}
-          className="w-[420px] shrink-0 rounded-none border-y-0 border-r-0 border-border/70"
+          className="w-[400px] shrink-0 overflow-hidden rounded-none border-y-0 border-r-0 border-border/70"
         >
           {panelMode === "create" ? (
             <CardContent className="flex flex-col gap-4 pt-6">{createPanel}</CardContent>
           ) : selectedRow ? (
-            <CardContent className="flex flex-col gap-4 p-0">
-              <div className="flex items-start justify-between border-b border-border/70 px-6 py-4">
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-muted text-lg font-semibold text-foreground">
+            <CardContent className="flex h-full flex-col gap-0 p-0">
+              <div className="border-b border-border/70 p-6">
+                <div className="mb-4 flex items-start justify-between">
+                  <span className="flex size-14 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted text-lg font-semibold text-foreground">
                     {initials(selectedRow.name)}
                   </span>
-                  <div className="min-w-0">
-                    <h2 className="truncate font-serif text-xl font-semibold text-foreground">
-                      {selectedRow.name}
-                    </h2>
-                    <ActiveBadge status={detailStatus} />
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      className="flex size-8 items-center justify-center rounded-full border border-border/70 text-muted-foreground"
+                      aria-label={t("registry.edit")}
+                    >
+                      <MaterialIcon ligature="edit" className="text-[18px]" />
+                    </button>
+                    <button
+                      type="button"
+                      className="flex size-8 items-center justify-center rounded-full text-muted-foreground"
+                      aria-label={t("registry.close")}
+                      onClick={onClosePanel}
+                    >
+                      <MaterialIcon ligature="close" className="text-[20px]" />
+                    </button>
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 shrink-0"
-                  aria-label="Close panel"
-                  onClick={onClosePanel}
-                >
-                  <X className="size-4" />
-                </Button>
+                <h2 className="mb-1 text-lg font-semibold text-foreground">
+                  {selectedRow.name}
+                </h2>
+                <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+                  <span className="inline-flex rounded-md border border-border/70 bg-muted/40 px-2 py-0.5 text-[11px] uppercase tracking-wider">
+                    {selectedRow.pillLabel}
+                  </span>
+                  <span className="size-1 rounded-full bg-border" />
+                  <span>
+                    {detailStatus === "Inactive"
+                      ? t("registry.statusInactive")
+                      : t("registry.statusActive")}
+                  </span>
+                </div>
               </div>
 
-              <div className="flex gap-1 overflow-x-auto border-b border-border/70 px-4">
+              <div className="flex border-b border-border/70 px-2 pt-2">
                 {DETAIL_TABS.map((tab) => (
                   <button
-                    key={tab}
+                    key={tab.id}
                     type="button"
-                    onClick={() => setActiveTab(tab)}
-                    className={`shrink-0 border-b-2 px-3 py-2 text-sm ${
-                      activeTab === tab
-                        ? "border-foreground font-medium text-foreground"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex-1 border-b-2 px-1 pt-2 pb-3 text-sm ${
+                      activeTab === tab.id
+                        ? "border-primary-container font-medium text-primary-container"
                         : "border-transparent text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    {tab}
+                    {tab.label}
                   </button>
                 ))}
               </div>
 
-              <div className="flex flex-col gap-4 px-6 pb-6 pt-2 text-sm">
-                {activeTab === "Overview" ? (
+              <div className="flex flex-1 flex-col gap-6 overflow-y-auto bg-muted/20 p-6">
+                {activeTab === "master" ? (
                   <>
-                    <CollapsibleSection title="General Information">
-                      <dl className="grid gap-3">
-                        <div>
-                          <dt className="text-muted-foreground">{pillColumnHeader}</dt>
-                          <dd className="font-medium text-foreground">
-                            {selectedRow.pillLabel}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">Country</dt>
-                          <dd className="text-foreground">
-                            {countryFlag(selectedRow.countryIso)}{" "}
-                            {getCountryLabel(selectedRow.countryIso)}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">Tax ID</dt>
-                          <dd className="tabular-nums text-foreground">
-                            {selectedRow.taxId ?? "—"}
-                          </dd>
-                        </div>
-                      </dl>
+                    <CollapsibleSection title={t("registry.sections.general")}>
+                      <Field
+                        label={t("registry.legalName")}
+                        value={selectedRow.legalName ?? selectedRow.name}
+                      />
+                      <Field label={pillColumnHeader} value={selectedRow.pillLabel} />
+                      <Field
+                        label={t("registry.country")}
+                        value={getCountryLabel(selectedRow.countryIso)}
+                      />
                     </CollapsibleSection>
-
-                    <CollapsibleSection title="Registered Address">
-                      <p className="text-foreground">{selectedRow.address}</p>
-                      <div className="flex h-28 items-center justify-center rounded-md border border-border/70 bg-muted/40 text-xs text-muted-foreground">
-                        Map preview
-                      </div>
+                    <CollapsibleSection title={t("registry.sections.address")}>
+                      <Field
+                        label={t("registry.address")}
+                        value={selectedRow.address || "—"}
+                      />
                     </CollapsibleSection>
-
-                    <CollapsibleSection title="Management contacts" defaultOpen={false}>
-                      <ul className="flex flex-col gap-2">
-                        {detailPeople.slice(0, 2).map((person) => (
-                          <li
-                            key={person.name}
-                            className="flex items-center gap-2 text-sm"
-                          >
-                            <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-xs font-semibold text-foreground">
-                              {initials(person.name)}
-                            </span>
-                            <span className="min-w-0">
-                              <span className="block font-medium text-foreground">
-                                {person.name}
-                              </span>
+                    <CollapsibleSection
+                      title={t("registry.sections.management")}
+                      defaultOpen={false}
+                    >
+                      {selectedRow.people?.length ? (
+                        <ul className="flex flex-col gap-2">
+                          {selectedRow.people.map((person) => (
+                            <li key={person.name} className="text-sm">
+                              <span className="font-medium text-foreground">{person.name}</span>
                               <span className="block text-xs text-muted-foreground">
                                 {person.title}
                               </span>
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">—</p>
+                      )}
                     </CollapsibleSection>
-
-                    {selectedRow.linkedAccount ? (
-                      <CollapsibleSection title="Linked Accounts" defaultOpen={false}>
-                        <button
-                          type="button"
-                          className="text-left text-sm font-medium text-primary underline-offset-4 hover:underline"
-                        >
-                          {selectedRow.linkedAccount}
-                        </button>
-                      </CollapsibleSection>
-                    ) : null}
                   </>
-                ) : activeTab === "Details" ? (
-                  <dl className="grid gap-4">
-                    <div>
-                      <dt className="text-muted-foreground">Legal Name</dt>
-                      <dd className="font-medium text-foreground">
-                        {selectedRow.legalName ?? selectedRow.name}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-muted-foreground">Registration Number</dt>
-                      <dd className="tabular-nums text-foreground">
-                        {selectedRow.registrationNumber ?? "HRB 123456"}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-muted-foreground">Incorporation Date</dt>
-                      <dd className="tabular-nums text-foreground">
-                        {selectedRow.incorporationDate ?? "15.03.2019"}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-muted-foreground">Fiscal Year End</dt>
-                      <dd className="tabular-nums text-foreground">
-                        {selectedRow.fiscalYearEnd ?? "31.12"}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-muted-foreground">Status</dt>
-                      <dd>
-                        <ActiveBadge status={detailStatus} />
-                      </dd>
-                    </div>
-                  </dl>
-                ) : activeTab === "People" ? (
-                  <ul className="flex flex-col gap-3">
-                    {detailPeople.map((person) => (
-                      <li
-                        key={person.name}
-                        className="flex items-center gap-3 rounded-md border border-border/70 p-3 dark:border-border"
-                      >
-                        <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-muted text-sm font-semibold text-foreground">
-                          {initials(person.name)}
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-foreground">{person.name}</p>
-                          <p className="text-xs text-muted-foreground">{person.title}</p>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="size-8 shrink-0 text-muted-foreground"
-                          aria-label={`Email ${person.name}`}
-                        >
-                          <Mail className="size-4" />
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : activeTab === "Documents" ? (
-                  <ul className="flex flex-col gap-2">
-                    {detailDocuments.map((doc) => (
-                      <li
-                        key={doc.name}
-                        className="flex items-center gap-3 rounded-md border border-border/70 px-3 py-2.5 dark:border-border"
-                      >
-                        <FileText className="size-4 shrink-0 text-muted-foreground" />
-                        <span className="text-sm font-medium text-foreground">
-                          {doc.name}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                ) : activeTab === "tax" ? (
+                  <CollapsibleSection title={t("registry.tabs.tax")}>
+                    <Field label={t("registry.vatId")} value={selectedRow.taxId ?? "—"} />
+                    <Field
+                      label={t("registry.taxNumber")}
+                      value={selectedRow.registrationNumber ?? "—"}
+                    />
+                  </CollapsibleSection>
                 ) : (
-                  <ol className="relative flex flex-col gap-5 pl-4 before:absolute before:left-[5px] before:top-2 before:h-[calc(100%-16px)] before:w-px before:bg-border/70 dark:before:bg-border">
-                    {detailActivity.map((event) => (
-                      <li key={event.label} className="relative">
-                        <span
-                          className="absolute -left-4 top-1.5 size-2 rounded-full bg-primary ring-2 ring-background"
-                          aria-hidden
-                        />
-                        <p className="font-medium text-foreground">{event.label}</p>
-                        <p className="text-xs tabular-nums text-muted-foreground">
-                          {event.date}
-                        </p>
-                      </li>
-                    ))}
-                  </ol>
+                  <CollapsibleSection title={t("registry.sections.bank")}>
+                    <Field
+                      label={t("registry.accountHolder")}
+                      value={selectedRow.legalName ?? selectedRow.name}
+                    />
+                    <Field label={t("registry.bankName")} value="—" />
+                    <Field label={t("registry.iban")} value="—" />
+                    <Field label={t("registry.bic")} value="—" />
+                  </CollapsibleSection>
                 )}
               </div>
             </CardContent>

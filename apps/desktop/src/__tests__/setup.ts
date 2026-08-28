@@ -1,4 +1,5 @@
 import { beforeEach, vi } from "vitest";
+import "../i18n";
 import { fetchMock, resetAuthMocks } from "./auth-test-doubles";
 
 const NativeRequest = globalThis.Request;

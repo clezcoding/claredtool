@@ -6,10 +6,18 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   Input,
   Label,
 } from "@clared/ui";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { apiFetch } from "../auth/api";
 import { useSession } from "../auth/session-provider";
 import {
@@ -38,7 +46,7 @@ type CustomerRow = {
   entityName: string;
 };
 
-type PanelMode = "none" | "detail" | "create";
+type PanelMode = "none" | "detail";
 
 const CREATE_DEFAULTS = {
   entityId: "",
@@ -67,7 +75,10 @@ function toRegistryRow(row: CustomerRow): RegistryListRow {
   };
 }
 
-export function KundenScreen() {
+export interface KundenScreenProps {}
+
+export function KundenScreen(_props: KundenScreenProps = {}) {
+  const { t } = useTranslation();
   const { me } = useSession();
   const canCreate = me?.permissions.includes("kunde.write") ?? false;
   const [entities, setEntities] = useState<EntityRow[]>([]);
@@ -76,9 +87,12 @@ export function KundenScreen() {
   const [loadError, setLoadError] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [panelMode, setPanelMode] = useState<PanelMode>("none");
+  const [createOpen, setCreateOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [createForm, setCreateForm] = useState(CREATE_DEFAULTS);
-  const [fieldError, setFieldError] = useState<string | null>(null);
+  const [entityError, setEntityError] = useState<string | null>(null);
+  const [vatError, setVatError] = useState<string | null>(null);
+  const userClosedRef = useRef(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -113,12 +127,12 @@ export function KundenScreen() {
   }, [loadData]);
 
   useEffect(() => {
-    if (loading || customers.length === 0 || panelMode === "create") return;
+    if (loading || customers.length === 0 || userClosedRef.current) return;
     if (selectedId == null || !customers.some((row) => row.id === selectedId)) {
       setSelectedId(customers[0].id);
       setPanelMode("detail");
     }
-  }, [loading, customers, selectedId, panelMode]);
+  }, [loading, customers, selectedId]);
 
   const registryRows = useMemo(
     () => customers.map(toRegistryRow),
@@ -132,7 +146,12 @@ export function KundenScreen() {
 
   async function handleCreate(event: React.FormEvent) {
     event.preventDefault();
-    setFieldError(null);
+    setEntityError(null);
+    setVatError(null);
+    if (!createForm.entityId) {
+      setEntityError(t("registry.entityRequired"));
+      return;
+    }
     setSubmitting(true);
     try {
       const body: Record<string, string> = {
@@ -152,12 +171,13 @@ export function KundenScreen() {
       });
       if (!res.ok) {
         if (res.status === 400 && isEuCountry(createForm.country)) {
-          setFieldError("USt-IdNr. ist für EU-Länder Pflicht.");
+          setVatError("USt-IdNr. ist für EU-Länder Pflicht.");
         }
         throw new Error("create failed");
       }
       const created = (await res.json()) as Omit<CustomerRow, "entityName">;
       await loadData();
+      setCreateOpen(false);
       setSelectedId(created.id);
       setPanelMode("detail");
       setCreateForm(CREATE_DEFAULTS);
@@ -167,35 +187,35 @@ export function KundenScreen() {
   }
 
   function openCreate() {
-    setSelectedId(null);
-    setPanelMode("create");
-    setFieldError(null);
+    setCreateOpen(true);
+    setEntityError(null);
+    setVatError(null);
     setCreateForm(CREATE_DEFAULTS);
   }
 
   function selectRow(id: string) {
+    userClosedRef.current = false;
     setSelectedId(id);
     setPanelMode("detail");
-    setFieldError(null);
+    setEntityError(null);
+    setVatError(null);
   }
 
   function closePanel() {
-    if (panelMode === "create" && customers[0]) {
-      setSelectedId(customers[0].id);
-      setPanelMode("detail");
-      return;
-    }
+    userClosedRef.current = true;
     setPanelMode("none");
     setSelectedId(null);
   }
 
   function onEntityChange(entity: EntityRow | null) {
     if (!entity) return;
+    setEntityError(null);
     setCreateForm((current) => ({ ...current, entityId: entity.id }));
   }
 
   function onCountryChange(country: CountryOption | null) {
     if (!country) return;
+    setVatError(null);
     setCreateForm((current) => ({
       ...current,
       country: country.iso,
@@ -229,6 +249,9 @@ export function KundenScreen() {
             </ComboboxList>
           </ComboboxContent>
         </Combobox>
+        {entityError ? (
+          <p className="text-xs text-destructive">{entityError}</p>
+        ) : null}
       </div>
       <div className="flex flex-col gap-1">
         <Label htmlFor="kunde-name">Name</Label>
@@ -286,6 +309,9 @@ export function KundenScreen() {
           }
         />
       </div>
+      {vatError ? (
+        <p className="text-xs text-destructive">{vatError}</p>
+      ) : null}
       {isEuCountry(createForm.country) ? (
         <div className="flex flex-col gap-1">
           <Label htmlFor="kunde-vat">USt-IdNr.</Label>
@@ -300,29 +326,25 @@ export function KundenScreen() {
               }))
             }
           />
-          {fieldError ? (
-            <p className="text-xs text-destructive">{fieldError}</p>
-          ) : null}
         </div>
       ) : null}
       <Button
         type="submit"
-        disabled={submitting}
+        disabled={submitting || !createForm.entityId}
         className={PRIMARY_SUBMIT_CLASS}
       >
-        {submitting ? <Spinner /> : "Kunden anlegen"}
+        {submitting ? <Spinner /> : t("registry.createSubmit")}
       </Button>
     </form>
   );
 
   return (
+    <>
     <RegistryListPanel
-      title="Kunden"
+      title={t("registry.kundenTitle")}
       count={customers.length}
-      countSingular="Kunde"
-      countPlural="Kunden"
-      searchPlaceholder="Search kunden..."
-      newButtonLabel="+ New Kunde"
+      searchPlaceholder={t("registry.searchKunden")}
+      newButtonLabel={t("registry.newKunde")}
       canCreate={canCreate}
       createHint="Keine Berechtigung zum Anlegen von Kunden."
       onNew={openCreate}
@@ -331,16 +353,32 @@ export function KundenScreen() {
       loading={loading}
       loadError={loadError}
       onRetry={() => void loadData()}
-      emptyTitle="Noch keine Kunden angelegt"
-      emptyDescription="Legen Sie einen Kunden für die gewählte Entity an."
+      emptyTitle={t("empty.generic.title")}
+      emptyDescription={t("empty.generic.body")}
       selectedId={selectedId}
       onSelectRow={selectRow}
       panelMode={panelMode}
       onClosePanel={closePanel}
       selectedRow={selectedRow}
-      pillColumnHeader="Entity"
-      createPanel={createPanel}
+      nameColumnHeader={t("registry.kundenTitle")}
+      pillColumnHeader={t("registry.entity")}
+      createPanel={null}
       detailTestId="kunden-detail"
     />
+    <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+      <DialogContent className="sm:max-w-[560px]" showCloseButton>
+        <DialogHeader>
+          <DialogTitle>{t("registry.newKunde")}</DialogTitle>
+          <DialogDescription>{t("registry.kundeModalBody")}</DialogDescription>
+        </DialogHeader>
+        {createPanel}
+        <DialogFooter>
+          <DialogClose className="inline-flex h-11 items-center rounded-lg border px-5 text-sm">
+            {t("registry.cancel")}
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

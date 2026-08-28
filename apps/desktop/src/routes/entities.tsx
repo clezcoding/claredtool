@@ -6,10 +6,18 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
   Input,
   Label,
 } from "@clared/ui";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { apiFetch } from "../auth/api";
 import { useSession } from "../auth/session-provider";
 import {
@@ -34,7 +42,7 @@ type EntityRow = {
   vatId: string | null;
 };
 
-type PanelMode = "none" | "detail" | "create";
+type PanelMode = "none" | "detail";
 
 const CREATE_DEFAULTS = {
   name: "",
@@ -62,7 +70,10 @@ function toRegistryRow(row: EntityRow): RegistryListRow {
   };
 }
 
-export function EntitiesScreen() {
+export interface EntitiesScreenProps {}
+
+export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
+  const { t } = useTranslation();
   const { me } = useSession();
   const canCreate = me?.permissions.includes("entity.create") ?? false;
   const [entities, setEntities] = useState<EntityRow[]>([]);
@@ -70,9 +81,11 @@ export function EntitiesScreen() {
   const [loadError, setLoadError] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [panelMode, setPanelMode] = useState<PanelMode>("none");
+  const [createOpen, setCreateOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [createForm, setCreateForm] = useState(CREATE_DEFAULTS);
   const [fieldError, setFieldError] = useState<string | null>(null);
+  const userClosedRef = useRef(false);
 
   const loadEntities = useCallback(async () => {
     setLoading(true);
@@ -94,12 +107,12 @@ export function EntitiesScreen() {
   }, [loadEntities]);
 
   useEffect(() => {
-    if (loading || entities.length === 0 || panelMode === "create") return;
+    if (loading || entities.length === 0 || userClosedRef.current) return;
     if (selectedId == null || !entities.some((row) => row.id === selectedId)) {
       setSelectedId(entities[0].id);
       setPanelMode("detail");
     }
-  }, [loading, entities, selectedId, panelMode]);
+  }, [loading, entities, selectedId]);
 
   const registryRows = useMemo(
     () => entities.map(toRegistryRow),
@@ -142,6 +155,7 @@ export function EntitiesScreen() {
       }
       const created = (await res.json()) as EntityRow;
       await loadEntities();
+      setCreateOpen(false);
       setSelectedId(created.id);
       setPanelMode("detail");
       setCreateForm(CREATE_DEFAULTS);
@@ -151,30 +165,27 @@ export function EntitiesScreen() {
   }
 
   function openCreate() {
-    setSelectedId(null);
-    setPanelMode("create");
+    setCreateOpen(true);
     setFieldError(null);
     setCreateForm(CREATE_DEFAULTS);
   }
 
   function selectRow(id: string) {
+    userClosedRef.current = false;
     setSelectedId(id);
     setPanelMode("detail");
     setFieldError(null);
   }
 
   function closePanel() {
-    if (panelMode === "create" && entities[0]) {
-      setSelectedId(entities[0].id);
-      setPanelMode("detail");
-      return;
-    }
+    userClosedRef.current = true;
     setPanelMode("none");
     setSelectedId(null);
   }
 
   function onCountryChange(country: CountryOption | null) {
     if (!country) return;
+    setFieldError(null);
     setCreateForm((current) => ({
       ...current,
       country: country.iso,
@@ -271,6 +282,9 @@ export function EntitiesScreen() {
           }
         />
       </div>
+      {fieldError ? (
+        <p className="text-xs text-destructive">{fieldError}</p>
+      ) : null}
       {isEuCountry(createForm.country) ? (
         <div className="flex flex-col gap-1">
           <Label htmlFor="entity-vat">USt-IdNr.</Label>
@@ -285,9 +299,6 @@ export function EntitiesScreen() {
               }))
             }
           />
-          {fieldError ? (
-            <p className="text-xs text-destructive">{fieldError}</p>
-          ) : null}
         </div>
       ) : null}
       <Button
@@ -295,19 +306,18 @@ export function EntitiesScreen() {
         disabled={submitting}
         className={PRIMARY_SUBMIT_CLASS}
       >
-        {submitting ? <Spinner /> : "Entity anlegen"}
+        {submitting ? <Spinner /> : t("registry.createSubmit")}
       </Button>
     </form>
   );
 
   return (
+    <>
     <RegistryListPanel
-      title="Entities"
+      title={t("registry.entitiesTitle")}
       count={entities.length}
-      countSingular="Entity"
-      countPlural="Entities"
-      searchPlaceholder="Search entities..."
-      newButtonLabel="+ New Entity"
+      searchPlaceholder={t("registry.search")}
+      newButtonLabel={t("registry.newEntity")}
       canCreate={canCreate}
       createHint="Nur Inhaber können Entities anlegen."
       onNew={openCreate}
@@ -316,16 +326,35 @@ export function EntitiesScreen() {
       loading={loading}
       loadError={loadError}
       onRetry={() => void loadEntities()}
-      emptyTitle="Noch keine Entity angelegt"
-      emptyDescription="Legen Sie Ihre erste Firma an, um Rechnungen zu stellen."
+      emptyTitle={t("empty.entities.title")}
+      emptyDescription={t("empty.entities.body")}
+      emptyCtaLabel={t("empty.entities.cta")}
       selectedId={selectedId}
       onSelectRow={selectRow}
       panelMode={panelMode}
       onClosePanel={closePanel}
       selectedRow={selectedRow}
-      pillColumnHeader="Rechtsform"
-      createPanel={createPanel}
+      nameColumnHeader={t("registry.entitiesTitle")}
+      pillColumnHeader={t("registry.legalForm")}
+      createPanel={null}
       detailTestId="entity-detail"
     />
+    <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+      <DialogContent className="sm:max-w-[560px]" showCloseButton>
+        <DialogHeader>
+          <DialogTitle className="text-[32px] leading-tight">
+            {t("registry.newEntity")}
+          </DialogTitle>
+          <DialogDescription>{t("registry.entityModalBody")}</DialogDescription>
+        </DialogHeader>
+        {createPanel}
+        <DialogFooter>
+          <DialogClose className="inline-flex h-11 items-center rounded-lg border px-6 text-sm">
+            {t("registry.cancel")}
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

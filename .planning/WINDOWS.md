@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 11
+open_count: 23
 waived_count: 1
 fixed_count: 2
-total_count: 14
-last_updated: 2026-08-23T03:37:27.623Z
+total_count: 26
+last_updated: 2026-08-27T05:15:02.518Z
 ---
 
 # Broken Windows Ledger
@@ -29,6 +29,18 @@ last_updated: 2026-08-23T03:37:27.623Z
 | 12 | 02 | deviation | apps/backend/test/auth.e2e-spec.ts |  | e2e seeds tickets and listen(0) for parallel GETDEL | open |  | 2026-08-22T01:46:25.164Z |  |
 | 13 | 04 | deviation | apps/desktop/src/components/invoice-empty-state.tsx |  | CTA Beispielrechnung anzeigen restored; focuses form instead of sample restore (Phase 3) | open |  | 2026-08-23T01:18:49.549Z |  |
 | 14 | 04 | unrun-verify | apps/desktop/index.html |  | Human cold-launch FOUC/splash check (04-UAT tests 1–3) not run in this executor | open |  | 2026-08-23T03:37:27.623Z |  |
+| 15 | 04.1 | stub | apps/desktop/src/components/app-shell.tsx |  | Upgrade CTA is local Bald toast only (D-53, T-04.1-03); no billing route | open |  | 2026-08-27T03:32:20.564Z |  |
+| 16 | 04.1 | stub | apps/desktop/src/components/app-shell.tsx |  | ⌘K chrome is Bald-only; full command palette deferred to Phase 5.1 (D-51/D-28) | open |  | 2026-08-27T03:32:20.656Z |  |
+| 17 | 04.1 | stub | apps/desktop/src/routes/rechnung.tsx | 1199 | Send dialog Senden closes overlay only; no email API this wave | open |  | 2026-08-27T03:54:18.913Z |  |
+| 18 | 04.1 | stub | apps/desktop/src/routes/rechnung.tsx | 1281 | Delete AlertDialog confirm closes overlay only; invoice DELETE not in this plan | open |  | 2026-08-27T03:54:19.019Z |  |
+| 19 | 04.1 | stub | apps/desktop/src/routes/rechnung.tsx | 1217 | Save-template and duplicate menu items close menu only; persist APIs out of scope | open |  | 2026-08-27T03:54:19.112Z |  |
+| 20 | 04.1 | stub | apps/desktop/src/components/registry-list-panel.tsx | 558 | Bank IBAN/BIC/Bankname render — until an API exists (D-14) | open |  | 2026-08-27T04:10:57.947Z |  |
+| 21 | 04.1 | stub | apps/desktop/src/routes/tax.tsx |  | Neu ordnen Bald toast — no rule-reorder API (A5) | open |  | 2026-08-27T04:24:42.814Z |  |
+| 22 | 04.1 | stub | apps/desktop/src/routes/tax.tsx |  | Dialog Regel speichern Bald + close — no rule-write API (A5) | open |  | 2026-08-27T04:24:42.903Z |  |
+| 23 | 04.1 | stub | apps/desktop/src/routes/tax.tsx |  | modal Bedingung hinzufügen / delete Bald — chrome only until data plan | open |  | 2026-08-27T04:24:42.988Z |  |
+| 24 | 04.1 | deviation | apps/desktop/src/__tests__/routes.test.tsx |  | Updated Tax heading Tax Rules → Steuerregeln so sidebar tests match i18n H1 | open |  | 2026-08-27T04:24:43.075Z |  |
+| 25 | 04.1 | stub | apps/desktop/src/routes/pdf.tsx |  | download/email/print/full audit Bald toast — D-39 Phase 5 | open |  | 2026-08-27T05:15:02.431Z |  |
+| 26 | 04.1 | stub | apps/desktop/src/components/export-panel.tsx |  | DATEV generate/row download/show-all/advisor Bald toast — D-40 Phase 5 | open |  | 2026-08-27T05:15:02.518Z |  |
 
 ````json
 [
@@ -198,6 +210,150 @@ last_updated: 2026-08-23T03:37:27.623Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-23T03:37:27.623Z",
+    "resolved_at": null
+  },
+  {
+    "id": 15,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/components/app-shell.tsx",
+    "line": null,
+    "description": "Upgrade CTA is local Bald toast only (D-53, T-04.1-03); no billing route",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T03:32:20.564Z",
+    "resolved_at": null
+  },
+  {
+    "id": 16,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/components/app-shell.tsx",
+    "line": null,
+    "description": "⌘K chrome is Bald-only; full command palette deferred to Phase 5.1 (D-51/D-28)",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T03:32:20.656Z",
+    "resolved_at": null
+  },
+  {
+    "id": 17,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/rechnung.tsx",
+    "line": 1199,
+    "description": "Send dialog Senden closes overlay only; no email API this wave",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T03:54:18.913Z",
+    "resolved_at": null
+  },
+  {
+    "id": 18,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/rechnung.tsx",
+    "line": 1281,
+    "description": "Delete AlertDialog confirm closes overlay only; invoice DELETE not in this plan",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T03:54:19.019Z",
+    "resolved_at": null
+  },
+  {
+    "id": 19,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/rechnung.tsx",
+    "line": 1217,
+    "description": "Save-template and duplicate menu items close menu only; persist APIs out of scope",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T03:54:19.112Z",
+    "resolved_at": null
+  },
+  {
+    "id": 20,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/components/registry-list-panel.tsx",
+    "line": 558,
+    "description": "Bank IBAN/BIC/Bankname render — until an API exists (D-14)",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T04:10:57.947Z",
+    "resolved_at": null
+  },
+  {
+    "id": 21,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/tax.tsx",
+    "line": null,
+    "description": "Neu ordnen Bald toast — no rule-reorder API (A5)",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T04:24:42.814Z",
+    "resolved_at": null
+  },
+  {
+    "id": 22,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/tax.tsx",
+    "line": null,
+    "description": "Dialog Regel speichern Bald + close — no rule-write API (A5)",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T04:24:42.903Z",
+    "resolved_at": null
+  },
+  {
+    "id": 23,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/tax.tsx",
+    "line": null,
+    "description": "modal Bedingung hinzufügen / delete Bald — chrome only until data plan",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T04:24:42.988Z",
+    "resolved_at": null
+  },
+  {
+    "id": 24,
+    "kind": "deviation",
+    "phase": "04.1",
+    "file": "apps/desktop/src/__tests__/routes.test.tsx",
+    "line": null,
+    "description": "Updated Tax heading Tax Rules → Steuerregeln so sidebar tests match i18n H1",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T04:24:43.075Z",
+    "resolved_at": null
+  },
+  {
+    "id": 25,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/routes/pdf.tsx",
+    "line": null,
+    "description": "download/email/print/full audit Bald toast — D-39 Phase 5",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T05:15:02.431Z",
+    "resolved_at": null
+  },
+  {
+    "id": 26,
+    "kind": "stub",
+    "phase": "04.1",
+    "file": "apps/desktop/src/components/export-panel.tsx",
+    "line": null,
+    "description": "DATEV generate/row download/show-all/advisor Bald toast — D-40 Phase 5",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-27T05:15:02.518Z",
     "resolved_at": null
   }
 ]
