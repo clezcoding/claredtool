@@ -9,4 +9,10 @@ Human confirmed release after audit showed **0 fails**, **10 warns** (all non-bl
 
 ## Scope note (D-13)
 
-Approval covers the **full Stitch catalog** as design reference. **v1 Tauri shipping scope** remains the 5-item shell (Rechnung · Entities · Kunden · Tax · PDF). Screens 10–15 and extended catalog convert in a later phase.
+Approval covers the **full Stitch catalog** as design reference. **v1 Tauri shipping scope** remains the 5-item shell (Rechnung · Entities · Kunden · Tax · PDF).
+
+**Roadmap (Option A, 2026-08-25):**
+- **Phase 4.1** — stitch-build convert 5 routes (+ mapped modals/empty)
+- **Phase 5** — PDF / Audit / Offline (depends on 4.1)
+- **Phase 5.1** — extended catalog (screens 10–15 + out-of-nav)
+- **Phase 6** — 1:1 fidelity closure on routes 02–07
