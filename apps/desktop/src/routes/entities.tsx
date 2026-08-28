@@ -185,6 +185,7 @@ export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
 
   function onCountryChange(country: CountryOption | null) {
     if (!country) return;
+    setFieldError(null);
     setCreateForm((current) => ({
       ...current,
       country: country.iso,

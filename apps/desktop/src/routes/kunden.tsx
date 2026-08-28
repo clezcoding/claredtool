@@ -210,6 +210,7 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
 
   function onCountryChange(country: CountryOption | null) {
     if (!country) return;
+    setVatError(null);
     setCreateForm((current) => ({
       ...current,
       country: country.iso,
