@@ -19,4 +19,8 @@ describe("i18n", () => {
   it("t('nav.rechnung') returns the German Rechnung label", () => {
     expect(i18n.t("nav.rechnung")).toBe("Rechnung");
   });
+
+  it("t('update.install') returns the German install label", () => {
+    expect(i18n.t("update.install")).toBe("Jetzt installieren");
+  });
 });

@@ -2,9 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink, Outlet } from "react-router";
 import { useSession } from "../auth/session-provider";
+import { subscribeUpdateToasts } from "../lib/updater";
 import { MaterialIcon } from "./material-icon";
 import { SessionBanner } from "./session-banner";
 import { SessionChip } from "./session-chip";
+import { UpdateDialog } from "./update-dialog";
 
 export interface AppShellProps {}
 
@@ -41,12 +43,19 @@ export function AppShell(_props: AppShellProps = {}) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [showBald]);
 
+  useEffect(() => {
+    return subscribeUpdateToasts((key) => {
+      setFeedback(t(key));
+    });
+  }, [t]);
+
   const personaName = me?.name.trim() || t("persona.name");
   const personaEmail = me?.email || t("persona.email");
   const personaCompany = me ? null : t("persona.company");
 
   return (
     <div className="flex h-screen bg-background text-foreground">
+      <UpdateDialog />
       <nav className="flex h-full w-[260px] shrink-0 flex-col border-r border-border bg-background px-4 py-8 dark:bg-surface-dark">
         <div className="mb-8 flex items-center gap-3 px-2 text-foreground">
           <span

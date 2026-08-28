@@ -94,6 +94,21 @@
   "clipboard": {
     "failed": "Kopieren fehlgeschlagen"
   },
+  "update": {
+    "title": "Update verfügbar ({{version}})",
+    "description": "Eine neue Version von Clared ist bereit.",
+    "install": "Jetzt installieren",
+    "later": "Später",
+    "relaunch": "Neu starten",
+    "downloading": "Wird installiert…",
+    "current": "Clared ist auf dem neuesten Stand.",
+    "manualFail": "Update-Prüfung fehlgeschlagen.",
+    "downloadFail": "Update-Download fehlgeschlagen. Bitte später erneut versuchen.",
+    "menuCheck": "Auf Updates prüfen…",
+    "notificationTitle": "Clared-Update bereit",
+    "notificationBody": "Version {{version}} wurde heruntergeladen. Starten Sie Clared neu, um zu aktualisieren.",
+    "permissionHint": "Benachrichtigungen sind deaktiviert. Sie können Updates weiterhin im Dialog installieren."
+  },
   "shell": {
     "tagline": "Buchhaltung",
     "upgradeTitle": "Clared Pro",
