@@ -119,6 +119,7 @@ async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result
 
     let nav_app = app.clone();
     let close_app = app.clone();
+    #[cfg(debug_assertions)]
     let load_login = parsed_login.clone();
     let ticket_emitted = Arc::new(AtomicBool::new(false));
     let ticket_for_nav = ticket_emitted.clone();
@@ -547,14 +548,18 @@ pub fn run() {
         );
     }
 
-    builder
-        .on_web_content_process_terminate(|webview| {
+    #[cfg(target_os = "macos")]
+    {
+        builder = builder.on_web_content_process_terminate(|webview| {
             if webview.label() == LOGIN_LABEL {
                 let _ = webview.window().close();
             } else if let Err(error) = webview.reload() {
                 log::error!("failed to reload webview after content process exit: {error}");
             }
-        })
+        });
+    }
+
+    builder
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_os::init())
