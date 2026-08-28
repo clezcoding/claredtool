@@ -28,6 +28,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { apiFetch } from "../auth/api";
 import { useSession } from "../auth/session-provider";
+import { useAppShellFeedback } from "../components/app-shell";
 import { ErrorState } from "../components/error-state";
 import { InvoiceEmptyState } from "../components/invoice-empty-state";
 import { LineItemCard } from "../components/line-item-card";
@@ -35,6 +36,7 @@ import { MaterialIcon } from "../components/material-icon";
 import { Skeleton } from "../components/skeleton";
 import { Spinner } from "../components/spinner";
 import { TaxRail } from "../components/tax-rail";
+import { copyText } from "../lib/clipboard";
 import { taxPercent as taxPercentFromRate } from "../lib/money";
 import {
   resetTaxLiveState,
@@ -212,6 +214,7 @@ export interface RechnungScreenProps {}
 
 export function RechnungScreen(_props: RechnungScreenProps = {}) {
   const { t } = useTranslation();
+  const { setFeedback } = useAppShellFeedback();
   const { me } = useSession();
   const canRead = me?.permissions.includes("invoice.read") ?? false;
   const canWrite = me?.permissions.includes("invoice.write") ?? false;
@@ -461,6 +464,13 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
     selectedCustomer,
     selectedEntity,
   ]);
+
+  const copyInvoiceNumber = useCallback(async () => {
+    const value = rechnungsnummer.trim();
+    if (!value) return;
+    const ok = await copyText(value);
+    if (!ok) setFeedback(t("clipboard.failed"));
+  }, [rechnungsnummer, setFeedback, t]);
 
   const persistDraft = useCallback(async () => {
     if (!canWrite || !entityId || skipAutosaveRef.current) return;
@@ -970,8 +980,18 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
                   readOnly
                   placeholder={t("invoice.numberPending")}
                   value={rechnungsnummer}
-                  className="h-11 bg-card pr-10"
+                  className="copyable h-11 bg-card pr-20"
                 />
+                {rechnungsnummer ? (
+                  <button
+                    type="button"
+                    aria-label={t("invoice.copyNumber")}
+                    className="absolute right-10 inline-flex size-7 items-center justify-center rounded-md text-muted-foreground hover:text-foreground"
+                    onClick={() => void copyInvoiceNumber()}
+                  >
+                    <MaterialIcon ligature="content_copy" className="text-[16px]" />
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   disabled={!canWrite}

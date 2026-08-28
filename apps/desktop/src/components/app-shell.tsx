@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NavLink, Outlet } from "react-router";
+import { NavLink, Outlet, useOutletContext } from "react-router";
 import { useSession } from "../auth/session-provider";
 import { subscribeUpdateToasts } from "../lib/updater";
 import { MaterialIcon } from "./material-icon";
@@ -9,6 +9,15 @@ import { SessionChip } from "./session-chip";
 import { UpdateDialog } from "./update-dialog";
 
 export interface AppShellProps {}
+
+export type AppShellOutletContext = {
+  setFeedback: (message: string | null) => void;
+};
+
+export function useAppShellFeedback(): AppShellOutletContext {
+  const context = useOutletContext<AppShellOutletContext | null>();
+  return context ?? { setFeedback: () => {} };
+}
 
 const NAV_ITEMS = [
   { to: "/", labelKey: "nav.rechnung", ligature: "receipt_long" },
@@ -175,7 +184,7 @@ export function AppShell(_props: AppShellProps = {}) {
               {feedback}
             </p>
           ) : null}
-          <Outlet />
+          <Outlet context={{ setFeedback } satisfies AppShellOutletContext} />
         </main>
       </div>
     </div>
