@@ -215,3 +215,9 @@ jobs:
           curl -sfS \
             "$FAYNOSYNC_BASE_URL/checkVersion?app_name=clared&version=0.0.0&platform=darwin&arch=aarch64&channel=stable&updater=tauri&owner=admin" \
             | jq -e '.version'
+
+      - name: Verify FaynoSync checkVersion (Windows)
+        run: |
+          curl -sfS \
+            "$FAYNOSYNC_BASE_URL/checkVersion?app_name=clared&version=0.0.0&platform=windows&arch=x86_64&channel=stable&updater=tauri&owner=admin" \
+            | jq -e '.version'
