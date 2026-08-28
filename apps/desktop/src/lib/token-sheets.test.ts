@@ -49,4 +49,8 @@ describe("token sheets", () => {
     expect(colorScheme(selectorBlock(desktop, ".dark"))).toBe("dark");
     expect(colorScheme(selectorBlock(ui, ".dark"))).toBe("dark");
   });
+
+  it("desktop globals scans packages/ui so dialog fixed positioning utilities exist", () => {
+    expect(desktop).toContain('@source "../../../../packages/ui/src/**/*.{ts,tsx}"');
+  });
 });

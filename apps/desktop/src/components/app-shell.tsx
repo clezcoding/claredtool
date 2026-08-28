@@ -6,7 +6,6 @@ import { subscribeUpdateToasts } from "../lib/updater";
 import { MaterialIcon } from "./material-icon";
 import { SessionBanner } from "./session-banner";
 import { SessionChip } from "./session-chip";
-import { UpdateDialog } from "./update-dialog";
 
 export interface AppShellProps {}
 
@@ -100,7 +99,6 @@ export function AppShell(_props: AppShellProps = {}) {
 
   return (
     <div className="flex h-screen bg-background text-foreground">
-      <UpdateDialog />
       {DebugPanel ? (
         <DebugPanel open={debugPanelOpen} onOpenChange={setDebugPanelOpen} />
       ) : null}

@@ -7,8 +7,10 @@ import {
   checkForUpdates,
   downloadUpdate,
   getUpdateDialogState,
+  getUpdateProgress,
   relaunchApp,
   shouldToastOnSilentCheckFailure,
+  subscribeUpdateProgress,
   subscribeUpdateToasts,
   UPDATE_CHECK_INTERVAL_MS,
   UPDATE_CHECK_ON_STARTUP,
@@ -68,15 +70,51 @@ describe("updater (D-17/D-23)", () => {
     expect(toasts).toContain("update.manualFail");
   });
 
-  it("does not relaunch automatically after download", async () => {
+  it("emits download progress while installing", async () => {
+    const download = vi.fn(async (onEvent?: (event: { event: string; data: Record<string, number> }) => void) => {
+      onEvent?.({ event: "Started", data: { contentLength: 200 } });
+      onEvent?.({ event: "Progress", data: { chunkLength: 50 } });
+      onEvent?.({ event: "Progress", data: { chunkLength: 50 } });
+      onEvent?.({ event: "Finished", data: {} });
+    });
+    const install = vi.fn(async () => undefined);
     vi.mocked(check).mockResolvedValueOnce({
       version: "1.2.0",
       body: "Notes",
       date: "2026-01-01",
-      downloadAndInstall: vi.fn(async () => undefined),
+      download,
+      install,
+    } as never);
+    const progressSnapshots: Array<{ phase: string; downloadedBytes: number }> = [];
+    subscribeUpdateProgress((p) =>
+      progressSnapshots.push({ phase: p.phase, downloadedBytes: p.downloadedBytes }),
+    );
+    await checkForUpdates(true);
+    await downloadUpdate();
+    expect(progressSnapshots.some((p) => p.phase === "download" && p.downloadedBytes === 100)).toBe(true);
+    expect(progressSnapshots.some((p) => p.phase === "install")).toBe(true);
+    expect(getUpdateProgress()).toBeNull();
+    expect(getUpdateDialogState()).toBe("ready");
+  });
+
+  it("does not relaunch automatically after download", async () => {
+    const download = vi.fn(async (onEvent?: (event: { event: string; data: Record<string, number> }) => void) => {
+      onEvent?.({ event: "Started", data: { contentLength: 100 } });
+      onEvent?.({ event: "Progress", data: { chunkLength: 100 } });
+      onEvent?.({ event: "Finished", data: {} });
+    });
+    const install = vi.fn(async () => undefined);
+    vi.mocked(check).mockResolvedValueOnce({
+      version: "1.2.0",
+      body: "Notes",
+      date: "2026-01-01",
+      download,
+      install,
     } as never);
     await checkForUpdates(true);
     await downloadUpdate();
+    expect(download).toHaveBeenCalled();
+    expect(install).toHaveBeenCalled();
     expect(relaunch).not.toHaveBeenCalled();
     await relaunchApp();
     expect(relaunch).toHaveBeenCalled();

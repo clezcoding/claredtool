@@ -40,7 +40,7 @@ import {
 export const DEBUG_PANEL_ENABLED = import.meta.env.DEV;
 
 const UPDATER_ENDPOINT =
-  "https://updates.puzzlessdev.online/checkVersion?app_name=clared&version={{current_version}}&target={{target}}&arch={{arch}}&channel=stable&updater=tauri&owner=admin";
+  "https://updates.puzzlessdev.online/checkVersion?app_name=clared&version={{current_version}}&platform={{target}}&arch={{arch}}&channel=stable&updater=tauri&owner=admin";
 
 const CLIPBOARD_TEST_VALUE = "Clared Debug-Zwischenablage-Test";
 

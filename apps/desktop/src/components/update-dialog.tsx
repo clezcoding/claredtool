@@ -4,13 +4,15 @@ import {
   requestPermission,
   sendNotification,
 } from "@tauri-apps/plugin-notification";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   dismissUpdate,
   downloadUpdate,
   relaunchApp,
   subscribeUpdater,
+  subscribeUpdateProgress,
+  type UpdateProgress,
   type UpdateState,
 } from "../lib/updater";
 
@@ -18,6 +20,42 @@ const NOTIFICATION_HINT_KEY = "clared-update-notification-hint-shown";
 
 function isTauriRuntime(): boolean {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+}
+
+function formatEta(seconds: number): string {
+  if (!Number.isFinite(seconds) || seconds < 0) return "";
+  if (seconds < 60) return `${Math.max(1, Math.round(seconds))} s`;
+  const minutes = Math.floor(seconds / 60);
+  const remainder = Math.round(seconds % 60);
+  return remainder > 0 ? `${minutes} min ${remainder} s` : `${minutes} min`;
+}
+
+function useDownloadEta(progress: UpdateProgress | null): string | null {
+  const startedAt = useRef<number | null>(null);
+  const lastBytes = useRef(0);
+
+  if (!progress || progress.phase !== "download") {
+    startedAt.current = null;
+    lastBytes.current = 0;
+    return null;
+  }
+
+  if (startedAt.current === null) startedAt.current = Date.now();
+  if (progress.downloadedBytes < lastBytes.current) {
+    startedAt.current = Date.now();
+  }
+  lastBytes.current = progress.downloadedBytes;
+
+  if (!progress.totalBytes || progress.downloadedBytes <= 0) return null;
+
+  const elapsedSec = (Date.now() - startedAt.current) / 1000;
+  if (elapsedSec < 1) return null;
+
+  const bytesPerSec = progress.downloadedBytes / elapsedSec;
+  if (bytesPerSec <= 0) return null;
+
+  const remaining = (progress.totalBytes - progress.downloadedBytes) / bytesPerSec;
+  return formatEta(remaining);
 }
 
 async function notifyUpdateReady(
@@ -47,12 +85,62 @@ async function notifyUpdateReady(
   }
 }
 
+function UpdateProgressPanel({
+  progress,
+  eta,
+}: {
+  progress: UpdateProgress;
+  eta: string | null;
+}) {
+  const { t } = useTranslation();
+  const percent =
+    progress.totalBytes && progress.totalBytes > 0
+      ? Math.min(100, Math.round((progress.downloadedBytes / progress.totalBytes) * 100))
+      : null;
+
+  const phaseLabel =
+    progress.phase === "install"
+      ? t("update.installPhase")
+      : t("update.downloadPhase");
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-3 text-sm">
+        <span className="font-medium text-foreground">{phaseLabel}</span>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          {percent !== null ? <span>{percent}%</span> : null}
+          {eta && progress.phase === "download" ? (
+            <span>{t("update.eta", { time: eta })}</span>
+          ) : null}
+        </div>
+      </div>
+      <div
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percent ?? undefined}
+        aria-label={phaseLabel}
+        className="h-2 overflow-hidden rounded-full bg-muted"
+      >
+        <div
+          className={`h-full rounded-full bg-primary transition-[width] duration-300 ${
+            percent === null ? "w-1/3 animate-pulse" : ""
+          }`}
+          style={percent !== null ? { width: `${percent}%` } : undefined}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function UpdateDialog() {
   const { t } = useTranslation();
   const [state, setState] = useState<UpdateState>("idle");
   const [version, setVersion] = useState("");
   const [notes, setNotes] = useState("");
   const [permissionHint, setPermissionHint] = useState<string | null>(null);
+  const [progress, setProgress] = useState<UpdateProgress | null>(null);
+  const eta = useDownloadEta(progress);
 
   useEffect(() => {
     return subscribeUpdater((nextState, info) => {
@@ -61,6 +149,15 @@ export function UpdateDialog() {
         setVersion(info.version);
         setNotes(info.notes);
       }
+      if (nextState !== "downloading") {
+        setProgress(null);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    return subscribeUpdateProgress((nextProgress) => {
+      setProgress(nextProgress);
     });
   }, []);
 
@@ -86,23 +183,56 @@ export function UpdateDialog() {
     }
   };
 
+  const title =
+    state === "ready"
+      ? t("update.readyTitle", { version })
+      : state === "downloading"
+        ? t("update.downloadingTitle", { version })
+        : t("update.title", { version });
+
+  const description =
+    state === "ready"
+      ? t("update.readyDescription", { version })
+      : state === "downloading"
+        ? t("update.downloadingDescription")
+        : t("update.description");
+
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent>
+      <DialogContent
+        className="sm:max-w-md"
+        showCloseButton={state !== "downloading"}
+        onEscapeKeyDown={(event) => {
+          if (state === "downloading") event.preventDefault();
+        }}
+        onPointerDownOutside={(event) => {
+          if (state === "downloading") event.preventDefault();
+        }}
+      >
         <DialogHeader>
-          <DialogTitle>{t("update.title", { version })}</DialogTitle>
-          <DialogDescription>{t("update.description")}</DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        <div className="max-h-48 overflow-y-auto whitespace-pre-wrap rounded-md border border-border bg-surface-container-low px-3 py-2 text-sm text-foreground dark:bg-surface-elevated-dark">
-          {notes}
-        </div>
+        {state !== "ready" ? (
+          <div className="max-h-48 overflow-y-auto whitespace-pre-wrap rounded-md border border-border bg-surface-container-low px-3 py-2 text-sm text-foreground dark:bg-surface-elevated-dark">
+            {notes}
+          </div>
+        ) : null}
+
+        {state === "downloading" && progress ? (
+          <UpdateProgressPanel progress={progress} eta={eta} />
+        ) : null}
 
         {permissionHint ? (
           <p className="text-xs text-muted-foreground">{permissionHint}</p>
         ) : null}
 
-        <DialogFooter className="gap-2 sm:gap-0">
+        {state === "error" ? (
+          <p className="text-sm text-destructive">{t("update.downloadFail")}</p>
+        ) : null}
+
+        <DialogFooter>
           {state === "available" || state === "error" ? (
             <>
               <Button
@@ -122,8 +252,10 @@ export function UpdateDialog() {
           ) : null}
 
           {state === "downloading" ? (
-            <Button type="button" disabled>
-              {t("update.downloading")}
+            <Button type="button" disabled className="w-full sm:w-auto">
+              {progress?.phase === "install"
+                ? t("update.installPhase")
+                : t("update.downloading")}
             </Button>
           ) : null}
 
@@ -134,10 +266,10 @@ export function UpdateDialog() {
                 variant="outline"
                 onClick={() => dismissUpdate()}
               >
-                {t("update.later")}
+                {t("update.relaunchLater")}
               </Button>
               <Button type="button" onClick={() => void relaunchApp()}>
-                {t("update.relaunch")}
+                {t("update.relaunchNow")}
               </Button>
             </>
           ) : null}

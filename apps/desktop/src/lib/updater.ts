@@ -29,11 +29,21 @@ export interface UpdateInfo {
   date?: string;
 }
 
+export type UpdatePhase = "download" | "install";
+
+export interface UpdateProgress {
+  phase: UpdatePhase;
+  downloadedBytes: number;
+  totalBytes: number | null;
+}
+
 type StateListener = (state: UpdateState, info: UpdateInfo | null) => void;
 type ToastListener = (key: UpdateToastKey) => void;
+type ProgressListener = (progress: UpdateProgress) => void;
 
 let state: UpdateState = "idle";
 let info: UpdateInfo | null = null;
+let progress: UpdateProgress | null = null;
 let pluginUpdate: Update | null = null;
 let silentFailCount = 0;
 let schedulerTimer: ReturnType<typeof setInterval> | undefined;
@@ -41,6 +51,7 @@ let schedulerStarted = false;
 
 const stateListeners = new Set<StateListener>();
 const toastListeners = new Set<ToastListener>();
+const progressListeners = new Set<ProgressListener>();
 
 function isTauriRuntime(): boolean {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -62,6 +73,12 @@ function setState(next: UpdateState, nextInfo: UpdateInfo | null = info): void {
   state = next;
   info = nextInfo;
   for (const listener of stateListeners) listener(state, info);
+}
+
+function emitProgress(next: UpdateProgress | null): void {
+  progress = next;
+  if (!next) return;
+  for (const listener of progressListeners) listener(next);
 }
 
 function emitToast(key: UpdateToastKey): void {
@@ -91,6 +108,16 @@ export function subscribeUpdater(listener: StateListener): () => void {
 export function subscribeUpdateToasts(listener: ToastListener): () => void {
   toastListeners.add(listener);
   return () => toastListeners.delete(listener);
+}
+
+export function subscribeUpdateProgress(listener: ProgressListener): () => void {
+  progressListeners.add(listener);
+  if (progress) listener(progress);
+  return () => progressListeners.delete(listener);
+}
+
+export function getUpdateProgress(): UpdateProgress | null {
+  return progress;
 }
 
 export function getUpdateDialogState(): UpdateDialogState {
@@ -142,13 +169,35 @@ export async function checkForUpdates(
 }
 
 export async function downloadUpdate(): Promise<void> {
-  if (!pluginUpdate) return;
+  if (!pluginUpdate) {
+    await checkForUpdates(false);
+    if (!pluginUpdate) return;
+  }
   setState("downloading", info);
+  let downloadedBytes = 0;
+  let totalBytes: number | null = null;
+  emitProgress({ phase: "download", downloadedBytes: 0, totalBytes: null });
   try {
-    await pluginUpdate.downloadAndInstall();
+    await pluginUpdate.download((event) => {
+      if (event.event === "Started") {
+        totalBytes = event.data.contentLength ?? null;
+        downloadedBytes = 0;
+        emitProgress({ phase: "download", downloadedBytes, totalBytes });
+        return;
+      }
+      if (event.event === "Progress") {
+        downloadedBytes += event.data.chunkLength;
+        emitProgress({ phase: "download", downloadedBytes, totalBytes });
+        return;
+      }
+      emitProgress({ phase: "install", downloadedBytes, totalBytes });
+    });
+    emitProgress({ phase: "install", downloadedBytes, totalBytes });
+    await pluginUpdate.install();
+    emitProgress(null);
     setState("ready", info);
   } catch (err) {
-    pluginUpdate = null;
+    emitProgress(null);
     desktopLog.error(`Update-Download fehlgeschlagen: ${String(err)}`);
     emitToast("update.downloadFail");
     setState("error", info);
@@ -156,6 +205,7 @@ export async function downloadUpdate(): Promise<void> {
 }
 
 export function dismissUpdate(): void {
+  emitProgress(null);
   setState("idle", null);
 }
 
@@ -182,6 +232,7 @@ export function startUpdateScheduler(): void {
 export function __resetUpdaterForTests(): void {
   state = "idle";
   info = null;
+  progress = null;
   pluginUpdate = null;
   silentFailCount = 0;
   schedulerStarted = false;
@@ -191,4 +242,5 @@ export function __resetUpdaterForTests(): void {
   }
   stateListeners.clear();
   toastListeners.clear();
+  progressListeners.clear();
 }

@@ -24,6 +24,7 @@ apps/desktop/src-tauri/gen/schemas
 .claude/
 
 .env
+apps/desktop/.env
 !.env.example
 
 # Nest / Prisma
