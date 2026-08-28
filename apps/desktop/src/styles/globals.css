@@ -186,8 +186,14 @@
     @apply border-border;
   }
 
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+
   html {
     @apply bg-background;
+    user-select: none;
   }
 
   body {
@@ -196,6 +202,15 @@
     font-size: 14px;
     font-weight: 400;
     line-height: 1.5;
+    user-select: none;
+  }
+
+  input,
+  textarea,
+  [contenteditable],
+  .tabular-nums,
+  .copyable {
+    user-select: text;
   }
 
   /* Fontsource only ships @font-face. Without this, body Inter wins and ligatures render as receipt_long. */
