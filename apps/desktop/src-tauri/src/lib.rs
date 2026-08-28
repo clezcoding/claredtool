@@ -192,10 +192,13 @@ async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result
     Ok(())
 }
 
+// D-31 / D-50: prevent-default blocks reload, back/forward, and disruptive zoom in
+// release; context menus in inputs stay allowed via plugin defaults. Cmd↔Ctrl
+// mapping is handled by tauri-plugin-prevent-default on Windows.
 #[cfg(debug_assertions)]
 fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
     use tauri_plugin_prevent_default::Flags;
-    // D-50: keep DevTools/reload in debug; D-31 finalized in Plan 02 Task 3.
+    // D-50: debug keeps F12 DevTools and reload shortcuts for DX.
     tauri_plugin_prevent_default::Builder::new()
         .with_flags(Flags::all().difference(Flags::DEV_TOOLS | Flags::RELOAD))
         .build()
@@ -203,6 +206,7 @@ fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
 
 #[cfg(not(debug_assertions))]
 fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
+    // D-31: release uses full battery — blocks F5/Ctrl-R reload, back/forward, zoom.
     tauri_plugin_prevent_default::init()
 }
 
