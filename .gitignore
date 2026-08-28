@@ -16,6 +16,7 @@ target
 apps/desktop/src-tauri/gen/schemas
 
 # Local agent/runtime (never commit secrets or GSD scratch)
+TXTOS.txt
 .artifacts/
 .cursor/mcp.json
 .planning/tmp/
