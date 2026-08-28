@@ -20,6 +20,7 @@ export type UpdateDialogState = UpdateState;
 
 export type UpdateToastKey =
   | "update.current"
+  | "update.downloading"
   | "update.manualFail"
   | "update.downloadFail";
 
@@ -138,6 +139,10 @@ export async function checkForUpdates(
 ): Promise<UpdateInfo | null> {
   const manual = parseManual(manualOrOptions);
   if (!isTauriRuntime()) return null;
+  if (state === "downloading") {
+    if (manual) emitToast("update.downloading");
+    return info;
+  }
 
   try {
     const update = await check();

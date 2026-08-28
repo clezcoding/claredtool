@@ -1,6 +1,6 @@
 import { CheckMenuItem, Menu, MenuItem, Submenu } from "@tauri-apps/api/menu";
 import i18n from "../i18n";
-import { checkForUpdates } from "./updater";
+import { checkForUpdates, getUpdateDialogState } from "./updater";
 import { setThemePref } from "./desktop-store";
 import { applyTheme, currentPref, type ThemePref } from "./theme";
 
@@ -43,6 +43,7 @@ export async function installThemeMenu(): Promise<void> {
       id: "check-updates",
       text: i18n.t("update.menuCheck"),
       action: () => {
+        if (getUpdateDialogState() === "downloading") return;
         void checkForUpdates(true);
       },
     });

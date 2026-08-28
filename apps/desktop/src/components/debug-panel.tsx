@@ -308,7 +308,13 @@ export function DebugPanel({
               label="Endpunkt"
               value={maskUpdaterEndpoint(UPDATER_ENDPOINT)}
             />
-            <Button type="button" size="sm" variant="outline" onClick={handleCheckUpdates}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              disabled={updateState === "downloading"}
+              onClick={handleCheckUpdates}
+            >
               Jetzt prüfen
             </Button>
           </Section>
