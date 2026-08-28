@@ -10,6 +10,8 @@ const CUSTOMER_NAME_IN_TEXT_RE =
   /\b((?:Kunde|Kundin|customer|Customer|Rechnungsempfänger|recipient)\s*:?\s*)([A-ZÄÖÜ][\wäöüÄÖÜß.&-]+(?:\s+(?:GmbH|AG|KG|OHG|UG|e\.V\.))?)/gi;
 
 export type SentryEvent = {
+  message?: string;
+  exception?: { values?: Array<{ value?: string }> };
   request?: { headers?: Record<string, string> };
   extra?: Record<string, unknown>;
   user?: Record<string, unknown>;
@@ -65,8 +67,9 @@ function scrubRecord(
 
 /** D-40 beforeSend scrub — tokens, PII, invoice/customer names. */
 export function scrubSentryEvent(event: SentryEvent): SentryEvent {
-  const headers = event.request?.headers
-    ? { ...event.request.headers }
+  const scrubbed: SentryEvent = { ...event };
+  const headers = scrubbed.request?.headers
+    ? { ...scrubbed.request.headers }
     : undefined;
   if (headers) {
     for (const key of Object.keys(headers)) {
@@ -76,19 +79,30 @@ export function scrubSentryEvent(event: SentryEvent): SentryEvent {
     }
   }
 
-  return {
-    ...event,
-    request: headers ? { ...event.request, headers } : event.request,
-    extra: scrubRecord(event.extra),
-    user: scrubRecord(event.user),
-    breadcrumbs: event.breadcrumbs?.map((crumb) => ({
-      ...crumb,
-      message: crumb.message
-        ? redactMessage(crumb.message)
-        : crumb.message,
-      data: scrubRecord(crumb.data),
-    })),
-  };
+  if (headers) {
+    scrubbed.request = { ...scrubbed.request, headers };
+  }
+  scrubbed.extra = scrubRecord(scrubbed.extra);
+  scrubbed.user = scrubRecord(scrubbed.user);
+  scrubbed.breadcrumbs = scrubbed.breadcrumbs?.map((crumb) => ({
+    ...crumb,
+    message: crumb.message ? redactMessage(crumb.message) : crumb.message,
+    data: scrubRecord(crumb.data),
+  }));
+  if (typeof scrubbed.message === "string") {
+    scrubbed.message = redactMessage(scrubbed.message);
+  }
+  if (Array.isArray(scrubbed.exception?.values)) {
+    scrubbed.exception = {
+      ...scrubbed.exception,
+      values: scrubbed.exception.values.map((value) =>
+        typeof value?.value === "string"
+          ? { ...value, value: redactMessage(value.value) }
+          : value,
+      ),
+    };
+  }
+  return scrubbed;
 }
 
 export function sentryDsn(): string {

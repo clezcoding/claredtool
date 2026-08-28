@@ -58,4 +58,23 @@ describe("sentry scrub (D-40)", () => {
     expect(String(scrubbed.breadcrumbs?.[0]?.message)).not.toContain("Acme");
     expect(String(scrubbed.breadcrumbs?.[0]?.message)).toContain("[redacted]");
   });
+
+  it("redacts email addresses in top-level message", () => {
+    const scrubbed = scrubSentryEvent({
+      message: "Unhandled error for user@example.com",
+    });
+    expect(String(scrubbed.message)).not.toContain("@");
+    expect(String(scrubbed.message)).toContain("[redacted]");
+  });
+
+  it("redacts PII in exception values", () => {
+    const scrubbed = scrubSentryEvent({
+      exception: {
+        values: [{ value: "Kunde: Acme GmbH failed for user@example.com" }],
+      },
+    });
+    expect(String(scrubbed.exception?.values?.[0]?.value)).not.toContain("Acme");
+    expect(String(scrubbed.exception?.values?.[0]?.value)).not.toContain("@");
+    expect(String(scrubbed.exception?.values?.[0]?.value)).toContain("[redacted]");
+  });
 });
