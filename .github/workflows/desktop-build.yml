@@ -159,7 +159,7 @@ jobs:
             -F "file=@${MAC_FILE}" \
             -F "data=${DATA}")
           cat /tmp/fayno-mac.json
-          test "$HTTP_CODE" -lt 400
+          test "$HTTP_CODE" -lt 400 || grep -q 'already exists' /tmp/fayno-mac.json
 
       - name: Upload Windows updater to FaynoSync
         continue-on-error: true
@@ -192,7 +192,7 @@ jobs:
             -F "file=@${WIN_FILE}" \
             -F "data=${DATA}")
           cat /tmp/fayno-win.json
-          test "$HTTP_CODE" -lt 400
+          test "$HTTP_CODE" -lt 400 || grep -q 'already exists' /tmp/fayno-win.json
 
       - name: Verify FaynoSync checkVersion (macOS)
         run: |
