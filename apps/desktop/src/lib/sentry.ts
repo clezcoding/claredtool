@@ -6,6 +6,8 @@ const TOKEN_KEY_RE =
   /token|authorization|password|secret|keychain|session|bearer|api[_-]?key/i;
 const NAME_KEY_RE =
   /customername|customer[_-]?name|invoice.*name|recipient|kunde|rechnungsempf/i;
+const CUSTOMER_NAME_IN_TEXT_RE =
+  /\b((?:Kunde|Kundin|customer|Customer|Rechnungsempfänger|recipient)\s*:?\s*)([A-ZÄÖÜ][\wäöüÄÖÜß.&-]+(?:\s+(?:GmbH|AG|KG|OHG|UG|e\.V\.))?)/gi;
 
 export type SentryEvent = {
   request?: { headers?: Record<string, string> };
@@ -22,6 +24,25 @@ function redactString(value: string, key?: string): string {
   return value;
 }
 
+function redactMessage(message: string): string {
+  let out = redactString(message);
+  out = out.replace(CUSTOMER_NAME_IN_TEXT_RE, `$1${REDACTED}`);
+  return out;
+}
+
+function scrubValue(value: unknown, key?: string): unknown {
+  if (typeof value === "string") {
+    return redactString(value, key);
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => scrubValue(item, key));
+  }
+  if (value && typeof value === "object") {
+    return scrubRecord(value as Record<string, unknown>);
+  }
+  return value;
+}
+
 function scrubRecord(
   record: Record<string, unknown> | undefined,
 ): Record<string, unknown> | undefined {
@@ -35,10 +56,8 @@ function scrubRecord(
     }
     if (typeof value === "string") {
       out[key] = redactString(value, key);
-    } else if (value && typeof value === "object" && !Array.isArray(value)) {
-      out[key] = scrubRecord(value as Record<string, unknown>);
     } else {
-      out[key] = value;
+      out[key] = scrubValue(value, key);
     }
   }
   return out;
@@ -65,7 +84,7 @@ export function scrubSentryEvent(event: SentryEvent): SentryEvent {
     breadcrumbs: event.breadcrumbs?.map((crumb) => ({
       ...crumb,
       message: crumb.message
-        ? redactString(crumb.message)
+        ? redactMessage(crumb.message)
         : crumb.message,
       data: scrubRecord(crumb.data),
     })),

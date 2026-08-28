@@ -42,4 +42,20 @@ describe("sentry scrub (D-40)", () => {
     });
     expect(String(scrubbed.breadcrumbs?.[0]?.message)).not.toContain("@");
   });
+
+  it("redacts string values inside arrays", () => {
+    const scrubbed = scrubSentryEvent({
+      extra: { contacts: ["user@example.com", "ok"] },
+    });
+    expect(String(scrubbed.extra?.contacts)).not.toContain("@");
+    expect((scrubbed.extra?.contacts as string[])[1]).toBe("ok");
+  });
+
+  it("redacts customer names in breadcrumb messages", () => {
+    const scrubbed = scrubSentryEvent({
+      breadcrumbs: [{ message: "Kunde: Acme GmbH viewed invoice" }],
+    });
+    expect(String(scrubbed.breadcrumbs?.[0]?.message)).not.toContain("Acme");
+    expect(String(scrubbed.breadcrumbs?.[0]?.message)).toContain("[redacted]");
+  });
 });
