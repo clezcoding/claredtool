@@ -24,7 +24,7 @@
     "security": {
       "csp": {
         "default-src": "'self'",
-        "connect-src": "'self' http://localhost:5174 ws://localhost:5174 http://localhost:3000 http://localhost:9000 https://*.sentry.io",
+        "connect-src": "'self' http://localhost:5174 ws://localhost:5174 http://localhost:3000 http://localhost:9000 https://*.sentry.io https://updates.puzzlessdev.online https://updates-staging.puzzlessdev.online",
         "script-src": "'self' 'unsafe-inline' 'unsafe-eval' http://localhost:5174",
         "style-src": "'self' 'unsafe-inline'",
         "img-src": "'self' data: blob: https:",
@@ -36,6 +36,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "createUpdaterArtifacts": true,
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -51,7 +52,13 @@
       }
     },
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDhBN0Y2NkYyQTUwNEIxODMKUldTRHNRU2w4bVovaXB1R1MrbVdRUHQzN3RHaWZtQW1iSzFvTTMzektRYzhVWXd3N1RlaVZpVzcK"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDhBN0Y2NkYyQTUwNEIxODMKUldTRHNRU2w4bVovaXB1R1MrbVdRUHQzN3RHaWZtQW1iSzFvTTMzektRYzhVWXd3N1RlaVZpVzcK",
+      "endpoints": [
+        "https://updates.puzzlessdev.online/checkVersion?app_name=clared&version={{current_version}}&target={{target}}&arch={{arch}}&channel=stable&updater=tauri"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
     }
   }
 }

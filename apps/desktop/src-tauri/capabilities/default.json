@@ -16,6 +16,8 @@
     "allow-open-login-window",
     "window-state:default",
     "notification:default",
-    "log:default"
+    "log:default",
+    "updater:default",
+    "process:default"
   ]
 }

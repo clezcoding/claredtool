@@ -45,7 +45,10 @@ jobs:
 
       - run: pnpm install
 
-      - run: pnpm --filter ./apps/desktop tauri build
+      - name: Build desktop bundles (signed updater artifacts)
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: pnpm --filter ./apps/desktop tauri build
 
       - name: Upload Windows bundle
         if: runner.os == 'Windows'
@@ -53,8 +56,9 @@ jobs:
         with:
           name: windows-bundle
           path: |
-            apps/desktop/src-tauri/target/release/bundle/msi/*.msi
             apps/desktop/src-tauri/target/release/bundle/nsis/*.exe
+            apps/desktop/src-tauri/target/release/bundle/nsis/*.exe.sig
+            apps/desktop/src-tauri/target/release/bundle/msi/*.msi
           if-no-files-found: error
 
       - name: Upload macOS bundle
@@ -64,5 +68,10 @@ jobs:
           name: macos-bundle
           path: |
             apps/desktop/src-tauri/target/release/bundle/dmg/*.dmg
-            apps/desktop/src-tauri/target/release/bundle/macos
+            apps/desktop/src-tauri/target/release/bundle/macos/*.app.tar.gz
+            apps/desktop/src-tauri/target/release/bundle/macos/*.app.tar.gz.sig
           if-no-files-found: error
+
+      # FaynoSync upload (D-10): CI uploads signed NSIS/.app.tar.gz + .sig to prod
+      # https://updates.puzzlessdev.online after release cut. Staging builds must set
+      # TAURI_UPDATER_ENDPOINT / VITE_UPDATER_ENDPOINT to updates-staging host (D-12).
