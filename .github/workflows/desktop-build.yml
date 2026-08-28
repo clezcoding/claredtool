@@ -122,6 +122,13 @@ jobs:
           VERSION=$(node -p "require('./apps/desktop/src-tauri/tauri.conf.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: FaynoSync whoami (CI token preflight)
+        env:
+          FAYNOSYNC_CI_TOKEN: ${{ secrets.FAYNOSYNC_CI_TOKEN }}
+        run: |
+          curl -sfS "$FAYNOSYNC_BASE_URL/whoami" \
+            -H "Authorization: Bearer $FAYNOSYNC_CI_TOKEN"
+
       - name: Upload macOS updater to FaynoSync
         env:
           FAYNOSYNC_CI_TOKEN: ${{ secrets.FAYNOSYNC_CI_TOKEN }}
@@ -132,7 +139,7 @@ jobs:
           test -n "$MAC_FILE"
           test -n "$MAC_SIG_FILE"
           SIG=$(tr -d '\n' < "$MAC_SIG_FILE")
-          DATA=$(jq -n \
+          DATA=$(jq -nc \
             --arg version "${{ steps.meta.outputs.version }}" \
             --arg signature "$SIG" \
             --arg changelog "Clared ${{ steps.meta.outputs.version }} (macOS aarch64)" \
@@ -147,10 +154,12 @@ jobs:
               signature: $signature,
               changelog: $changelog
             }')
-          curl -sfS -X POST "$FAYNOSYNC_BASE_URL/upload" \
+          HTTP_CODE=$(curl -sS -o /tmp/fayno-mac.json -w "%{http_code}" -X POST "$FAYNOSYNC_BASE_URL/upload" \
             -H "Authorization: Bearer $FAYNOSYNC_CI_TOKEN" \
             -F "file=@${MAC_FILE}" \
-            -F "data=${DATA}"
+            -F "data=${DATA}")
+          cat /tmp/fayno-mac.json
+          test "$HTTP_CODE" -lt 400
 
       - name: Upload Windows updater to FaynoSync
         env:
@@ -162,7 +171,7 @@ jobs:
           test -n "$WIN_FILE"
           test -n "$WIN_SIG_FILE"
           SIG=$(tr -d '\n' < "$WIN_SIG_FILE")
-          DATA=$(jq -n \
+          DATA=$(jq -nc \
             --arg version "${{ steps.meta.outputs.version }}" \
             --arg signature "$SIG" \
             --arg changelog "Clared ${{ steps.meta.outputs.version }} (Windows x86_64)" \
@@ -177,10 +186,12 @@ jobs:
               signature: $signature,
               changelog: $changelog
             }')
-          curl -sfS -X POST "$FAYNOSYNC_BASE_URL/upload" \
+          HTTP_CODE=$(curl -sS -o /tmp/fayno-win.json -w "%{http_code}" -X POST "$FAYNOSYNC_BASE_URL/upload" \
             -H "Authorization: Bearer $FAYNOSYNC_CI_TOKEN" \
             -F "file=@${WIN_FILE}" \
-            -F "data=${DATA}"
+            -F "data=${DATA}")
+          cat /tmp/fayno-win.json
+          test "$HTTP_CODE" -lt 400
 
       - name: Verify FaynoSync checkVersion (macOS)
         run: |
