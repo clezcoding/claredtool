@@ -3,9 +3,12 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
+  buildUpdaterEndpoints,
+  FAYNOSYNC_WINDOWS_ARCH,
   UPDATER_ENDPOINT_DEV,
   UPDATER_ENDPOINT_PRODUCTION,
   UPDATER_ENDPOINT_STAGING,
+  UPDATER_ENDPOINTS_DEV,
 } from "./updater-endpoint";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -22,8 +25,15 @@ describe("updater-endpoint SSOT", () => {
     expect(UPDATER_ENDPOINT_DEV).toBe(UPDATER_ENDPOINT_STAGING);
   });
 
-  it("matches tauri.conf.json dev default endpoint", () => {
-    const configured = tauriConf.plugins?.updater?.endpoints?.[0];
-    expect(configured).toBe(UPDATER_ENDPOINT_DEV);
+  it("adds FaynoSync Windows arch fallback after Tauri {{arch}} endpoint", () => {
+    const endpoints = buildUpdaterEndpoints(UPDATER_ENDPOINT_STAGING);
+    expect(endpoints).toHaveLength(2);
+    expect(endpoints[0]).toContain("arch={{arch}}");
+    expect(endpoints[1]).toContain(`arch=${FAYNOSYNC_WINDOWS_ARCH}`);
+    expect(endpoints[1]).not.toContain("{{arch}}");
+  });
+
+  it("matches tauri.conf.json dev updater endpoints", () => {
+    expect(tauriConf.plugins?.updater?.endpoints).toEqual(UPDATER_ENDPOINTS_DEV);
   });
 });

@@ -2,14 +2,17 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildUpdaterEndpoints } from "./updater-endpoint-list.mjs";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const srcConf = path.resolve(root, "../src-tauri/tauri.conf.json");
 const buildConf = path.resolve(root, "../src-tauri/tauri.conf.build.json");
 const endpointsPath = path.resolve(root, "../updater-endpoints.json");
-const { production: PROD_ENDPOINT, staging: STAGING_ENDPOINT } = JSON.parse(
-  readFileSync(endpointsPath, "utf8"),
-);
+const {
+  production: PROD_ENDPOINT,
+  staging: STAGING_ENDPOINT,
+  faynosyncWindowsArch,
+} = JSON.parse(readFileSync(endpointsPath, "utf8"));
 
 const config = JSON.parse(readFileSync(srcConf, "utf8"));
 const endpoint = process.env.TAURI_UPDATER_ENDPOINT?.trim() || PROD_ENDPOINT;
@@ -25,7 +28,10 @@ if (
 
 config.plugins ??= {};
 config.plugins.updater ??= {};
-config.plugins.updater.endpoints = [endpoint];
+config.plugins.updater.endpoints = buildUpdaterEndpoints(
+  endpoint,
+  faynosyncWindowsArch,
+);
 
 config.app ??= {};
 config.app.security ??= {};
