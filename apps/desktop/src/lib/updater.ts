@@ -139,8 +139,8 @@ export async function checkForUpdates(
 ): Promise<UpdateInfo | null> {
   const manual = parseManual(manualOrOptions);
   if (!isTauriRuntime()) return null;
-  if (state === "downloading") {
-    if (manual) emitToast("update.downloading");
+  if (state === "downloading" || state === "ready") {
+    if (manual && state === "downloading") emitToast("update.downloading");
     return info;
   }
 

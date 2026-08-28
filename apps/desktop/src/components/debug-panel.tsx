@@ -312,7 +312,7 @@ export function DebugPanel({
               type="button"
               size="sm"
               variant="outline"
-              disabled={updateState === "downloading"}
+              disabled={updateState === "downloading" || updateState === "ready"}
               onClick={handleCheckUpdates}
             >
               Jetzt prüfen

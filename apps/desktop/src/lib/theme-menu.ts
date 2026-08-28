@@ -43,7 +43,8 @@ export async function installThemeMenu(): Promise<void> {
       id: "check-updates",
       text: i18n.t("update.menuCheck"),
       action: () => {
-        if (getUpdateDialogState() === "downloading") return;
+        const updateState = getUpdateDialogState();
+        if (updateState === "downloading" || updateState === "ready") return;
         void checkForUpdates(true);
       },
     });
