@@ -3,6 +3,7 @@ import {
   Menu,
   Submenu,
 } from "@tauri-apps/api/menu";
+import { setThemePref } from "./desktop-store";
 import { applyTheme, currentPref, type ThemePref } from "./theme";
 
 function isTauriRuntime(): boolean {
@@ -20,6 +21,7 @@ export async function installThemeMenu(): Promise<void> {
         checked: currentPref() === id,
         action: () => {
           applyTheme(id);
+          void setThemePref(id);
           void syncChecks();
         },
       });

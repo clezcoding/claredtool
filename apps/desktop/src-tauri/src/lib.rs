@@ -1,8 +1,6 @@
-use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
-use tauri::{
-    Emitter, Manager, Url, WebviewUrl, WebviewWindowBuilder, webview::PageLoadEvent,
-};
+use std::sync::Arc;
+use tauri::{webview::PageLoadEvent, Emitter, Manager, Url, WebviewUrl, WebviewWindowBuilder};
 
 const KEYCHAIN_SERVICE: &str = "com.clared.app";
 const KEYCHAIN_ACCOUNT: &str = "session";
@@ -50,7 +48,10 @@ fn env_url(keys: &[&str], fallback: &str) -> String {
 }
 
 fn backend_url() -> String {
-    env_url(&["BACKEND_URL", "VITE_BACKEND_URL"], "http://localhost:3000")
+    env_url(
+        &["BACKEND_URL", "VITE_BACKEND_URL"],
+        "http://localhost:3000",
+    )
 }
 
 fn authentik_url() -> String {
@@ -119,9 +120,7 @@ async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result
     let authentik = authentik_url();
     let backend_origin = origin_of(&backend);
     let authentik_origin = origin_of(&authentik);
-    let auth_login = url.unwrap_or_else(|| {
-        format!("{}/auth/login", backend.trim_end_matches('/'))
-    });
+    let auth_login = url.unwrap_or_else(|| format!("{}/auth/login", backend.trim_end_matches('/')));
     let parsed_login = Url::parse(&auth_login).map_err(|e| e.to_string())?;
     if !allow_navigation(
         &parsed_login,
@@ -145,43 +144,40 @@ async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result
     let ticket_for_nav = ticket_emitted.clone();
     let ticket_for_close = ticket_emitted;
 
-    let window = WebviewWindowBuilder::new(
-        &app,
-        LOGIN_LABEL,
-        WebviewUrl::External(login_init_url()),
-    )
-    .title("Anmelden")
-    .inner_size(480.0, 640.0)
-    .min_inner_size(480.0, 640.0)
-    .decorations(true)
-    .resizable(true)
-    .initialization_script(&csp_script)
-    .on_navigation(move |url| {
-        if url.scheme() == "clared" {
-            if let Some(ticket) = url
-                .query_pairs()
-                .find(|(key, _)| key == "ticket")
-                .map(|(_, value)| value.into_owned())
-            {
-                ticket_for_nav.store(true, Ordering::SeqCst);
-                if let Some(main) = nav_app.get_webview_window("main") {
-                    let _ = main.emit(TICKET_EVENT, ticket);
+    let window =
+        WebviewWindowBuilder::new(&app, LOGIN_LABEL, WebviewUrl::External(login_init_url()))
+            .title("Anmelden")
+            .inner_size(480.0, 640.0)
+            .min_inner_size(480.0, 640.0)
+            .decorations(true)
+            .resizable(true)
+            .initialization_script(&csp_script)
+            .on_navigation(move |url| {
+                if url.scheme() == "clared" {
+                    if let Some(ticket) = url
+                        .query_pairs()
+                        .find(|(key, _)| key == "ticket")
+                        .map(|(_, value)| value.into_owned())
+                    {
+                        ticket_for_nav.store(true, Ordering::SeqCst);
+                        if let Some(main) = nav_app.get_webview_window("main") {
+                            let _ = main.emit(TICKET_EVENT, ticket);
+                        }
+                    }
+                    if let Some(login) = nav_app.get_webview_window(LOGIN_LABEL) {
+                        let _ = login.close();
+                    }
+                    return false;
                 }
-            }
-            if let Some(login) = nav_app.get_webview_window(LOGIN_LABEL) {
-                let _ = login.close();
-            }
-            return false;
-        }
-        allow_navigation(url, backend_origin.as_deref(), authentik_origin.as_deref())
-    })
-    .on_page_load(move |window, payload| {
-        if payload.event() == PageLoadEvent::Finished && payload.url().scheme() == "data" {
-            let _ = window.navigate(load_login.clone());
-        }
-    })
-    .build()
-    .map_err(|e| e.to_string())?;
+                allow_navigation(url, backend_origin.as_deref(), authentik_origin.as_deref())
+            })
+            .on_page_load(move |window, payload| {
+                if payload.event() == PageLoadEvent::Finished && payload.url().scheme() == "data" {
+                    let _ = window.navigate(load_login.clone());
+                }
+            })
+            .build()
+            .map_err(|e| e.to_string())?;
 
     window.on_window_event(move |event| {
         if let tauri::WindowEvent::Destroyed = event {
@@ -196,9 +192,25 @@ async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result
     Ok(())
 }
 
+#[cfg(debug_assertions)]
+fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
+    use tauri_plugin_prevent_default::Flags;
+    // D-50: keep DevTools/reload in debug; D-31 finalized in Plan 02 Task 3.
+    tauri_plugin_prevent_default::Builder::new()
+        .with_flags(Flags::all().difference(Flags::DEV_TOOLS | Flags::RELOAD))
+        .build()
+}
+
+#[cfg(not(debug_assertions))]
+fn prevent_default() -> tauri::plugin::TauriPlugin<tauri::Wry> {
+    tauri_plugin_prevent_default::init()
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let mut builder = tauri::Builder::default();
+    let mut builder = tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::new().build())
+        .plugin(prevent_default());
 
     #[cfg(desktop)]
     {

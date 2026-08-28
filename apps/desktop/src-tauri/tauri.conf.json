@@ -22,7 +22,15 @@
     ],
     "withGlobalTauri": true,
     "security": {
-      "csp": null
+      "csp": {
+        "default-src": "'self'",
+        "connect-src": "'self' http://localhost:5174 ws://localhost:5174 http://localhost:3000 http://localhost:9000 https://*.sentry.io",
+        "script-src": "'self' 'unsafe-inline' 'unsafe-eval' http://localhost:5174",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' data: blob: https:",
+        "font-src": "'self' data:",
+        "frame-src": "'self' http://localhost:3000 http://localhost:9000"
+      }
     }
   },
   "bundle": {
