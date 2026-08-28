@@ -1,12 +1,10 @@
 name: desktop-build
+# Signed Win/macOS bundles run on path-filtered main, v* tags, and workflow_dispatch; typecheck/tests stay in ci.yml.
 
 on:
   push:
     branches: [main]
-    paths:
-      - apps/desktop/**
-      - .github/workflows/desktop-build.yml
-  pull_request:
+    tags: ['v*']
     paths:
       - apps/desktop/**
       - .github/workflows/desktop-build.yml
