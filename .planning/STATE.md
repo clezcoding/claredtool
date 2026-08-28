@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.2
 current_phase_name: Desktop Platform Hardening
 status: executing
-stopped_at: Completed 04.2-04-PLAN.md
-last_updated: "2026-08-28T04:00:17.991Z"
+stopped_at: Completed 04.2-05-PLAN.md
+last_updated: "2026-08-28T04:49:42.585Z"
 last_activity: 2026-08-28
 last_activity_desc: Phase 04.2 execution started
-state_head: 8a87643e273612bb3def0d1290cba57d6aecaab5
+state_head: 0a62fb5e7ed6ebdb58f0794fd2cf6bc611460f04
 progress:
   total_phases: 10
   completed_phases: 5
   total_plans: 39
-  completed_plans: 35
+  completed_plans: 36
 milestone_name: milestone
 ---
 
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 Status: Ready to execute
 Phase: 04.2 (Desktop Platform Hardening) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 5 of 8
+Plan: 6 of 8
 Phase 04 (Premium UI & Brand Redesign) — complete 2026-08-25
 Phase 04.1 (Stitch→React 5-route) — complete 2026-08-28
 Phase 04.2 (Desktop Platform Hardening) — **NEXT** re-check / execute (clipboard wave 7 before debug wave 8)
@@ -100,6 +100,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P02 | 4min | 3 tasks | 10 files |
 | Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P03 | 12 | 3 tasks | 7 files |
 | Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P04 | 18 | 3 tasks | 8 files |
+| Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P05 | 90min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -193,6 +194,7 @@ Recent decisions affecting current work:
 - [Phase 04.2]: link-guard installed via requestAnimationFrame after boot IIFE — external https via opener only on main WebView (D-34)
 - [Phase 04.2]: [Phase 04.2]: sentry-api skipped — tauri-plugin-sentry 0.6 + @sentry/browser + init_with_no_injection; no tauri-plugin-sentry-api
 - [Phase 04.2]: [Phase 04.2]: tauri-plugin-log LogDir + desktopLog; debug dev / info prod (D-42/D-43)
+- [Phase 04.2]: Garage on Coolify uses alpine dockerfile_inline wrapper; FaynoSync admin must seed clared/stable channel post-migrate
 
 ### Pending Todos
 
@@ -227,8 +229,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-28T04:00:17.867Z
-Stopped at: Completed 04.2-04-PLAN.md
+Last session: 2026-08-28T04:49:42.473Z
+Stopped at: Completed 04.2-05-PLAN.md
 Resume file: None
 
 ## Rebuild Log
