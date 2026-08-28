@@ -203,6 +203,7 @@ export async function downloadUpdate(): Promise<void> {
     setState("ready", info);
   } catch (err) {
     emitProgress(null);
+    pluginUpdate = null;
     desktopLog.error(`Update-Download fehlgeschlagen: ${String(err)}`);
     emitToast("update.downloadFail");
     setState("error", info);
@@ -211,6 +212,7 @@ export async function downloadUpdate(): Promise<void> {
 
 export function dismissUpdate(): void {
   emitProgress(null);
+  pluginUpdate = null;
   setState("idle", null);
 }
 
