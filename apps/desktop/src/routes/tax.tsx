@@ -189,6 +189,47 @@ export function TaxScreen(_props: TaxScreenProps = {}) {
     setModal({ mode: "edit", ruleId: rule.id });
   }
 
+  function draftToRuleFields(
+    ruleDraft: RuleDraft,
+    existing?: TaxDemoRule,
+  ): Omit<TaxDemoRule, "id" | "number"> {
+    const rate = ruleDraft.rate.trim() || "0";
+    const thenTax = rate.includes("%") ? rate : `${rate}%`;
+    return {
+      title: ruleDraft.name.trim() || "Neue Regel",
+      category: existing?.category ?? "Inland",
+      active: ruleDraft.active,
+      ifCustomer: ruleDraft.condValue,
+      andService: ruleDraft.cond2Value,
+      thenTax,
+      description: existing?.description ?? "",
+      updatedAgo: "gerade eben",
+    };
+  }
+
+  function saveRule() {
+    if (!modal) return;
+    if (modal.mode === "create") {
+      setRules((prev) => [
+        ...prev,
+        {
+          id: `rule-${Date.now()}`,
+          number: prev.length + 1,
+          ...draftToRuleFields(draft),
+        },
+      ]);
+    } else {
+      setRules((prev) =>
+        prev.map((rule) =>
+          rule.id === modal.ruleId
+            ? { ...rule, ...draftToRuleFields(draft, rule) }
+            : rule,
+        ),
+      );
+    }
+    setModal(null);
+  }
+
   const activeRuleId = taxDecision?.applied_rule_id ?? null;
 
   function toggleActive(id: string) {
@@ -745,8 +786,7 @@ export function TaxScreen(_props: TaxScreenProps = {}) {
             type="button"
             className={`inline-flex h-[40px] items-center gap-2 rounded-[8px] bg-primary-container px-5 text-sm font-medium text-card shadow-sm dark:text-foreground ${FOCUS_RING}`}
             onClick={() => {
-              showBald();
-              setModal(null);
+              saveRule();
             }}
           >
             <MaterialIcon ligature="check" className="text-[18px]" />
