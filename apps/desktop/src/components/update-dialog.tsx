@@ -207,7 +207,10 @@ export function UpdateDialog() {
     state === "error";
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen && (state === "available" || state === "error")) {
+    if (
+      !nextOpen &&
+      (state === "available" || state === "error" || state === "ready")
+    ) {
       dismissUpdate();
     }
   };
