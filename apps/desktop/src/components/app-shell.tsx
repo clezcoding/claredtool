@@ -43,7 +43,7 @@ export function AppShell(_props: AppShellProps = {}) {
 
   const personaName = me?.name.trim() || t("persona.name");
   const personaEmail = me?.email || t("persona.email");
-  const personaCompany = t("persona.company");
+  const personaCompany = me ? null : t("persona.company");
 
   return (
     <div className="flex h-screen bg-background text-foreground">
@@ -127,9 +127,11 @@ export function AppShell(_props: AppShellProps = {}) {
               <span className="block truncate text-[12px] text-muted-foreground">
                 {personaEmail}
               </span>
-              <span className="block truncate text-[12px] text-muted-foreground">
-                {personaCompany}
-              </span>
+              {personaCompany ? (
+                <span className="block truncate text-[12px] text-muted-foreground">
+                  {personaCompany}
+                </span>
+              ) : null}
             </span>
           </div>
         </div>
