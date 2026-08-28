@@ -16,7 +16,7 @@ import {
   Input,
   Label,
 } from "@clared/ui";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { apiFetch } from "../auth/api";
 import { useSession } from "../auth/session-provider";
@@ -91,6 +91,7 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
   const [submitting, setSubmitting] = useState(false);
   const [createForm, setCreateForm] = useState(CREATE_DEFAULTS);
   const [fieldError, setFieldError] = useState<string | null>(null);
+  const userClosedRef = useRef(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -125,12 +126,12 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
   }, [loadData]);
 
   useEffect(() => {
-    if (loading || customers.length === 0) return;
+    if (loading || customers.length === 0 || userClosedRef.current) return;
     if (selectedId == null || !customers.some((row) => row.id === selectedId)) {
       setSelectedId(customers[0].id);
       setPanelMode("detail");
     }
-  }, [loading, customers, selectedId, panelMode]);
+  }, [loading, customers, selectedId]);
 
   const registryRows = useMemo(
     () => customers.map(toRegistryRow),
@@ -145,6 +146,10 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
   async function handleCreate(event: React.FormEvent) {
     event.preventDefault();
     setFieldError(null);
+    if (!createForm.entityId) {
+      setFieldError("Bitte Entity wählen.");
+      return;
+    }
     setSubmitting(true);
     try {
       const body: Record<string, string> = {
@@ -186,12 +191,14 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
   }
 
   function selectRow(id: string) {
+    userClosedRef.current = false;
     setSelectedId(id);
     setPanelMode("detail");
     setFieldError(null);
   }
 
   function closePanel() {
+    userClosedRef.current = true;
     setPanelMode("none");
     setSelectedId(null);
   }
@@ -314,7 +321,7 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
       ) : null}
       <Button
         type="submit"
-        disabled={submitting}
+        disabled={submitting || !createForm.entityId}
         className={PRIMARY_SUBMIT_CLASS}
       >
         {submitting ? <Spinner /> : t("registry.createSubmit")}

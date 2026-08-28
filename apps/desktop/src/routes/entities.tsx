@@ -16,7 +16,7 @@ import {
   Input,
   Label,
 } from "@clared/ui";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { apiFetch } from "../auth/api";
 import { useSession } from "../auth/session-provider";
@@ -85,6 +85,7 @@ export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
   const [submitting, setSubmitting] = useState(false);
   const [createForm, setCreateForm] = useState(CREATE_DEFAULTS);
   const [fieldError, setFieldError] = useState<string | null>(null);
+  const userClosedRef = useRef(false);
 
   const loadEntities = useCallback(async () => {
     setLoading(true);
@@ -106,12 +107,12 @@ export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
   }, [loadEntities]);
 
   useEffect(() => {
-    if (loading || entities.length === 0) return;
+    if (loading || entities.length === 0 || userClosedRef.current) return;
     if (selectedId == null || !entities.some((row) => row.id === selectedId)) {
       setSelectedId(entities[0].id);
       setPanelMode("detail");
     }
-  }, [loading, entities, selectedId, panelMode]);
+  }, [loading, entities, selectedId]);
 
   const registryRows = useMemo(
     () => entities.map(toRegistryRow),
@@ -170,12 +171,14 @@ export function EntitiesScreen(_props: EntitiesScreenProps = {}) {
   }
 
   function selectRow(id: string) {
+    userClosedRef.current = false;
     setSelectedId(id);
     setPanelMode("detail");
     setFieldError(null);
   }
 
   function closePanel() {
+    userClosedRef.current = true;
     setPanelMode("none");
     setSelectedId(null);
   }
