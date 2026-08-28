@@ -117,7 +117,7 @@ function formatIsoLocal(date: Date): string {
 }
 
 function dueDateFromTerms(isoDate: string, days: number): string {
-  const date = new Date(isoDate);
+  const date = new Date(`${isoDate.slice(0, 10)}T00:00:00`);
   date.setDate(date.getDate() + days);
   return formatIsoLocal(date);
 }
@@ -231,6 +231,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
   const [sendOpen, setSendOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [dateField, setDateField] = useState<"datum" | "faellig" | null>(null);
   const [dateCursor, setDateCursor] = useState(todayIso);
   const [createCustomerQuery, setCreateCustomerQuery] = useState("");
@@ -614,10 +615,14 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
           skipAutosaveRef.current = false;
         });
       } else {
-        applyInvoice(remaining[0], entities);
+        const next = [...remaining].sort(
+          (a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+        )[0];
+        if (next) applyInvoice(next, entities);
       }
     } catch {
-      setDeleteOpen(false);
+      setDeleteError(t("invoice.deleteFailed"));
     }
   }
 
@@ -1324,12 +1329,21 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+      <AlertDialog
+        open={deleteOpen}
+        onOpenChange={(open) => {
+          setDeleteOpen(open);
+          if (!open) setDeleteError(null);
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Rechnung löschen?</AlertDialogTitle>
             <AlertDialogDescription>
               Die Rechnung wird aus der Liste entfernt. Diese Aktion kann nicht rückgängig gemacht werden.
+              {deleteError ? (
+                <span className="mt-2 block text-destructive">{deleteError}</span>
+              ) : null}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
