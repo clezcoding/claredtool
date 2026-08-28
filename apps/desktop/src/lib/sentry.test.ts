@@ -34,6 +34,19 @@ describe("sentry scrub (D-40)", () => {
     expect(String(scrubbed.extra?.contact)).not.toContain("@");
   });
 
+  it("redacts multiple email fields in one event", () => {
+    const scrubbed = scrubSentryEvent({
+      extra: {
+        primary: "first@example.com",
+        secondary: "second@example.com",
+      },
+      tags: { notify: "alerts@example.com" },
+    });
+    expect(String(scrubbed.extra?.primary)).not.toContain("@");
+    expect(String(scrubbed.extra?.secondary)).not.toContain("@");
+    expect(String(scrubbed.tags?.notify)).not.toContain("@");
+  });
+
   it("redacts invoice customer names in breadcrumbs", () => {
     const scrubbed = scrubSentryEvent({
       breadcrumbs: [

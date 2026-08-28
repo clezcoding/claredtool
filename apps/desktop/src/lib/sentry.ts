@@ -1,7 +1,8 @@
 import * as Sentry from "@sentry/browser";
 
 const REDACTED = "[redacted]";
-const EMAIL_RE = /[^\s@]+@[^\s@]+\.[^\s@]+/g;
+const EMAIL_RE = /[^\s@]+@[^\s@]+\.[^\s@]+/;
+const EMAIL_REPLACE_RE = /[^\s@]+@[^\s@]+\.[^\s@]+/g;
 const TOKEN_KEY_RE =
   /token|authorization|password|secret|keychain|session|bearer|api[_-]?key/i;
 const NAME_KEY_RE =
@@ -21,7 +22,7 @@ export type SentryEvent = {
 
 function redactString(value: string, key?: string): string {
   if (key && TOKEN_KEY_RE.test(key)) return REDACTED;
-  if (EMAIL_RE.test(value)) return value.replace(EMAIL_RE, REDACTED);
+  if (EMAIL_RE.test(value)) return value.replace(EMAIL_REPLACE_RE, REDACTED);
   if (/bearer\s+\S+/i.test(value)) return REDACTED;
   if (key && NAME_KEY_RE.test(key)) return REDACTED;
   return value;
