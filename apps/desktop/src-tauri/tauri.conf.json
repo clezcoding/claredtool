@@ -49,6 +49,9 @@
       "desktop": {
         "schemes": ["clared"]
       }
+    },
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDhBN0Y2NkYyQTUwNEIxODMKUldTRHNRU2w4bVovaXB1R1MrbVdRUHQzN3RHaWZtQW1iSzFvTTMzektRYzhVWXd3N1RlaVZpVzcK"
     }
   }
 }
