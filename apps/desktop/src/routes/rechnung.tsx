@@ -1073,6 +1073,16 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
                     setLineItems((current) =>
                       current.filter((_, rowIndex) => rowIndex !== index),
                     );
+                    setLineItemCategories((current) => {
+                      const next: Record<number, string> = {};
+                      let target = 0;
+                      for (let i = 0; i < lineItems.length; i += 1) {
+                        if (i === index) continue;
+                        if (current[i] !== undefined) next[target] = current[i];
+                        target += 1;
+                      }
+                      return next;
+                    });
                     if (canWrite) setAutosaveStatus("saving");
                   }}
                 />
