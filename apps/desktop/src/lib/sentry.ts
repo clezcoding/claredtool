@@ -75,7 +75,9 @@ export function scrubSentryEvent(event: SentryEvent): SentryEvent {
     for (const key of Object.keys(headers)) {
       if (key.toLowerCase() === "authorization") {
         delete headers[key];
+        continue;
       }
+      headers[key] = redactString(headers[key], key);
     }
   }
 

@@ -9,6 +9,16 @@ describe("sentry scrub (D-40)", () => {
     expect(scrubbed.request?.headers?.Authorization).toBeUndefined();
   });
 
+  it("redacts non-Authorization request headers with token-like values", () => {
+    const scrubbed = scrubSentryEvent({
+      request: { headers: { "X-Auth-Token": "secret-token-abc123" } },
+    });
+    expect(scrubbed.request?.headers?.["X-Auth-Token"]).not.toBe(
+      "secret-token-abc123",
+    );
+    expect(scrubbed.request?.headers?.["X-Auth-Token"]).toBe("[redacted]");
+  });
+
   it("redacts token-like strings in extras", () => {
     const scrubbed = scrubSentryEvent({
       extra: { access_token: "abc123", note: "ok" },
