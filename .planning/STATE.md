@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.2
 current_phase_name: Desktop Platform Hardening
 status: executing
-stopped_at: Completed 04.2-06-PLAN.md
-last_updated: "2026-08-28T04:54:26.385Z"
+stopped_at: Completed 04.2-08-PLAN.md
+last_updated: "2026-08-28T04:59:02.644Z"
 last_activity: 2026-08-28
 last_activity_desc: Phase 04.2 execution started
-state_head: 9886a35f5181c87423ad3b2648a7e65478c51e27
+state_head: 37c4634bf8f813fd4baf3397a4374fd1cc4fff60
 progress:
   total_phases: 10
   completed_phases: 5
   total_plans: 39
-  completed_plans: 37
+  completed_plans: 38
 milestone_name: milestone
 ---
 
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 Status: Ready to execute
 Phase: 04.2 (Desktop Platform Hardening) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 7 of 8
+Plan: 8 of 8
 Phase 04 (Premium UI & Brand Redesign) — complete 2026-08-25
 Phase 04.1 (Stitch→React 5-route) — complete 2026-08-28
 Phase 04.2 (Desktop Platform Hardening) — **NEXT** re-check / execute (clipboard wave 7 before debug wave 8)
@@ -102,6 +102,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P04 | 18 | 3 tasks | 8 files |
 | Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P05 | 90min | 3 tasks | 9 files |
 | Phase 04.2 P06 | 12 | 3 tasks | 9 files |
+| Phase 04.2 P08 | 5min | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -198,6 +199,7 @@ Recent decisions affecting current work:
 - [Phase 04.2]: Garage on Coolify uses alpine dockerfile_inline wrapper; FaynoSync admin must seed clared/stable channel post-migrate
 - [Phase 04.2]: Updater states: idle|available|downloading|ready|error; relaunch only on user action (D-19)
 - [Phase 04.2]: Sentry after 3 silent update-check failures; German internal message (D-54)
+- [Phase 04.2]: useAppShellFeedback no-op fallback for route tests outside AppShell Outlet
 
 ### Pending Todos
 
@@ -232,8 +234,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-28T04:54:26.283Z
-Stopped at: Completed 04.2-06-PLAN.md
+Last session: 2026-08-28T04:59:02.547Z
+Stopped at: Completed 04.2-08-PLAN.md
 Resume file: None
 
 ## Rebuild Log
