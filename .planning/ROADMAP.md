@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Entities, Invoices & Live Tax** - Create invoice, see live tax from modular engine (completed 2026-08-22)
 - [x] **Phase 4: Premium UI & Brand Redesign** - Crafted Minimal; every page mockup-first with new brand, graphics, and motion (completed 2026-08-25)
 - [x] **Phase 4.1: Stitch→React 5-route conversion** (INSERTED) - stitch-build HTML→TSX for Rechnung · Entities · Kunden · Tax · PDF (completed 2026-08-28)
-- [ ] **Phase 4.2: Desktop Platform Hardening** (INSERTED) - Tauri plugins, Sentry, updater, desktop polish
+- [x] **Phase 4.2: Desktop Platform Hardening** (INSERTED) - Tauri plugins, Sentry, updater, desktop polish (completed 2026-08-28)
 - [ ] **Phase 4.3: Infra & Prep for PDF, Offline & Audit** (INSERTED) - Gotenberg, monitoring, OTel, desktop/backend scaffolding before Phase 5
 - [ ] **Phase 5: PDF, Audit & Offline Sync** - Download PDF, inspect tax audit trail, work offline and sync
 - [ ] **Phase 5.1: Stitch→React extended catalog** (INSERTED) - remaining Stitch screens after PDF loop ships
@@ -203,7 +203,7 @@ Plans:
   5. **Wave 5 — Clipboard:** official [`clipboard-manager`](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/clipboard-manager) write-only (D-01); not CrossCopy
   6. Constraints: no tauri-ui scaffold migration; MCP bridge unchanged; no Gotenberg/SQL/dialog/fs (those are Phase 4.3)
 
-**Plans:** 8/8 plans executed
+**Plans:** 8/8 plans complete
 **UI hint**: no (infra; minimal UI for debug-panel / update dialog / link guard only)
 
 Plans:
@@ -289,7 +289,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 →
 | 3. Entities, Invoices & Live Tax | 6/6 | Complete | 2026-08-22 |
 | 4. Premium UI & Brand Redesign | 6/6 | Complete | 2026-08-25 |
 | 4.1 Stitch→React 5-route conversion | 7/7 | Complete    | 2026-08-28 |
-| 4.2 Desktop Platform Hardening | 8/8 | In Progress|  |
+| 4.2 Desktop Platform Hardening | 8/8 | Complete    | 2026-08-28 |
 | 4.3 Infra & Prep for PDF/Offline/Audit | 0/? | Not started | - |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |
