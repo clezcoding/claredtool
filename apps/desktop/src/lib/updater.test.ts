@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   __resetUpdaterForTests,
   checkForUpdates,
+  dismissUpdate,
   downloadUpdate,
   getUpdateDialogState,
   getUpdateProgress,
@@ -121,6 +122,66 @@ describe("updater (D-17/D-23)", () => {
     await checkForUpdates(true);
     expect(vi.mocked(check)).not.toHaveBeenCalled();
     expect(toasts).toContain("update.downloading");
+  });
+
+  it("skips manual check while update is ready to relaunch", async () => {
+    const download = vi.fn(async (onEvent?: (event: { event: string; data: Record<string, number> }) => void) => {
+      onEvent?.({ event: "Started", data: { contentLength: 100 } });
+      onEvent?.({ event: "Progress", data: { chunkLength: 100 } });
+      onEvent?.({ event: "Finished", data: {} });
+    });
+    const install = vi.fn(async () => undefined);
+    vi.mocked(check).mockResolvedValueOnce({
+      version: "1.2.0",
+      body: "Notes",
+      date: "2026-01-01",
+      download,
+      install,
+    } as never);
+
+    await checkForUpdates(true);
+    await downloadUpdate();
+    expect(getUpdateDialogState()).toBe("ready");
+
+    vi.mocked(check).mockClear();
+    await expect(checkForUpdates(true)).resolves.toEqual(
+      expect.objectContaining({ version: "1.2.0" }),
+    );
+    expect(vi.mocked(check)).not.toHaveBeenCalled();
+  });
+
+  it("does not re-prompt after dismissing a ready update", async () => {
+    const download = vi.fn(async (onEvent?: (event: { event: string; data: Record<string, number> }) => void) => {
+      onEvent?.({ event: "Started", data: { contentLength: 100 } });
+      onEvent?.({ event: "Progress", data: { chunkLength: 100 } });
+      onEvent?.({ event: "Finished", data: {} });
+    });
+    const install = vi.fn(async () => undefined);
+    vi.mocked(check).mockResolvedValueOnce({
+      version: "1.2.0",
+      body: "Notes",
+      date: "2026-01-01",
+      download,
+      install,
+    } as never);
+
+    await checkForUpdates(true);
+    await downloadUpdate();
+    dismissUpdate();
+    expect(getUpdateDialogState()).toBe("idle");
+
+    vi.mocked(check).mockResolvedValueOnce({
+      version: "1.2.0",
+      body: "Notes",
+      date: "2026-01-01",
+      download,
+      install,
+    } as never);
+    vi.mocked(check).mockClear();
+
+    await expect(checkForUpdates(true)).resolves.toBeNull();
+    expect(vi.mocked(check)).toHaveBeenCalledTimes(1);
+    expect(getUpdateDialogState()).toBe("idle");
   });
 
   it("does not relaunch automatically after download", async () => {
