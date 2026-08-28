@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import type { StagedTaxDecision } from "../data/sample-invoice";
-import { formatDateDe, formatMoney } from "../lib/money";
+import { formatDateDe, formatMoney, taxFraction, taxPercent } from "../lib/money";
 import { MaterialIcon } from "./material-icon";
 
 export interface TaxRailProps {
@@ -27,9 +27,9 @@ export function TaxRail({
   const { t } = useTranslation();
   const rate = typeof tax?.invoice_tax_rate === "number" ? tax.invoice_tax_rate : 0;
   const reverse = Boolean(tax?.reverse_charge_flag);
-  const taxAmount = reverse ? 0 : netto * rate;
+  const taxAmount = reverse ? 0 : netto * taxFraction(rate);
   const total = netto + taxAmount;
-  const percent = Math.round(rate * 100);
+  const percent = taxPercent(rate);
   const vatLabel = reverse
     ? `${t("taxRail.vat")} (0%)`
     : `${t("taxRail.vat")} (${percent}%)`;
