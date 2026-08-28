@@ -174,6 +174,7 @@ export async function checkForUpdates(
 }
 
 export async function downloadUpdate(): Promise<void> {
+  if (state === "downloading") return;
   if (!pluginUpdate) {
     await checkForUpdates(false);
     if (!pluginUpdate) return;

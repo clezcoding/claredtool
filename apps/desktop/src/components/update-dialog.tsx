@@ -156,6 +156,7 @@ export function UpdateDialog() {
   const [notes, setNotes] = useState("");
   const [permissionHint, setPermissionHint] = useState<string | null>(null);
   const [progress, setProgress] = useState<UpdateProgress | null>(null);
+  const [isInstalling, setIsInstalling] = useState(false);
   const eta = useDownloadEta(progress);
 
   useEffect(() => {
@@ -186,6 +187,18 @@ export function UpdateDialog() {
       setPermissionHint,
     );
   }, [state, t, version]);
+
+  useEffect(() => {
+    if (state !== "available" && state !== "error") {
+      setIsInstalling(false);
+    }
+  }, [state]);
+
+  const handleInstall = () => {
+    if (isInstalling) return;
+    setIsInstalling(true);
+    void downloadUpdate().finally(() => setIsInstalling(false));
+  };
 
   const open =
     state === "available" ||
@@ -260,7 +273,8 @@ export function UpdateDialog() {
               </Button>
               <Button
                 type="button"
-                onClick={() => void downloadUpdate()}
+                disabled={isInstalling}
+                onClick={handleInstall}
               >
                 {t("update.install")}
               </Button>
