@@ -12,6 +12,11 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **UI-01**: Every UI-bearing phase has interactive mockups / UI-SPEC before implementation (ALWAYS build mockups)
 - [x] **BRAND-01**: Crafted Minimal is the visual system (design tokens + approved-mockup SSOT + motion). UI-01 still requires mockup/UI-SPEC before code.
 - [x] **DESK-01**: User can run Clared as a Tauri desktop app (Rust + Web-UI) on macOS and Windows
+- [ ] **DESK-02**: Desktop feel — prevent-default, selection/overscroll, link-guard, store+theme migration, window-state, notification smoke, dragout smoke (Phase 04.2)
+- [ ] **DESK-03**: Observability — `tauri-plugin-log` + Sentry EU (`tauri-plugin-sentry`) env-gated and scrubbed (Phase 04.2)
+- [ ] **DESK-04**: Ship path — signed updater + process relaunch + FaynoSync on Coolify (`stable`) (Phase 04.2)
+- [ ] **DESK-05**: Debug-only rich Cmd/Ctrl+D panel + DevTools; MCP bridge unchanged (Phase 04.2)
+- [ ] **DESK-06**: Clipboard write-only helper + 1–2 copy actions + i18n toast (Phase 04.2)
 
 ### Backend & Identity
 
@@ -91,6 +96,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-01 | Phase 1 | Complete |
 | BRAND-01 | Phase 4 | Complete |
 | DESK-01 | Phase 1 | Complete |
+| DESK-02 | Phase 04.2 | Pending |
+| DESK-03 | Phase 04.2 | Pending |
+| DESK-04 | Phase 04.2 | Pending |
+| DESK-05 | Phase 04.2 | Pending |
+| DESK-06 | Phase 04.2 | Pending |
 | BACK-01 | Phase 2 | Complete |
 | AUTH-01 | Phase 2 | Complete |
 | ENT-01 | Phase 3 | Pending |
@@ -103,10 +113,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Coverage:**
 
-- v1 requirements: 12 total
-- Mapped to phases: 12
+- v1 requirements: 17 total (DESK-02…06 added for Phase 04.2 hardening)
+- Mapped to phases: 17
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-08-19*
-*Last updated: 2026-08-20 — SaaS vendor Coolify, SAAS-01 v2, BACK-01/AUTH-01 wording*
+*Last updated: 2026-08-28 — DESK-02…06 for Phase 04.2*
