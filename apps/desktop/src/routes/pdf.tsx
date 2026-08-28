@@ -1,4 +1,4 @@
-import { useCallback, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { ErrorState } from "../components/error-state";
@@ -38,8 +38,12 @@ function auditSteps(vatRate: number): AuditStep[] {
   ];
 }
 
-export function PdfScreen({ demoState = "populated" }: PdfScreenProps = {}) {
+export function PdfScreen({ demoState: demoStateProp = "populated" }: PdfScreenProps = {}) {
   const { t } = useTranslation();
+  const [demoState, setDemoState] = useState(demoStateProp);
+  useEffect(() => {
+    setDemoState(demoStateProp);
+  }, [demoStateProp]);
   const [zoom, setZoom] = useState(100);
   const [lang, setLang] = useState<"en" | "de">("de");
   const [fullscreen, setFullscreen] = useState(false);
@@ -132,7 +136,7 @@ export function PdfScreen({ demoState = "populated" }: PdfScreenProps = {}) {
           ) : null}
           {demoState === "error" ? (
             <div className="self-center">
-              <ErrorState onRetry={() => undefined} />
+              <ErrorState onRetry={() => setDemoState("populated")} />
             </div>
           ) : null}
           {demoState === "empty" ? (
