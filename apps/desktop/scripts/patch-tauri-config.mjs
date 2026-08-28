@@ -29,5 +29,19 @@ config.plugins ??= {};
 config.plugins.updater ??= {};
 config.plugins.updater.endpoints = [endpoint];
 
+config.app ??= {};
+config.app.security ??= {};
+config.app.security.csp = {
+  "default-src": "'self'",
+  "connect-src":
+    "'self' https://clared-api.puzzlessdev.online https://clared-auth.puzzlessdev.online https://*.sentry.io https://updates.puzzlessdev.online https://updates-staging.puzzlessdev.online https://updates-assets.puzzlessdev.online https://updates-assets-staging.puzzlessdev.online",
+  "script-src": "'self'",
+  "style-src": "'self' 'unsafe-inline'",
+  "img-src": "'self' data: blob: https:",
+  "font-src": "'self' data:",
+  "frame-src":
+    "'self' https://clared-api.puzzlessdev.online https://clared-auth.puzzlessdev.online",
+};
+
 writeFileSync(buildConf, `${JSON.stringify(config, null, 2)}\n`);
 console.log(`Wrote ${path.basename(buildConf)}`);
