@@ -1,15 +1,16 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 05.1
-current_phase_name: Stitch→React extended catalog
-status: "Phase 04.1 shipped — PR #39"
-stopped_at: Phase 04.1 complete, ready to plan Phase 05.1
-last_updated: "2026-08-28T01:27:04.037Z"
+current_phase: 04.2
+current_phase_name: Desktop Platform Hardening
+status: planning
+stopped_at: Phase 04.1 merged (PR #39); Phase 04.2 + 04.3 scoped in ROADMAP — discuss/plan 04.2 first
+last_updated: "2026-08-28T01:49:00.000Z"
 last_activity: 2026-08-28
-state_head: 8c8ec340134d6a28061dac19cd3483129d0007ce
+last_activity_desc: Completed quick task 260828-5c8 — CI parallel jobs, path filters, rust-cache, vitest parallel
+state_head: 30e331aa0342464abc99ef911b888fa2d72cf533
 progress:
-  total_phases: 8
+  total_phases: 10
   completed_phases: 5
   total_plans: 31
   completed_plans: 31
@@ -23,21 +24,24 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 04.1 — Stitch→React 5-route conversion
+**Current focus:** Phase 04.2 — Desktop Platform Hardening
 
 ## Current Position
 
-Status: Phase 04.1 shipped — PR #39
-Phase: 05.1 — Stitch→React extended catalog
+Status: planning
+Phase: 04.2 — Desktop Platform Hardening (INSERTED)
+Phase 04.1 merged: PR #39 (`30e331a`)
 Plan: Not started
 Phase 04 (Premium UI & Brand Redesign) — complete 2026-08-25
-Phase 04.1 (Stitch→React 5-route) — **NEXT** execute (7 plans finalized)
-Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.1
+Phase 04.1 (Stitch→React 5-route) — complete 2026-08-28
+Phase 04.2 (Desktop Platform Hardening) — **NEXT** discuss → plan → execute
+Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — after 04.2
+Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.3
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
-Decided: Option A — 4.1 = 5-route stitch-build before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-08-28
+Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
+Last activity: 2026-08-28 — Phase 04.1 merged PR #39; 04.2 scope enriched; 04.3 inserted before Phase 5
 
-Progress: [██████░░░░] 60%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -192,11 +196,14 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260822-u6p | Räume das Projektverzeichniss auf. | 2026-08-22 | 7c30d5e | [260822-u6p-r-ume-das-projektverzeichniss-auf](./quick/260822-u6p-r-ume-das-projektverzeichniss-auf/) |
+| 260828-5c8 | Optimize GitHub Actions CI: parallel jobs, path filters, rust-cache, vitest parallel | 2026-08-28 | 41ec7f6 | [260828-5c8-optimize-github-actions-ci-parallel-jobs](./quick/260828-5c8-optimize-github-actions-ci-parallel-jobs/) |
 
 ### Roadmap Evolution
 
 - Phase 4.1 inserted after Phase 4: Stitch→React 5-route conversion (D-13 v1 nav; stitch-build; P1 backlog R-01–R-04) (URGENT)
 - Phase 5.1 inserted after Phase 5: Stitch→React extended catalog (out-of-nav + P2 R-10–R-14) (URGENT)
+- Phase 04.2 inserted after Phase 4: Desktop Platform Hardening — Tauri plugins, sentry, tauri-ui batteries, updater infra (URGENT)
+- Phase 04.3 inserted after Phase 4: Infra & Prep for PDF/Offline/Audit — Gotenberg, Uptime Kuma, Beszel, OTel/Grafana, Pino, dialog/fs/sharekit/sql scaffold, BullMQ skeleton (URGENT)
 
 ## Deferred Items
 
@@ -209,7 +216,7 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-08-27T23:40:58.621Z
-Stopped at: Phase 04.1 complete, ready to plan Phase 05.1
+Stopped at: Phase 04.1 complete; Phase 04.2 + 04.3 scoped — discuss/plan 04.2 first
 Resume file: None
 
 ## Rebuild Log
