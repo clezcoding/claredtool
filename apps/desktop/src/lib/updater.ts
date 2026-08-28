@@ -47,6 +47,7 @@ let info: UpdateInfo | null = null;
 let progress: UpdateProgress | null = null;
 let pluginUpdate: Update | null = null;
 let silentFailCount = 0;
+let dismissedReadyVersion: string | null = null;
 let schedulerTimer: ReturnType<typeof setInterval> | undefined;
 let schedulerStarted = false;
 
@@ -154,6 +155,10 @@ export async function checkForUpdates(
       return null;
     }
 
+    if (dismissedReadyVersion && update.version === dismissedReadyVersion) {
+      return null;
+    }
+
     pluginUpdate = update;
     const updateInfo: UpdateInfo = {
       version: update.version,
@@ -213,6 +218,13 @@ export async function downloadUpdate(): Promise<void> {
 
 export function dismissUpdate(): void {
   emitProgress(null);
+  if (state === "ready" && info?.version) {
+    dismissedReadyVersion = info.version;
+    pluginUpdate = null;
+    setState("idle", null);
+    return;
+  }
+  dismissedReadyVersion = null;
   pluginUpdate = null;
   setState("idle", null);
 }
@@ -243,6 +255,7 @@ export function __resetUpdaterForTests(): void {
   progress = null;
   pluginUpdate = null;
   silentFailCount = 0;
+  dismissedReadyVersion = null;
   schedulerStarted = false;
   if (schedulerTimer !== undefined) {
     clearInterval(schedulerTimer);
