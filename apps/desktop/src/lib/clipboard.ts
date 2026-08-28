@@ -1,4 +1,10 @@
+import { writeText } from "@tauri-apps/plugin-clipboard-manager";
+
 export async function copyText(value: string): Promise<boolean> {
-  void value;
-  return false;
+  try {
+    await writeText(value);
+    return true;
+  } catch {
+    return false;
+  }
 }
