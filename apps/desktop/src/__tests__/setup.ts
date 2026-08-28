@@ -51,6 +51,11 @@ vi.mock("@tauri-apps/plugin-store", () => {
   };
 });
 
+vi.mock("@sentry/browser", () => ({
+  captureMessage: vi.fn(),
+  init: vi.fn(),
+}));
+
 vi.mock("@tauri-apps/plugin-log", () => ({
   debug: vi.fn(),
   info: vi.fn(),
