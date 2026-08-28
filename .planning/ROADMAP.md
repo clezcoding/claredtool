@@ -214,8 +214,8 @@ Plans:
 - [ ] 04.2-04-PLAN.md — Observability: log + Sentry EU scrubbed
 - [ ] 04.2-05-PLAN.md — Ship ops: D-06 pubkey gate + FaynoSync Coolify + CI signing
 - [ ] 04.2-06-PLAN.md — Ship client: updater UX, menu, dialog, relaunch
-- [ ] 04.2-07-PLAN.md — DX: rich debug panel + DevTools debug-only
-- [ ] 04.2-08-PLAN.md — Clipboard write-only + invoice/tax copy actions
+- [ ] 04.2-08-PLAN.md — Wave 7: Clipboard write-only + invoice/tax copy (before debug)
+- [ ] 04.2-07-PLAN.md — Wave 8: DX rich debug panel + DevTools (depends on 08 copyText)
 
 ### Phase 04.1: Stitch→React 5-route conversion (INSERTED)
 
