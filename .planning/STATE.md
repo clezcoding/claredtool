@@ -1,19 +1,18 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 04.2
-current_phase_name: Desktop Platform Hardening
-status: planning
-stopped_at: Phase 04.1 merged (PR #39); Phase 04.2 + 04.3 scoped in ROADMAP — discuss/plan 04.2 first
-last_updated: "2026-08-28T01:49:00.000Z"
+current_phase: 04.3
+current_phase_name: Infra & Prep for PDF, Offline & Audit
+status: "Phase 04.2 shipped — PR #42"
+stopped_at: Phase 04.2 complete, ready to plan Phase 04.3
+last_updated: "2026-08-28T21:54:55.827Z"
 last_activity: 2026-08-28
-last_activity_desc: Completed quick task 260828-5c8 — CI parallel jobs, path filters, rust-cache, vitest parallel
-state_head: 30e331aa0342464abc99ef911b888fa2d72cf533
+state_head: 7a1fbd2e6e9a446e5099057e000d22120f49b6f4
 progress:
   total_phases: 10
-  completed_phases: 5
-  total_plans: 31
-  completed_plans: 31
+  completed_phases: 6
+  total_plans: 39
+  completed_plans: 39
 milestone_name: milestone
 ---
 
@@ -28,18 +27,18 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 
 ## Current Position
 
-Status: planning
-Phase: 04.2 — Desktop Platform Hardening (INSERTED)
+Status: Phase 04.2 shipped — PR #42
+Phase: 04.3 — Infra & Prep for PDF, Offline & Audit
 Phase 04.1 merged: PR #39 (`30e331a`)
 Plan: Not started
 Phase 04 (Premium UI & Brand Redesign) — complete 2026-08-25
 Phase 04.1 (Stitch→React 5-route) — complete 2026-08-28
-Phase 04.2 (Desktop Platform Hardening) — **NEXT** discuss → plan → execute
+Phase 04.2 (Desktop Platform Hardening) — **NEXT** re-check / execute (clipboard wave 7 before debug wave 8)
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — after 04.2
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.3
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-08-28 — Phase 04.1 merged PR #39; 04.2 scope enriched; 04.3 inserted before Phase 5
+Last activity: 2026-08-28
 
 Progress: [█████░░░░░] 50%
 
@@ -47,7 +46,7 @@ Progress: [█████░░░░░] 50%
 
 **Velocity:**
 
-- Total plans completed: 31
+- Total plans completed: 39
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -61,6 +60,7 @@ Progress: [█████░░░░░] 50%
 | 04 | 6 | - | - |
 | 06 | 0 | - | - |
 | 04.1 | 7 | - | - |
+| 04.2 | 8 | - | - |
 
 **Recent Trend:**
 
@@ -96,6 +96,14 @@ Progress: [█████░░░░░] 50%
 | Phase 04.1-stitch-react-5-route-conversion P05 | 11min | 2 tasks | 10 files |
 | Phase 04.1-stitch-react-5-route-conversion P06 | 48 | 2 tasks | 11 files |
 | Phase 04.1 P07 | 25min | 3 tasks | 7 files |
+| Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P01 | 4 | 3 tasks | 20 files |
+| Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P02 | 4min | 3 tasks | 10 files |
+| Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P03 | 12 | 3 tasks | 7 files |
+| Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P04 | 18 | 3 tasks | 8 files |
+| Phase 04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent P05 | 90min | 3 tasks | 9 files |
+| Phase 04.2 P06 | 12 | 3 tasks | 9 files |
+| Phase 04.2 P08 | 5min | 3 tasks | 13 files |
+| Phase 04.2 P07 | 6min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -181,6 +189,21 @@ Recent decisions affecting current work:
 - [Phase 04.1]: DATEV #00AA13 is --datev for the brand chip only; generate CTA uses primary-container
 - [Phase 04.1]: Human 2026-08-28 phase6: transfer F-09 threshold-0 FAIL (02–07) to Phase 06. D-11 five-nav vs catalog mockups. Pixel gate residual-closed, not PASS. — Named residual D-09/D-27; Kaneo #70.
 - [Phase 04.1]: Capture inner 1536x1024 requires fullscreen first; WKWebView native shot is 2x even-pixel CSS subsample. — Windowed availHeight ~1005 cannot fit inner 1536x1024.
+- [Phase 04.2]: Wave 0: vitest resolve aliases for uninstalled plugin packages until Plan 02 npm add
+- [Phase 04.2]: clipboard.failed i18n keys seeded in Wave 0 for RED toast-path test
+- [Phase 04.2]: desktop-store calls load() per access — no module cache (Vitest mock compatibility)
+- [Phase 04.2]: CSP object allowlists Vite :5174, backend, Authentik, Sentry connect-src
+- [Phase 04.2]: Human blocked tauri-plugin-dragout at SUS gate — Phase 5 uses CrabNebula tauri-plugin-drag cross-platform with temp-file PDF path instead
+- [Phase 04.2]: link-guard installed via requestAnimationFrame after boot IIFE — external https via opener only on main WebView (D-34)
+- [Phase 04.2]: [Phase 04.2]: sentry-api skipped — tauri-plugin-sentry 0.6 + @sentry/browser + init_with_no_injection; no tauri-plugin-sentry-api
+- [Phase 04.2]: [Phase 04.2]: tauri-plugin-log LogDir + desktopLog; debug dev / info prod (D-42/D-43)
+- [Phase 04.2]: Garage on Coolify uses alpine dockerfile_inline wrapper; FaynoSync admin must seed clared/stable channel post-migrate
+- [Phase 04.2]: Updater states: idle|available|downloading|ready|error; relaunch only on user action (D-19)
+- [Phase 04.2]: Sentry after 3 silent update-check failures; German internal message (D-54)
+- [Phase 04.2]: useAppShellFeedback no-op fallback for route tests outside AppShell Outlet
+- [Phase 04.2]: Omit tauri.conf window.devtools — Tauri debug_assertions default keeps DevTools in dev only (D-50)
+- [Phase 04.2]: maskUpdaterEndpoint masks subdomain + registrable label for safe updater display
+- [Phase 04.2]: [quick-260828-mn3]: desktop-build skips PRs; v* tags trigger FaynoSync publish if; explicit pnpm tauri CLI kept
 
 ### Pending Todos
 
@@ -197,6 +220,7 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260822-u6p | Räume das Projektverzeichniss auf. | 2026-08-22 | 7c30d5e | [260822-u6p-r-ume-das-projektverzeichniss-auf](./quick/260822-u6p-r-ume-das-projektverzeichniss-auf/) |
 | 260828-5c8 | Optimize GitHub Actions CI: parallel jobs, path filters, rust-cache, vitest parallel | 2026-08-28 | 41ec7f6 | [260828-5c8-optimize-github-actions-ci-parallel-jobs](./quick/260828-5c8-optimize-github-actions-ci-parallel-jobs/) |
+| 260828-mn3 | Optimize desktop-build GitHub Actions: skip PR signed tauri build; trigger on v* tags | 2026-08-28 | 667385b | [260828-mn3-optimize-desktop-build-github-actions-ke](./quick/260828-mn3-optimize-desktop-build-github-actions-ke/) |
 
 ### Roadmap Evolution
 
@@ -215,8 +239,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-27T23:40:58.621Z
-Stopped at: Phase 04.1 complete; Phase 04.2 + 04.3 scoped — discuss/plan 04.2 first
+Last session: 2026-08-28T05:04:23.014Z
+Stopped at: Phase 04.2 complete, ready to plan Phase 04.3
 Resume file: None
 
 ## Rebuild Log

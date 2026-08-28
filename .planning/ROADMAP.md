@@ -2,7 +2,7 @@
 
 ## Overview
 
-Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. It is **paid subscription SaaS**: backend, Postgres, Redis, and Authentik run on the **founder's Coolify**, not on the customer's machine, not as open source, not for free. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to the vendor Coolify API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 is a full premium redesign (Crafted Minimal) — brand tokens, theme, motion. Phase 4.1 converts approved Google Stitch HTML for the 5 v1 routes into Tauri TSX/React via stitch-build. Phase 5 closes the loop with PDF, tax-decision audit, and offline sync. Phase 5.1 converts the remaining Stitch catalog. Phase 6 closes 1:1 fidelity on the 5 routes. Stripe/seats (`SAAS-01`) stay v2.
+Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. It is **paid subscription SaaS**: backend, Postgres, Redis, and Authentik run on the **founder's Coolify**, not on the customer's machine, not as open source, not for free. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to the vendor Coolify API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 is a full premium redesign (Crafted Minimal) — brand tokens, theme, motion. Phase 4.1 converts approved Google Stitch HTML for the 5 v1 routes into Tauri TSX/React via stitch-build. Phase 4.2 hardens the desktop platform (Tauri plugins, Sentry, updater). Phase 4.3 deploys PDF/audit/offline prep infra (Gotenberg, monitoring, OTel, desktop SQL/dialog/fs). Phase 5 closes the loop with PDF, tax-decision audit, and offline sync. Phase 5.1 converts the remaining Stitch catalog. Phase 6 closes 1:1 fidelity on the 5 routes. Stripe/seats (`SAAS-01`) stay v2.
 
 ## Phases
 
@@ -18,6 +18,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Entities, Invoices & Live Tax** - Create invoice, see live tax from modular engine (completed 2026-08-22)
 - [x] **Phase 4: Premium UI & Brand Redesign** - Crafted Minimal; every page mockup-first with new brand, graphics, and motion (completed 2026-08-25)
 - [x] **Phase 4.1: Stitch→React 5-route conversion** (INSERTED) - stitch-build HTML→TSX for Rechnung · Entities · Kunden · Tax · PDF (completed 2026-08-28)
+- [x] **Phase 4.2: Desktop Platform Hardening** (INSERTED) - Tauri plugins, Sentry, updater, desktop polish (completed 2026-08-28)
+- [ ] **Phase 4.3: Infra & Prep for PDF, Offline & Audit** (INSERTED) - Gotenberg, monitoring, OTel, desktop/backend scaffolding before Phase 5
 - [ ] **Phase 5: PDF, Audit & Offline Sync** - Download PDF, inspect tax audit trail, work offline and sync
 - [ ] **Phase 5.1: Stitch→React extended catalog** (INSERTED) - remaining Stitch screens after PDF loop ships
 - [ ] **Phase 6: Mockup 1:1 Fidelity Closure** - pixel-match approved mockups 02–07 on the 5 routes
@@ -166,6 +168,55 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **UI hint**: yes
 
+### Phase 04.3: Infra & Prep for PDF, Offline & Audit (INSERTED)
+
+**Goal:** Deploy supporting Coolify infra and wire desktop/backend scaffolding so Phase 5 focuses on product flows (generate PDF, audit trail, offline sync) — not plumbing
+**Requirements**: PDF-01 (prep), OFFL-01 (prep), AUDT-01 (prep) — full IDs mapped in `/gsd-plan-phase 04.3`
+**Depends on:** Phase 4.2
+**Success Criteria** (what must be TRUE):
+
+  1. **Wave 1 — Monitoring:** [Uptime Kuma](https://github.com/louislam/uptime-kuma) on Coolify monitors `clared-api`, Authentik, Postgres; [Beszel](https://github.com/henrygd/beszel) tracks VPS CPU/RAM/docker; alert webhooks documented
+  2. **Wave 2 — PDF render infra:** [Gotenberg](https://github.com/gotenberg/gotenberg) on Coolify; NestJS PDF module skeleton (HTML template + invoice facts → PDF bytes contract); optional OTEL on Gotenberg
+  3. **Wave 3 — Backend observability prep:** Pino structured logging in NestJS; OpenTelemetry SDK bootstrap; OTel Collector + Grafana (or minimal Coolify stack) deployed or documented for AUDT-01 — no `audit_logs` product UI yet
+  4. **Wave 4 — Desktop PDF/offline prep:** official `tauri-plugin-dialog`, `tauri-plugin-fs`, [tauri-plugin-sharekit](https://github.com/Choochmeque/tauri-plugin-sharekit); `tauri-plugin-sql` scaffold (migrations dir, empty schema — no sync logic)
+  5. **Wave 5 — Async jobs prep:** BullMQ skeleton on existing Redis (`pdf-generation` queue + worker stub); no invoice PDF templates in this phase
+  6. Phase 5 owns end-user PDF download, `audit_logs` rows, and offline sync — this phase only prepares pipes
+
+**Plans:** 0 plans
+**UI hint**: no (infra + thin scaffolding)
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 04.3 to break down)
+
+### Phase 04.2: Desktop Platform Hardening (INSERTED)
+
+**Goal:** Harden the Tauri desktop shell for ship-readiness and premium macOS feel — observability, auto-update, native polish, and agent-friendly dev tooling
+**Requirements**: DESK-01, DESK-02, DESK-03, DESK-04, DESK-05, DESK-06
+**Depends on:** Phase 4.1
+**Success Criteria** (what must be TRUE):
+
+  1. **Wave 1 — Desktop feel (tauri-ui batteries cherry-picked):** external-link-guard; overscroll/rubber-band off; desktop selection defaults; startup flash aligned with existing boot paint; [`tauri-plugin-prevent-default`](https://github.com/ferreira-tb/tauri-plugin-prevent-default); [`tauri-plugin-store`](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/store) with localStorage→store migration path documented; official [`window-state`](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/window-state); [`notification`](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/notification); community [`dragout`](https://github.com/alexqqqqqq777/tauri-plugin-dragout) (PDF drag-out ready for Phase 5)
+  2. **Wave 2 — Observability:** official [`log`](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/log); [`tauri-plugin-sentry`](https://github.com/timfish/sentry-tauri) 0.6 → **Sentry EU Free Cloud** (`de.sentry.io`), `sendDefaultPii: false`, env-gated dev/staging/prod; GlitchTip self-host explicitly deferred unless Cloud limits hit
+  3. **Wave 3 — Ship:** official [`updater`](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/updater) + official [`process`](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/process) (restart after update); update-server on Coolify ([FaynoSync](https://github.com/ku9nov/faynoSync)); signed release channel documented
+  4. **Wave 4 — DX (debug builds only):** rich Cmd/Ctrl+D debug-panel; Specta/TauRPC deferred (D-48)
+  5. **Wave 5 — Clipboard:** official [`clipboard-manager`](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/clipboard-manager) write-only (D-01); not CrossCopy
+  6. Constraints: no tauri-ui scaffold migration; MCP bridge unchanged; no Gotenberg/SQL/dialog/fs (those are Phase 4.3)
+
+**Plans:** 8/8 plans complete
+**UI hint**: no (infra; minimal UI for debug-panel / update dialog / link guard only)
+
+Plans:
+
+- [x] 04.2-01-PLAN.md — Wave 0: Vitest mocks + RED test stubs (Nyquist)
+- [x] 04.2-02-PLAN.md — Tracer: store theme + prevent-default + CSP
+- [x] 04.2-03-PLAN.md — Feel: link-guard, window-state, notification, dragout SUS gate
+- [x] 04.2-04-PLAN.md — Observability: log + Sentry EU scrubbed
+- [x] 04.2-05-PLAN.md — Ship ops: D-06 pubkey gate + FaynoSync Coolify + CI signing
+- [x] 04.2-06-PLAN.md — Ship client: updater UX, menu, dialog, relaunch
+- [x] 04.2-08-PLAN.md — Wave 7: Clipboard write-only + invoice/tax copy (before debug)
+- [x] 04.2-07-PLAN.md — Wave 8: DX rich debug panel + DevTools (depends on 08 copyText)
+
 ### Phase 04.1: Stitch→React 5-route conversion (INSERTED)
 
 **Goal:** Convert approved Google Stitch HTML for the v1 5-item nav (Rechnung · Entities · Kunden · Tax · PDF) into production TSX/React in the Tauri desktop app using the stitch-build plugin/skills; close P1 repair backlog items during conversion
@@ -214,14 +265,14 @@ Plans:
 ### Phase 5: PDF, Audit & Offline Sync
 
 **Goal**: User finishes the two-minute loop with a PDF, can explain a tax decision from the audit trail, and can keep working when offline
-**Depends on**: Phase 4.1
+**Depends on**: Phase 4.3
 **Requirements**: PDF-01, OFFL-01, AUDT-01
 **Success Criteria** (what must be TRUE):
 
   1. Interactive mockups / UI-SPEC for PDF viewer and offline/sync states exist before implementation (satisfied by Phase 4.1 Stitch→React surfaces + remaining offline/sync mockups)
-  2. User can generate, download, and view a multilingual (DE/EN) invoice PDF that includes TaxDecision text blocks
-  3. Each tax evaluation leaves a persisted `audit_logs` row (applied rule, audit_trace); backend application logs exist; operator can add Grafana/Prometheus on Coolify
-  4. User can open recently used entities, customers, and invoices offline (IndexedDB/SQLite) and sync when the connection returns
+  2. User can generate, download, and view a multilingual (DE/EN) invoice PDF that includes TaxDecision text blocks (uses Gotenberg + NestJS from 4.3)
+  3. Each tax evaluation leaves a persisted `audit_logs` row (applied rule, audit_trace); backend application logs exist (Pino/OTel from 4.3); Grafana dashboards live
+  4. User can open recently used entities, customers, and invoices offline (SQLite sync via 4.3 scaffold) and sync when the connection returns
 
 **Plans**: TBD
 **UI hint**: yes
@@ -229,7 +280,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 5 → 5.1 → 6
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 → 5 → 5.1 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -238,6 +289,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 5 → 5.1 → 6
 | 3. Entities, Invoices & Live Tax | 6/6 | Complete | 2026-08-22 |
 | 4. Premium UI & Brand Redesign | 6/6 | Complete | 2026-08-25 |
 | 4.1 Stitch→React 5-route conversion | 7/7 | Complete    | 2026-08-28 |
+| 4.2 Desktop Platform Hardening | 8/8 | Complete    | 2026-08-28 |
+| 4.3 Infra & Prep for PDF/Offline/Audit | 0/? | Not started | - |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |
 | 6. Mockup 1:1 Fidelity Closure | 0/? | Not started | - |

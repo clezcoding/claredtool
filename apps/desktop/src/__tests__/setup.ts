@@ -35,6 +35,63 @@ vi.mock("@tauri-apps/plugin-os", async () => {
   return { hostname: hostnameMock };
 });
 
+vi.mock("@tauri-apps/plugin-store", () => {
+  const memory = new Map<string, unknown>();
+  return {
+    load: vi.fn(async () => ({
+      get: vi.fn(async <T>(key: string) => memory.get(key) as T | undefined),
+      set: vi.fn(async (key: string, value: unknown) => {
+        memory.set(key, value);
+      }),
+      save: vi.fn(async () => undefined),
+      delete: vi.fn(async (key: string) => {
+        memory.delete(key);
+      }),
+    })),
+  };
+});
+
+vi.mock("@sentry/browser", () => ({
+  captureMessage: vi.fn(),
+  init: vi.fn(),
+}));
+
+vi.mock("@tauri-apps/plugin-log", () => ({
+  debug: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+}));
+
+vi.mock("@tauri-apps/plugin-updater", () => ({
+  check: vi.fn(async () => null),
+}));
+
+vi.mock("@tauri-apps/plugin-process", () => ({
+  relaunch: vi.fn(async () => undefined),
+}));
+
+vi.mock("@tauri-apps/plugin-clipboard-manager", () => ({
+  writeText: vi.fn(async () => undefined),
+}));
+
+vi.mock("@tauri-apps/plugin-notification", () => ({
+  isPermissionGranted: vi.fn(async () => true),
+  requestPermission: vi.fn(async () => "granted" as const),
+  sendNotification: vi.fn(async () => undefined),
+}));
+
+vi.mock("@tauri-apps/plugin-window-state", () => ({
+  StateFlags: {
+    SIZE: 1,
+    POSITION: 2,
+    MAXIMIZED: 4,
+    VISIBLE: 8,
+    DECORATIONS: 16,
+    FULLSCREEN: 32,
+  },
+}));
+
 globalThis.fetch = fetchMock as typeof fetch;
 
 class ResizeObserverStub {

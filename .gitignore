@@ -14,8 +14,11 @@ pnpm-debug.log*
 target
 **/target
 apps/desktop/src-tauri/gen/schemas
+apps/desktop/src-tauri/tauri.conf.build.json
 
 # Local agent/runtime (never commit secrets or GSD scratch)
+TXTOS.txt
+.artifacts/
 .cursor/mcp.json
 .planning/tmp/
 .gsd/
@@ -23,6 +26,7 @@ apps/desktop/src-tauri/gen/schemas
 .claude/
 
 .env
+apps/desktop/.env
 !.env.example
 
 # Nest / Prisma

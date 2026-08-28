@@ -1,6 +1,6 @@
 [package]
 name = "clared"
-version = "0.1.0"
+version = "0.1.1"
 description = "Clared desktop"
 authors = ["you"]
 edition = "2021"
@@ -11,6 +11,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
+serde_json = "1"
 
 [dependencies]
 # Process-wide; only open_login_window loads a data URL (login-init).
@@ -23,3 +24,16 @@ tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
 keyring = "4"
 tauri-plugin-os = "2"
 tauri-plugin-mcp-bridge = "0.12"
+tauri-plugin-store = "2"
+tauri-plugin-prevent-default = "5"
+tauri-plugin-notification = "2"
+tauri-plugin-log = "2"
+log = "0.4"
+tauri-plugin-sentry = "0.6"
+sentry = "0.49"
+tauri-plugin-clipboard-manager = "2"
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-window-state = "2"
+tauri-plugin-updater = "2"
+tauri-plugin-process = "2"

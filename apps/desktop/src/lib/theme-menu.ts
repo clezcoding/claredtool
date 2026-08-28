@@ -1,8 +1,7 @@
-import {
-  CheckMenuItem,
-  Menu,
-  Submenu,
-} from "@tauri-apps/api/menu";
+import { CheckMenuItem, Menu, MenuItem, Submenu } from "@tauri-apps/api/menu";
+import i18n from "../i18n";
+import { checkForUpdates, getUpdateDialogState } from "./updater";
+import { setThemePref } from "./desktop-store";
 import { applyTheme, currentPref, type ThemePref } from "./theme";
 
 function isTauriRuntime(): boolean {
@@ -20,6 +19,7 @@ export async function installThemeMenu(): Promise<void> {
         checked: currentPref() === id,
         action: () => {
           applyTheme(id);
+          void setThemePref(id);
           void syncChecks();
         },
       });
@@ -39,8 +39,23 @@ export async function installThemeMenu(): Promise<void> {
       items: [hell, dunkel, system],
     });
 
-    const menu = await Menu.default();
-    await menu.append(darstellung);
+    const checkUpdates = await MenuItem.new({
+      id: "check-updates",
+      text: i18n.t("update.menuCheck"),
+      action: () => {
+        const updateState = getUpdateDialogState();
+        if (updateState === "downloading" || updateState === "ready") return;
+        void checkForUpdates(true);
+      },
+    });
+
+    // macOS ignores top-level menu items — first Submenu lands in the app menu.
+    const appSubmenu = await Submenu.new({
+      text: "Clared",
+      items: [darstellung, checkUpdates],
+    });
+
+    const menu = await Menu.new({ items: [appSubmenu] });
     await menu.setAsAppMenu();
   } catch (err) {
     console.warn("[theme-menu] Darstellung menu install failed:", err);

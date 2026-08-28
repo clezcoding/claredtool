@@ -5,12 +5,21 @@ import "./i18n";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import {
+  getThemePref,
+  migrateThemeToStore,
+} from "./lib/desktop-store";
+import { installLinkGuard } from "./lib/link-guard";
 import { installThemeMenu } from "./lib/theme-menu";
-import { applyTheme, currentPref, syncSystemAppearance } from "./lib/theme";
+import { applyTheme, syncSystemAppearance } from "./lib/theme";
 import "./styles/globals.css";
 
-applyTheme(currentPref());
-void installThemeMenu();
+void (async () => {
+  await migrateThemeToStore();
+  applyTheme(await getThemePref());
+  void installThemeMenu();
+  requestAnimationFrame(() => installLinkGuard());
+})();
 window
   .matchMedia("(prefers-color-scheme: dark)")
   .addEventListener("change", () => {
@@ -22,3 +31,12 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <App />
   </React.StrictMode>,
 );
+
+requestAnimationFrame(() => {
+  // D-50: WebView DevTools follow Tauri debug_assertions default — enabled in dev,
+  // disabled in release. tauri.conf.json omits window.devtools intentionally.
+  void import("./lib/sentry").then(({ initDesktopSentry }) => initDesktopSentry());
+  void import("./lib/updater").then(({ startUpdateScheduler }) =>
+    startUpdateScheduler(),
+  );
+});

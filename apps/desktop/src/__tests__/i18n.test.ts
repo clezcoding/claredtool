@@ -19,4 +19,12 @@ describe("i18n", () => {
   it("t('nav.rechnung') returns the German Rechnung label", () => {
     expect(i18n.t("nav.rechnung")).toBe("Rechnung");
   });
+
+  it("t('update.install') returns the German install label", () => {
+    expect(i18n.t("update.install")).toBe("Jetzt installieren");
+  });
+
+  it("t('clipboard.failed') returns the German copy-failure label", () => {
+    expect(i18n.t("clipboard.failed")).toBe("Kopieren fehlgeschlagen");
+  });
 });

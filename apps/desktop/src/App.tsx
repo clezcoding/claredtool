@@ -5,6 +5,7 @@ import { SessionProvider, useSession } from "./auth/session-provider";
 import { AppShell } from "./components/app-shell";
 import { ErrorState } from "./components/error-state";
 import { Splash } from "./components/splash";
+import { UpdateDialog } from "./components/update-dialog";
 import { EntitiesScreen } from "./routes/entities";
 import { KundenScreen } from "./routes/kunden";
 import { PdfScreen } from "./routes/pdf";
@@ -53,10 +54,20 @@ function AuthenticatedApp() {
   }
 
   if (state === "unsigned") {
-    return <LoginGate />;
+    return (
+      <>
+        <UpdateDialog />
+        <LoginGate />
+      </>
+    );
   }
 
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <UpdateDialog />
+      <RouterProvider router={router} />
+    </>
+  );
 }
 
 export default function App() {

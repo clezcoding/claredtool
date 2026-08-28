@@ -9,10 +9,16 @@
     "opener:default",
     "deep-link:default",
     "os:allow-hostname",
-    "mcp-bridge:default",
+    "store:default",
     "allow-keychain-set-session",
     "allow-keychain-get-session",
     "allow-keychain-delete-session",
-    "allow-open-login-window"
+    "allow-open-login-window",
+    "window-state:default",
+    "notification:default",
+    "log:default",
+    "updater:default",
+    "process:default",
+    "clipboard-manager:allow-write-text"
   ]
 }

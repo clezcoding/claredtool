@@ -187,6 +187,13 @@ describe("theme", () => {
     expect(paintedBackground(document.body)).toMatch(/#F7F7F5|rgb\(247,247,245\)/i);
   });
 
+  it("globals.css applies D-32/D-33 selection and overscroll defaults", () => {
+    const desktopCss = readRepo("../styles/globals.css");
+    expect(desktopCss).toMatch(/overscroll-behavior:\s*none/);
+    expect(desktopCss).toMatch(/user-select:\s*none/);
+    expect(desktopCss).toMatch(/\.copyable[\s\S]*user-select:\s*text/);
+  });
+
   it("PAINT_* match boot IIFE and both globals.css --background tokens", () => {
     const html = readRepo("../../index.html");
     const themeSrc = readRepo("./theme.ts");

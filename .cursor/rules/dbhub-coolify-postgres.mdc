@@ -1,0 +1,33 @@
+---
+description: Query Coolify Postgres only through dbhub MCP. Not psql, SSH, or Coolify env dumps.
+alwaysApply: true
+---
+
+# Coolify Postgres: dbhub MCP
+
+Anything against the **Coolify Postgres** (Clared app DB: database `clared`, role `clared_app`, schema, data, indexes) goes through **`user-dbhub`**. Do not `psql` the remote DB, SSH into the Postgres container, or read schema from Coolify env/`DATABASE_URL`.
+
+## How
+
+`GetMcpTools` on `user-dbhub` first, then `CallMcpTool`.
+
+| Need | Tool |
+|------|------|
+| List/find tables, columns, indexes | `search_objects` |
+| Run SQL | `execute_sql` |
+
+```text
+❌ BAD  ssh … docker exec postgres psql -U clared_app
+❌ BAD  psql "$DATABASE_URL" -c 'select …'
+✅ GOOD search_objects({ object_type: "table", schema: "public" })
+✅ GOOD execute_sql({ sql: "select current_database(), current_user;" })
+```
+
+Auth failure: `mcp_auth` on `user-dbhub`, inspect, retry once.
+
+## Boundaries
+
+- **This MCP = Coolify Clared Postgres only.** Authentik has its own Postgres — never query that via dbhub. Authentik objects stay on `user-authentik`.
+- **Local OrbStack Postgres** (`compose.clared.yml`) is not this server. Local schema/dev data: local `psql`/Prisma. Coolify prod/staging data: dbhub.
+- Destructive SQL (DROP, TRUNCATE, UPDATE without WHERE) needs an explicit user confirm first.
+- Do not dump secrets from tables into chat or commit them.

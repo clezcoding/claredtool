@@ -1,0 +1,267 @@
+import * as Sentry from "@sentry/browser";
+import { relaunch } from "@tauri-apps/plugin-process";
+import { check, type Update } from "@tauri-apps/plugin-updater";
+import { desktopLog } from "./log";
+
+export const UPDATE_CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000;
+export const UPDATE_CHECK_ON_STARTUP = true;
+
+const SILENT_FAIL_SENTRY_THRESHOLD = 3;
+
+export type UpdateState =
+  | "idle"
+  | "available"
+  | "downloading"
+  | "ready"
+  | "error";
+
+/** @deprecated alias for UpdateState — kept for tests and gradual migration */
+export type UpdateDialogState = UpdateState;
+
+export type UpdateToastKey =
+  | "update.current"
+  | "update.downloading"
+  | "update.manualFail"
+  | "update.downloadFail";
+
+export interface UpdateInfo {
+  version: string;
+  notes: string;
+  date?: string;
+}
+
+export type UpdatePhase = "download" | "install";
+
+export interface UpdateProgress {
+  phase: UpdatePhase;
+  downloadedBytes: number;
+  totalBytes: number | null;
+}
+
+type StateListener = (state: UpdateState, info: UpdateInfo | null) => void;
+type ToastListener = (key: UpdateToastKey) => void;
+type ProgressListener = (progress: UpdateProgress) => void;
+
+let state: UpdateState = "idle";
+let info: UpdateInfo | null = null;
+let progress: UpdateProgress | null = null;
+let pluginUpdate: Update | null = null;
+let silentFailCount = 0;
+let dismissedReadyVersion: string | null = null;
+let schedulerTimer: ReturnType<typeof setInterval> | undefined;
+let schedulerStarted = false;
+
+const stateListeners = new Set<StateListener>();
+const toastListeners = new Set<ToastListener>();
+const progressListeners = new Set<ProgressListener>();
+
+function isTauriRuntime(): boolean {
+  return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+}
+
+function parseManual(
+  manualOrOptions?: boolean | { manual?: boolean },
+): boolean {
+  if (typeof manualOrOptions === "boolean") return manualOrOptions;
+  return Boolean(manualOrOptions?.manual);
+}
+
+function formatNotes(body: string | undefined | null, version: string): string {
+  const trimmed = body?.trim();
+  return trimmed ? trimmed : version;
+}
+
+function setState(next: UpdateState, nextInfo: UpdateInfo | null = info): void {
+  state = next;
+  info = nextInfo;
+  for (const listener of stateListeners) listener(state, info);
+}
+
+function emitProgress(next: UpdateProgress | null): void {
+  progress = next;
+  if (!next) return;
+  for (const listener of progressListeners) listener(next);
+}
+
+function emitToast(key: UpdateToastKey): void {
+  for (const listener of toastListeners) listener(key);
+}
+
+function handleSilentFailure(err: unknown): void {
+  silentFailCount += 1;
+  desktopLog.error(
+    `Update-Prüfung fehlgeschlagen (Hintergrund): ${String(err)}`,
+  );
+  if (silentFailCount >= SILENT_FAIL_SENTRY_THRESHOLD) {
+    Sentry.captureMessage(
+      "Wiederholte fehlgeschlagene Hintergrund-Update-Prüfung",
+      "warning",
+    );
+    silentFailCount = 0;
+  }
+}
+
+export function subscribeUpdater(listener: StateListener): () => void {
+  stateListeners.add(listener);
+  listener(state, info);
+  return () => stateListeners.delete(listener);
+}
+
+export function subscribeUpdateToasts(listener: ToastListener): () => void {
+  toastListeners.add(listener);
+  return () => toastListeners.delete(listener);
+}
+
+export function subscribeUpdateProgress(listener: ProgressListener): () => void {
+  progressListeners.add(listener);
+  if (progress) listener(progress);
+  return () => progressListeners.delete(listener);
+}
+
+export function getUpdateProgress(): UpdateProgress | null {
+  return progress;
+}
+
+export function getUpdateDialogState(): UpdateDialogState {
+  return state;
+}
+
+export function getUpdateInfo(): UpdateInfo | null {
+  return info;
+}
+
+/** D-23: silent background check failures must not toast. */
+export function shouldToastOnSilentCheckFailure(): boolean {
+  return false;
+}
+
+export async function checkForUpdates(
+  manualOrOptions?: boolean | { manual?: boolean },
+): Promise<UpdateInfo | null> {
+  const manual = parseManual(manualOrOptions);
+  if (!isTauriRuntime()) return null;
+  if (state === "downloading" || state === "ready") {
+    if (manual && state === "downloading") emitToast("update.downloading");
+    return info;
+  }
+
+  try {
+    const update = await check();
+    silentFailCount = 0;
+
+    if (!update) {
+      if (manual) emitToast("update.current");
+      if (state === "available" || state === "error") setState("idle", null);
+      return null;
+    }
+
+    if (dismissedReadyVersion && update.version === dismissedReadyVersion) {
+      return null;
+    }
+
+    pluginUpdate = update;
+    const updateInfo: UpdateInfo = {
+      version: update.version,
+      notes: formatNotes(update.body, update.version),
+      date: update.date,
+    };
+    setState("available", updateInfo);
+    return updateInfo;
+  } catch (err) {
+    if (manual) {
+      emitToast("update.manualFail");
+      desktopLog.error(`Manuelle Update-Prüfung fehlgeschlagen: ${String(err)}`);
+    } else {
+      handleSilentFailure(err);
+    }
+    return null;
+  }
+}
+
+export async function downloadUpdate(): Promise<void> {
+  if (state === "downloading") return;
+  if (!pluginUpdate) {
+    await checkForUpdates(false);
+    if (!pluginUpdate) return;
+  }
+  setState("downloading", info);
+  let downloadedBytes = 0;
+  let totalBytes: number | null = null;
+  emitProgress({ phase: "download", downloadedBytes: 0, totalBytes: null });
+  try {
+    await pluginUpdate.download((event) => {
+      if (event.event === "Started") {
+        totalBytes = event.data.contentLength ?? null;
+        downloadedBytes = 0;
+        emitProgress({ phase: "download", downloadedBytes, totalBytes });
+        return;
+      }
+      if (event.event === "Progress") {
+        downloadedBytes += event.data.chunkLength;
+        emitProgress({ phase: "download", downloadedBytes, totalBytes });
+        return;
+      }
+      emitProgress({ phase: "install", downloadedBytes, totalBytes });
+    });
+    emitProgress({ phase: "install", downloadedBytes, totalBytes });
+    await pluginUpdate.install();
+    emitProgress(null);
+    setState("ready", info);
+  } catch (err) {
+    emitProgress(null);
+    pluginUpdate = null;
+    desktopLog.error(`Update-Download fehlgeschlagen: ${String(err)}`);
+    emitToast("update.downloadFail");
+    setState("error", info);
+  }
+}
+
+export function dismissUpdate(): void {
+  emitProgress(null);
+  if (state === "ready" && info?.version) {
+    dismissedReadyVersion = info.version;
+    pluginUpdate = null;
+    setState("idle", null);
+    return;
+  }
+  dismissedReadyVersion = null;
+  pluginUpdate = null;
+  setState("idle", null);
+}
+
+/** D-19: relaunch only when user explicitly requests — never auto after download. */
+export async function relaunchApp(): Promise<void> {
+  if (!isTauriRuntime()) return;
+  await relaunch();
+}
+
+export function startUpdateScheduler(): void {
+  if (!isTauriRuntime() || schedulerStarted) return;
+  schedulerStarted = true;
+
+  if (UPDATE_CHECK_ON_STARTUP) {
+    void checkForUpdates(false);
+  }
+
+  schedulerTimer = setInterval(() => {
+    void checkForUpdates(false);
+  }, UPDATE_CHECK_INTERVAL_MS);
+}
+
+/** Test-only reset — not part of public app API. */
+export function __resetUpdaterForTests(): void {
+  state = "idle";
+  info = null;
+  progress = null;
+  pluginUpdate = null;
+  silentFailCount = 0;
+  dismissedReadyVersion = null;
+  schedulerStarted = false;
+  if (schedulerTimer !== undefined) {
+    clearInterval(schedulerTimer);
+    schedulerTimer = undefined;
+  }
+  stateListeners.clear();
+  toastListeners.clear();
+  progressListeners.clear();
+}

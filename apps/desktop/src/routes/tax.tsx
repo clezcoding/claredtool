@@ -9,10 +9,12 @@ import {
 } from "@clared/ui";
 import { useCallback, useState, useSyncExternalStore } from "react";
 import { useTranslation } from "react-i18next";
+import { useAppShellFeedback } from "../components/app-shell";
 import { MaterialIcon } from "../components/material-icon";
 import type { StagedTaxDecision } from "../data/sample-invoice";
 import { DEMO_RULES, type TaxDemoRule } from "../data/tax-demo-rules";
 import { getTaxLiveState, subscribeTaxLive } from "../data/tax-live-store";
+import { copyText } from "../lib/clipboard";
 
 type RuleModal = { mode: "create" } | { mode: "edit"; ruleId: string };
 
@@ -65,6 +67,13 @@ function TaxDecisionFields({
   taxError: string | null;
 }) {
   const { t } = useTranslation();
+  const { setFeedback } = useAppShellFeedback();
+
+  async function copyAppliedRuleId(ruleId: string) {
+    const ok = await copyText(ruleId);
+    if (!ok) setFeedback(t("clipboard.failed"));
+  }
+
   return (
     <>
       <dl className="mt-3 flex flex-col gap-3 text-sm">
@@ -74,11 +83,26 @@ function TaxDecisionFields({
             <dd
               className={
                 field === "invoice_tax_rate"
-                  ? "break-words whitespace-normal tabular-nums"
-                  : "break-words whitespace-normal"
+                  ? "flex items-center gap-2 break-words whitespace-normal tabular-nums"
+                  : "flex items-center gap-2 break-words whitespace-normal"
               }
             >
-              {taxDecision ? String(taxDecision[field]) : "—"}
+              <span className={field === "applied_rule_id" ? "copyable" : undefined}>
+                {taxDecision ? String(taxDecision[field]) : "—"}
+              </span>
+              {field === "applied_rule_id" && taxDecision?.applied_rule_id ? (
+                <button
+                  type="button"
+                  aria-label={t("tax.copyRuleId")}
+                  className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-foreground"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    void copyAppliedRuleId(taxDecision.applied_rule_id);
+                  }}
+                >
+                  <MaterialIcon ligature="content_copy" className="text-[16px]" />
+                </button>
+              ) : null}
             </dd>
           </div>
         ))}

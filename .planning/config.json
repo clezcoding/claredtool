@@ -21,7 +21,8 @@
     "cross_ai_timeout": 300,
     "test_gate_timeout": 600,
     "_auto_chain_active": false,
-    "response_language": "de-DE"
+    "response_language": "de-DE",
+    "ai_integration_phase": true
   },
   "ship": {
     "pr_body_sections": []
