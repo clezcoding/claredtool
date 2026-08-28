@@ -147,7 +147,7 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
     event.preventDefault();
     setFieldError(null);
     if (!createForm.entityId) {
-      setFieldError("Bitte Entity wählen.");
+      setFieldError(t("registry.entityRequired"));
       return;
     }
     setSubmitting(true);
@@ -243,6 +243,9 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
             </ComboboxList>
           </ComboboxContent>
         </Combobox>
+        {fieldError ? (
+          <p className="text-xs text-destructive">{fieldError}</p>
+        ) : null}
       </div>
       <div className="flex flex-col gap-1">
         <Label htmlFor="kunde-name">Name</Label>
@@ -314,9 +317,6 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
               }))
             }
           />
-          {fieldError ? (
-            <p className="text-xs text-destructive">{fieldError}</p>
-          ) : null}
         </div>
       ) : null}
       <Button
