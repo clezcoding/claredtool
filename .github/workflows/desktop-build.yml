@@ -11,6 +11,20 @@ on:
       - apps/desktop/**
       - .github/workflows/desktop-build.yml
   workflow_dispatch:
+    inputs:
+      target:
+        description: FaynoSync environment for publish job
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+      publish:
+        description: Upload signed updater artifacts to FaynoSync
+        required: true
+        default: true
+        type: boolean
 
 permissions:
   contents: read
@@ -72,6 +86,104 @@ jobs:
             apps/desktop/src-tauri/target/release/bundle/macos/*.app.tar.gz.sig
           if-no-files-found: error
 
-      # FaynoSync upload (D-10): CI uploads signed NSIS/.app.tar.gz + .sig to prod
-      # https://updates.puzzlessdev.online after release cut. Staging builds must set
-      # TAURI_UPDATER_ENDPOINT / VITE_UPDATER_ENDPOINT to updates-staging host (D-12).
+  publish-faynosync:
+    needs: tauri
+    if: >
+      (github.event_name == 'workflow_dispatch' && inputs.publish == true) ||
+      (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
+      startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.target || (startsWith(github.ref, 'refs/tags/v') && 'production' || 'staging') }}
+    env:
+      FAYNOSYNC_BASE_URL: ${{ vars.FAYNOSYNC_BASE_URL }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Resolve FaynoSync base URL
+        run: |
+          if [ -n "$FAYNOSYNC_BASE_URL" ]; then
+            echo "Using FAYNOSYNC_BASE_URL from repository variable"
+          elif [ "${{ github.event_name == 'workflow_dispatch' && inputs.target || (startsWith(github.ref, 'refs/tags/v') && 'production' || 'staging') }}" = "production" ]; then
+            echo "FAYNOSYNC_BASE_URL=https://updates.puzzlessdev.online" >> "$GITHUB_ENV"
+          else
+            echo "FAYNOSYNC_BASE_URL=https://updates-staging.puzzlessdev.online" >> "$GITHUB_ENV"
+          fi
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v7
+        with:
+          pattern: "*-bundle"
+          path: artifacts
+          merge-multiple: true
+
+      - name: Read app version
+        id: meta
+        run: |
+          VERSION=$(node -p "require('./apps/desktop/src-tauri/tauri.conf.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Upload macOS updater to FaynoSync
+        env:
+          FAYNOSYNC_CI_TOKEN: ${{ secrets.FAYNOSYNC_CI_TOKEN }}
+        run: |
+          set -euo pipefail
+          MAC_FILE=$(find artifacts -name '*.app.tar.gz' -type f | head -1)
+          MAC_SIG_FILE=$(find artifacts -name '*.app.tar.gz.sig' -type f | head -1)
+          test -n "$MAC_FILE"
+          test -n "$MAC_SIG_FILE"
+          SIG=$(tr -d '\n' < "$MAC_SIG_FILE")
+          DATA=$(jq -n \
+            --arg version "${{ steps.meta.outputs.version }}" \
+            --arg signature "$SIG" \
+            --arg changelog "Clared ${{ steps.meta.outputs.version }} (macOS aarch64)" \
+            '{
+              app_name: "clared",
+              version: $version,
+              channel: "stable",
+              publish: true,
+              platform: "darwin",
+              arch: "aarch64",
+              updater: "tauri",
+              signature: $signature,
+              changelog: $changelog
+            }')
+          curl -sfS -X POST "$FAYNOSYNC_BASE_URL/upload" \
+            -H "Authorization: Bearer $FAYNOSYNC_CI_TOKEN" \
+            -F "file=@${MAC_FILE}" \
+            -F "data=${DATA}"
+
+      - name: Upload Windows updater to FaynoSync
+        env:
+          FAYNOSYNC_CI_TOKEN: ${{ secrets.FAYNOSYNC_CI_TOKEN }}
+        run: |
+          set -euo pipefail
+          WIN_FILE=$(find artifacts -path '*/nsis/*.exe' -type f ! -name '*.sig' | head -1)
+          WIN_SIG_FILE=$(find artifacts -path '*/nsis/*.exe.sig' -type f | head -1)
+          test -n "$WIN_FILE"
+          test -n "$WIN_SIG_FILE"
+          SIG=$(tr -d '\n' < "$WIN_SIG_FILE")
+          DATA=$(jq -n \
+            --arg version "${{ steps.meta.outputs.version }}" \
+            --arg signature "$SIG" \
+            --arg changelog "Clared ${{ steps.meta.outputs.version }} (Windows x86_64)" \
+            '{
+              app_name: "clared",
+              version: $version,
+              channel: "stable",
+              publish: true,
+              platform: "windows",
+              arch: "x86_64",
+              updater: "tauri",
+              signature: $signature,
+              changelog: $changelog
+            }')
+          curl -sfS -X POST "$FAYNOSYNC_BASE_URL/upload" \
+            -H "Authorization: Bearer $FAYNOSYNC_CI_TOKEN" \
+            -F "file=@${WIN_FILE}" \
+            -F "data=${DATA}"
+
+      - name: Verify FaynoSync checkVersion (macOS)
+        run: |
+          curl -sfS \
+            "$FAYNOSYNC_BASE_URL/checkVersion?app_name=clared&version=0.0.0&target=darwin&arch=aarch64&channel=stable&updater=tauri&owner=admin" \
+            | jq -e '.version'

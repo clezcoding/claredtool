@@ -52,7 +52,7 @@
       }
     },
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDhBN0Y2NkYyQTUwNEIxODMKUldTRHNRU2w4bVovaXB1R1MrbVdRUHQzN3RHaWZtQW1iSzFvTTMzektRYzhVWXd3N1RlaVZpVzcK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDFBMDAyRTVBNkEwRkUwRjYKUldUMjRBOXFXaTRBR2pnVVc3NGcyNkdGWnJaSnNmVWg2bzVQUGwxY3A1d3EzakhqSzlZWmk4MmYK",
       "endpoints": [
         "https://updates.puzzlessdev.online/checkVersion?app_name=clared&version={{current_version}}&target={{target}}&arch={{arch}}&channel=stable&updater=tauri&owner=admin"
       ],
