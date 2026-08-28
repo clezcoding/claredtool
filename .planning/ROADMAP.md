@@ -203,7 +203,7 @@ Plans:
   5. **Wave 5 — Clipboard:** official [`clipboard-manager`](https://github.com/tauri-apps/plugins-workspace/tree/v2/plugins/clipboard-manager) write-only (D-01); not CrossCopy
   6. Constraints: no tauri-ui scaffold migration; MCP bridge unchanged; no Gotenberg/SQL/dialog/fs (those are Phase 4.3)
 
-**Plans:** 5/8 plans executed
+**Plans:** 6/8 plans executed
 **UI hint**: no (infra; minimal UI for debug-panel / update dialog / link guard only)
 
 Plans:
@@ -213,7 +213,7 @@ Plans:
 - [x] 04.2-03-PLAN.md — Feel: link-guard, window-state, notification, dragout SUS gate
 - [x] 04.2-04-PLAN.md — Observability: log + Sentry EU scrubbed
 - [x] 04.2-05-PLAN.md — Ship ops: D-06 pubkey gate + FaynoSync Coolify + CI signing
-- [ ] 04.2-06-PLAN.md — Ship client: updater UX, menu, dialog, relaunch
+- [x] 04.2-06-PLAN.md — Ship client: updater UX, menu, dialog, relaunch
 - [ ] 04.2-08-PLAN.md — Wave 7: Clipboard write-only + invoice/tax copy (before debug)
 - [ ] 04.2-07-PLAN.md — Wave 8: DX rich debug panel + DevTools (depends on 08 copyText)
 
@@ -289,7 +289,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 →
 | 3. Entities, Invoices & Live Tax | 6/6 | Complete | 2026-08-22 |
 | 4. Premium UI & Brand Redesign | 6/6 | Complete | 2026-08-25 |
 | 4.1 Stitch→React 5-route conversion | 7/7 | Complete    | 2026-08-28 |
-| 4.2 Desktop Platform Hardening | 5/8 | In Progress|  |
+| 4.2 Desktop Platform Hardening | 6/8 | In Progress|  |
 | 4.3 Infra & Prep for PDF/Offline/Audit | 0/? | Not started | - |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |
