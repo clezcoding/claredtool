@@ -380,7 +380,7 @@ export function DebugPanel({
               {pluginChecks.map(({ name, ok }) => (
                 <li key={name} className="flex justify-between gap-2">
                   <span>{name}</span>
-                  <span className={ok ? "text-green-600" : "text-muted-foreground"}>
+                  <span className={ok ? "text-[var(--success)]" : "text-muted-foreground"}>
                     {ok ? "OK" : "—"}
                   </span>
                 </li>

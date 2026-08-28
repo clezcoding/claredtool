@@ -1,6 +1,6 @@
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
-use tauri::{webview::PageLoadEvent, Emitter, Manager, Url, WebviewUrl, WebviewWindowBuilder};
+use tauri::{Emitter, Manager, Url, WebviewUrl, WebviewWindowBuilder};
 
 const KEYCHAIN_SERVICE: &str = "com.clared.app";
 const KEYCHAIN_ACCOUNT: &str = "session";
@@ -85,23 +85,6 @@ fn login_init_url() -> Url {
     encoded.parse().expect("login-init data URL")
 }
 
-fn login_csp(backend: &str, authentik: &str) -> String {
-    // Meta CSP is defense-in-depth only; Chromium/WebKit may ignore script-injected
-    // meta tags after parse. Origin allowlist in allow_navigation is the real control.
-    let backend = origin_of(backend).unwrap_or_default();
-    let authentik = origin_of(authentik).unwrap_or_default();
-    format!(
-        "default-src 'self' {backend} {authentik}; img-src 'self' data: {backend} {authentik}; style-src 'self' 'unsafe-inline' {backend} {authentik}; script-src 'self' {backend} {authentik}; connect-src 'self' {backend} {authentik}; form-action {backend} {authentik}; frame-src {backend} {authentik}"
-    )
-}
-
-fn csp_init_script(backend: &str, authentik: &str) -> String {
-    let content = serde_json::to_string(&login_csp(backend, authentik)).expect("csp json");
-    format!(
-        "(function(){{var m=document.createElement('meta');m.httpEquiv='Content-Security-Policy';m.content={content};(document.head||document.documentElement).appendChild(m);}})();"
-    )
-}
-
 fn allow_navigation(url: &Url, backend: Option<&str>, authentik: Option<&str>) -> bool {
     match url.scheme() {
         "about" => true,
@@ -131,27 +114,31 @@ async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result
     }
 
     if let Some(existing) = app.get_webview_window(LOGIN_LABEL) {
-        let _ = existing.navigate(parsed_login);
-        existing.set_focus().map_err(|e| e.to_string())?;
-        return Ok(());
+        existing.destroy().map_err(|e| e.to_string())?;
     }
-    let csp_script = csp_init_script(&backend, &authentik);
 
     let nav_app = app.clone();
     let close_app = app.clone();
-    let load_login = parsed_login;
+    let load_login = parsed_login.clone();
     let ticket_emitted = Arc::new(AtomicBool::new(false));
     let ticket_for_nav = ticket_emitted.clone();
     let ticket_for_close = ticket_emitted;
 
+    // Dev: data-URL spinner (needs security.csp null in tauri.conf — CSP rewrites break data URLs).
+    // Release: load auth directly (patch-tauri-config.mjs sets CSP for main window assets).
+    #[cfg(debug_assertions)]
+    let initial_url = login_init_url();
+    #[cfg(not(debug_assertions))]
+    let initial_url = parsed_login.clone();
+
     let window =
-        WebviewWindowBuilder::new(&app, LOGIN_LABEL, WebviewUrl::External(login_init_url()))
+        WebviewWindowBuilder::new(&app, LOGIN_LABEL, WebviewUrl::External(initial_url))
             .title("Anmelden")
             .inner_size(480.0, 640.0)
             .min_inner_size(480.0, 640.0)
             .decorations(true)
             .resizable(true)
-            .initialization_script(&csp_script)
+            .incognito(true)
             .on_navigation(move |url| {
                 if url.scheme() == "clared" {
                     if let Some(ticket) = url
@@ -171,13 +158,13 @@ async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result
                 }
                 allow_navigation(url, backend_origin.as_deref(), authentik_origin.as_deref())
             })
-            .on_page_load(move |window, payload| {
-                if payload.event() == PageLoadEvent::Finished && payload.url().scheme() == "data" {
-                    let _ = window.navigate(load_login.clone());
-                }
-            })
             .build()
             .map_err(|e| e.to_string())?;
+
+    #[cfg(debug_assertions)]
+    {
+        window.navigate(load_login).map_err(|e| e.to_string())?;
+    }
 
     window.on_window_event(move |event| {
         if let tauri::WindowEvent::Destroyed = event {
@@ -529,7 +516,9 @@ pub fn run() {
     builder = builder
         .plugin(log_plugin())
         .plugin(tauri_plugin_notification::init())
-        .plugin(tauri_plugin_window_state::Builder::new().build())
+        .plugin(tauri_plugin_window_state::Builder::new()
+            .with_filter(|label| label != LOGIN_LABEL)
+            .build())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(prevent_default());
 
@@ -559,6 +548,13 @@ pub fn run() {
     }
 
     builder
+        .on_web_content_process_terminate(|webview| {
+            if webview.label() == LOGIN_LABEL {
+                let _ = webview.window().close();
+            } else if let Err(error) = webview.reload() {
+                log::error!("failed to reload webview after content process exit: {error}");
+            }
+        })
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_os::init())

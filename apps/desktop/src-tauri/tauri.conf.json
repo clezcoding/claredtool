@@ -22,15 +22,7 @@
     ],
     "withGlobalTauri": true,
     "security": {
-      "csp": {
-        "default-src": "'self'",
-        "connect-src": "'self' http://localhost:5174 ws://localhost:5174 http://localhost:3000 http://localhost:9000 https://clared-api.puzzlessdev.online https://clared-auth.puzzlessdev.online https://*.sentry.io https://updates.puzzlessdev.online https://updates-staging.puzzlessdev.online https://updates-assets.puzzlessdev.online https://updates-assets-staging.puzzlessdev.online",
-        "script-src": "'self' 'unsafe-inline' 'unsafe-eval' http://localhost:5174",
-        "style-src": "'self' 'unsafe-inline'",
-        "img-src": "'self' data: blob: https:",
-        "font-src": "'self' data:",
-        "frame-src": "'self' http://localhost:3000 http://localhost:9000 https://clared-api.puzzlessdev.online https://clared-auth.puzzlessdev.online"
-      }
+      "csp": null
     }
   },
   "bundle": {

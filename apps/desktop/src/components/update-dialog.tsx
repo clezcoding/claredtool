@@ -4,6 +4,7 @@ import {
   requestPermission,
   sendNotification,
 } from "@tauri-apps/plugin-notification";
+import type { TFunction } from "i18next";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -22,15 +23,20 @@ function isTauriRuntime(): boolean {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 }
 
-function formatEta(seconds: number): string {
+function formatEta(seconds: number, t: TFunction): string {
   if (!Number.isFinite(seconds) || seconds < 0) return "";
-  if (seconds < 60) return `${Math.max(1, Math.round(seconds))} s`;
+  if (seconds < 60) {
+    return t("update.etaSeconds", { count: Math.max(1, Math.round(seconds)) });
+  }
   const minutes = Math.floor(seconds / 60);
   const remainder = Math.round(seconds % 60);
-  return remainder > 0 ? `${minutes} min ${remainder} s` : `${minutes} min`;
+  return remainder > 0
+    ? t("update.etaMinutesSeconds", { minutes, seconds: remainder })
+    : t("update.etaMinutes", { minutes });
 }
 
 function useDownloadEta(progress: UpdateProgress | null): string | null {
+  const { t } = useTranslation();
   const startedAt = useRef<number | null>(null);
   const lastBytes = useRef(0);
   const [eta, setEta] = useState<string | null>(null);
@@ -68,8 +74,8 @@ function useDownloadEta(progress: UpdateProgress | null): string | null {
 
     const remaining =
       (progress.totalBytes - progress.downloadedBytes) / bytesPerSec;
-    setEta(formatEta(remaining));
-  }, [progress?.downloadedBytes, progress?.phase, progress?.totalBytes]);
+    setEta(formatEta(remaining, t));
+  }, [progress?.downloadedBytes, progress?.phase, progress?.totalBytes, t]);
 
   return eta;
 }
@@ -246,7 +252,9 @@ export function UpdateDialog() {
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
-        {state !== "ready" ? (
+        {state !== "ready" &&
+        notes.trim() &&
+        notes.trim() !== version.trim() ? (
           <div className="max-h-48 overflow-y-auto whitespace-pre-wrap rounded-md border border-border bg-surface-container-low px-3 py-2 text-sm text-foreground dark:bg-surface-elevated-dark">
             {notes}
           </div>
