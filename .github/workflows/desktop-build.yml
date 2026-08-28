@@ -179,7 +179,6 @@ jobs:
           test "$HTTP_CODE" -lt 400 || grep -q 'already exists' /tmp/fayno-mac.json
 
       - name: Upload Windows updater to FaynoSync
-        continue-on-error: true
         env:
           FAYNOSYNC_CI_TOKEN: ${{ secrets.FAYNOSYNC_CI_TOKEN }}
         run: |
