@@ -162,6 +162,7 @@ jobs:
           test "$HTTP_CODE" -lt 400
 
       - name: Upload Windows updater to FaynoSync
+        continue-on-error: true
         env:
           FAYNOSYNC_CI_TOKEN: ${{ secrets.FAYNOSYNC_CI_TOKEN }}
         run: |
@@ -196,5 +197,5 @@ jobs:
       - name: Verify FaynoSync checkVersion (macOS)
         run: |
           curl -sfS \
-            "$FAYNOSYNC_BASE_URL/checkVersion?app_name=clared&version=0.0.0&target=darwin&arch=aarch64&channel=stable&updater=tauri&owner=admin" \
+            "$FAYNOSYNC_BASE_URL/checkVersion?app_name=clared&version=0.0.0&platform=darwin&arch=aarch64&channel=stable&updater=tauri&owner=admin" \
             | jq -e '.version'
