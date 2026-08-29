@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.3
 current_phase_name: Infra & Prep for PDF, Offline & Audit (INSERTED)
 status: executing
-stopped_at: Completed 04.3-05-PLAN.md
-last_updated: "2026-08-29T03:43:27.510Z"
+stopped_at: Completed 04.3-06-PLAN.md
+last_updated: "2026-08-29T04:41:06.867Z"
 last_activity: 2026-08-29
 last_activity_desc: Phase 04.3 execution started
-state_head: 00dc2cc8148fe58981562bddf7cad4b4dd2ebce5
+state_head: f7b150228587c0a686626a67ea00dfc7ca0723b3
 progress:
   total_phases: 10
   completed_phases: 6
   total_plans: 47
-  completed_plans: 44
+  completed_plans: 45
 milestone_name: milestone
 ---
 
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 Status: Ready to execute
 Phase: 04.3 (Infra & Prep for PDF, Offline & Audit (INSERTED)) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 6 of 8
+Plan: 7 of 8
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — **NEXT** execute
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.3
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
@@ -107,6 +107,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P04 | 9 | 3 tasks | 11 files |
 | Phase 04.3 P03 | 6 | 3 tasks | 11 files |
 | Phase 04.3 P05 | 90min | 3 tasks | 2 files |
+| Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P06 | 7 min | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -220,6 +221,9 @@ Recent decisions affecting current work:
 - [Phase 04.3]: Worker PID 1 via Dockerfile target worker; Coolify 4.3.14 start_command is Nixpacks-only
 - [Phase 04.3]: Gotenberg created docker_compose_raw no FQDN; compose coolify network alias (connect_to_docker_network flag unset on service)
 - [Phase 04.3]: create_github 500: clone clared-api then strip FQDN for clared-worker
+- [Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze]: A4: bake HEALTHCHECKS_PING_URL into Coolify cron command (72 chars); do not assume env expansion — Coolify scheduled-task env expansion is unverified (A4); dead-man must ping even if $VAR is literal
+- [Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze]: Beszel agent exclude_from_status until Plan 08 H4 KEY/TOKEN (placeholder pending-h4 crash-loops) — Hub must stay green; agent enroll is H4
+- [Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze]: Kuma/Beszel Traefik: gzip + HTTPS redirect only — no Authentik middleware (D-05) — Monitors must stay reachable when Authentik is down
 
 ### Pending Todos
 
@@ -255,8 +259,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-29T03:43:27.401Z
-Stopped at: Completed 04.3-05-PLAN.md
+Last session: 2026-08-29T04:41:06.754Z
+Stopped at: Completed 04.3-06-PLAN.md
 Resume file: None
 
 ## Rebuild Log

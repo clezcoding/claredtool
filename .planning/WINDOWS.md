@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 31
+open_count: 32
 waived_count: 1
 fixed_count: 3
-total_count: 35
-last_updated: 2026-08-29T02:29:14.221Z
+total_count: 36
+last_updated: 2026-08-29T04:41:07.137Z
 ---
 
 # Broken Windows Ledger
@@ -50,6 +50,7 @@ last_updated: 2026-08-29T02:29:14.221Z
 | 33 | 04.2 | deviation | .planning/phases/04.2-desktop-platform-hardening-tauri-plugins-updater-log-prevent/04.2-VALIDATION.md |  | 04.2-03-T3 dragout skipped — human blocked tauri-plugin-dragout; Phase 5 CrabNebula drag | open |  | 2026-08-28T03:54:59.759Z |  |
 | 34 | 04.2 | unrun-verify | apps/desktop/package.json |  | Full desktop vitest suite: clipboard.test.ts fails on pre-existing clipboard.ts stub | fixed |  | 2026-08-28T04:54:25.264Z | 2026-08-28T14:54:50.667Z |
 | 35 | 04.3 | deviation | apps/desktop/src-tauri/src/lib.rs |  | PRAGMA key via sqlite3_auto_extension (plugin has no after_connect) | open |  | 2026-08-29T02:29:14.221Z |  |
+| 36 | 04.3 | stub | .planning/phases/04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze/04.3-MONITOR-OPS.md |  | Beszel KEY/TOKEN pending-h4 until Plan 08 H4 | open |  | 2026-08-29T04:41:07.137Z |  |
 
 ````json
 [
@@ -471,6 +472,18 @@ last_updated: 2026-08-29T02:29:14.221Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-29T02:29:14.221Z",
+    "resolved_at": null
+  },
+  {
+    "id": 36,
+    "kind": "stub",
+    "phase": "04.3",
+    "file": ".planning/phases/04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze/04.3-MONITOR-OPS.md",
+    "line": null,
+    "description": "Beszel KEY/TOKEN pending-h4 until Plan 08 H4",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-29T04:41:07.137Z",
     "resolved_at": null
   }
 ]
