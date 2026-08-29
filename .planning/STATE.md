@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.3
 current_phase_name: Infra & Prep for PDF, Offline & Audit (INSERTED)
 status: executing
-stopped_at: Completed 04.3-03-PLAN.md
-last_updated: "2026-08-29T02:38:15.587Z"
+stopped_at: Completed 04.3-05-PLAN.md
+last_updated: "2026-08-29T03:43:27.510Z"
 last_activity: 2026-08-29
 last_activity_desc: Phase 04.3 execution started
-state_head: 3608b699f6431a42c56f9dd0e54615655f81414d
+state_head: 00dc2cc8148fe58981562bddf7cad4b4dd2ebce5
 progress:
   total_phases: 10
   completed_phases: 6
   total_plans: 47
-  completed_plans: 43
+  completed_plans: 44
 milestone_name: milestone
 ---
 
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 Status: Ready to execute
 Phase: 04.3 (Infra & Prep for PDF, Offline & Audit (INSERTED)) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 5 of 8
+Plan: 6 of 8
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — **NEXT** execute
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.3
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
@@ -106,6 +106,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P02 | 5 min | 3 tasks | 16 files |
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P04 | 9 | 3 tasks | 11 files |
 | Phase 04.3 P03 | 6 | 3 tasks | 11 files |
+| Phase 04.3 P05 | 90min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -216,6 +217,9 @@ Recent decisions affecting current work:
 - [Phase 04.3]: NodeSDK never exports logs; Pino dual-write owns OTLP logs when OTEL_LOGS_EXPORTER=otlp (D-30)
 - [Phase 04.3]: When traces exporter is none, pass spanProcessors: [] so env default otlp cannot hang on :4318 (D-24)
 - [Phase 04.3]: Worker uses raw pino with the same redact, not LoggerModule/pino-http
+- [Phase 04.3]: Worker PID 1 via Dockerfile target worker; Coolify 4.3.14 start_command is Nixpacks-only
+- [Phase 04.3]: Gotenberg created docker_compose_raw no FQDN; compose coolify network alias (connect_to_docker_network flag unset on service)
+- [Phase 04.3]: create_github 500: clone clared-api then strip FQDN for clared-worker
 
 ### Pending Todos
 
@@ -251,8 +255,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-29T02:38:15.461Z
-Stopped at: Completed 04.3-03-PLAN.md
+Last session: 2026-08-29T03:43:27.401Z
+Stopped at: Completed 04.3-05-PLAN.md
 Resume file: None
 
 ## Rebuild Log
