@@ -1,19 +1,115 @@
+use std::ffi::CString;
+use std::os::raw::{c_char, c_int};
+use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 use tauri::{Emitter, Manager, Url, WebviewUrl, WebviewWindowBuilder};
+use tauri_plugin_sql::{Migration, MigrationKind};
 
 const KEYCHAIN_SERVICE: &str = "com.clared.app";
 const KEYCHAIN_ACCOUNT: &str = "session";
+const KEYCHAIN_OFFLINE_ACCOUNT: &str = "offline-sqlcipher";
+const OFFLINE_DB_FILENAME: &str = "clared-offline.db";
 const LOGIN_LABEL: &str = "login";
 const TICKET_EVENT: &str = "ticket-received";
 const CANCEL_EVENT: &str = "login-cancelled";
+
+/// Hex-encoded 32-byte SQLCipher key. Never passed to JS / generate_handler (D-32).
+static SQLCIPHER_KEY_HEX: OnceLock<String> = OnceLock::new();
 
 fn session_entry() -> Result<keyring::Entry, String> {
     keyring::Entry::new(KEYCHAIN_SERVICE, KEYCHAIN_ACCOUNT).map_err(|e| e.to_string())
 }
 
+fn offline_sqlcipher_entry() -> Result<keyring::Entry, String> {
+    keyring::Entry::new(KEYCHAIN_SERVICE, KEYCHAIN_OFFLINE_ACCOUNT).map_err(|e| e.to_string())
+}
+
 fn is_no_entry(err: &keyring::Error) -> bool {
     matches!(err, keyring::Error::NoEntry)
+}
+
+fn sqlite_url_for(path: &Path) -> String {
+    format!("sqlite:{}", path.to_string_lossy().replace('\\', "/"))
+}
+
+fn load_or_create_sqlcipher_key_hex() -> Result<String, String> {
+    let entry = offline_sqlcipher_entry()?;
+    match entry.get_password() {
+        Ok(existing) if !existing.is_empty() => Ok(existing),
+        Err(err) if is_no_entry(&err) => {
+            let mut bytes = [0u8; 32];
+            getrandom::getrandom(&mut bytes).map_err(|e| e.to_string())?;
+            let hex: String = bytes.iter().map(|b| format!("{b:02x}")).collect();
+            entry.set_password(&hex).map_err(|e| e.to_string())?;
+            Ok(hex)
+        }
+        Err(err) => Err(err.to_string()),
+        Ok(_) => {
+            let mut bytes = [0u8; 32];
+            getrandom::getrandom(&mut bytes).map_err(|e| e.to_string())?;
+            let hex: String = bytes.iter().map(|b| format!("{b:02x}")).collect();
+            entry.set_password(&hex).map_err(|e| e.to_string())?;
+            Ok(hex)
+        }
+    }
+}
+
+unsafe extern "C" fn sqlcipher_apply_pragma_key(
+    db: *mut libsqlite3_sys::sqlite3,
+    _pz_err_msg: *mut *mut c_char,
+    _api: *const libsqlite3_sys::sqlite3_api_routines,
+) -> c_int {
+    let Some(hex) = SQLCIPHER_KEY_HEX.get() else {
+        return libsqlite3_sys::SQLITE_ERROR;
+    };
+    // PRAGMA key in Rust after connect — never JS (D-32).
+    let Ok(pragma) = CString::new(format!("PRAGMA key = \"x'{hex}'\";")) else {
+        return libsqlite3_sys::SQLITE_ERROR;
+    };
+    let mut errmsg: *mut c_char = std::ptr::null_mut();
+    let rc = unsafe {
+        libsqlite3_sys::sqlite3_exec(db, pragma.as_ptr(), None, std::ptr::null_mut(), &mut errmsg)
+    };
+    if !errmsg.is_null() {
+        unsafe { libsqlite3_sys::sqlite3_free(errmsg.cast()) };
+    }
+    rc
+}
+
+fn ensure_offline_sqlcipher_hook() -> Result<(), String> {
+    let hex = load_or_create_sqlcipher_key_hex()?;
+    let stored = SQLCIPHER_KEY_HEX.get_or_init(|| hex);
+    if stored.is_empty() {
+        return Err("offline-sqlcipher key missing".into());
+    }
+    let rc = unsafe { libsqlite3_sys::sqlite3_auto_extension(Some(sqlcipher_apply_pragma_key)) };
+    if rc != libsqlite3_sys::SQLITE_OK {
+        return Err(format!("sqlite3_auto_extension failed: {rc}"));
+    }
+    Ok(())
+}
+
+fn register_offline_sql(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+    ensure_offline_sqlcipher_hook()?;
+    let db_dir = app.path().app_data_dir()?;
+    std::fs::create_dir_all(&db_dir)?;
+    let db_path = db_dir.join(OFFLINE_DB_FILENAME);
+    let url = sqlite_url_for(&db_path);
+    app.handle().plugin(
+        tauri_plugin_sql::Builder::new()
+            .add_migrations(
+                &url,
+                vec![Migration {
+                    version: 1,
+                    description: "_init",
+                    sql: include_str!("../migrations/0001_init.sql"),
+                    kind: MigrationKind::Up,
+                }],
+            )
+            .build(),
+    )?;
+    Ok(())
 }
 
 #[tauri::command]
@@ -132,35 +228,34 @@ async fn open_login_window(app: tauri::AppHandle, url: Option<String>) -> Result
     #[cfg(not(debug_assertions))]
     let initial_url = parsed_login.clone();
 
-    let window =
-        WebviewWindowBuilder::new(&app, LOGIN_LABEL, WebviewUrl::External(initial_url))
-            .title("Anmelden")
-            .inner_size(480.0, 640.0)
-            .min_inner_size(480.0, 640.0)
-            .decorations(true)
-            .resizable(true)
-            .incognito(true)
-            .on_navigation(move |url| {
-                if url.scheme() == "clared" {
-                    if let Some(ticket) = url
-                        .query_pairs()
-                        .find(|(key, _)| key == "ticket")
-                        .map(|(_, value)| value.into_owned())
-                    {
-                        ticket_for_nav.store(true, Ordering::SeqCst);
-                        if let Some(main) = nav_app.get_webview_window("main") {
-                            let _ = main.emit(TICKET_EVENT, ticket);
-                        }
+    let window = WebviewWindowBuilder::new(&app, LOGIN_LABEL, WebviewUrl::External(initial_url))
+        .title("Anmelden")
+        .inner_size(480.0, 640.0)
+        .min_inner_size(480.0, 640.0)
+        .decorations(true)
+        .resizable(true)
+        .incognito(true)
+        .on_navigation(move |url| {
+            if url.scheme() == "clared" {
+                if let Some(ticket) = url
+                    .query_pairs()
+                    .find(|(key, _)| key == "ticket")
+                    .map(|(_, value)| value.into_owned())
+                {
+                    ticket_for_nav.store(true, Ordering::SeqCst);
+                    if let Some(main) = nav_app.get_webview_window("main") {
+                        let _ = main.emit(TICKET_EVENT, ticket);
                     }
-                    if let Some(login) = nav_app.get_webview_window(LOGIN_LABEL) {
-                        let _ = login.close();
-                    }
-                    return false;
                 }
-                allow_navigation(url, backend_origin.as_deref(), authentik_origin.as_deref())
-            })
-            .build()
-            .map_err(|e| e.to_string())?;
+                if let Some(login) = nav_app.get_webview_window(LOGIN_LABEL) {
+                    let _ = login.close();
+                }
+                return false;
+            }
+            allow_navigation(url, backend_origin.as_deref(), authentik_origin.as_deref())
+        })
+        .build()
+        .map_err(|e| e.to_string())?;
 
     #[cfg(debug_assertions)]
     {
@@ -287,10 +382,18 @@ fn find_ascii_insensitive(haystack: &str, needle: &str) -> Option<usize> {
 
 fn sentry_redact_customer_names_in_text(text: &str) -> String {
     const MARKERS: &[&str] = &[
-        "Kunde:", "Kunde ", "Kundin:", "Kundin ",
-        "customer:", "customer ", "Customer:", "Customer ",
-        "Rechnungsempfänger:", "Rechnungsempfänger ",
-        "recipient:", "recipient ",
+        "Kunde:",
+        "Kunde ",
+        "Kundin:",
+        "Kundin ",
+        "customer:",
+        "customer ",
+        "Customer:",
+        "Customer ",
+        "Rechnungsempfänger:",
+        "Rechnungsempfänger ",
+        "recipient:",
+        "recipient ",
     ];
     const LEGAL_SUFFIXES: &[&str] = &[" GmbH", " AG", " KG", " OHG", " UG", " e.V."];
 
@@ -417,7 +520,9 @@ fn sentry_scrub_user(mut user: sentry::protocol::User) -> sentry::protocol::User
 }
 
 fn sentry_scrub_request(mut request: sentry::protocol::Request) -> sentry::protocol::Request {
-    request.headers.retain(|key, _| key.to_ascii_lowercase() != "authorization");
+    request
+        .headers
+        .retain(|key, _| key.to_ascii_lowercase() != "authorization");
     for value in request.headers.values_mut() {
         *value = sentry_redact_string(value, None);
     }
@@ -433,7 +538,9 @@ fn sentry_scrub_request(mut request: sentry::protocol::Request) -> sentry::proto
     request
 }
 
-fn sentry_scrub_event(mut event: sentry::protocol::Event<'static>) -> sentry::protocol::Event<'static> {
+fn sentry_scrub_event(
+    mut event: sentry::protocol::Event<'static>,
+) -> sentry::protocol::Event<'static> {
     if let Some(message) = event.message.as_mut() {
         *message = sentry_redact_message(message);
     }
@@ -508,7 +615,11 @@ fn log_plugin() -> tauri::plugin::TauriPlugin<tauri::Wry> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let mut builder = tauri::Builder::default().plugin(tauri_plugin_clipboard_manager::init());
+    let mut builder = tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_sharekit::init())
+        .plugin(tauri_plugin_clipboard_manager::init());
 
     if let Some(sentry) = sentry_plugin() {
         builder = builder.plugin(sentry);
@@ -517,9 +628,11 @@ pub fn run() {
     builder = builder
         .plugin(log_plugin())
         .plugin(tauri_plugin_notification::init())
-        .plugin(tauri_plugin_window_state::Builder::new()
-            .with_filter(|label| label != LOGIN_LABEL)
-            .build())
+        .plugin(
+            tauri_plugin_window_state::Builder::new()
+                .with_filter(|label| label != LOGIN_LABEL)
+                .build(),
+        )
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(prevent_default());
 
@@ -569,6 +682,7 @@ pub fn run() {
             keychain_delete_session,
             open_login_window,
         ])
+        .setup(|app| register_offline_sql(app))
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
