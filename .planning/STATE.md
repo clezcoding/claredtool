@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.3
 current_phase_name: Infra & Prep for PDF, Offline & Audit (INSERTED)
 status: executing
-stopped_at: Completed 04.3-01-PLAN.md
-last_updated: "2026-08-29T02:08:16.483Z"
+stopped_at: Completed 04.3-02-PLAN.md
+last_updated: "2026-08-29T02:17:05.770Z"
 last_activity: 2026-08-29
 last_activity_desc: Phase 04.3 execution started
-state_head: 047eb00aabae0064d4c5ae99e8b6c061f68ce833
+state_head: a1bd58d1d72690e6a8c4483cabff4b6e07cf71bd
 progress:
   total_phases: 10
   completed_phases: 6
   total_plans: 47
-  completed_plans: 40
+  completed_plans: 41
 milestone_name: milestone
 ---
 
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 Status: Ready to execute
 Phase: 04.3 (Infra & Prep for PDF, Offline & Audit (INSERTED)) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 2 of 8
+Plan: 3 of 8
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — **NEXT** execute
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.3
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
@@ -103,6 +103,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04.2 P08 | 5min | 3 tasks | 13 files |
 | Phase 04.2 P07 | 6min | 2 tasks | 4 files |
 | Phase 04.3 P01 | 8 min | 3 tasks | 7 files |
+| Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P02 | 5 min | 3 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -204,6 +205,9 @@ Recent decisions affecting current work:
 - [Phase 04.2]: maskUpdaterEndpoint masks subdomain + registrable label for safe updater display
 - [Phase 04.2]: [quick-260828-mn3]: desktop-build skips PRs; v* tags trigger FaynoSync publish if; explicit pnpm tauri CLI kept
 - [Phase 04.3]: A1: RESEARCH Hub tags pull as spelled (no twin); Prometheus keeps v prefix
+- [Phase 04.3]: BullModule.forRootAsync uses connection.url from REDIS_URL and prefix clared-bull (not RedisService)
+- [Phase 04.3]: WorkerModule is a separate process with controllers []; PdfProcessor is not on AppModule
+- [Phase 04.3]: Local Gotenberg on OrbStack 127.0.0.1:3000 with dummy Basic Auth dev/dev; no Gotenberg OTEL (D-16)
 
 ### Pending Todos
 
@@ -239,8 +243,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-29T02:08:16.378Z
-Stopped at: Completed 04.3-01-PLAN.md
+Last session: 2026-08-29T02:17:05.650Z
+Stopped at: Completed 04.3-02-PLAN.md
 Resume file: None
 
 ## Rebuild Log
