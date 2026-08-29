@@ -1,5 +1,7 @@
-# GHA builds the Nest image; Coolify only pulls it.
-# Same image for clared-api (CMD: migrate + main.js) and clared-worker (start_command: node dist/worker.js).
+# GHA builds Nest images; Coolify only pulls them.
+# API: default stage (migrate + main.js) tag sha-<7>.
+# Worker: --target worker (CMD node dist/worker.js) tag sha-<7>-worker.
+# Coolify 4.3.14 dockerimage pack ignores start_command.
 # Official Coolify pattern: GHCR push + deploy API (coolify.io/docs/applications/ci-cd/github/actions).
 # Vs the sample workflow: path filter, buildx GHA cache, metadata-action, immutable sha- tag,
 # one build / two deploys, linux/amd64 only, provenance off (Coolify pull of attestation indexes is flaky).
@@ -47,7 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
@@ -112,6 +114,22 @@ jobs:
           cache-from: type=gha,scope=clared-backend
           cache-to: type=gha,scope=clared-backend,mode=max
 
+      # Coolify 4.3.14 dockerimage pack ignores start_command (same as dockerfile).
+      # Worker stage CMD is node dist/worker.js — separate tag, not an override.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/backend/Dockerfile
+          target: worker
+          platforms: linux/amd64
+          push: true
+          provenance: false
+          sbom: false
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.image.outputs.sha_tag }}-worker
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=clared-backend
+          cache-to: type=gha,scope=clared-backend,mode=max
+
   deploy:
     needs: build
     if: |
@@ -129,15 +147,17 @@ jobs:
         app:
           - name: clared-api
             uuid_var: COOLIFY_APP_API
+            tag_suffix: ""
           - name: clared-worker
             uuid_var: COOLIFY_APP_WORKER
+            tag_suffix: "-worker"
     steps:
       - name: Pin sha tag and deploy
         env:
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
           COOLIFY_URL: ${{ vars.COOLIFY_URL }}
           APP_UUID: ${{ vars[matrix.app.uuid_var] }}
-          SHA_TAG: ${{ needs.build.outputs.sha_tag }}
+          SHA_TAG: ${{ needs.build.outputs.sha_tag }}${{ matrix.app.tag_suffix }}
           IMAGE: ${{ needs.build.outputs.image }}
         run: |
           set -euo pipefail
