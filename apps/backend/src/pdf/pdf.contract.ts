@@ -19,4 +19,4 @@ export interface PdfBytes {
 export const PDF_QUEUE = "pdf-generation";
 
 /** Host-local sample. Coolify alias is http://clared-gotenberg:3000. Never a public FQDN (D-11). */
-export const DEFAULT_GOTENBERG_URL = "http://127.0.0.1:3000";
+export const DEFAULT_GOTENBERG_URL = "http://127.0.0.1:3001";

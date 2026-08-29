@@ -21,7 +21,7 @@ describe("PdfPaperSize A4", () => {
 describe("DEFAULT_GOTENBERG_URL", () => {
   it("is host-local or docker alias, not a public hostname (D-11)", () => {
     expect([
-      "http://127.0.0.1:3000",
+      "http://127.0.0.1:3001",
       "http://gotenberg:3000",
       "http://clared-gotenberg:3000",
     ]).toContain(DEFAULT_GOTENBERG_URL);
