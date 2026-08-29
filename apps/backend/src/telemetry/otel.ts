@@ -1,13 +1,8 @@
-import type { Context } from "@opentelemetry/api";
+import { api, NodeSDK, tracing } from "@opentelemetry/sdk-node";
 import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import { NodeSDK } from "@opentelemetry/sdk-node";
-import {
-  BatchSpanProcessor,
-  type ReadableSpan,
-  type Span,
-  type SpanProcessor,
-} from "@opentelemetry/sdk-trace-base";
+
+const { BatchSpanProcessor } = tracing;
 
 const TOKEN_KEY_RE =
   /token|authorization|password|secret|keychain|session|bearer|api[_-]?key/i;
@@ -27,14 +22,14 @@ export function isAllowedSpanAttribute(key: string): boolean {
   return true;
 }
 
-class AllowlistSpanProcessor implements SpanProcessor {
-  constructor(private readonly inner: SpanProcessor) {}
+class AllowlistSpanProcessor implements tracing.SpanProcessor {
+  constructor(private readonly inner: tracing.SpanProcessor) {}
 
-  onStart(span: Span, parent: Context) {
+  onStart(span: tracing.Span, parent: api.Context) {
     this.inner.onStart(span, parent);
   }
 
-  onEnd(span: ReadableSpan) {
+  onEnd(span: tracing.ReadableSpan) {
     const attrs = span.attributes;
     for (const key of Object.keys(attrs)) {
       if (!isAllowedSpanAttribute(key)) {
