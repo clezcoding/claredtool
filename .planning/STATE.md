@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04.3
-current_phase_name: Infra & Prep for PDF, Offline & Audit
-status: Phase 04.3 planned — 8 plans (revision 1)
-stopped_at: Phase 04.3 plan revision 1
-last_updated: "2026-08-29T01:52:57.849Z"
+current_phase_name: Infra & Prep for PDF, Offline & Audit (INSERTED)
+status: executing
+stopped_at: Completed 04.3-01-PLAN.md
+last_updated: "2026-08-29T02:08:16.483Z"
 last_activity: 2026-08-29
-last_activity_desc: Phase 04.3 planning complete
-state_head: ea5010ea906262cd1408c07917366a87cd3fc48c
+last_activity_desc: Phase 04.3 execution started
+state_head: 047eb00aabae0064d4c5ae99e8b6c061f68ce833
 progress:
   total_phases: 10
   completed_phases: 6
   total_plans: 47
-  completed_plans: 39
+  completed_plans: 40
 milestone_name: milestone
 ---
 
@@ -24,19 +24,19 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-19)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 04.2 — Desktop Platform Hardening
+**Current focus:** Phase 04.3 — Infra & Prep for PDF, Offline & Audit (INSERTED)
 
 ## Current Position
 
-Status: Phase 04.2 shipped — PR #42
-Phase: 04.3 (Infra & Prep for PDF, Offline & Audit) — READY TO EXECUTE
+Status: Ready to execute
+Phase: 04.3 (Infra & Prep for PDF, Offline & Audit (INSERTED)) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 8 plans written (04.3-01 … 04.3-08)
+Plan: 2 of 8
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — **NEXT** execute
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.3
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-08-29 — Phase 04.3 planning complete
+Last activity: 2026-08-29 — Phase 04.3 execution started
 
 Progress: [█████░░░░░] 50%
 
@@ -102,6 +102,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04.2 P06 | 12 | 3 tasks | 9 files |
 | Phase 04.2 P08 | 5min | 3 tasks | 13 files |
 | Phase 04.2 P07 | 6min | 2 tasks | 4 files |
+| Phase 04.3 P01 | 8 min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -202,6 +203,7 @@ Recent decisions affecting current work:
 - [Phase 04.2]: Omit tauri.conf window.devtools — Tauri debug_assertions default keeps DevTools in dev only (D-50)
 - [Phase 04.2]: maskUpdaterEndpoint masks subdomain + registrable label for safe updater display
 - [Phase 04.2]: [quick-260828-mn3]: desktop-build skips PRs; v* tags trigger FaynoSync publish if; explicit pnpm tauri CLI kept
+- [Phase 04.3]: A1: RESEARCH Hub tags pull as spelled (no twin); Prometheus keeps v prefix
 
 ### Pending Todos
 
@@ -237,9 +239,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-29T00:37:55.794Z
-Stopped at: Phase 04.3 research complete
-Resume file: .planning/phases/04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze/04.3-01-PLAN.md
+Last session: 2026-08-29T02:08:16.378Z
+Stopped at: Completed 04.3-01-PLAN.md
+Resume file: None
 
 ## Rebuild Log
 
