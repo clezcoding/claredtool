@@ -41,6 +41,19 @@ class AllowlistSpanProcessor implements tracing.SpanProcessor {
         delete attrs[key];
       }
     }
+    for (const event of span.events) {
+      if (event.name === "exception" && event.attributes) {
+        for (const key of Object.keys(event.attributes)) {
+          if (!isAllowedSpanAttribute(key)) {
+            delete event.attributes[key];
+          }
+        }
+        const msg = event.attributes["exception.message"];
+        if (typeof msg === "string") {
+          event.attributes["exception.message"] = "[redacted]";
+        }
+      }
+    }
     this.inner.onEnd(span);
   }
 
