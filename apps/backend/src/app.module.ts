@@ -1,6 +1,7 @@
 import { Module, ValidationPipe } from "@nestjs/common";
 import { APP_GUARD, APP_PIPE } from "@nestjs/core";
 import { TerminusModule } from "@nestjs/terminus";
+import { LoggerModule } from "nestjs-pino";
 import { AuthController } from "./auth/auth.controller";
 import { AuthGuard } from "./auth/auth.guard";
 import { PermissionsGuard } from "./auth/permissions.guard";
@@ -19,9 +20,16 @@ import { KEY_VALUE_STORE, RedisService, createKeyValueStore } from "./redis/redi
 import { PdfModule } from "./pdf/pdf.module";
 import { TaxController } from "./tax/tax.controller";
 import { TaxModule } from "./tax/tax.module";
+import { pinoBaseOptions } from "./telemetry/pino-options";
 
 @Module({
   imports: [
+    LoggerModule.forRoot({
+      pinoHttp: {
+        autoLogging: true,
+        ...pinoBaseOptions("clared-api"),
+      },
+    }),
     TerminusModule,
     EntitiesModule,
     CustomersModule,

@@ -2,13 +2,15 @@ import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import helmet from "helmet";
+import { Logger } from "nestjs-pino";
 import { AppModule } from "./app.module";
 import { setOpenApiDocument } from "./http/docs.controller";
 import { initOtel } from "./telemetry/otel";
 
 async function bootstrap() {
   initOtel();
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(Logger));
   app.use(helmet());
   const origins = process.env.CORS_ORIGINS?.split(",")
     .map((s) => s.trim())
