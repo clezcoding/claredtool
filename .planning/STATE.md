@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.3
 current_phase_name: Infra & Prep for PDF, Offline & Audit (INSERTED)
 status: executing
-stopped_at: "Checkpoint H6 (04.3-08): awaiting Grafana first login"
-last_updated: "2026-08-29T22:07:00.000Z"
+stopped_at: "Plan 04.3-08 complete; awaiting /gsd-verify-work 4.3"
+last_updated: "2026-08-29T22:32:00.000Z"
 last_activity: 2026-08-29
-last_activity_desc: H4 Beszel agent enrolled; awaiting H6 Grafana
-state_head: 83fb63725b777e0a3eba1506a56325e9b4eec055
+last_activity_desc: H6 Grafana login + datasources recorded; 04.3-08 SUMMARY
+state_head: 0759f3d
 progress:
   total_phases: 10
   completed_phases: 6
   total_plans: 47
-  completed_plans: 46
+  completed_plans: 47
 milestone_name: milestone
 ---
 
@@ -36,7 +36,7 @@ Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — **NEXT** execute
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.3
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-08-29 — Phase 04.3 execution started
+Last activity: 2026-08-29 — 04.3-08 H3/H4/H6 UAT complete
 
 Progress: [█████░░░░░] 50%
 
@@ -109,6 +109,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04.3 P05 | 90min | 3 tasks | 2 files |
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P06 | 7 min | 3 tasks | 1 files |
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P07 | 90min | 3 tasks | 1 files |
+| Phase 04.3 P08 | 19h wall | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -261,8 +262,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-29T22:07:00.000Z
-Stopped at: Checkpoint H6 (04.3-08): awaiting Grafana first login
+Last session: 2026-08-29T22:32:00.000Z
+Stopped at: Plan 04.3-08 complete; awaiting /gsd-verify-work 4.3
 Resume file: .planning/phases/04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze/04.3-08-PLAN.md
 
 ## Rebuild Log

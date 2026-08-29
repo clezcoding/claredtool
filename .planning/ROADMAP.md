@@ -182,7 +182,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. **Wave 5 — Async jobs prep:** BullMQ skeleton on existing Redis (`pdf-generation` queue + worker stub); no invoice PDF templates in this phase
   6. Phase 5 owns end-user PDF download, `audit_logs` rows, and offline sync — this phase only prepares pipes
 
-**Plans:** 7/8 plans executed
+**Plans:** 8/8 plans executed
 **UI hint**: no (infra + thin scaffolding)
 
 Plans:
@@ -211,7 +211,7 @@ Plans:
 
 **Wave 6** *(blocked on 06+07)*
 
-- [ ] 04.3-08-PLAN.md — H3/H4/H6 Kuma monitors, Beszel enroll, Grafana login
+- [x] 04.3-08-PLAN.md — H3/H4/H6 Kuma monitors, Beszel enroll, Grafana login
 
 ### Phase 04.2: Desktop Platform Hardening (INSERTED)
 
