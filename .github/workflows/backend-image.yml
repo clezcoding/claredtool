@@ -2,7 +2,7 @@
 # API: default stage (migrate + main.js) tag sha-<7>.
 # Worker: --target worker (CMD node dist/worker.js) tag sha-<7>-worker.
 # Coolify 4.3.14 dockerimage pack ignores start_command.
-# Deploy job: PATCH tag + GET /deploy when vars.COOLIFY_IMAGE_DEPLOY=true.
+# Deploy job: PATCH tag + POST /deploy when vars.COOLIFY_IMAGE_DEPLOY=true.
 # Official Coolify pattern: GHCR push + deploy API (coolify.io/docs/applications/ci-cd/github/actions).
 # Vs the sample workflow: path filter, buildx GHA cache, metadata-action, immutable sha- tag,
 # one build / two deploys, linux/amd64 only, provenance off (Coolify pull of attestation indexes is flaky).
@@ -171,8 +171,9 @@ jobs:
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -d "{\"docker_registry_image_name\":\"${IMAGE}\",\"docker_registry_image_tag\":\"${SHA_TAG}\"}"
-          curl -fsS -G "${COOLIFY_URL}/api/v1/deploy" \
+          # Coolify 4.3.14: GET /api/v1/deploy is 405; POST JSON body is the working verb.
+          curl -fsS -X POST "${COOLIFY_URL}/api/v1/deploy" \
             -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
             -H "Accept: application/json" \
-            --data-urlencode "uuid=${APP_UUID}" \
-            --data-urlencode "force=true"
+            -H "Content-Type: application/json" \
+            -d "{\"uuid\":\"${APP_UUID}\",\"force\":true}"
