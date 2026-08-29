@@ -1,8 +1,8 @@
 import {
   DEFAULT_GOTENBERG_URL,
+  PDF_PAPER_A4,
   PDF_QUEUE,
   type HtmlInvoiceFacts,
-  type PdfPaperSize,
 } from "./pdf.contract";
 
 describe("PDF_QUEUE", () => {
@@ -13,9 +13,8 @@ describe("PDF_QUEUE", () => {
 
 describe("PdfPaperSize A4", () => {
   it("uses Gotenberg HTML-to-PDF inches paperWidth 8.27 and paperHeight 11.7", () => {
-    const a4: PdfPaperSize = { paperWidth: "8.27", paperHeight: "11.7" };
-    expect(a4.paperWidth).toBe("8.27");
-    expect(a4.paperHeight).toBe("11.7");
+    expect(PDF_PAPER_A4.paperWidth).toBe("8.27");
+    expect(PDF_PAPER_A4.paperHeight).toBe("11.7");
   });
 });
 
