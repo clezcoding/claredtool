@@ -19,6 +19,8 @@ vi.mock("../lib/clipboard", () => ({
 
 vi.mock("@tauri-apps/api/path", () => ({
   appLogDir: vi.fn(async () => "/tmp/clared-logs"),
+  appDataDir: vi.fn(async () => "/tmp/clared-app-data"),
+  join: vi.fn(async (...parts: string[]) => parts.join("/")),
 }));
 
 vi.mock("@tauri-apps/api/window", () => ({

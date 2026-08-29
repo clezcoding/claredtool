@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@clared/ui";
-import { appLogDir } from "@tauri-apps/api/path";
+import { appLogDir, appDataDir, join } from "@tauri-apps/api/path";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import {
   isPermissionGranted,
@@ -16,6 +16,10 @@ import {
 import { revealItemInDir } from "@tauri-apps/plugin-opener";
 import { load } from "@tauri-apps/plugin-store";
 import { filename as windowStateFilename } from "@tauri-apps/plugin-window-state";
+import Database from "@tauri-apps/plugin-sql";
+import { open as openDialog } from "@tauri-apps/plugin-dialog";
+import { BaseDirectory, exists, writeTextFile } from "@tauri-apps/plugin-fs";
+import { shareText } from "@choochmeque/tauri-plugin-sharekit-api";
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "../auth/session-provider";
 import { roleLabel } from "./session-chip";
@@ -114,6 +118,10 @@ export function DebugPanel({
   const [lastCheck, setLastCheck] = useState<string>("—");
   const [clipboardStatus, setClipboardStatus] = useState<string>("—");
   const [notificationStatus, setNotificationStatus] = useState<string>("—");
+  const [offlineDialogStatus, setOfflineDialogStatus] = useState<string>("—");
+  const [offlineFsStatus, setOfflineFsStatus] = useState<string>("—");
+  const [offlineSqlStatus, setOfflineSqlStatus] = useState<string>("—");
+  const [offlineShareStatus, setOfflineShareStatus] = useState<string>("—");
 
   const refreshMeta = useCallback(async () => {
     try {
@@ -236,6 +244,82 @@ export function DebugPanel({
     captureSentryTestEvent();
   };
 
+  const handleOfflineDialogTest = () => {
+    void (async () => {
+      if (!isTauriRuntime()) {
+        setOfflineDialogStatus("Nur Desktop");
+        return;
+      }
+      try {
+        await openDialog({ title: "Clared Offline-Dialog" });
+        setOfflineDialogStatus("OK");
+      } catch (err) {
+        setOfflineDialogStatus("Fehlgeschlagen");
+        desktopLog.error(`Offline-Dialog-Test fehlgeschlagen: ${String(err)}`);
+      }
+    })();
+  };
+
+  const handleOfflineFsTest = () => {
+    void (async () => {
+      if (!isTauriRuntime()) {
+        setOfflineFsStatus("Nur Desktop");
+        return;
+      }
+      try {
+        await writeTextFile("clared-offline-smoke.txt", "ok", {
+          baseDir: BaseDirectory.AppData,
+        });
+        await writeTextFile("clared-offline-smoke.txt", "ok", {
+          baseDir: BaseDirectory.Temp,
+        });
+        await exists("clared-offline-smoke.txt", {
+          baseDir: BaseDirectory.AppData,
+        });
+        await exists("clared-offline-smoke.txt", { baseDir: BaseDirectory.Temp });
+        setOfflineFsStatus("OK");
+      } catch (err) {
+        setOfflineFsStatus("Fehlgeschlagen");
+        desktopLog.error(`Offline-FS-Test fehlgeschlagen: ${String(err)}`);
+      }
+    })();
+  };
+
+  const handleOfflineSqlTest = () => {
+    void (async () => {
+      if (!isTauriRuntime()) {
+        setOfflineSqlStatus("Nur Desktop");
+        return;
+      }
+      try {
+        const dir = await appDataDir();
+        const dbPath = await join(dir, "clared-offline.db");
+        const db = await Database.load(`sqlite:${dbPath.replaceAll("\\", "/")}`);
+        await db.select("SELECT ok FROM _init LIMIT 1");
+        setOfflineSqlStatus("OK");
+      } catch (err) {
+        setOfflineSqlStatus("Fehlgeschlagen");
+        desktopLog.error(`Offline-SQL-Test fehlgeschlagen: ${String(err)}`);
+      }
+    })();
+  };
+
+  const handleOfflineSharekitTest = () => {
+    void (async () => {
+      if (!isTauriRuntime()) {
+        setOfflineShareStatus("Nur Desktop");
+        return;
+      }
+      try {
+        await shareText("Clared Offline-Sharekit-Test");
+        setOfflineShareStatus("OK");
+      } catch (err) {
+        setOfflineShareStatus("Fehlgeschlagen");
+        desktopLog.error(`Offline-Sharekit-Test fehlgeschlagen: ${String(err)}`);
+      }
+    })();
+  };
+
   const pluginChecks = [
     { name: "Tauri-Laufzeit", ok: isTauriRuntime() },
     { name: "Store", ok: isTauriRuntime() },
@@ -244,6 +328,10 @@ export function DebugPanel({
     { name: "Benachrichtigung", ok: isTauriRuntime() },
     { name: "Zwischenablage", ok: isTauriRuntime() },
     { name: "Sentry DSN", ok: Boolean(sentryDsn()) },
+    { name: "Dialog", ok: isTauriRuntime() },
+    { name: "FS", ok: isTauriRuntime() },
+    { name: "SQL", ok: isTauriRuntime() },
+    { name: "Sharekit", ok: isTauriRuntime() },
   ];
 
   return (
@@ -373,6 +461,49 @@ export function DebugPanel({
               label="DevTools (D-50)"
               value={import.meta.env.DEV ? "erlaubt" : "gesperrt"}
             />
+          </Section>
+
+          <Section id="debug-section-offline" title="Offline (Dialog / FS / SQL / Sharekit)">
+            <Row label="Dialog" value={offlineDialogStatus} />
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              data-testid="debug-offline-dialog"
+              onClick={handleOfflineDialogTest}
+            >
+              Dialog testen
+            </Button>
+            <Row label="FS (App-Daten + Temp)" value={offlineFsStatus} />
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              data-testid="debug-offline-fs"
+              onClick={handleOfflineFsTest}
+            >
+              FS testen
+            </Button>
+            <Row label="SQL (_init)" value={offlineSqlStatus} />
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              data-testid="debug-offline-sql"
+              onClick={handleOfflineSqlTest}
+            >
+              SQL testen
+            </Button>
+            <Row label="Sharekit" value={offlineShareStatus} />
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              data-testid="debug-offline-sharekit"
+              onClick={handleOfflineSharekitTest}
+            >
+              Sharekit testen
+            </Button>
           </Section>
 
           <Section id="debug-section-plugins" title="Plugin-Gesundheit">

@@ -92,13 +92,14 @@ vi.mock("@tauri-apps/plugin-window-state", () => ({
   },
 }));
 
-vi.mock("@tauri-apps/plugin-sql", () => ({
-  load: vi.fn(async () => ({
+vi.mock("@tauri-apps/plugin-sql", () => {
+  const load = vi.fn(async () => ({
     execute: vi.fn(async () => ({ rowsAffected: 0 })),
     select: vi.fn(async () => []),
     close: vi.fn(async () => undefined),
-  })),
-}));
+  }));
+  return { default: { load }, load };
+});
 
 vi.mock("@tauri-apps/plugin-dialog", () => ({
   open: vi.fn(async () => null),
@@ -109,10 +110,12 @@ vi.mock("@tauri-apps/plugin-fs", () => ({
   readTextFile: vi.fn(async () => ""),
   writeTextFile: vi.fn(async () => undefined),
   exists: vi.fn(async () => false),
+  BaseDirectory: { AppData: 8, Temp: 12 },
 }));
 
 vi.mock("@choochmeque/tauri-plugin-sharekit-api", () => ({
   share: vi.fn(async () => undefined),
+  shareText: vi.fn(async () => undefined),
 }));
 
 globalThis.fetch = fetchMock as typeof fetch;
