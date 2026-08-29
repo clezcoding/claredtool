@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.3
 current_phase_name: Infra & Prep for PDF, Offline & Audit (INSERTED)
 status: executing
-stopped_at: Completed 04.3-04-PLAN.md
-last_updated: "2026-08-29T02:29:13.884Z"
+stopped_at: Completed 04.3-03-PLAN.md
+last_updated: "2026-08-29T02:38:15.587Z"
 last_activity: 2026-08-29
 last_activity_desc: Phase 04.3 execution started
-state_head: 65cc289b08a6bc4e066365f1fbac6f2707a4798e
+state_head: 3608b699f6431a42c56f9dd0e54615655f81414d
 progress:
   total_phases: 10
   completed_phases: 6
   total_plans: 47
-  completed_plans: 42
+  completed_plans: 43
 milestone_name: milestone
 ---
 
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 Status: Ready to execute
 Phase: 04.3 (Infra & Prep for PDF, Offline & Audit (INSERTED)) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 4 of 8
+Plan: 5 of 8
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — **NEXT** execute
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.3
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
@@ -105,6 +105,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04.3 P01 | 8 min | 3 tasks | 7 files |
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P02 | 5 min | 3 tasks | 16 files |
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P04 | 9 | 3 tasks | 11 files |
+| Phase 04.3 P03 | 6 | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -212,6 +213,9 @@ Recent decisions affecting current work:
 - [Phase 04.3]: PRAGMA key via sqlite3_auto_extension because tauri-plugin-sql 2.4.0 has no after_connect (D-32)
 - [Phase 04.3]: SQL plugin setup() uses absolute sqlite: URL under app_data_dir (Pitfall 6)
 - [Phase 04.3]: fs command perms exists/read/write plus APPDATA+TEMP scope; never fs:default
+- [Phase 04.3]: NodeSDK never exports logs; Pino dual-write owns OTLP logs when OTEL_LOGS_EXPORTER=otlp (D-30)
+- [Phase 04.3]: When traces exporter is none, pass spanProcessors: [] so env default otlp cannot hang on :4318 (D-24)
+- [Phase 04.3]: Worker uses raw pino with the same redact, not LoggerModule/pino-http
 
 ### Pending Todos
 
@@ -247,8 +251,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-29T02:29:13.741Z
-Stopped at: Completed 04.3-04-PLAN.md
+Last session: 2026-08-29T02:38:15.461Z
+Stopped at: Completed 04.3-03-PLAN.md
 Resume file: None
 
 ## Rebuild Log
