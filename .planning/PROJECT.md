@@ -81,6 +81,10 @@ Open gap (INFO, not a blocker): ExecutionEngine step 4 expects collision logic i
 | Tax-engine integrated module vs later microservice | PRD: start integrated; extract later | — Pending |
 | Collision logic (priority ties) | SPEC says PRD describes it; PRD silent | — Pending |
 | Supabase self-hosted BaaS | Optional PRD alternative; not v1; vendor Nest+Postgres instead | ✓ Locked (out) |
+| Kuma/Beszel/Grafana: app login, no Authentik in front (D-05/D-22) | Monitors stay up if Authentik is down | ✓ Phase 04.3 |
+| Gotenberg internal-only Chromium HTML; no Gotenberg OTEL (D-16) | Invoice PDF pipe for Phase 5; no public FQDN | ✓ Phase 04.3 |
+| Same Nest image, two processes: API migrate+main, worker `node dist/worker.js` | Coolify start_command is Nixpacks-only | ✓ Phase 04.3 |
+| SQLCipher keychain + empty `_init` schema; no sync yet | OFFL-01 product sync is Phase 5 | ✓ Phase 04.3 |
 
 ---
-*Last updated: 2026-08-22 after Phase 2*
+*Last updated: 2026-08-30 after Phase 04.3*
