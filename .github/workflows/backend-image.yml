@@ -1,0 +1,155 @@
+# GHA builds the Nest image; Coolify only pulls it.
+# Same image for clared-api (CMD: migrate + main.js) and clared-worker (start_command: node dist/worker.js).
+# Official Coolify pattern: GHCR push + deploy API (coolify.io/docs/applications/ci-cd/github/actions).
+# Vs the sample workflow: path filter, buildx GHA cache, metadata-action, immutable sha- tag,
+# one build / two deploys, linux/amd64 only, provenance off (Coolify pull of attestation indexes is flaky).
+
+name: backend-image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - apps/backend/**
+      - packages/tax-engine/**
+      - apps/backend/Dockerfile
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - .npmrc
+      - .dockerignore
+      - .github/workflows/backend-image.yml
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: Redeploy clared-api and clared-worker after push
+        type: boolean
+        default: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-image-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.filter.outputs.image }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            image:
+              - 'apps/backend/**'
+              - 'packages/tax-engine/**'
+              - 'apps/backend/Dockerfile'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '.npmrc'
+              - '.dockerignore'
+              - '.github/workflows/backend-image.yml'
+
+  build:
+    needs: changes
+    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.image == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      sha_tag: ${{ steps.image.outputs.sha_tag }}
+      image: ${{ steps.image.outputs.image }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          flavor: |
+            latest=false
+          tags: |
+            type=sha,prefix=sha-,format=short
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=ref,event=branch,enable=${{ github.ref != 'refs/heads/main' }}
+
+      - id: image
+        run: |
+          echo "image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" >> "$GITHUB_OUTPUT"
+          echo "sha_tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/backend/Dockerfile
+          platforms: linux/amd64
+          push: true
+          provenance: false
+          sbom: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=clared-backend
+          cache-to: type=gha,scope=clared-backend,mode=max
+
+  deploy:
+    needs: build
+    if: |
+      needs.build.result == 'success' &&
+      vars.COOLIFY_IMAGE_DEPLOY == 'true' &&
+      (github.event_name != 'workflow_dispatch' || inputs.deploy)
+    runs-on: ubuntu-latest
+    concurrency:
+      group: coolify-nest-deploy
+      cancel-in-progress: false
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        app:
+          - name: clared-api
+            uuid_var: COOLIFY_APP_API
+          - name: clared-worker
+            uuid_var: COOLIFY_APP_WORKER
+    steps:
+      - name: Pin sha tag and deploy
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          COOLIFY_URL: ${{ vars.COOLIFY_URL }}
+          APP_UUID: ${{ vars[matrix.app.uuid_var] }}
+          SHA_TAG: ${{ needs.build.outputs.sha_tag }}
+          IMAGE: ${{ needs.build.outputs.image }}
+        run: |
+          set -euo pipefail
+          test -n "$COOLIFY_TOKEN"
+          test -n "$COOLIFY_URL"
+          test -n "$APP_UUID"
+          test -n "$SHA_TAG"
+          curl -fsS -X PATCH "${COOLIFY_URL}/api/v1/applications/${APP_UUID}" \
+            -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -d "{\"docker_registry_image_name\":\"${IMAGE}\",\"docker_registry_image_tag\":\"${SHA_TAG}\"}"
+          curl -fsS -G "${COOLIFY_URL}/api/v1/deploy" \
+            -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+            -H "Accept: application/json" \
+            --data-urlencode "uuid=${APP_UUID}" \
+            --data-urlencode "force=true"
