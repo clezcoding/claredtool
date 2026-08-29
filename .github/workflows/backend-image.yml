@@ -2,6 +2,7 @@
 # API: default stage (migrate + main.js) tag sha-<7>.
 # Worker: --target worker (CMD node dist/worker.js) tag sha-<7>-worker.
 # Coolify 4.3.14 dockerimage pack ignores start_command.
+# Deploy job: PATCH tag + GET /deploy when vars.COOLIFY_IMAGE_DEPLOY=true.
 # Official Coolify pattern: GHCR push + deploy API (coolify.io/docs/applications/ci-cd/github/actions).
 # Vs the sample workflow: path filter, buildx GHA cache, metadata-action, immutable sha- tag,
 # one build / two deploys, linux/amd64 only, provenance off (Coolify pull of attestation indexes is flaky).
