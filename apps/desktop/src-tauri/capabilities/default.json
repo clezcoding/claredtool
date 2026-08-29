@@ -19,6 +19,25 @@
     "log:default",
     "updater:default",
     "process:default",
-    "clipboard-manager:allow-write-text"
+    "clipboard-manager:allow-write-text",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "sql:allow-load",
+    "sql:allow-execute",
+    "sql:allow-select",
+    "sql:allow-close",
+    "sharekit:default",
+    "fs:allow-exists",
+    "fs:allow-read-text-file",
+    "fs:allow-write-text-file",
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        { "path": "$APPDATA" },
+        { "path": "$APPDATA/**" },
+        { "path": "$TEMP" },
+        { "path": "$TEMP/**" }
+      ]
+    }
   ]
 }
