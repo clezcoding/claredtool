@@ -1,10 +1,11 @@
-import { initOtel, isAllowedSpanAttribute } from "./otel";
+import { initOtel, isAllowedSpanAttribute, resetOtelForTests } from "./otel";
 
 describe("initOtel", () => {
   const origTraces = process.env.OTEL_TRACES_EXPORTER;
   const origLogs = process.env.OTEL_LOGS_EXPORTER;
 
   afterEach(() => {
+    resetOtelForTests();
     if (origTraces === undefined) {
       delete process.env.OTEL_TRACES_EXPORTER;
     } else {
@@ -30,6 +31,12 @@ describe("initOtel", () => {
       initOtel();
       initOtel();
     }).not.toThrow();
+  });
+
+  it("installs allowlist span processor when OTEL_TRACES_EXPORTER=otlp", () => {
+    process.env.OTEL_TRACES_EXPORTER = "otlp";
+    process.env.OTEL_LOGS_EXPORTER = "none";
+    expect(() => initOtel()).not.toThrow();
   });
 });
 
