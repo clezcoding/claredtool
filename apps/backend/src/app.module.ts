@@ -16,11 +16,19 @@ import { InvoicesModule } from "./invoices/invoices.module";
 import { MeController } from "./me/me.controller";
 import { PrismaService } from "./prisma/prisma.service";
 import { KEY_VALUE_STORE, RedisService, createKeyValueStore } from "./redis/redis.service";
+import { PdfModule } from "./pdf/pdf.module";
 import { TaxController } from "./tax/tax.controller";
 import { TaxModule } from "./tax/tax.module";
 
 @Module({
-  imports: [TerminusModule, EntitiesModule, CustomersModule, InvoicesModule, TaxModule],
+  imports: [
+    TerminusModule,
+    EntitiesModule,
+    CustomersModule,
+    InvoicesModule,
+    TaxModule,
+    PdfModule,
+  ],
   controllers: [
     HealthController,
     AuthController,
