@@ -4,8 +4,10 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import helmet from "helmet";
 import { AppModule } from "./app.module";
 import { setOpenApiDocument } from "./http/docs.controller";
+import { initOtel } from "./telemetry/otel";
 
 async function bootstrap() {
+  initOtel();
   const app = await NestFactory.create(AppModule);
   app.use(helmet());
   const origins = process.env.CORS_ORIGINS?.split(",")

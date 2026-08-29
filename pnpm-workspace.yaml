@@ -10,3 +10,4 @@ allowBuilds:
   "@scarf/scarf": false
   unrs-resolver: false
   msgpackr-extract: false
+  protobufjs: false
