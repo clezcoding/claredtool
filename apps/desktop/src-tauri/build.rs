@@ -22,7 +22,7 @@ fn main() {
     println!("cargo:rerun-if-changed=tauri.conf.json");
     println!("cargo:rerun-if-changed=capabilities");
 
-    let tauri_attrs = if std::env::var("TAURI_ENV_DEBUG").is_ok() {
+    let tauri_attrs = if cfg!(debug_assertions) {
         tauri_build::Attributes::new().capabilities_path_pattern("./capabilities/*.json")
     } else {
         tauri_build::Attributes::new()
