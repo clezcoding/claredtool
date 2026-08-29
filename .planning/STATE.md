@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.3
 current_phase_name: Infra & Prep for PDF, Offline & Audit (INSERTED)
 status: executing
-stopped_at: Completed 04.3-02-PLAN.md
-last_updated: "2026-08-29T02:17:05.770Z"
+stopped_at: Completed 04.3-04-PLAN.md
+last_updated: "2026-08-29T02:29:13.884Z"
 last_activity: 2026-08-29
 last_activity_desc: Phase 04.3 execution started
-state_head: a1bd58d1d72690e6a8c4483cabff4b6e07cf71bd
+state_head: 65cc289b08a6bc4e066365f1fbac6f2707a4798e
 progress:
   total_phases: 10
   completed_phases: 6
   total_plans: 47
-  completed_plans: 41
+  completed_plans: 42
 milestone_name: milestone
 ---
 
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 Status: Ready to execute
 Phase: 04.3 (Infra & Prep for PDF, Offline & Audit (INSERTED)) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 3 of 8
+Plan: 4 of 8
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — **NEXT** execute
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.3
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
@@ -104,6 +104,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04.2 P07 | 6min | 2 tasks | 4 files |
 | Phase 04.3 P01 | 8 min | 3 tasks | 7 files |
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P02 | 5 min | 3 tasks | 16 files |
+| Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P04 | 9 | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -208,6 +209,9 @@ Recent decisions affecting current work:
 - [Phase 04.3]: BullModule.forRootAsync uses connection.url from REDIS_URL and prefix clared-bull (not RedisService)
 - [Phase 04.3]: WorkerModule is a separate process with controllers []; PdfProcessor is not on AppModule
 - [Phase 04.3]: Local Gotenberg on OrbStack 127.0.0.1:3000 with dummy Basic Auth dev/dev; no Gotenberg OTEL (D-16)
+- [Phase 04.3]: PRAGMA key via sqlite3_auto_extension because tauri-plugin-sql 2.4.0 has no after_connect (D-32)
+- [Phase 04.3]: SQL plugin setup() uses absolute sqlite: URL under app_data_dir (Pitfall 6)
+- [Phase 04.3]: fs command perms exists/read/write plus APPDATA+TEMP scope; never fs:default
 
 ### Pending Todos
 
@@ -243,8 +247,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-29T02:17:05.650Z
-Stopped at: Completed 04.3-02-PLAN.md
+Last session: 2026-08-29T02:29:13.741Z
+Stopped at: Completed 04.3-04-PLAN.md
 Resume file: None
 
 ## Rebuild Log
