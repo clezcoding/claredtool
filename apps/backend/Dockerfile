@@ -1,4 +1,4 @@
-FROM node:22-bookworm-slim
+FROM node:22-bookworm-slim AS build
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends openssl ca-certificates curl \
@@ -38,4 +38,10 @@ ENV NODE_ENV=production
 RUN chown -R node:node /app
 USER node
 
+# Coolify dockerfile build pack ignores start_command (Nixpacks-only).
+# Last stage stays API. Worker app sets dockerfile_target_build=worker.
+FROM build AS worker
+CMD ["node", "dist/worker.js"]
+
+FROM build AS api
 CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/main.js"]
