@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04.3
 current_phase_name: Infra & Prep for PDF, Offline & Audit
-status: "Phase 04.3 planned — 8 plans"
-stopped_at: Phase 04.3 plans written
-last_updated: "2026-08-29T03:30:00.000Z"
+status: "Phase 04.3 planned — 8 plans (revision 1)"
+stopped_at: Phase 04.3 plan revision 1
+last_updated: "2026-08-29T03:50:00.000Z"
 last_activity: 2026-08-29
 state_head: 28223a5a5acfa119abd8b6442e274ffc559d87e9
 progress:

@@ -203,10 +203,13 @@ Plans:
 
 **Wave 4** *(blocked on 03+05; 06 also waits on 05)*
 
-- [ ] 04.3-06-PLAN.md — H1/H2 + Coolify Kuma/Beszel + Healthchecks cron
-- [ ] 04.3-07-PLAN.md — Grafana Loki Tempo Prometheus collector + OTEL env (parallel with 06)
+- [ ] 04.3-06-PLAN.md — Copy H1/H2 from .env + Coolify Kuma/Beszel + Healthchecks cron
 
-**Wave 5** *(blocked on 06+07)*
+**Wave 5** *(blocked on 06; serializes clared-api env after 06)*
+
+- [ ] 04.3-07-PLAN.md — Grafana Loki Tempo Prometheus collector + OTEL env
+
+**Wave 6** *(blocked on 06+07)*
 
 - [ ] 04.3-08-PLAN.md — H3/H4/H6 Kuma monitors, Beszel enroll, Grafana login
 
