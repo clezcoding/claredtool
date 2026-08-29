@@ -4,10 +4,10 @@ milestone: v1.0
 current_phase: 04.3
 current_phase_name: Infra & Prep for PDF, Offline & Audit (INSERTED)
 status: executing
-stopped_at: "Checkpoint H4 (04.3-08): awaiting Beszel first admin + agent KEY/TOKEN"
-last_updated: "2026-08-29T21:43:00.000Z"
+stopped_at: "Checkpoint H6 (04.3-08): awaiting Grafana first login"
+last_updated: "2026-08-29T22:07:00.000Z"
 last_activity: 2026-08-29
-last_activity_desc: H3 Kuma matrix verified via MCP; awaiting H4 Beszel
+last_activity_desc: H4 Beszel agent enrolled; awaiting H6 Grafana
 state_head: 83fb63725b777e0a3eba1506a56325e9b4eec055
 progress:
   total_phases: 10
@@ -261,8 +261,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-29T21:43:00.000Z
-Stopped at: Checkpoint H4 (04.3-08): awaiting Beszel first admin + agent KEY/TOKEN
+Last session: 2026-08-29T22:07:00.000Z
+Stopped at: Checkpoint H6 (04.3-08): awaiting Grafana first login
 Resume file: .planning/phases/04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze/04.3-08-PLAN.md
 
 ## Rebuild Log
