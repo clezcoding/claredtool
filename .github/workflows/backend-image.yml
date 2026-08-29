@@ -8,7 +8,9 @@ name: backend-image
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - gsd/phase-04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze
     paths:
       - apps/backend/**
       - packages/tax-engine/**
