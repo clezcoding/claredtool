@@ -92,6 +92,29 @@ vi.mock("@tauri-apps/plugin-window-state", () => ({
   },
 }));
 
+vi.mock("@tauri-apps/plugin-sql", () => ({
+  load: vi.fn(async () => ({
+    execute: vi.fn(async () => ({ rowsAffected: 0 })),
+    select: vi.fn(async () => []),
+    close: vi.fn(async () => undefined),
+  })),
+}));
+
+vi.mock("@tauri-apps/plugin-dialog", () => ({
+  open: vi.fn(async () => null),
+  save: vi.fn(async () => null),
+}));
+
+vi.mock("@tauri-apps/plugin-fs", () => ({
+  readTextFile: vi.fn(async () => ""),
+  writeTextFile: vi.fn(async () => undefined),
+  exists: vi.fn(async () => false),
+}));
+
+vi.mock("@choochmeque/tauri-plugin-sharekit-api", () => ({
+  share: vi.fn(async () => undefined),
+}));
+
 globalThis.fetch = fetchMock as typeof fetch;
 
 class ResizeObserverStub {
