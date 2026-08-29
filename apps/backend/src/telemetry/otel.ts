@@ -10,7 +10,8 @@ const NAME_KEY_RE =
   /customername|customer[_-]?name|invoice.*name|recipient|kunde|rechnungsempf/i;
 const IBAN_LINE_KEY_RE =
   /iban|lineitems|invoicelines|invoice[_-]?lines|positions|positionen|rechnungszeile/i;
-const URL_KEY_RE = /^(http\.(url|target|route|path)|url\.full)$/i;
+const URL_KEY_RE =
+  /^(http\.(url|target|route|path)|url\.(full|path|query))$/i;
 const DB_STATEMENT_KEY_RE = /^db\.statement$/i;
 
 const DEFAULT_OTLP_ENDPOINT = "http://clared-otel-collector:4318";

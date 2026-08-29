@@ -46,6 +46,8 @@ describe("isAllowedSpanAttribute", () => {
     expect(isAllowedSpanAttribute("http.status_code")).toBe(true);
     expect(isAllowedSpanAttribute("http.url")).toBe(false);
     expect(isAllowedSpanAttribute("url.full")).toBe(false);
+    expect(isAllowedSpanAttribute("url.query")).toBe(false);
+    expect(isAllowedSpanAttribute("url.path")).toBe(false);
     expect(isAllowedSpanAttribute("http.target")).toBe(false);
     expect(isAllowedSpanAttribute("db.statement")).toBe(false);
     expect(isAllowedSpanAttribute("customerName")).toBe(false);
