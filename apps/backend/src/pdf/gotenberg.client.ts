@@ -19,7 +19,13 @@ function basicAuthHeader(): string {
 }
 
 function gotenbergOrigin(): string {
-  const raw = process.env.GOTENBERG_URL ?? DEFAULT_GOTENBERG_URL;
+  const raw = process.env.GOTENBERG_URL?.trim();
+  if (!raw) {
+    if (process.env.NODE_ENV === "test") {
+      return DEFAULT_GOTENBERG_URL.replace(/\/$/, "");
+    }
+    throw new Error("GOTENBERG_URL is required");
+  }
   return raw.replace(/\/$/, "");
 }
 
@@ -38,6 +44,7 @@ export async function convertHtmlToPdf(html: string): Promise<PdfBytes> {
     method: "POST",
     headers: { Authorization: basicAuthHeader() },
     body,
+    signal: AbortSignal.timeout(30_000),
   });
   if (!res.ok) {
     throw new Error(`Gotenberg HTTP ${res.status}`);
