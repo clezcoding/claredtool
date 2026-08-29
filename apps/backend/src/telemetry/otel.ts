@@ -48,9 +48,11 @@ class AllowlistSpanProcessor implements tracing.SpanProcessor {
             delete event.attributes[key];
           }
         }
-        const msg = event.attributes["exception.message"];
-        if (typeof msg === "string") {
-          event.attributes["exception.message"] = "[redacted]";
+        for (const redactKey of ["exception.message", "exception.stacktrace"]) {
+          const val = event.attributes[redactKey];
+          if (typeof val === "string") {
+            event.attributes[redactKey] = "[redacted]";
+          }
         }
       }
     }
