@@ -58,7 +58,7 @@ export function AppShell(_props: AppShellProps = {}) {
   }, [t]);
 
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
+    if (!import.meta.env.DEV || import.meta.env.MODE === "test") return;
     void import("./debug-panel").then((mod) => {
       setDebugPanel(() => mod.DebugPanel);
     });

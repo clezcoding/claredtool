@@ -1,6 +1,10 @@
+import { configure } from "@testing-library/react";
 import { beforeEach, vi } from "vitest";
 import "../i18n";
 import { fetchMock, resetAuthMocks } from "./auth-test-doubles";
+
+// ponytail: waitFor default 1s flakes when 34 files + debug-panel chunk share a core; 4s ceiling, drop if fileParallelism: false.
+configure({ asyncUtilTimeout: 4000 });
 
 const NativeRequest = globalThis.Request;
 
