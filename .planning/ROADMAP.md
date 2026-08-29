@@ -182,7 +182,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. **Wave 5 — Async jobs prep:** BullMQ skeleton on existing Redis (`pdf-generation` queue + worker stub); no invoice PDF templates in this phase
   6. Phase 5 owns end-user PDF download, `audit_logs` rows, and offline sync — this phase only prepares pipes
 
-**Plans:** 6/8 plans executed
+**Plans:** 7/8 plans executed
 **UI hint**: no (infra + thin scaffolding)
 
 Plans:
@@ -207,7 +207,7 @@ Plans:
 
 **Wave 5** *(blocked on 06; serializes clared-api env after 06)*
 
-- [ ] 04.3-07-PLAN.md — Grafana Loki Tempo Prometheus collector + OTEL env
+- [x] 04.3-07-PLAN.md — Grafana Loki Tempo Prometheus collector + OTEL env
 
 **Wave 6** *(blocked on 06+07)*
 
@@ -314,7 +314,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 →
 | 4. Premium UI & Brand Redesign | 6/6 | Complete | 2026-08-25 |
 | 4.1 Stitch→React 5-route conversion | 7/7 | Complete    | 2026-08-28 |
 | 4.2 Desktop Platform Hardening | 8/8 | Complete    | 2026-08-28 |
-| 4.3 Infra & Prep for PDF/Offline/Audit | 6/8 | In Progress|  |
+| 4.3 Infra & Prep for PDF/Offline/Audit | 7/8 | In Progress|  |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |
 | 6. Mockup 1:1 Fidelity Closure | 0/? | Not started | - |

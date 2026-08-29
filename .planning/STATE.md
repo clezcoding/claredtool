@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.3
 current_phase_name: Infra & Prep for PDF, Offline & Audit (INSERTED)
 status: executing
-stopped_at: Completed 04.3-06-PLAN.md
-last_updated: "2026-08-29T04:41:06.867Z"
+stopped_at: Completed 04.3-07-PLAN.md
+last_updated: "2026-08-29T05:15:27.180Z"
 last_activity: 2026-08-29
 last_activity_desc: Phase 04.3 execution started
-state_head: f7b150228587c0a686626a67ea00dfc7ca0723b3
+state_head: 207fae60beae9556a7cadb57514bb39b83f6352a
 progress:
   total_phases: 10
   completed_phases: 6
   total_plans: 47
-  completed_plans: 45
+  completed_plans: 46
 milestone_name: milestone
 ---
 
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-19)
 Status: Ready to execute
 Phase: 04.3 (Infra & Prep for PDF, Offline & Audit (INSERTED)) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 7 of 8
+Plan: 8 of 8
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — **NEXT** execute
 Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.3
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
@@ -108,6 +108,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04.3 P03 | 6 | 3 tasks | 11 files |
 | Phase 04.3 P05 | 90min | 3 tasks | 2 files |
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P06 | 7 min | 3 tasks | 1 files |
+| Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P07 | 90min | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -224,6 +225,7 @@ Recent decisions affecting current work:
 - [Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze]: A4: bake HEALTHCHECKS_PING_URL into Coolify cron command (72 chars); do not assume env expansion — Coolify scheduled-task env expansion is unverified (A4); dead-man must ping even if $VAR is literal
 - [Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze]: Beszel agent exclude_from_status until Plan 08 H4 KEY/TOKEN (placeholder pending-h4 crash-loops) — Hub must stay green; agent enroll is H4
 - [Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze]: Kuma/Beszel Traefik: gzip + HTTPS redirect only — no Authentik middleware (D-05) — Monitors must stay reachable when Authentik is down
+- [Phase 04.3]: OTEL env on live GHCR API/worker; collector alias clared-otel-collector; no Grafana Telegram
 
 ### Pending Todos
 
@@ -259,8 +261,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-29T04:41:06.754Z
-Stopped at: Completed 04.3-06-PLAN.md
+Last session: 2026-08-29T05:15:27.078Z
+Stopped at: Completed 04.3-07-PLAN.md
 Resume file: None
 
 ## Rebuild Log
