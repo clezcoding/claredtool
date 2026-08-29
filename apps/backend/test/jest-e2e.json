@@ -6,12 +6,16 @@
   "setupFiles": ["reflect-metadata", "<rootDir>/test/setup-e2e-env.ts"],
   "forceExit": true,
   "detectOpenHandles": false,
+  "transformIgnorePatterns": [
+    "/node_modules/(?!.pnpm)(?!@nestjs/bullmq)(?!@nestjs/bull-shared)"
+  ],
   "transform": {
     "^.+\\.(t|j)s$": [
       "ts-jest",
       {
         "tsconfig": {
-          "types": ["node", "jest"]
+          "types": ["node", "jest"],
+          "allowJs": true
         }
       }
     ]
