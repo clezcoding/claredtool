@@ -29,7 +29,8 @@ ARG DATABASE_URL=postgresql://build:build@127.0.0.1:5432/clared
 RUN rm -f tsconfig.build.tsbuildinfo \
   && pnpm exec prisma generate \
   && pnpm exec nest build \
-  && test -f dist/main.js
+  && test -f dist/main.js \
+  && test -f dist/worker.js
 
 ENV DATABASE_URL=
 ENV NODE_ENV=production
