@@ -107,6 +107,8 @@ jobs:
 
       - run: pnpm --filter @clared/tax-engine build
 
+      - run: pnpm --filter ./apps/backend exec nest build
+
       - run: pnpm --filter ./apps/backend test
 
       - run: pnpm --filter @clared/tax-engine test
