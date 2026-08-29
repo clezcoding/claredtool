@@ -10,12 +10,16 @@ const NAME_KEY_RE =
   /customername|customer[_-]?name|invoice.*name|recipient|kunde|rechnungsempf/i;
 const IBAN_LINE_KEY_RE =
   /iban|lineitems|invoicelines|invoice[_-]?lines|positions|positionen|rechnungszeile/i;
+const URL_KEY_RE = /^(http\.(url|target|route|path)|url\.full)$/i;
+const DB_STATEMENT_KEY_RE = /^db\.statement$/i;
 
 const DEFAULT_OTLP_ENDPOINT = "http://clared-otel-collector:4318";
 
 let initialized = false;
 
 export function isAllowedSpanAttribute(key: string): boolean {
+  if (URL_KEY_RE.test(key)) return false;
+  if (DB_STATEMENT_KEY_RE.test(key)) return false;
   if (TOKEN_KEY_RE.test(key)) return false;
   if (NAME_KEY_RE.test(key)) return false;
   if (IBAN_LINE_KEY_RE.test(key)) return false;
@@ -66,6 +70,7 @@ function autoInstrumentations() {
     },
     "@opentelemetry/instrumentation-pg": {
       requireParentSpan: true,
+      enhancedDatabaseReporting: false,
     },
   });
 }

@@ -44,6 +44,10 @@ describe("isAllowedSpanAttribute", () => {
   it("allows operational keys and denies customer names, IBAN, tokens (D-23)", () => {
     expect(isAllowedSpanAttribute("http.method")).toBe(true);
     expect(isAllowedSpanAttribute("http.status_code")).toBe(true);
+    expect(isAllowedSpanAttribute("http.url")).toBe(false);
+    expect(isAllowedSpanAttribute("url.full")).toBe(false);
+    expect(isAllowedSpanAttribute("http.target")).toBe(false);
+    expect(isAllowedSpanAttribute("db.statement")).toBe(false);
     expect(isAllowedSpanAttribute("customerName")).toBe(false);
     expect(isAllowedSpanAttribute("customer_name")).toBe(false);
     expect(isAllowedSpanAttribute("iban")).toBe(false);
