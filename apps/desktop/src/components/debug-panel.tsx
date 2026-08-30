@@ -294,7 +294,7 @@ export function DebugPanel({
       try {
         const dir = await appDataDir();
         const dbPath = await join(dir, "clared-offline.db");
-        const db = await Database.load(`sqlite:${dbPath.replaceAll("\\", "/")}`);
+        const db = await Database.load(`sqlite:${dbPath.replace(/\\/g, "/")}`);
         await db.select("SELECT ok FROM _init LIMIT 1");
         setOfflineSqlStatus("OK");
       } catch (err) {
