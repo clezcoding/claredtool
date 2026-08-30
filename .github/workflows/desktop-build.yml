@@ -183,18 +183,10 @@ jobs:
           MAC_SIG_FILE="${MAC_FILE}.sig"
           test -f "$MAC_SIG_FILE"
           BASE=$(basename "$MAC_FILE")
-          VERSION="${{ steps.meta.outputs.version }}"
-          case "$BASE" in
-            *"$VERSION"*) ;;
-            *) echo "basename ${BASE} missing version ${VERSION}"; exit 1 ;;
-          esac
-          case "$BASE" in
-            *aarch64*) ;;
-            *) echo "basename ${BASE} missing arch aarch64"; exit 1 ;;
-          esac
+          # Tauri names this Clared.app.tar.gz — version/arch live in the FaynoSync JSON, not the basename.
           case "$BASE" in
             *.app.tar.gz) ;;
-            *) echo "basename ${BASE} missing darwin platform cue .app.tar.gz"; exit 1 ;;
+            *) echo "basename ${BASE} is not a darwin updater tarball"; exit 1 ;;
           esac
           SIG=$(tr -d '\n' < "$MAC_SIG_FILE")
           DATA=$(jq -nc \
@@ -234,18 +226,13 @@ jobs:
           WIN_SIG_FILE="${WIN_FILE}.sig"
           test -f "$WIN_SIG_FILE"
           BASE=$(basename "$WIN_FILE")
-          VERSION="${{ steps.meta.outputs.version }}"
           case "$BASE" in
-            *"$VERSION"*) ;;
-            *) echo "basename ${BASE} missing version ${VERSION}"; exit 1 ;;
-          esac
-          case "$BASE" in
-            *x64*) ;;
-            *) echo "basename ${BASE} missing arch x64"; exit 1 ;;
+            *.exe) ;;
+            *) echo "basename ${BASE} is not an NSIS exe"; exit 1 ;;
           esac
           case "$WIN_FILE" in
             */nsis/*.exe) ;;
-            *) echo "path ${WIN_FILE} missing windows platform cue nsis .exe"; exit 1 ;;
+            *) echo "path ${WIN_FILE} is not under nsis/"; exit 1 ;;
           esac
           SIG=$(tr -d '\n' < "$WIN_SIG_FILE")
           DATA=$(jq -nc \
