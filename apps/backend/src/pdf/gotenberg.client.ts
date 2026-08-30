@@ -50,5 +50,11 @@ export async function convertHtmlToPdf(html: string): Promise<PdfBytes> {
     throw new Error(`Gotenberg HTTP ${res.status}`);
   }
   const bytes = new Uint8Array(await res.arrayBuffer());
+  if (
+    bytes.byteLength < 5 ||
+    String.fromCharCode(...bytes.slice(0, 4)) !== "%PDF"
+  ) {
+    throw new Error("Gotenberg response is not a PDF");
+  }
   return { bytes, contentType: "application/pdf" };
 }
