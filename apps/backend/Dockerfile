@@ -43,5 +43,7 @@ FROM build AS worker
 CMD ["node", "dist/worker.js"]
 
 FROM build AS api
-# PID 1 is Nest only. prisma migrate deploy runs once in CI (backend-image.yml migrate job).
-CMD ["node", "dist/main.js"]
+# ponytail: Coolify Postgres is Docker-internal DNS. GitHub-hosted runners cannot
+# reach it, so prisma migrate deploy stays in CMD while swarm_replicas=1.
+# GHA migrate job is the scale-out path once a reachable DATABASE_URL exists.
+CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/main.js"]
