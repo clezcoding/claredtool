@@ -95,6 +95,8 @@ jobs:
       needs.changes.outputs.shared == 'true' ||
       needs.changes.outputs.tax-engine == 'true'
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://prisma-test:unused@127.0.0.1:5432/clared
     steps:
       - uses: actions/checkout@v7
 
