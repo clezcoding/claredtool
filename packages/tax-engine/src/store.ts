@@ -14,13 +14,7 @@ function getValidator(): ReturnType<typeof ajv.compile> {
     return validateRule;
   }
   const schemaPath = join(__dirname, "schema", "clared-tax-rule-dsl-schema.json");
-  const monorepoPath = join(__dirname, "..", "..", "docs", "clared-tax-rule-dsl-schema.json");
-  let raw: string;
-  try {
-    raw = readFileSync(schemaPath, "utf8");
-  } catch {
-    raw = readFileSync(monorepoPath, "utf8");
-  }
+  const raw = readFileSync(schemaPath, "utf8");
   validateRule = ajv.compile(JSON.parse(raw));
   return validateRule;
 }

@@ -39,7 +39,7 @@ tax-engine:
   - changed-files:
       - any-glob-to-any-file:
           - packages/tax-engine/**
-          - docs/clared-tax-rule-dsl-schema.json
+          - packages/tax-engine/src/schema/clared-tax-rule-dsl-schema.json
 
 docker:
   - changed-files:

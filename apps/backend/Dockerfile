@@ -15,7 +15,6 @@ COPY packages/tax-engine/package.json packages/tax-engine/package.json
 RUN pnpm install --frozen-lockfile --filter @clared/tax-engine... --filter ./apps/backend...
 
 COPY packages/tax-engine packages/tax-engine
-COPY docs/clared-tax-rule-dsl-schema.json docs/clared-tax-rule-dsl-schema.json
 COPY apps/backend apps/backend
 
 WORKDIR /app
