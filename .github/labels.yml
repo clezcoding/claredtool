@@ -107,3 +107,15 @@
 - name: ready-for-human
   color: "0052cc"
   description: Requires human implementation
+- name: backend
+  color: "1d76db"
+  description: apps/backend (Nest API)
+- name: tax-engine
+  color: "bfd4f2"
+  description: packages/tax-engine + tax rule schema
+- name: docker
+  color: "2496ed"
+  description: Dockerfile and compose image updates
+- name: infrastructure
+  color: "ededed"
+  description: Docker, compose, and deployment config
