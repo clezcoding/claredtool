@@ -1,14 +1,14 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: "05"
+current_phase: 05
 current_phase_name: PDF, Audit & Offline Sync
 status: planning
-stopped_at: Phase 04.3 complete, ready to discuss Phase 05
-last_updated: "2026-08-30T02:45:00.000Z"
-last_activity: 2026-08-30 - Planned quick task 260830-6hk: land all open Dependabot upgrades (keep Node 24)
-last_activity_desc: Phase 04.3 complete, transitioned to Phase 05; quick 260830-6hk plan ready
-state_head: 673225a24b9388b948e80babd6246709baa8f360
+stopped_at: Quick 260830-6hk complete; waiting on PR CI then merge
+last_updated: "2026-08-30T02:57:53.876Z"
+last_activity: 2026-08-30
+last_activity_desc: Quick 260830-6hk complete; Dependabot versions on branch, PRs left open for supersede-close
+state_head: 9c8c8b9f0249cdd79ddf544fd39491ae29f57581
 progress:
   total_phases: 10
   completed_phases: 7
@@ -36,7 +36,7 @@ Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
 Phase 05 (PDF, Audit & Offline Sync) — **NEXT** discuss/plan
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-08-30 — Phase 04.3 complete, transitioned to Phase 05
+Last activity: 2026-08-30 - Completed quick task 260830-6hk: Resolve open Dependabot PRs (getrandom 0.4 fill; action majors via #67; Node 24)
 
 Progress: [███████░░░] 70%
 
@@ -228,6 +228,7 @@ Recent decisions affecting current work:
 - [Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze]: Beszel agent exclude_from_status until Plan 08 H4 KEY/TOKEN (placeholder pending-h4 crash-loops) — Hub must stay green; agent enroll is H4
 - [Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze]: Kuma/Beszel Traefik: gzip + HTTPS redirect only — no Authentik middleware (D-05) — Monitors must stay reachable when Authentik is down
 - [Phase 04.3]: OTEL env on live GHCR API/worker; collector alias clared-otel-collector; no Grafana Telegram
+- [Phase 05]: getrandom 0.4: fill API + cargo update -p clared (ambiguous -p getrandom); action majors already SHA-pinned by #67; Node 24 unchanged; Dependabot PRs left open
 
 ### Pending Todos
 
@@ -247,6 +248,7 @@ None yet.
 | 260828-mn3 | Optimize desktop-build GitHub Actions: skip PR signed tauri build; trigger on v* tags | 2026-08-28 | 667385b | [260828-mn3-optimize-desktop-build-github-actions-ke](./quick/260828-mn3-optimize-desktop-build-github-actions-ke/) |
 | 260830-4kp | Audit claredtool-findings-consolidated Phase 1+2+3 subset (CI/Dependabot/GitHub Actions) | 2026-08-30 | 2410795 | [260830-4kp-analysiere-audit-claredtool-findings-con](./quick/260830-4kp-analysiere-audit-claredtool-findings-con/) |
 | 260830-59y | Audit Phase 3 complete: schema SSOT, Rust 1.97.1 pin, action SHA pinning | 2026-08-30 | 7927540 | [260830-59y-analysiere-audit-claredtool-findings-con](./quick/260830-59y-analysiere-audit-claredtool-findings-con/) |
+| 260830-6hk | Land open Dependabot upgrades: getrandom 0.4 fill; SHA action majors confirmed; Node 24 unchanged | 2026-08-30 | 9c8c8b9 | [260830-6hk-resolve-all-open-dependabot-prs-by-actua](./quick/260830-6hk-resolve-all-open-dependabot-prs-by-actua/) |
 
 ### Roadmap Evolution
 
@@ -265,8 +267,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-29T23:07:00.000Z
-Stopped at: Phase 04.3 complete, ready to discuss Phase 05
+Last session: 2026-08-30T02:57:53.531Z
+Stopped at: Quick 260830-6hk complete; waiting on PR CI then merge
 Resume file: None
 
 ## Rebuild Log
