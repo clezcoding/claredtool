@@ -60,4 +60,21 @@ describe("convertHtmlToPdf", () => {
     expect(form.get("paperWidth")).toBe("8.27");
     expect(form.get("paperHeight")).toBe("11.7");
   });
+
+  it("rejects non-PDF response bodies", async () => {
+    process.env.GOTENBERG_API_BASIC_AUTH_USERNAME = "dev";
+    process.env.GOTENBERG_API_BASIC_AUTH_PASSWORD = "dev";
+    process.env.GOTENBERG_URL = "http://127.0.0.1:3000";
+    globalThis.fetch = jest
+      .fn()
+      .mockResolvedValue(
+        new Response(new TextEncoder().encode("<html>error</html>"), {
+          status: 200,
+        }),
+      ) as unknown as typeof fetch;
+
+    await expect(convertHtmlToPdf("<html>ok</html>")).rejects.toThrow(
+      "Gotenberg response is not a PDF",
+    );
+  });
 });
