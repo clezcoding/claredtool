@@ -39,6 +39,7 @@ services:
     build:
       context: .
       dockerfile: apps/backend/Dockerfile
+      target: worker
     command: node dist/worker.js
     depends_on:
       - redis
