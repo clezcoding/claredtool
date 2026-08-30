@@ -29,6 +29,21 @@ export class HealthController {
         await this.redis.ping();
         return { redis: { status: "up" } };
       },
+      async (): Promise<HealthIndicatorResult> => {
+        const raw = process.env.GOTENBERG_URL?.trim();
+        if (!raw) {
+          // Phase 5: worker queue depth deferred; Uptime Kuma covers external PDF path when GOTENBERG_URL is set in prod.
+          return { gotenberg: { status: "up", message: "skipped (GOTENBERG_URL unset)" } };
+        }
+        const origin = raw.replace(/\/$/, "");
+        const res = await fetch(`${origin}/health`, {
+          signal: AbortSignal.timeout(2_000),
+        });
+        if (!res.ok) {
+          throw new Error(`Gotenberg health HTTP ${res.status}`);
+        }
+        return { gotenberg: { status: "up" } };
+      },
     ]);
   }
 }

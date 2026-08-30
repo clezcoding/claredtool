@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Premium UI & Brand Redesign** - Crafted Minimal; every page mockup-first with new brand, graphics, and motion (completed 2026-08-25)
 - [x] **Phase 4.1: Stitch→React 5-route conversion** (INSERTED) - stitch-build HTML→TSX for Rechnung · Entities · Kunden · Tax · PDF (completed 2026-08-28)
 - [x] **Phase 4.2: Desktop Platform Hardening** (INSERTED) - Tauri plugins, Sentry, updater, desktop polish (completed 2026-08-28)
-- [ ] **Phase 4.3: Infra & Prep for PDF, Offline & Audit** (INSERTED) - Gotenberg, monitoring, OTel, desktop/backend scaffolding before Phase 5
+- [x] **Phase 4.3: Infra & Prep for PDF, Offline & Audit** (INSERTED) - Gotenberg, monitoring, OTel, desktop/backend scaffolding before Phase 5 (completed 2026-08-30)
 - [ ] **Phase 5: PDF, Audit & Offline Sync** - Download PDF, inspect tax audit trail, work offline and sync
 - [ ] **Phase 5.1: Stitch→React extended catalog** (INSERTED) - remaining Stitch screens after PDF loop ships
 - [ ] **Phase 6: Mockup 1:1 Fidelity Closure** - pixel-match approved mockups 02–07 on the 5 routes
@@ -182,12 +182,36 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. **Wave 5 — Async jobs prep:** BullMQ skeleton on existing Redis (`pdf-generation` queue + worker stub); no invoice PDF templates in this phase
   6. Phase 5 owns end-user PDF download, `audit_logs` rows, and offline sync — this phase only prepares pipes
 
-**Plans:** 0 plans
+**Plans:** 8/8 plans complete
 **UI hint**: no (infra + thin scaffolding)
 
 Plans:
 
-- [ ] TBD (run /gsd-plan-phase 04.3 to break down)
+**Wave 1**
+
+- [x] 04.3-01-PLAN.md — Wave 0: image pins + Nyquist RED/GREEN stubs (PDF/OFFL/AUDT prep)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [x] 04.3-02-PLAN.md — Tracer: local Gotenberg + BullMQ worker HTML convert
+- [x] 04.3-04-PLAN.md — Desktop SQLCipher + dialog/fs/sharekit debug smokes (parallel with 02)
+
+**Wave 3** *(blocked on 02)*
+
+- [x] 04.3-03-PLAN.md — Pino + OTel SDK local export off
+- [x] 04.3-05-PLAN.md — Coolify internal Gotenberg + clared-worker (parallel with 03)
+
+**Wave 4** *(blocked on 03+05; 06 also waits on 05)*
+
+- [x] 04.3-06-PLAN.md — Copy H1/H2 from .env + Coolify Kuma/Beszel + Healthchecks cron
+
+**Wave 5** *(blocked on 06; serializes clared-api env after 06)*
+
+- [x] 04.3-07-PLAN.md — Grafana Loki Tempo Prometheus collector + OTEL env
+
+**Wave 6** *(blocked on 06+07)*
+
+- [x] 04.3-08-PLAN.md — H3/H4/H6 Kuma monitors, Beszel enroll, Grafana login
 
 ### Phase 04.2: Desktop Platform Hardening (INSERTED)
 
@@ -290,7 +314,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 →
 | 4. Premium UI & Brand Redesign | 6/6 | Complete | 2026-08-25 |
 | 4.1 Stitch→React 5-route conversion | 7/7 | Complete    | 2026-08-28 |
 | 4.2 Desktop Platform Hardening | 8/8 | Complete    | 2026-08-28 |
-| 4.3 Infra & Prep for PDF/Offline/Audit | 0/? | Not started | - |
+| 4.3 Infra & Prep for PDF/Offline/Audit | 8/8 | Complete    | 2026-08-30 |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |
 | 6. Mockup 1:1 Fidelity Closure | 0/? | Not started | - |

@@ -1,18 +1,19 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 04.3
-current_phase_name: Infra & Prep for PDF, Offline & Audit
-status: "Phase 04.2 shipped — PR #42"
-stopped_at: Phase 04.2 complete, ready to plan Phase 04.3
-last_updated: "2026-08-28T21:54:55.827Z"
-last_activity: 2026-08-28
-state_head: 7a1fbd2e6e9a446e5099057e000d22120f49b6f4
+current_phase: "05"
+current_phase_name: PDF, Audit & Offline Sync
+status: planning
+stopped_at: Phase 04.3 complete, ready to discuss Phase 05
+last_updated: "2026-08-29T23:07:00.000Z"
+last_activity: 2026-08-30
+last_activity_desc: Phase 04.3 complete, transitioned to Phase 05
+state_head: 673225a24b9388b948e80babd6246709baa8f360
 progress:
   total_phases: 10
-  completed_phases: 6
-  total_plans: 39
-  completed_plans: 39
+  completed_phases: 7
+  total_plans: 47
+  completed_plans: 47
 milestone_name: milestone
 ---
 
@@ -20,33 +21,30 @@ milestone_name: milestone
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-08-19)
+See: .planning/PROJECT.md (updated 2026-08-30)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 04.2 — Desktop Platform Hardening
+**Current focus:** Phase 05 — PDF, Audit & Offline Sync
 
 ## Current Position
 
-Status: Phase 04.2 shipped — PR #42
-Phase: 04.3 — Infra & Prep for PDF, Offline & Audit
+Status: Ready to plan
+Phase: 05 — PDF, Audit & Offline Sync
 Phase 04.1 merged: PR #39 (`30e331a`)
 Plan: Not started
-Phase 04 (Premium UI & Brand Redesign) — complete 2026-08-25
-Phase 04.1 (Stitch→React 5-route) — complete 2026-08-28
-Phase 04.2 (Desktop Platform Hardening) — **NEXT** re-check / execute (clipboard wave 7 before debug wave 8)
-Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — after 04.2
-Phase 05 (PDF, Audit & Offline Sync) — blocked on 04.3
+Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
+Phase 05 (PDF, Audit & Offline Sync) — **NEXT** discuss/plan
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-08-28
+Last activity: 2026-08-30 — Phase 04.3 complete, transitioned to Phase 05
 
-Progress: [█████░░░░░] 50%
+Progress: [███████░░░] 70%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 39
+- Total plans completed: 47
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -61,6 +59,7 @@ Progress: [█████░░░░░] 50%
 | 06 | 0 | - | - |
 | 04.1 | 7 | - | - |
 | 04.2 | 8 | - | - |
+| 04.3 | 8 | - | - |
 
 **Recent Trend:**
 
@@ -104,6 +103,14 @@ Progress: [█████░░░░░] 50%
 | Phase 04.2 P06 | 12 | 3 tasks | 9 files |
 | Phase 04.2 P08 | 5min | 3 tasks | 13 files |
 | Phase 04.2 P07 | 6min | 2 tasks | 4 files |
+| Phase 04.3 P01 | 8 min | 3 tasks | 7 files |
+| Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P02 | 5 min | 3 tasks | 16 files |
+| Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P04 | 9 | 3 tasks | 11 files |
+| Phase 04.3 P03 | 6 | 3 tasks | 11 files |
+| Phase 04.3 P05 | 90min | 3 tasks | 2 files |
+| Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P06 | 7 min | 3 tasks | 1 files |
+| Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P07 | 90min | 3 tasks | 1 files |
+| Phase 04.3 P08 | 19h wall | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -204,6 +211,23 @@ Recent decisions affecting current work:
 - [Phase 04.2]: Omit tauri.conf window.devtools — Tauri debug_assertions default keeps DevTools in dev only (D-50)
 - [Phase 04.2]: maskUpdaterEndpoint masks subdomain + registrable label for safe updater display
 - [Phase 04.2]: [quick-260828-mn3]: desktop-build skips PRs; v* tags trigger FaynoSync publish if; explicit pnpm tauri CLI kept
+- [Phase 04.3]: A1: RESEARCH Hub tags pull as spelled (no twin); Prometheus keeps v prefix
+- [Phase 04.3]: BullModule.forRootAsync uses connection.url from REDIS_URL and prefix clared-bull (not RedisService)
+- [Phase 04.3]: WorkerModule is a separate process with controllers []; PdfProcessor is not on AppModule
+- [Phase 04.3]: Local Gotenberg on OrbStack 127.0.0.1:3000 with dummy Basic Auth dev/dev; no Gotenberg OTEL (D-16)
+- [Phase 04.3]: PRAGMA key via sqlite3_auto_extension because tauri-plugin-sql 2.4.0 has no after_connect (D-32)
+- [Phase 04.3]: SQL plugin setup() uses absolute sqlite: URL under app_data_dir (Pitfall 6)
+- [Phase 04.3]: fs command perms exists/read/write plus APPDATA+TEMP scope; never fs:default
+- [Phase 04.3]: NodeSDK never exports logs; Pino dual-write owns OTLP logs when OTEL_LOGS_EXPORTER=otlp (D-30)
+- [Phase 04.3]: When traces exporter is none, pass spanProcessors: [] so env default otlp cannot hang on :4318 (D-24)
+- [Phase 04.3]: Worker uses raw pino with the same redact, not LoggerModule/pino-http
+- [Phase 04.3]: Worker PID 1 via Dockerfile target worker; Coolify 4.3.14 start_command is Nixpacks-only
+- [Phase 04.3]: Gotenberg created docker_compose_raw no FQDN; compose coolify network alias (connect_to_docker_network flag unset on service)
+- [Phase 04.3]: create_github 500: clone clared-api then strip FQDN for clared-worker
+- [Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze]: A4: bake HEALTHCHECKS_PING_URL into Coolify cron command (72 chars); do not assume env expansion — Coolify scheduled-task env expansion is unverified (A4); dead-man must ping even if $VAR is literal
+- [Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze]: Beszel agent exclude_from_status until Plan 08 H4 KEY/TOKEN (placeholder pending-h4 crash-loops) — Hub must stay green; agent enroll is H4
+- [Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze]: Kuma/Beszel Traefik: gzip + HTTPS redirect only — no Authentik middleware (D-05) — Monitors must stay reachable when Authentik is down
+- [Phase 04.3]: OTEL env on live GHCR API/worker; collector alias clared-otel-collector; no Grafana Telegram
 
 ### Pending Todos
 
@@ -239,8 +263,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-28T05:04:23.014Z
-Stopped at: Phase 04.2 complete, ready to plan Phase 04.3
+Last session: 2026-08-29T23:07:00.000Z
+Stopped at: Phase 04.3 complete, ready to discuss Phase 05
 Resume file: None
 
 ## Rebuild Log

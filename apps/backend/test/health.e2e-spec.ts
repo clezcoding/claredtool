@@ -2,9 +2,13 @@ import { INestApplication } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import request from "supertest";
 import { AppModule } from "../src/app.module";
+import { RuleSeedService } from "../src/tax/rule-seed";
 
+process.env.AUTH_TEST_MODE = "1";
 process.env.DATABASE_URL ??=
-  "postgresql://prisma-test:unused@127.0.0.1:5432/clared";
+  "postgresql://clared_app:clared_app_dev@127.0.0.1:5432/clared";
+
+const PII_KEYS = ["customerName", "iban", "authorization", "access_token"];
 
 describe("Health (e2e)", () => {
   let app: INestApplication;
@@ -12,7 +16,10 @@ describe("Health (e2e)", () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(RuleSeedService)
+      .useValue({ onModuleInit: async () => undefined })
+      .compile();
     app = moduleFixture.createNestApplication();
     await app.listen(0);
   });
@@ -21,8 +28,13 @@ describe("Health (e2e)", () => {
     await app.close();
   }, 15000);
 
-  it("GET /health returns 200 with no Postgres I/O", () => {
-    return request(app.getHttpServer()).get("/health").expect(200);
+  it("GET /health returns 200 with status ok and no PII keys", async () => {
+    const res = await request(app.getHttpServer()).get("/health").expect(200);
+    expect(res.body.status).toBe("ok");
+    const json = JSON.stringify(res.body);
+    for (const key of PII_KEYS) {
+      expect(json).not.toContain(key);
+    }
   });
 
   it("GET /health/ready returns 200 or 503 with postgres and redis in the body", async () => {

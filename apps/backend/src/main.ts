@@ -1,12 +1,17 @@
+import "dotenv/config";
 import "reflect-metadata";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import helmet from "helmet";
+import { Logger } from "nestjs-pino";
 import { AppModule } from "./app.module";
 import { setOpenApiDocument } from "./http/docs.controller";
+import { initOtel } from "./telemetry/otel";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  initOtel();
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(Logger));
   app.use(helmet());
   const origins = process.env.CORS_ORIGINS?.split(",")
     .map((s) => s.trim())
@@ -29,4 +34,7 @@ async function bootstrap() {
   });
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+bootstrap().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

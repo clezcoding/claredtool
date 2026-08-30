@@ -1,0 +1,12 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "debug",
+  "description": "DEV-only SQL smoke permissions for the debug panel (D-33)",
+  "windows": ["main"],
+  "permissions": [
+    "sql:allow-load",
+    "sql:allow-execute",
+    "sql:allow-select",
+    "sql:allow-close"
+  ]
+}

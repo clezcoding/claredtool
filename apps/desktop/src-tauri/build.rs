@@ -20,9 +20,17 @@ fn main() {
     let version = app_version();
     println!("cargo:rustc-env=APP_VERSION={version}");
     println!("cargo:rerun-if-changed=tauri.conf.json");
+    println!("cargo:rerun-if-changed=capabilities");
+
+    let tauri_attrs = if cfg!(debug_assertions) {
+        tauri_build::Attributes::new().capabilities_path_pattern("./capabilities/*.json")
+    } else {
+        tauri_build::Attributes::new()
+            .capabilities_path_pattern("./capabilities/{default,login}.json")
+    };
 
     tauri_build::try_build(
-        tauri_build::Attributes::new().app_manifest(tauri_build::AppManifest::new().commands(&[
+        tauri_attrs.app_manifest(tauri_build::AppManifest::new().commands(&[
             "keychain_set_session",
             "keychain_get_session",
             "keychain_delete_session",
