@@ -39,7 +39,7 @@ fn load_or_create_sqlcipher_key_hex() -> Result<String, String> {
         Ok(existing) if !existing.is_empty() => Ok(existing),
         Err(err) if is_no_entry(&err) => {
             let mut bytes = [0u8; 32];
-            getrandom::getrandom(&mut bytes).map_err(|e| e.to_string())?;
+            getrandom::fill(&mut bytes).map_err(|e| e.to_string())?;
             let hex: String = bytes.iter().map(|b| format!("{b:02x}")).collect();
             entry.set_password(&hex).map_err(|e| e.to_string())?;
             Ok(hex)
@@ -47,7 +47,7 @@ fn load_or_create_sqlcipher_key_hex() -> Result<String, String> {
         Err(err) => Err(err.to_string()),
         Ok(_) => {
             let mut bytes = [0u8; 32];
-            getrandom::getrandom(&mut bytes).map_err(|e| e.to_string())?;
+            getrandom::fill(&mut bytes).map_err(|e| e.to_string())?;
             let hex: String = bytes.iter().map(|b| format!("{b:02x}")).collect();
             entry.set_password(&hex).map_err(|e| e.to_string())?;
             Ok(hex)
