@@ -36,7 +36,7 @@ jobs:
   tauri:
     # cancel-in-progress: false for v* tags and workflow_dispatch (F-E2)
     concurrency:
-      group: desktop-tauri-${{ startsWith(github.ref, 'refs/tags/v') && 'production' || (github.event_name == 'workflow_dispatch' && 'manual' || 'staging') }}-${{ github.ref }}
+      group: desktop-tauri-${{ startsWith(github.ref, 'refs/tags/v') && 'production' || (github.event_name == 'workflow_dispatch' && 'manual' || 'staging') }}-${{ github.ref }}-${{ matrix.os }}
       cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/v') && github.event_name != 'workflow_dispatch' }}
     strategy:
       fail-fast: false
