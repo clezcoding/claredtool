@@ -482,7 +482,7 @@ fn sentry_scrub_json_map(
 ) -> serde_json::Map<String, sentry::protocol::Value> {
     let mut out = serde_json::Map::new();
     for (key, value) in map {
-        if key.to_ascii_lowercase() == "authorization" {
+        if key.eq_ignore_ascii_case("authorization") {
             continue;
         }
         if sentry_key_is_sensitive(&key) {
@@ -499,7 +499,7 @@ fn sentry_scrub_map(
 ) -> sentry::protocol::Map<String, sentry::protocol::Value> {
     let mut out = sentry::protocol::Map::new();
     for (key, value) in map {
-        if key.to_ascii_lowercase() == "authorization" {
+        if key.eq_ignore_ascii_case("authorization") {
             continue;
         }
         if sentry_key_is_sensitive(&key) {
@@ -522,14 +522,14 @@ fn sentry_scrub_user(mut user: sentry::protocol::User) -> sentry::protocol::User
 fn sentry_scrub_request(mut request: sentry::protocol::Request) -> sentry::protocol::Request {
     request
         .headers
-        .retain(|key, _| key.to_ascii_lowercase() != "authorization");
+        .retain(|key, _| !key.eq_ignore_ascii_case("authorization"));
     for value in request.headers.values_mut() {
         *value = sentry_redact_string(value, None);
     }
     request.env = request
         .env
         .into_iter()
-        .filter(|(key, _)| key.to_ascii_lowercase() != "authorization")
+        .filter(|(key, _)| !key.eq_ignore_ascii_case("authorization"))
         .map(|(key, value)| {
             let redacted = sentry_redact_string(&value, Some(&key));
             (key, redacted)

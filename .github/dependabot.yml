@@ -6,6 +6,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
+      time: "06:00"
       timezone: Europe/Berlin
     open-pull-requests-limit: 10
     labels:
@@ -13,7 +14,6 @@ updates:
       - npm
     commit-message:
       prefix: "chore"
-      prefix-development: "chore"
       include: scope
     groups:
       npm-patch-minor:
@@ -22,17 +22,13 @@ updates:
           - minor
         patterns:
           - "*"
-      npm-major:
-        update-types:
-          - major
-        patterns:
-          - "*"
 
   - package-ecosystem: cargo
     directory: /apps/desktop/src-tauri
     schedule:
       interval: weekly
       day: monday
+      time: "06:15"
       timezone: Europe/Berlin
     open-pull-requests-limit: 5
     labels:
@@ -45,16 +41,13 @@ updates:
     # is fixed in glib 0.20, which cannot resolve until Tauri moves gtk-rs.
     ignore:
       - dependency-name: glib
+        versions:
+          - ">=0.19.0"
     groups:
       cargo-patch-minor:
         update-types:
           - patch
           - minor
-        patterns:
-          - "*"
-      cargo-major:
-        update-types:
-          - major
         patterns:
           - "*"
 
@@ -63,6 +56,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
+      time: "06:30"
       timezone: Europe/Berlin
     open-pull-requests-limit: 5
     labels:
@@ -78,8 +72,33 @@ updates:
           - minor
         patterns:
           - "*"
-      actions-major:
-        update-types:
-          - major
-        patterns:
-          - "*"
+
+  - package-ecosystem: docker
+    directory: /apps/backend
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:45"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - docker
+    commit-message:
+      prefix: "chore"
+      include: scope
+
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "07:00"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+      - docker
+    commit-message:
+      prefix: "chore"
+      include: scope

@@ -30,3 +30,30 @@ documentation:
 
 dependencies:
   - head-branch: ['^dependabot/']
+
+backend:
+  - changed-files:
+      - any-glob-to-any-file: apps/backend/**
+
+tax-engine:
+  - changed-files:
+      - any-glob-to-any-file:
+          - packages/tax-engine/**
+          - docs/clared-tax-rule-dsl-schema.json
+
+docker:
+  - changed-files:
+      - any-glob-to-any-file:
+          - apps/backend/Dockerfile
+          - compose.yml
+          - compose.clared.yml
+          - .dockerignore
+
+infrastructure:
+  - changed-files:
+      - any-glob-to-any-file:
+          - apps/backend/Dockerfile
+          - compose.yml
+          - compose.clared.yml
+          - .dockerignore
+          - .github/workflows/backend-image.yml
