@@ -43,5 +43,5 @@ FROM build AS worker
 CMD ["node", "dist/worker.js"]
 
 FROM build AS api
-# ponytail: prisma migrate deploy in CMD assumes single API replica at startup; multi-replica needs external migration job before scale-out.
-CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/main.js"]
+# PID 1 is Nest only. prisma migrate deploy runs once in CI (backend-image.yml migrate job).
+CMD ["node", "dist/main.js"]

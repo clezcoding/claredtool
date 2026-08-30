@@ -1,11 +1,15 @@
 # GHA builds Nest images; Coolify only pulls them.
-# API: default stage (migrate + main.js) tag sha-<7>.
+# API: default stage (CMD node dist/main.js) tag sha-<7>.
 # Worker: --target worker (CMD node dist/worker.js) tag sha-<7>-worker.
 # Coolify 4.3.14 dockerimage pack ignores start_command.
+# Prisma migrate deploy runs once in the migrate job (environment production)
+# before Coolify deploy. API replicas must not race migrate at process start.
 # Deploy job: PATCH tag + POST /deploy when vars.COOLIFY_IMAGE_DEPLOY=true.
 # Official Coolify pattern: GHCR push + deploy API (coolify.io/docs/applications/ci-cd/github/actions).
 # Vs the sample workflow: path filter, buildx GHA cache, metadata-action, immutable sha- tag,
-# one build / two deploys, linux/amd64 only, provenance off (Coolify pull of attestation indexes is flaky).
+# one build / two deploys, linux/amd64 only.
+# TECH-DEBT: provenance and sbom stay false — Coolify cannot pull attestation
+# indexes; re-enable after a Coolify upgrade that can.
 
 name: backend-image
 
@@ -40,6 +44,7 @@ permissions:
 
 jobs:
   build:
+    timeout-minutes: 45
     concurrency:
       group: backend-image-build-${{ github.ref }}
       cancel-in-progress: true
@@ -77,6 +82,8 @@ jobs:
           echo "image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" >> "$GITHUB_OUTPUT"
           echo "sha_tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
+      # TECH-DEBT: GHCR attestations stay off — Coolify cannot pull
+      # attestation indexes. Re-enable after a Coolify upgrade that can.
       - uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
@@ -92,6 +99,8 @@ jobs:
 
       # Coolify 4.3.14 dockerimage pack ignores start_command (same as dockerfile).
       # Worker stage CMD is node dist/worker.js — separate tag, not an override.
+      # TECH-DEBT: GHCR attestations stay off — Coolify cannot pull
+      # attestation indexes. Re-enable after a Coolify upgrade that can.
       - uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:
           context: .
@@ -105,14 +114,51 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=clared-backend
 
-  deploy:
+  migrate:
     needs: build
     if: |
       needs.build.result == 'success' &&
       vars.COOLIFY_IMAGE_DEPLOY == 'true' &&
       github.ref == 'refs/heads/main' &&
       (github.event_name != 'workflow_dispatch' || inputs.deploy)
+    environment: production
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: pnpm/action-setup@ff378ebe6b225b0680b81c1ad4498ae0d1d3a5e3 # v6.0.10
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Apply Prisma migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DATABASE_URL}" ]; then
+            echo "DATABASE_URL is required (GitHub Environment production secret). Failing closed."
+            exit 1
+          fi
+          pnpm --filter ./apps/backend exec prisma migrate deploy
+
+  deploy:
+    needs: [build, migrate]
+    if: |
+      needs.build.result == 'success' &&
+      vars.COOLIFY_IMAGE_DEPLOY == 'true' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name != 'workflow_dispatch' || inputs.deploy)
+    # GitHub UI (YAML cannot set): required reviewers; deployment branches
+    # main plus v* tags; do not add a wait timer that blocks this private-repo CI.
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     concurrency:
       group: coolify-nest-deploy
       cancel-in-progress: false
@@ -133,6 +179,7 @@ jobs:
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
           COOLIFY_URL: ${{ vars.COOLIFY_URL }}
           APP_UUID: ${{ vars[matrix.app.uuid_var] }}
+          APP_NAME: ${{ matrix.app.name }}
           SHA_TAG: ${{ needs.build.outputs.sha_tag }}${{ matrix.app.tag_suffix }}
           IMAGE: ${{ needs.build.outputs.image }}
         run: |
@@ -141,6 +188,11 @@ jobs:
           test -n "$COOLIFY_URL"
           test -n "$APP_UUID"
           test -n "$SHA_TAG"
+          test -n "$APP_NAME"
+          APP_JSON=$(curl -fsS -X GET "${COOLIFY_URL}/api/v1/applications/${APP_UUID}" \
+            -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+            -H "Accept: application/json")
+          PREV_TAG=$(printf '%s' "$APP_JSON" | jq -r '.docker_registry_image_tag // empty')
           curl -fsS -X PATCH "${COOLIFY_URL}/api/v1/applications/${APP_UUID}" \
             -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
             -H "Accept: application/json" \
@@ -152,3 +204,47 @@ jobs:
             -H "Accept: application/json" \
             -H "Content-Type: application/json" \
             -d "{\"uuid\":\"${APP_UUID}\",\"force\":true}"
+
+          poll_ok=0
+          for _ in $(seq 1 30); do
+            if [ "$APP_NAME" = "clared-api" ]; then
+              code=$(curl -sS -o /dev/null -w "%{http_code}" \
+                "https://clared-api.puzzlessdev.online/health/ready" || true)
+              if [ "$code" = "200" ]; then
+                poll_ok=1
+                break
+              fi
+            else
+              STATUS_JSON=$(curl -fsS -X GET "${COOLIFY_URL}/api/v1/applications/${APP_UUID}" \
+                -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+                -H "Accept: application/json" || true)
+              STATUS=$(printf '%s' "${STATUS_JSON:-}" | jq -r '.status // empty' 2>/dev/null || true)
+              STATUS_LC=$(printf '%s' "$STATUS" | tr '[:upper:]' '[:lower:]')
+              case "$STATUS_LC" in
+                *running*)
+                  poll_ok=1
+                  break
+                  ;;
+              esac
+            fi
+            sleep 10
+          done
+
+          if [ "$poll_ok" != "1" ]; then
+            if [ -n "$PREV_TAG" ]; then
+              echo "Health poll failed for ${APP_NAME}; rolling back to ${PREV_TAG}"
+              curl -fsS -X PATCH "${COOLIFY_URL}/api/v1/applications/${APP_UUID}" \
+                -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+                -H "Accept: application/json" \
+                -H "Content-Type: application/json" \
+                -d "{\"docker_registry_image_name\":\"${IMAGE}\",\"docker_registry_image_tag\":\"${PREV_TAG}\"}"
+              curl -fsS -X POST "${COOLIFY_URL}/api/v1/deploy" \
+                -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+                -H "Accept: application/json" \
+                -H "Content-Type: application/json" \
+                -d "{\"uuid\":\"${APP_UUID}\",\"force\":true}"
+            else
+              echo "Health poll failed for ${APP_NAME}; rollback is impossible (previous docker_registry_image_tag is empty)"
+            fi
+            exit 1
+          fi
