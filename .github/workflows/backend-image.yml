@@ -39,34 +39,10 @@ permissions:
   contents: read
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      image: ${{ steps.filter.outputs.image }}
-    steps:
-      - uses: actions/checkout@v7
-
-      - uses: dorny/paths-filter@v4
-        id: filter
-        with:
-          filters: |
-            image:
-              - 'apps/backend/**'
-              - 'packages/tax-engine/**'
-              - 'apps/backend/Dockerfile'
-              - 'package.json'
-              - 'pnpm-lock.yaml'
-              - 'pnpm-workspace.yaml'
-              - '.npmrc'
-              - '.dockerignore'
-              - '.github/workflows/backend-image.yml'
-
   build:
     concurrency:
       group: backend-image-build-${{ github.ref }}
       cancel-in-progress: true
-    needs: changes
-    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.image == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -128,7 +104,6 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.image.outputs.sha_tag }}-worker
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=clared-backend
-          cache-to: type=gha,scope=clared-backend,mode=max
 
   deploy:
     needs: build
