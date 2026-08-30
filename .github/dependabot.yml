@@ -87,6 +87,11 @@ updates:
     commit-message:
       prefix: "chore"
       include: scope
+    # Node 24 LTS lock: major bumps (25+) need explicit upgrade validation (corepack, Prisma, Nest).
+    ignore:
+      - dependency-name: node
+        versions:
+          - ">=25"
 
   - package-ecosystem: docker-compose
     directory: /
