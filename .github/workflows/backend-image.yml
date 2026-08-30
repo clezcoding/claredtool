@@ -124,28 +124,34 @@ jobs:
     environment: production
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Skip migrate when DATABASE_URL is unset
+        if: ${{ env.DATABASE_URL == '' }}
+        run: |
+          echo "No GitHub Environment production DATABASE_URL."
+          echo "Coolify Postgres uses Docker-internal DNS; GitHub-hosted runners cannot reach it."
+          echo "API image CMD still runs prisma migrate deploy (single replica)."
 
-      - uses: pnpm/action-setup@ff378ebe6b225b0680b81c1ad4498ae0d1d3a5e3 # v6.0.10
+      - if: ${{ env.DATABASE_URL != '' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - if: ${{ env.DATABASE_URL != '' }}
+        uses: pnpm/action-setup@ff378ebe6b225b0680b81c1ad4498ae0d1d3a5e3 # v6.0.10
+
+      - if: ${{ env.DATABASE_URL != '' }}
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - if: ${{ env.DATABASE_URL != '' }}
+        run: pnpm install --frozen-lockfile
 
       - name: Apply Prisma migrations
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          set -euo pipefail
-          if [ -z "${DATABASE_URL}" ]; then
-            echo "DATABASE_URL is required (GitHub Environment production secret). Failing closed."
-            exit 1
-          fi
-          pnpm --filter ./apps/backend exec prisma migrate deploy
+        if: ${{ env.DATABASE_URL != '' }}
+        run: pnpm --filter ./apps/backend exec prisma migrate deploy
 
   deploy:
     needs: [build, migrate]
