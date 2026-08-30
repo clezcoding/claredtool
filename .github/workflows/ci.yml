@@ -14,6 +14,7 @@ concurrency:
 
 jobs:
   changes:
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -43,6 +44,7 @@ jobs:
       shared: ${{ steps.filter.outputs.shared }}
 
   lint:
+    timeout-minutes: 15
     needs: changes
     if: |
       github.ref == 'refs/heads/main' ||
@@ -66,12 +68,13 @@ jobs:
       - run: pnpm --filter ./apps/desktop build
 
   desktop-test:
+    timeout-minutes: 15
     needs: changes
     if: |
       github.ref == 'refs/heads/main' ||
       needs.changes.outputs.desktop == 'true' ||
       needs.changes.outputs.shared == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -107,6 +110,7 @@ jobs:
       - run: pnpm --filter ./apps/desktop test
 
   backend-unit:
+    timeout-minutes: 15
     needs: changes
     if: |
       github.ref == 'refs/heads/main' ||
@@ -141,6 +145,7 @@ jobs:
       - run: pnpm --filter @clared/tax-engine test
 
   backend-e2e:
+    timeout-minutes: 20
     needs: changes
     if: |
       github.ref == 'refs/heads/main' ||
@@ -193,6 +198,7 @@ jobs:
       - run: pnpm --filter ./apps/backend test:e2e
 
   ci:
+    timeout-minutes: 5
     needs: [changes, lint, desktop-test, backend-unit, backend-e2e]
     if: always()
     runs-on: ubuntu-latest

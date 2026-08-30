@@ -6,8 +6,11 @@
 
 ## Test plan
 
-- [ ] `pnpm --filter ./apps/desktop test` (or relevant check) is green
-- [ ] UI/behavior checked where this PR touches the desktop app
+- [ ] Unit and e2e tests are green for affected packages
+- [ ] Production build of the affected app succeeds
+- [ ] Prisma migrate/schema checked if schema or migrations changed
+- [ ] Desktop/UI checks if `apps/desktop` or `packages/ui` changed
+- [ ] Deploy/infra checks if workflows, Dockerfile, or compose changed
 
 ## Merge
 

@@ -34,6 +34,7 @@ permissions:
 
 jobs:
   tauri:
+    timeout-minutes: 90
     # cancel-in-progress: false for v* tags and workflow_dispatch (F-E2)
     concurrency:
       group: desktop-tauri-${{ startsWith(github.ref, 'refs/tags/v') && 'production' || (github.event_name == 'workflow_dispatch' && 'manual' || 'staging') }}-${{ github.ref }}-${{ matrix.os }}
@@ -112,6 +113,7 @@ jobs:
           if-no-files-found: error
 
   publish-faynosync:
+    timeout-minutes: 20
     # cancel-in-progress: false for v* tags and workflow_dispatch (F-E2)
     concurrency:
       group: desktop-publish-${{ startsWith(github.ref, 'refs/tags/v') && 'production' || (github.event_name == 'workflow_dispatch' && 'manual' || 'staging') }}-${{ github.ref }}
@@ -148,8 +150,16 @@ jobs:
       - name: Read app version
         id: meta
         run: |
+          set -euo pipefail
           VERSION=$(node -p "require('./apps/desktop/src-tauri/tauri.conf.json').version")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            TAG_VERSION="${GITHUB_REF_NAME#v}"
+            if [ "$TAG_VERSION" != "$VERSION" ]; then
+              echo "v* tag ${GITHUB_REF_NAME} (without leading v: ${TAG_VERSION}) disagrees with tauri.conf.json version ${VERSION}"
+              exit 1
+            fi
+          fi
 
       - name: FaynoSync whoami (CI token preflight)
         env:
@@ -163,10 +173,29 @@ jobs:
           FAYNOSYNC_CI_TOKEN: ${{ secrets.FAYNOSYNC_CI_TOKEN }}
         run: |
           set -euo pipefail
-          MAC_FILE=$(find artifacts -name '*.app.tar.gz' -type f | head -1)
-          MAC_SIG_FILE=$(find artifacts -name '*.app.tar.gz.sig' -type f | head -1)
-          test -n "$MAC_FILE"
-          test -n "$MAC_SIG_FILE"
+          mapfile -t MAC_FILES < <(find artifacts -type f -name '*.app.tar.gz' ! -name '*.sig' | sort)
+          if [ "${#MAC_FILES[@]}" -ne 1 ]; then
+            echo "expected exactly one macOS updater artifact (.app.tar.gz), found ${#MAC_FILES[@]}"
+            printf '%s\n' "${MAC_FILES[@]}"
+            exit 1
+          fi
+          MAC_FILE="${MAC_FILES[0]}"
+          MAC_SIG_FILE="${MAC_FILE}.sig"
+          test -f "$MAC_SIG_FILE"
+          BASE=$(basename "$MAC_FILE")
+          VERSION="${{ steps.meta.outputs.version }}"
+          case "$BASE" in
+            *"$VERSION"*) ;;
+            *) echo "basename ${BASE} missing version ${VERSION}"; exit 1 ;;
+          esac
+          case "$BASE" in
+            *aarch64*) ;;
+            *) echo "basename ${BASE} missing arch aarch64"; exit 1 ;;
+          esac
+          case "$BASE" in
+            *.app.tar.gz) ;;
+            *) echo "basename ${BASE} missing darwin platform cue .app.tar.gz"; exit 1 ;;
+          esac
           SIG=$(tr -d '\n' < "$MAC_SIG_FILE")
           DATA=$(jq -nc \
             --arg version "${{ steps.meta.outputs.version }}" \
@@ -195,10 +224,29 @@ jobs:
           FAYNOSYNC_CI_TOKEN: ${{ secrets.FAYNOSYNC_CI_TOKEN }}
         run: |
           set -euo pipefail
-          WIN_FILE=$(find artifacts -path '*/nsis/*.exe' -type f ! -name '*.sig' | head -1)
-          WIN_SIG_FILE=$(find artifacts -path '*/nsis/*.exe.sig' -type f | head -1)
-          test -n "$WIN_FILE"
-          test -n "$WIN_SIG_FILE"
+          mapfile -t WIN_FILES < <(find artifacts -type f -path '*/nsis/*.exe' ! -name '*.sig' | sort)
+          if [ "${#WIN_FILES[@]}" -ne 1 ]; then
+            echo "expected exactly one Windows NSIS updater artifact (.exe), found ${#WIN_FILES[@]}"
+            printf '%s\n' "${WIN_FILES[@]}"
+            exit 1
+          fi
+          WIN_FILE="${WIN_FILES[0]}"
+          WIN_SIG_FILE="${WIN_FILE}.sig"
+          test -f "$WIN_SIG_FILE"
+          BASE=$(basename "$WIN_FILE")
+          VERSION="${{ steps.meta.outputs.version }}"
+          case "$BASE" in
+            *"$VERSION"*) ;;
+            *) echo "basename ${BASE} missing version ${VERSION}"; exit 1 ;;
+          esac
+          case "$BASE" in
+            *x64*) ;;
+            *) echo "basename ${BASE} missing arch x64"; exit 1 ;;
+          esac
+          case "$WIN_FILE" in
+            */nsis/*.exe) ;;
+            *) echo "path ${WIN_FILE} missing windows platform cue nsis .exe"; exit 1 ;;
+          esac
           SIG=$(tr -d '\n' < "$WIN_SIG_FILE")
           DATA=$(jq -nc \
             --arg version "${{ steps.meta.outputs.version }}" \

@@ -25,8 +25,10 @@ planning:
 documentation:
   - changed-files:
       - any-glob-to-any-file:
-          - "**/*.md"
+          - README.md
           - docs/**
+          - apps/*/README.md
+          - packages/*/README.md
 
 dependencies:
   - head-branch: ['^dependabot/']
