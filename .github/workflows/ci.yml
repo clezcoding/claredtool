@@ -27,7 +27,7 @@ jobs:
               - 'packages/ui/**'
             backend:
               - 'apps/backend/**'
-              - 'docs/clared-tax-rule-dsl-schema.json'
+              - 'packages/tax-engine/src/schema/clared-tax-rule-dsl-schema.json'
             tax-engine:
               - 'packages/tax-engine/**'
             shared:

@@ -22,7 +22,7 @@ on:
       - pnpm-workspace.yaml
       - .npmrc
       - .dockerignore
-      - docs/clared-tax-rule-dsl-schema.json
+      - packages/tax-engine/src/schema/clared-tax-rule-dsl-schema.json
       - .github/workflows/backend-image.yml
   workflow_dispatch:
     inputs:
