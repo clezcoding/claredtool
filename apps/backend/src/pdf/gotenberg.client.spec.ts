@@ -42,7 +42,9 @@ describe("convertHtmlToPdf", () => {
     process.env.GOTENBERG_URL = "http://127.0.0.1:3000";
     const html = "<html><body>café — äöü</body></html>";
     const fetchMock = jest.fn().mockResolvedValue(
-      new Response(new Uint8Array([0x25, 0x50, 0x44, 0x46]), { status: 200 }),
+      new Response(new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d]), {
+        status: 200,
+      }),
     );
     globalThis.fetch = fetchMock as unknown as typeof fetch;
 
