@@ -12,6 +12,14 @@ export class PdfService {
     if (typeof facts?.html !== "string" || !facts.html.trim()) {
       throw new EmptyHtmlError();
     }
-    return this.queue.add("html", { html: facts.html }, { jobId: crypto.randomUUID() });
+    return this.queue.add(
+      "html",
+      { html: facts.html },
+      {
+        jobId: crypto.randomUUID(),
+        removeOnComplete: { age: 86_400 },
+        removeOnFail: { age: 604_800 },
+      },
+    );
   }
 }
