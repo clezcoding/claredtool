@@ -7,6 +7,11 @@ on:
     tags: ['v*']
     paths:
       - apps/desktop/**
+      - packages/ui/**
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - .npmrc
       - .github/workflows/desktop-build.yml
   workflow_dispatch:
     inputs:
@@ -27,12 +32,12 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: desktop-build-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   tauri:
+    # cancel-in-progress: false for v* tags and workflow_dispatch (F-E2)
+    concurrency:
+      group: desktop-tauri-${{ startsWith(github.ref, 'refs/tags/v') && 'production' || (github.event_name == 'workflow_dispatch' && 'manual' || 'staging') }}-${{ github.ref }}
+      cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/v') && github.event_name != 'workflow_dispatch' }}
     strategy:
       fail-fast: false
       matrix:
@@ -55,7 +60,7 @@ jobs:
           workspaces: apps/desktop/src-tauri
           cache-on-failure: true
 
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
 
       - name: Resolve build environment
         id: build_env
@@ -104,6 +109,10 @@ jobs:
           if-no-files-found: error
 
   publish-faynosync:
+    # cancel-in-progress: false for v* tags and workflow_dispatch (F-E2)
+    concurrency:
+      group: desktop-publish-${{ startsWith(github.ref, 'refs/tags/v') && 'production' || (github.event_name == 'workflow_dispatch' && 'manual' || 'staging') }}-${{ github.ref }}
+      cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/v') && github.event_name != 'workflow_dispatch' }}
     needs: tauri
     if: >
       (github.event_name == 'workflow_dispatch' && inputs.publish == true) ||
