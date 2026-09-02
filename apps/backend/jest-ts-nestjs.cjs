@@ -8,7 +8,13 @@ const tsJest = require("ts-jest").default;
 const IMPORT_META_URL = 'require("url").pathToFileURL(__filename).href';
 
 function rewriteImportMeta(code) {
-  return code.replace(/import\.meta\.url/g, IMPORT_META_URL);
+  // Nest 12 ESM emits `const require = createRequire(import.meta.url)`. After
+  // ts-jest CJS emit that declaration collides with the wrapper `require`.
+  const withoutEsmRequire = code.replace(
+    /\bconst require\s*=/g,
+    "const createdRequire =",
+  );
+  return withoutEsmRequire.replace(/import\.meta\.url/g, IMPORT_META_URL);
 }
 
 function wrap(result) {
@@ -30,14 +36,26 @@ function createTransformer(config) {
       );
     },
     getCacheKey(src, filename, options) {
-      return `${inner.getCacheKey(src, filename, options)}:import.meta.url`;
+      return `${inner.getCacheKey(src, filename, options)}:import.meta.url:createdRequire`;
     },
     getCacheKeyAsync(src, filename, options) {
       return Promise.resolve(
         inner.getCacheKeyAsync(src, filename, options),
-      ).then((key) => `${key}:import.meta.url`);
+      ).then((key) => `${key}:import.meta.url:createdRequire`);
     },
   };
 }
 
-module.exports = { createTransformer };
+module.exports = { createTransformer, rewriteImportMeta };
+
+if (require.main === module) {
+  const out = rewriteImportMeta(
+    'const require = createRequire(import.meta.url);\ncreatedRequire;',
+  );
+  if (/\bconst require\s*=/.test(out)) {
+    throw new Error("rewrite still shadows CJS require");
+  }
+  if (!out.includes("createdRequire") || !out.includes(IMPORT_META_URL)) {
+    throw new Error("rewrite missed createdRequire or import.meta.url");
+  }
+}
