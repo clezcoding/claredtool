@@ -4,10 +4,10 @@ milestone: v1.0
 current_phase: 05
 current_phase_name: PDF, Audit & Offline Sync
 status: planning
-stopped_at: Quick 260830-7ia complete; GitHub Environment production still needs DATABASE_URL plus reviewers
-last_updated: "2026-08-30T03:40:17Z"
-last_activity: 2026-08-30
-last_activity_desc: Quick 260830-7ia complete; Phase 4 Release-Reife on fix/desktop-tauri-matrix-concurrency
+stopped_at: Quick 260902-l7q executed; Nest 12 lockstep + action-setup SHA on quick/260902-l7q-dependabot (not merged)
+last_updated: "2026-09-02T13:36:00Z"
+last_activity: 2026-09-02
+last_activity_desc: Quick 260902-l7q executed; Dependabot Nest 12 + pnpm/action-setup SHA; PRs left open
 state_head: 9c8c8b9f0249cdd79ddf544fd39491ae29f57581
 progress:
   total_phases: 10
@@ -36,7 +36,7 @@ Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
 Phase 05 (PDF, Audit & Offline Sync) — **NEXT** discuss/plan
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-08-30 - Completed quick task 260830-7ia: Audit Phase 4 Release-Reife (migrate-once, Coolify health rollback, FaynoSync exact-one)
+Last activity: 2026-09-02 - Completed quick task 260902-l7q: Land Dependabot Nest 12 lockstep + pnpm/action-setup SHA; Node 24 unchanged
 
 Progress: [███████░░░] 70%
 
@@ -229,7 +229,7 @@ Recent decisions affecting current work:
 - [Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze]: Kuma/Beszel Traefik: gzip + HTTPS redirect only — no Authentik middleware (D-05) — Monitors must stay reachable when Authentik is down
 - [Phase 04.3]: OTEL env on live GHCR API/worker; collector alias clared-otel-collector; no Grafana Telegram
 - [Phase 05]: getrandom 0.4: fill API + cargo update -p clared (ambiguous -p getrandom); action majors already SHA-pinned by #67; Node 24 unchanged; Dependabot PRs left open
-- [quick-260830-7ia]: API CMD node-only; prisma migrate deploy once in CI on GitHub Environment production; Coolify deploy health-gated with tag rollback; worker has no HTTP health FQDN
+- [quick-260902-l7q]: Nest 12 lockstep (six packages + terminus 12.0.0) + nestjs-pino ^5.0.0; Jest transformIgnorePatterns + import.meta.url rewrite; pnpm/action-setup SHA 0977fd99… ×6; Node 24 unchanged; Dependabot PRs left open
 
 ### Pending Todos
 
@@ -251,6 +251,7 @@ None yet.
 | 260830-59y | Audit Phase 3 complete: schema SSOT, Rust 1.97.1 pin, action SHA pinning | 2026-08-30 | 7927540 | [260830-59y-analysiere-audit-claredtool-findings-con](./quick/260830-59y-analysiere-audit-claredtool-findings-con/) |
 | 260830-6hk | Land open Dependabot upgrades: getrandom 0.4 fill; SHA action majors confirmed; Node 24 unchanged | 2026-08-30 | 9c8c8b9 | [260830-6hk-resolve-all-open-dependabot-prs-by-actua](./quick/260830-6hk-resolve-all-open-dependabot-prs-by-actua/) |
 | 260830-7ia | Audit Phase 4 Release-Reife: migrate-once, Coolify health rollback, FaynoSync exact-one, timeouts | 2026-08-30 | db78795 | [260830-7ia-implement-audit-phase-4-release-reife-fu](./quick/260830-7ia-implement-audit-phase-4-release-reife-fu/) |
+| 260902-l7q | Land Dependabot Nest 12 lockstep + pnpm/action-setup SHA; Node 24 unchanged | 2026-09-02 | 4d9dd25 | [260902-l7q-es-sind-einige-dependabot-prs-im-repo-of](./quick/260902-l7q-es-sind-einige-dependabot-prs-im-repo-of/) |
 
 ### Roadmap Evolution
 
@@ -269,8 +270,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-30T03:40:17Z
-Stopped at: Quick 260830-7ia complete; waiting on PR CI then merge
+Last session: 2026-09-02T13:36:00Z
+Stopped at: Quick 260902-l7q executed; waiting on orchestrator push/PR/CI/merge
 Resume file: None
 
 ## Rebuild Log
