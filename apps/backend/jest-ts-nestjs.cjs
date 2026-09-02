@@ -15,6 +15,8 @@ function rewriteImportMeta(code) {
     "const createdRequire =",
   );
   return withoutEsmRequire
+    .replace(/import\.meta\.dirname/g, "__dirname")
+    .replace(/import\.meta\.filename/g, "__filename")
     .replace(/import\.meta\.resolve\s*\(/g, "require.resolve(")
     .replace(/import\.meta\.url/g, IMPORT_META_URL);
 }
@@ -38,12 +40,12 @@ function createTransformer(config) {
       );
     },
     getCacheKey(src, filename, options) {
-      return `${inner.getCacheKey(src, filename, options)}:import.meta.url:createdRequire:resolve`;
+      return `${inner.getCacheKey(src, filename, options)}:import.meta.cjs:3`;
     },
     getCacheKeyAsync(src, filename, options) {
       return Promise.resolve(
         inner.getCacheKeyAsync(src, filename, options),
-      ).then((key) => `${key}:import.meta.url:createdRequire:resolve`);
+      ).then((key) => `${key}:import.meta.cjs:3`);
     },
   };
 }
@@ -52,15 +54,9 @@ module.exports = { createTransformer, rewriteImportMeta };
 
 if (require.main === module) {
   const out = rewriteImportMeta(
-    'const require = createRequire(import.meta.url);\nimport.meta.resolve("x");',
+    'const require = createRequire(import.meta.url);\nimport.meta.resolve("x");\nimport.meta.dirname;\nimport.meta.filename;',
   );
-  if (/\bconst require\s*=/.test(out)) {
-    throw new Error("rewrite still shadows CJS require");
-  }
-  if (out.includes("import.meta")) {
-    throw new Error("rewrite left import.meta");
-  }
-  if (!out.includes("createdRequire") || !out.includes("require.resolve(")) {
-    throw new Error("rewrite missed createdRequire or import.meta.resolve");
+  if (/\bconst require\s*=/.test(out) || out.includes("import.meta")) {
+    throw new Error("rewrite left CJS-unsafe import.meta or require shadow");
   }
 }
