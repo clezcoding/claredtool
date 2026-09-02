@@ -7,11 +7,11 @@
   "forceExit": true,
   "detectOpenHandles": false,
   "transformIgnorePatterns": [
-    "/node_modules/(?!.pnpm)(?!@nestjs/bullmq)(?!@nestjs/bull-shared)"
+    "/node_modules/(?!.pnpm)(?!@nestjs/)"
   ],
   "transform": {
     "^.+\\.(t|j)s$": [
-      "ts-jest",
+      "<rootDir>/jest-ts-nestjs.cjs",
       {
         "tsconfig": {
           "types": ["node", "jest"],
