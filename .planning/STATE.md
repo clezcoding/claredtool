@@ -256,7 +256,7 @@ None yet.
 | 260902-l7q | Land Dependabot Nest 12 lockstep + pnpm/action-setup SHA; Node 24 unchanged | 2026-09-02 | 4d9dd25 | [260902-l7q-es-sind-einige-dependabot-prs-im-repo-of](./quick/260902-l7q-es-sind-einige-dependabot-prs-im-repo-of/) |
 | 9 | Coolify general env/config check: GHCR API+Worker + all services | 2026-09-03 | 9604eea | — |
 | 260903-x8n | Implement audit Phase 5 security baseline (zizmor, gitleaks, Trivy, CodeQL, Harden-Runner audit) | 2026-09-03 | 17ab691 | [260903-x8n-implement-audit-phase-5-security-baselin](./quick/260903-x8n-implement-audit-phase-5-security-baselin/) |
-| 260904-2ix | Fix zizmor cache-poisoning #21 #22: no Actions cache in desktop-build.yml | 2026-09-04 [placeholder] [260904-2ix-fix-zizmor-cache-poisoning-alerts-21-and](./quick/260904-2ix-fix-zizmor-cache-poisoning-alerts-21-and/) |
+| 260904-2ix | Fix zizmor cache-poisoning #21 #22: no Actions cache in desktop-build.yml | 2026-09-04 | 740c6dc | [260904-2ix-fix-zizmor-cache-poisoning-alerts-21-and](./quick/260904-2ix-fix-zizmor-cache-poisoning-alerts-21-and/) |
 
 ### Roadmap Evolution
 
