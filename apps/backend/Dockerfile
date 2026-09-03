@@ -4,7 +4,11 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends openssl ca-certificates curl \
   && rm -rf /var/lib/apt/lists/*
 
-RUN corepack enable && corepack prepare pnpm@11.15.1 --activate
+# Runtime is node + pnpm. Drop the node:24-bookworm-slim npm bundle so
+# Trivy does not fail on unused HIGH brace-expansion / tar / ip-address.
+RUN corepack enable && corepack prepare pnpm@11.15.1 --activate \
+  && rm -rf /usr/local/lib/node_modules/npm \
+  && rm -f /usr/local/bin/npm /usr/local/bin/npx
 
 WORKDIR /app
 
@@ -33,6 +37,9 @@ RUN rm -f tsconfig.build.tsbuildinfo \
 
 ENV DATABASE_URL=
 ENV NODE_ENV=production
+
+# Build residue. Not a runtime path.
+RUN rm -rf /root/.cache /tmp/*
 
 RUN chown -R node:node /app
 USER node
