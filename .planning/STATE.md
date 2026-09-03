@@ -5,9 +5,9 @@ current_phase: 05
 current_phase_name: PDF, Audit & Offline Sync
 status: planning
 stopped_at: PR #90 — Coolify healthcheck + updater SSOT docs (Nest 12 already #88)
-last_updated: "2026-09-03T21:30:00.000Z"
+last_updated: "2026-09-03T22:10:00.000Z"
 last_activity: 2026-09-03
-last_activity_desc: Coolify compose healthchecks: disable wget on distroless Loki/Tempo/collector; Gotenberg curl /health healthy
+last_activity_desc: Completed quick task 260903-x8n: audit Phase 5 security baseline (zizmor, gitleaks, Trivy, CodeQL, Harden-Runner); Node 24 unchanged
 state_head: 9604eea45fa76c76ed1c142b5f812772bed3b46a
 progress:
   total_phases: 10
@@ -36,7 +36,7 @@ Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
 Phase 05 (PDF, Audit & Offline Sync) — **NEXT** discuss/plan
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-02 - Completed quick task 260902-l7q: Land Dependabot Nest 12 lockstep + pnpm/action-setup SHA; Node 24 unchanged
+Last activity: 2026-09-03 - Completed quick task 260903-x8n: Implement audit Phase 5 security baseline from docs/claredtool-phasenplan.md: zizmor.yml, gitleaks.yml, Trivy in backend-image.yml; Phase 5b CodeQL + Harden-Runner while public. Node 24 unchanged.
 
 Progress: [███████░░░] 70%
 
@@ -230,6 +230,7 @@ Recent decisions affecting current work:
 - [Phase 04.3]: OTEL env on live GHCR API/worker; collector alias clared-otel-collector; no Grafana Telegram
 - [Phase 05]: getrandom 0.4: fill API + cargo update -p clared (ambiguous -p getrandom); action majors already SHA-pinned by #67; Node 24 unchanged; Dependabot PRs left open
 - [quick-260902-l7q]: Nest 12 lockstep (six packages + terminus 12.0.0) + nestjs-pino ^5.0.0; Jest transformIgnorePatterns + import.meta.url rewrite; pnpm/action-setup SHA 0977fd99… ×6; Node 24 unchanged; Dependabot PRs left open
+- [quick-260903-x8n]: Audit Phase 5+5b YAML — zizmor/gitleaks/CodeQL SHA-pinned; Trivy both GHCR tags after both pushes; Harden Runner audit first uses ×11; Node 24 unchanged; Security-tab triage leftover (D-10)
 - [Phase 04.3]: Coolify healthchecks 2026-09-03 — Loki/Tempo/collector `healthcheck.disable` (distroless/scratch, no wget). Gotenberg `curl -fsS /health` → `running:healthy`. Worker stays no-HTTP. Kaneo #87.
 
 ### Pending Todos
@@ -254,6 +255,7 @@ None yet.
 | 260830-7ia | Audit Phase 4 Release-Reife: migrate-once, Coolify health rollback, FaynoSync exact-one, timeouts | 2026-08-30 | db78795 | [260830-7ia-implement-audit-phase-4-release-reife-fu](./quick/260830-7ia-implement-audit-phase-4-release-reife-fu/) |
 | 260902-l7q | Land Dependabot Nest 12 lockstep + pnpm/action-setup SHA; Node 24 unchanged | 2026-09-02 | 4d9dd25 | [260902-l7q-es-sind-einige-dependabot-prs-im-repo-of](./quick/260902-l7q-es-sind-einige-dependabot-prs-im-repo-of/) |
 | 9 | Coolify general env/config check: GHCR API+Worker + all services | 2026-09-03 | 9604eea | — |
+| 260903-x8n | Implement audit Phase 5 security baseline (zizmor, gitleaks, Trivy, CodeQL, Harden-Runner audit) | 2026-09-03 | 17ab691 | [260903-x8n-implement-audit-phase-5-security-baselin](./quick/260903-x8n-implement-audit-phase-5-security-baselin/) |
 
 ### Roadmap Evolution
 
