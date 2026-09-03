@@ -4,8 +4,8 @@ milestone: v1.0
 current_phase: 05
 current_phase_name: PDF, Audit & Offline Sync
 status: planning
-stopped_at: Quick 260902-l7q executed; Nest 12 lockstep + action-setup SHA on quick/260902-l7q-dependabot (not merged)
-last_updated: "2026-09-03T21:16:00.000Z"
+stopped_at: PR #90 — Coolify healthcheck + updater SSOT docs (Nest 12 already #88)
+last_updated: "2026-09-03T21:30:00.000Z"
 last_activity: 2026-09-03
 last_activity_desc: Coolify compose healthchecks: disable wget on distroless Loki/Tempo/collector; Gotenberg curl /health healthy
 state_head: 9604eea45fa76c76ed1c142b5f812772bed3b46a
