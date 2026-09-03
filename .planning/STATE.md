@@ -4,10 +4,10 @@ milestone: v1.0
 current_phase: 05
 current_phase_name: PDF, Audit & Offline Sync
 status: planning
-stopped_at: PR #90 — Coolify healthcheck + updater SSOT docs (Nest 12 already #88)
-last_updated: "2026-09-03T22:10:00.000Z"
-last_activity: 2026-09-03
-last_activity_desc: Completed quick task 260903-x8n: audit Phase 5 security baseline (zizmor, gitleaks, Trivy, CodeQL, Harden-Runner); Node 24 unchanged
+stopped_at: PR — zizmor cache-poisoning #21/#22 (desktop-build caches off)
+last_updated: "2026-09-04T00:00:00.000Z"
+last_activity: 2026-09-04
+last_activity_desc: Completed quick task 260904-2ix: drop Actions cache from desktop-build.yml (zizmor #21 #22); Node 24 unchanged
 state_head: 9604eea45fa76c76ed1c142b5f812772bed3b46a
 progress:
   total_phases: 10
@@ -36,7 +36,7 @@ Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
 Phase 05 (PDF, Audit & Offline Sync) — **NEXT** discuss/plan
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-03 - Completed quick task 260903-x8n: Implement audit Phase 5 security baseline from docs/claredtool-phasenplan.md: zizmor.yml, gitleaks.yml, Trivy in backend-image.yml; Phase 5b CodeQL + Harden-Runner while public. Node 24 unchanged.
+Last activity: 2026-09-04 - Completed quick task 260904-2ix: drop Actions cache from desktop-build.yml (zizmor #21 #22); Node 24 unchanged.
 
 Progress: [███████░░░] 70%
 
@@ -256,6 +256,7 @@ None yet.
 | 260902-l7q | Land Dependabot Nest 12 lockstep + pnpm/action-setup SHA; Node 24 unchanged | 2026-09-02 | 4d9dd25 | [260902-l7q-es-sind-einige-dependabot-prs-im-repo-of](./quick/260902-l7q-es-sind-einige-dependabot-prs-im-repo-of/) |
 | 9 | Coolify general env/config check: GHCR API+Worker + all services | 2026-09-03 | 9604eea | — |
 | 260903-x8n | Implement audit Phase 5 security baseline (zizmor, gitleaks, Trivy, CodeQL, Harden-Runner audit) | 2026-09-03 | 17ab691 | [260903-x8n-implement-audit-phase-5-security-baselin](./quick/260903-x8n-implement-audit-phase-5-security-baselin/) |
+| 260904-2ix | Fix zizmor cache-poisoning #21 #22: no Actions cache in desktop-build.yml | 2026-09-04 | TBD | [260904-2ix-fix-zizmor-cache-poisoning-alerts-21-and](./quick/260904-2ix-fix-zizmor-cache-poisoning-alerts-21-and/) |
 
 ### Roadmap Evolution
 
