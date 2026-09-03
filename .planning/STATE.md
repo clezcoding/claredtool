@@ -5,10 +5,10 @@ current_phase: 05
 current_phase_name: PDF, Audit & Offline Sync
 status: planning
 stopped_at: Quick 260902-l7q executed; Nest 12 lockstep + action-setup SHA on quick/260902-l7q-dependabot (not merged)
-last_updated: "2026-09-02T13:36:00Z"
-last_activity: 2026-09-02
-last_activity_desc: Quick 260902-l7q executed; Dependabot Nest 12 + pnpm/action-setup SHA; PRs left open
-state_head: 9c8c8b9f0249cdd79ddf544fd39491ae29f57581
+last_updated: "2026-09-03T21:16:00.000Z"
+last_activity: 2026-09-03
+last_activity_desc: Coolify compose healthchecks: disable wget on distroless Loki/Tempo/collector; Gotenberg curl /health healthy
+state_head: 9604eea45fa76c76ed1c142b5f812772bed3b46a
 progress:
   total_phases: 10
   completed_phases: 7
@@ -230,6 +230,7 @@ Recent decisions affecting current work:
 - [Phase 04.3]: OTEL env on live GHCR API/worker; collector alias clared-otel-collector; no Grafana Telegram
 - [Phase 05]: getrandom 0.4: fill API + cargo update -p clared (ambiguous -p getrandom); action majors already SHA-pinned by #67; Node 24 unchanged; Dependabot PRs left open
 - [quick-260902-l7q]: Nest 12 lockstep (six packages + terminus 12.0.0) + nestjs-pino ^5.0.0; Jest transformIgnorePatterns + import.meta.url rewrite; pnpm/action-setup SHA 0977fd99… ×6; Node 24 unchanged; Dependabot PRs left open
+- [Phase 04.3]: Coolify healthchecks 2026-09-03 — Loki/Tempo/collector `healthcheck.disable` (distroless/scratch, no wget). Gotenberg `curl -fsS /health` → `running:healthy`. Worker stays no-HTTP. Kaneo #87.
 
 ### Pending Todos
 
@@ -252,6 +253,7 @@ None yet.
 | 260830-6hk | Land open Dependabot upgrades: getrandom 0.4 fill; SHA action majors confirmed; Node 24 unchanged | 2026-08-30 | 9c8c8b9 | [260830-6hk-resolve-all-open-dependabot-prs-by-actua](./quick/260830-6hk-resolve-all-open-dependabot-prs-by-actua/) |
 | 260830-7ia | Audit Phase 4 Release-Reife: migrate-once, Coolify health rollback, FaynoSync exact-one, timeouts | 2026-08-30 | db78795 | [260830-7ia-implement-audit-phase-4-release-reife-fu](./quick/260830-7ia-implement-audit-phase-4-release-reife-fu/) |
 | 260902-l7q | Land Dependabot Nest 12 lockstep + pnpm/action-setup SHA; Node 24 unchanged | 2026-09-02 | 4d9dd25 | [260902-l7q-es-sind-einige-dependabot-prs-im-repo-of](./quick/260902-l7q-es-sind-einige-dependabot-prs-im-repo-of/) |
+| 9 | Coolify general env/config check: GHCR API+Worker + all services | 2026-09-03 | 9604eea | — |
 
 ### Roadmap Evolution
 
@@ -270,8 +272,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-02T13:36:00Z
-Stopped at: Quick 260902-l7q executed; waiting on orchestrator push/PR/CI/merge
+Last session: 2026-09-03T21:16:00Z
+Stopped at: Coolify healthcheck compose patched + restarted; Kaneo #87. Docs OTEL-OPS/PDF-OPS/VERIFICATION committed.
 Resume file: None
 
 ## Rebuild Log
