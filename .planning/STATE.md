@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.4
 current_phase_name: GitHub Actions Optimization
 status: executing
-stopped_at: Completed 04.4-04-PLAN.md
-last_updated: "2026-09-04T04:24:56.136Z"
+stopped_at: Completed 04.4-05-PLAN.md
+last_updated: "2026-09-04T04:31:33.921Z"
 last_activity: 2026-09-04
-last_activity_desc: Completed 04.4-04 desktop-release remainder; ready for 04.4-05
-state_head: 3a316f40c2274aa66aef04b095bf02c44e58069c
+last_activity_desc: Completed 04.4-05 Dependabot caps and nestjs-major; ready for 04.4-06
+state_head: beb838ff60ed37f644f7ccc2d5ae4f2ebbb54767
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 54
-  completed_plans: 51
+  completed_plans: 52
 milestone_name: milestone
 ---
 
@@ -31,13 +31,13 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 Status: Ready to execute
 Phase: 04.4 (GitHub Actions Optimization) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 5 of 7 (04.4-04 complete)
+Plan: 6 of 7 (04.4-05 complete)
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
-Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–04 done)
+Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–05 done)
 Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 — Completed 04.4-04 (signed desktop tags+dispatch only, GH Release, runner pins); next 04.4-05
+Last activity: 2026-09-04 — Completed 04.4-05 (Dependabot caps, monthly Actions/Docker, nestjs-major); next 04.4-06
 
 Progress: [███████░░░] 70%
 
@@ -116,6 +116,7 @@ Progress: [███████░░░] 70%
 | Phase 04.4 P02 | 5 min | 3 tasks | 2 files |
 | Phase 04.4 P03 | 5 min | 3 tasks | 5 files |
 | Phase 04.4 P04 | 4 | 3 tasks | 1 files |
+| Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de P05 | 3 min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -251,6 +252,9 @@ Recent decisions affecting current work:
 - [Phase 04.4]: Human selected proceed-drop-main; desktop-build.yml no longer signs on main (D-14)
 - [Phase 04.4]: Matrix pinned windows-2022 + macos-15; D-17 staging swap after merge (D-34)
 - [Phase 04.4]: GH Release is v* tags only; production dispatch stays FaynoSync-only (D-16)
+- [Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de]: Two atomic chore commits (caps/cadence then nestjs-major) instead of plan output single D-33 commit; linear, no squash — Executor per-task protocol and 04.4-04 precedent; D-33 still seven logical phase commits
+- [Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de]: nestjs-major applies-to version-updates before npm-patch-minor; expanded YAML lists matching existing groups — Dependabot first-match; security updates stay ungrouped; backend @nestjs/* lockstep
+- [Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de]: github-actions/docker/docker-compose monthly omit schedule.day; glib and Node ignores unchanged — Pitfall 5: day is weekly-only; D-32 keep glib >=0.19.0 and Node >=25
 
 ### Pending Todos
 
@@ -296,8 +300,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-04T04:24:55.986Z
-Stopped at: Completed 04.4-04-PLAN.md
+Last session: 2026-09-04T04:31:08.183Z
+Stopped at: Completed 04.4-05-PLAN.md
 Resume file: None
 
 ## Rebuild Log

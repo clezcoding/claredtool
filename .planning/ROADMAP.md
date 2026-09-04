@@ -182,7 +182,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Required check still named exactly `ci`; no `pull_request_target`; no `workflow_run` for desktop/backend deploy; SHA-pinned actions; `package-manager-cache: false` on signed desktop jobs
   5. Validation table from the brief covered (docs-only, draft, JS/TS, Rust, backend, workflow-YAML, `v*` tag, staging dispatch)
 
-**Plans:** 4/7 plans executed
+**Plans:** 5/7 plans executed
 **UI hint**: no (CI/CD only)
 
 Plans:
@@ -205,7 +205,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4)*
 
-- [ ] 04.4-05-PLAN.md — Dependabot caps, monthly Actions/Docker, Nest major group (D-33 commit 5)
+- [x] 04.4-05-PLAN.md — Dependabot caps, monthly Actions/Docker, Nest major group (D-33 commit 5)
 
 **Wave 6** *(blocked on Wave 5; D-24 human gate)*
 
@@ -362,7 +362,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 →
 | 4.1 Stitch→React 5-route conversion | 7/7 | Complete    | 2026-08-28 |
 | 4.2 Desktop Platform Hardening | 8/8 | Complete    | 2026-08-28 |
 | 4.3 Infra & Prep for PDF/Offline/Audit | 8/8 | Complete    | 2026-08-30 |
-| 4.4 GitHub Actions Optimization | 4/7 | In Progress|  |
+| 4.4 GitHub Actions Optimization | 5/7 | In Progress|  |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |
 | 6. Mockup 1:1 Fidelity Closure | 0/? | Not started | - |
