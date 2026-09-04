@@ -1,19 +1,19 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 05
-current_phase_name: PDF, Audit & Offline Sync
-status: planning
-stopped_at: PR — audit Phase 6 Squawk + SBOM/cosign (Node 24)
-last_updated: "2026-09-04T01:10:00.000Z"
+current_phase: 04.4
+current_phase_name: GitHub Actions Optimization
+status: verifying
+stopped_at: Completed 04.4-07-PLAN.md
+last_updated: "2026-09-04T04:57:54.461Z"
 last_activity: 2026-09-04
-last_activity_desc: Completed quick task 260904-458: audit Phase 6 Squawk/SBOM/cosign; Node 24 unchanged
-state_head: 9604eea45fa76c76ed1c142b5f812772bed3b46a
+last_activity_desc: Completed 04.4-06 backend-image SHA-only tags, migrate job gone, ordered deploy; ready for 04.4-07
+state_head: 54288bc69893c122a5ba40a4e7d651b4d9ef2e91
 progress:
-  total_phases: 10
+  total_phases: 11
   completed_phases: 7
-  total_plans: 47
-  completed_plans: 47
+  total_plans: 54
+  completed_plans: 54
 milestone_name: milestone
 ---
 
@@ -24,19 +24,20 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-30)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 05 — PDF, Audit & Offline Sync
+**Current focus:** Phase 04.4 — GitHub Actions Optimization
 
 ## Current Position
 
-Status: Ready to plan
-Phase: 05 — PDF, Audit & Offline Sync
+Status: Phase complete — ready for verification
+Phase: 04.4 (GitHub Actions Optimization) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: Not started
+Plan: 7 of 7 (04.4-06 complete)
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
-Phase 05 (PDF, Audit & Offline Sync) — **NEXT** discuss/plan
+Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–06 done)
+Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
-Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 - Completed quick task 260904-458: audit Phase 6 Squawk/SBOM/cosign; Node 24 unchanged.
+Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
+Last activity: 2026-09-04 — Completed 04.4-06 (drop GHCR latest, delete migrate job, collapse deploy, Bake abort); next 04.4-07
 
 Progress: [███████░░░] 70%
 
@@ -111,6 +112,13 @@ Progress: [███████░░░] 70%
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P06 | 7 min | 3 tasks | 1 files |
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P07 | 90min | 3 tasks | 1 files |
 | Phase 04.3 P08 | 19h wall | 3 tasks | 3 files |
+| Phase 04.4 P01 | 8 min | 3 tasks | 5 files |
+| Phase 04.4 P02 | 5 min | 3 tasks | 2 files |
+| Phase 04.4 P03 | 5 min | 3 tasks | 5 files |
+| Phase 04.4 P04 | 4 | 3 tasks | 1 files |
+| Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de P05 | 3 min | 2 tasks | 1 files |
+| Phase 04.4 P06 | 4 min | 3 tasks | 2 files |
+| Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de P07 | 8 min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -233,6 +241,29 @@ Recent decisions affecting current work:
 - [quick-260903-x8n]: Audit Phase 5+5b YAML — zizmor/gitleaks/CodeQL SHA-pinned; Trivy both GHCR tags after both pushes; Harden Runner audit first uses ×11; Node 24 unchanged; Security-tab triage leftover (D-10)
 - [quick-260904-458]: Audit Phase 6 YAML — squawk-cli 2.64.0 on Node 24 (not composite action Node 20); Syft SBOM + keyless cosign after Trivy; buildx provenance/sbom stay false; /health/ready live 200; Node 24 unchanged
 - [Phase 04.3]: Coolify healthchecks 2026-09-03 — Loki/Tempo/collector `healthcheck.disable` (distroless/scratch, no wget). Gotenberg `curl -fsS /health` → `running:healthy`. Worker stays no-HTTP. Kaneo #87.
+- [Phase 04.4]: Wave 0 rebase onto origin/main (no merge commit) so D-33 stays seven linear commits
+- [Phase 04.4]: run-name format strings omit # because GitHub expressions treat # as a comment
+- [Phase 04.4]: Plan 01 keeps origin ci.yml job names; desktop-web/backend-test split waits for 04.4-02
+- [Phase 04.4]: Create setup-pnpm-ci because three unsigned twins remain (desktop-web, backend-test, squawk) — D-30/BRIEF-2.4: extract only if ≥2 identical Node 24 + pnpm cache setups remain after the split.
+- [Phase 04.4]: desktop-rust has no pnpm/Node; build.rs is serde_json only — Local cargo path reads tauri.conf.json via serde_json; no Node in build.rs.
+- [Phase 04.4]: backend-test timeout-minutes 30 so sequential unit+e2e cannot inherit the old 15/20 split budgets — Consolidated job runs origin unit then e2e; 15 or 20 would be a false timeout.
+- [Phase 04.4]: gitleaks-action does not write workspace SARIF; CLI is zricethezav/gitleaks:v8.30.1 digest plus upload-sarif if: always() — Official gitleaks-action only uploads a SARIF artifact. gitleaks/gitleaks is not a public Docker Hub image. Job fail stays the merge gate; SARIF still needs to land when the scan fails (D-10, Pitfall 7).
+- [Phase 04.4]: A2 Actionlint 1.7.12 index digest unchanged from RESEARCH — docker buildx imagetools inspect rhysd/actionlint:1.7.12 still sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+- [Phase 04.4]: CodeQL JS/TS and Rust use build-mode none; drafts skip analyze; schedule/dispatch both languages — GitHub compiled-languages docs list None as default-setup for Rust. Revert analyze-rust to autobuild only if a scheduled run is empty.
+- [Phase 04.4]: D-09 gitleaks required check and D-12 Secret Scanning stay founder-after-merge — Plan 03 must not call GitHub Branch Protection, Environments, or Secret Scanning APIs (D-06, D-09, D-12).
+- [Phase 04.4]: Human selected proceed-drop-main; desktop-build.yml no longer signs on main (D-14)
+- [Phase 04.4]: Matrix pinned windows-2022 + macos-15; D-17 staging swap after merge (D-34)
+- [Phase 04.4]: GH Release is v* tags only; production dispatch stays FaynoSync-only (D-16)
+- [Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de]: Two atomic chore commits (caps/cadence then nestjs-major) instead of plan output single D-33 commit; linear, no squash — Executor per-task protocol and 04.4-04 precedent; D-33 still seven logical phase commits
+- [Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de]: nestjs-major applies-to version-updates before npm-patch-minor; expanded YAML lists matching existing groups — Dependabot first-match; security updates stay ungrouped; backend @nestjs/* lockstep
+- [Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de]: github-actions/docker/docker-compose monthly omit schedule.day; glib and Node ignores unchanged — Pitfall 5: day is weekly-only; D-32 keep glib >=0.19.0 and Node >=25
+- [Phase 04.4]: Human selected proceed-drop-latest (locked D-24); type=raw latest removed from metadata-action
+- [Phase 04.4]: Bake aborted (A5): bake-action metadata JSON would obscure DIGEST_API / DIGEST_WORKER for cosign; two origin build-push-action steps remain
+- [Phase 04.4]: Two atomic chore commits (deploy remainder, then Bake abort) instead of plan output single D-33 commit; linear, no squash
+- [Phase 04.4]: Collapsed deploy rolls back API if worker poll fails (matrix fail-fast false could leave API on the new tag)
+- [Phase 04.4]: Kept backend-image build actions: write for GHA cache-from/cache-to type=gha — docker/build-push-action GHA cache needs actions: write; dropping it would break CI cache
+- [Phase 04.4]: Three atomic 04.4-07 commits instead of one D-33 commit 7; linear no squash — Executor per-task protocol and 04.4-05/06 precedent
+- [Phase 04.4]: Dependabot cooldown default-days 7; zizmor.yml ignores sync-labels artipacked (D-36) — zizmor 1.30.0 must exit 0; cannot edit sync-labels.yml
 
 ### Pending Todos
 
@@ -266,6 +297,7 @@ None yet.
 - Phase 5.1 inserted after Phase 5: Stitch→React extended catalog (out-of-nav + P2 R-10–R-14) (URGENT)
 - Phase 04.2 inserted after Phase 4: Desktop Platform Hardening — Tauri plugins, sentry, tauri-ui batteries, updater infra (URGENT)
 - Phase 04.3 inserted after Phase 4: Infra & Prep for PDF/Offline/Audit — Gotenberg, Uptime Kuma, Beszel, OTel/Grafana, Pino, dialog/fs/sharekit/sql scaffold, BullMQ skeleton (URGENT)
+- Phase 04.4 inserted after Phase 4: GitHub Actions Optimization — CI fan-out, security workflows, desktop-release, Dependabot (URGENT)
 
 ## Deferred Items
 
@@ -277,8 +309,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-03T21:16:00Z
-Stopped at: Coolify healthcheck compose patched + restarted; Kaneo #87. Docs OTEL-OPS/PDF-OPS/VERIFICATION committed.
+Last session: 2026-09-04T04:57:54.326Z
+Stopped at: Completed 04.4-07-PLAN.md
 Resume file: None
 
 ## Rebuild Log

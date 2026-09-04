@@ -8,7 +8,9 @@ updates:
       day: monday
       time: "06:00"
       timezone: Europe/Berlin
-    open-pull-requests-limit: 10
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
     labels:
       - dependencies
       - npm
@@ -16,6 +18,12 @@ updates:
       prefix: "chore"
       include: scope
     groups:
+      nestjs-major:
+        applies-to: version-updates
+        patterns:
+          - "@nestjs/*"
+        update-types:
+          - major
       npm-patch-minor:
         update-types:
           - patch
@@ -30,7 +38,9 @@ updates:
       day: monday
       time: "06:15"
       timezone: Europe/Berlin
-    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 3
     labels:
       - dependencies
       - cargo
@@ -54,11 +64,12 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "06:30"
       timezone: Europe/Berlin
-    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 3
     labels:
       - dependencies
       - github-actions
@@ -76,11 +87,12 @@ updates:
   - package-ecosystem: docker
     directory: /apps/backend
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "06:45"
       timezone: Europe/Berlin
-    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 3
     labels:
       - dependencies
       - docker
@@ -96,11 +108,12 @@ updates:
   - package-ecosystem: docker-compose
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "07:00"
       timezone: Europe/Berlin
-    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 3
     labels:
       - dependencies
       - docker

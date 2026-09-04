@@ -1,0 +1,6 @@
+# D-36: leave labeler.yml / sync-labels.yml byte-unchanged. Origin sync-labels
+# checkout has no persist-credentials; do not mutate that file in 04.4.
+rules:
+  artipacked:
+    ignore:
+      - sync-labels.yml

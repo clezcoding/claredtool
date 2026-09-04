@@ -1,15 +1,17 @@
 name: ci
+run-name: ${{ github.event_name == 'pull_request' && format('CI · {0} · PR {1} · {2}', github.event_name, github.event.pull_request.number, github.head_ref) || format('CI · {0} · {1}', github.event_name, github.ref_name) }}
 
 on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -23,14 +25,26 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
           filters: |
-            desktop:
-              - 'apps/desktop/**'
+            desktop-web:
+              - 'apps/desktop/src/**'
+              - 'apps/desktop/index.html'
+              - 'apps/desktop/package.json'
+              - 'apps/desktop/vite.config.ts'
+              - 'apps/desktop/vitest.config.ts'
+              - 'apps/desktop/tsconfig.json'
+              - 'apps/desktop/tsconfig.node.json'
+              - 'apps/desktop/scripts/**'
               - 'packages/ui/**'
+            desktop-rust:
+              - 'apps/desktop/src-tauri/**'
+              - 'apps/desktop/src-tauri/rust-toolchain.toml'
             backend:
               - 'apps/backend/**'
               - 'packages/tax-engine/src/schema/clared-tax-rule-dsl-schema.json'
@@ -43,18 +57,18 @@ jobs:
               - '.npmrc'
               - '.github/workflows/ci.yml'
     outputs:
-      desktop: ${{ steps.filter.outputs.desktop }}
+      desktop-web: ${{ steps.filter.outputs.desktop-web }}
+      desktop-rust: ${{ steps.filter.outputs.desktop-rust }}
       backend: ${{ steps.filter.outputs.backend }}
       tax-engine: ${{ steps.filter.outputs.tax-engine }}
       shared: ${{ steps.filter.outputs.shared }}
 
-  lint:
+  desktop-web:
     timeout-minutes: 15
     needs: changes
     if: |
-      github.ref == 'refs/heads/main' ||
-      needs.changes.outputs.desktop == 'true' ||
-      needs.changes.outputs.shared == 'true'
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (needs.changes.outputs.desktop-web == 'true' || needs.changes.outputs.shared == 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
@@ -63,27 +77,36 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 24
-          cache: pnpm
+          persist-credentials: false
 
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/setup-pnpm-ci # zizmor: ignore[self-repository]
+
+      # @clared/ui must be a selected installer: `desktop...` links the
+      # workspace package but does not write packages/ui/node_modules, and
+      # tsc follows source exports from there.
+      - run: pnpm install --frozen-lockfile --filter ./apps/desktop... --filter @clared/ui
 
       - run: pnpm --filter ./apps/desktop exec tsc --noEmit
 
+      - run: pnpm --filter ./apps/desktop exec vitest run --reporter=default --reporter=junit --outputFile=junit.xml
+
+      - name: Upload Vitest JUnit
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: desktop-web-junit
+          path: apps/desktop/junit.xml
+          retention-days: 5
+
       - run: pnpm --filter ./apps/desktop build
 
-  desktop-test:
+  desktop-rust:
     timeout-minutes: 15
     needs: changes
     if: |
-      github.ref == 'refs/heads/main' ||
-      needs.changes.outputs.desktop == 'true' ||
-      needs.changes.outputs.shared == 'true'
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (needs.changes.outputs.desktop-rust == 'true' || needs.changes.outputs.shared == 'true')
     runs-on: ubuntu-24.04
     steps:
       - name: Harden Runner
@@ -92,6 +115,8 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install Tauri Linux dependencies
         run: |
@@ -107,7 +132,7 @@ jobs:
           echo "apt-get failed after 3 attempts"
           exit 1
 
-      - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # master
+      - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # v1
         with:
           toolchain: "1.97.1"
           components: rustfmt, clippy
@@ -116,75 +141,23 @@ jobs:
         with:
           workspaces: apps/desktop/src-tauri
 
-      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
       - run: cargo fmt --check --manifest-path apps/desktop/src-tauri/Cargo.toml
 
       - run: cargo clippy --locked --manifest-path apps/desktop/src-tauri/Cargo.toml -- -D warnings
 
       - run: cargo test --locked --manifest-path apps/desktop/src-tauri/Cargo.toml
 
-      - run: pnpm --filter ./apps/desktop test
-
-  backend-unit:
-    timeout-minutes: 15
+  backend-test:
+    timeout-minutes: 30
     needs: changes
     if: |
-      github.ref == 'refs/heads/main' ||
-      needs.changes.outputs.backend == 'true' ||
-      needs.changes.outputs.shared == 'true' ||
-      needs.changes.outputs.tax-engine == 'true'
-    runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: postgresql://prisma-test:unused@127.0.0.1:5432/clared
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - run: pnpm --filter @clared/tax-engine build
-
-      - run: pnpm --filter ./apps/backend exec prisma generate
-
-      - run: pnpm --filter ./apps/backend exec prisma validate
-
-      - run: pnpm --filter ./apps/backend exec nest build
-
-      - run: pnpm --filter ./apps/backend test
-
-      - run: pnpm --filter @clared/tax-engine test
-
-  backend-e2e:
-    timeout-minutes: 20
-    needs: changes
-    if: |
-      github.ref == 'refs/heads/main' ||
-      needs.changes.outputs.backend == 'true' ||
-      needs.changes.outputs.shared == 'true' ||
-      needs.changes.outputs.tax-engine == 'true'
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.tax-engine == 'true')
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16-alpine
+        # postgres:16-alpine — index digest re-inspected 2026-09-04 (A3)
+        image: postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
         env:
           POSTGRES_DB: clared
           POSTGRES_USER: prisma-test
@@ -197,7 +170,8 @@ jobs:
           --health-timeout 5s
           --health-retries 5
       redis:
-        image: redis:7-alpine
+        # redis:7-alpine — index digest re-inspected 2026-09-04 (A3)
+        image: redis:7-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
         ports:
           - 6379:6379
         options: >-
@@ -215,21 +189,30 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 24
-          cache: pnpm
+          persist-credentials: false
 
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/setup-pnpm-ci # zizmor: ignore[self-repository]
+
+      - run: pnpm install --frozen-lockfile --filter @clared/tax-engine... --filter ./apps/backend...
 
       - run: pnpm --filter @clared/tax-engine build
 
+      - run: pnpm --filter ./apps/backend exec prisma generate
+
+      - run: pnpm --filter ./apps/backend exec prisma validate
+
+      - run: pnpm --filter ./apps/backend exec nest build
+
+      # pnpm 11 inserts `--` before extra `run` args (`jest -- --reporters`
+      # then matches no tests). `exec` passes flags through.
+      - run: pnpm --filter ./apps/backend exec jest --reporters=default --reporters=github-actions
+
+      - run: pnpm --filter @clared/tax-engine exec jest --reporters=default --reporters=github-actions
+
       - run: pnpm --filter ./apps/backend exec prisma migrate deploy
 
-      - run: pnpm --filter ./apps/backend test:e2e
+      - run: pnpm --filter ./apps/backend exec jest --config ./test/jest-e2e.json --reporters=default --reporters=github-actions
 
   # G5: squawk-cli on Node 24. The GitHub composite action (v2.1.0)
   # hardcodes setup-node node-version 20 — do not uses it.
@@ -238,14 +221,13 @@ jobs:
     timeout-minutes: 15
     needs: changes
     if: |
-      github.ref == 'refs/heads/main' ||
-      needs.changes.outputs.backend == 'true' ||
-      needs.changes.outputs.shared == 'true' ||
-      needs.changes.outputs.tax-engine == 'true'
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.tax-engine == 'true')
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16-alpine
+        # postgres:16-alpine — index digest re-inspected 2026-09-04 (A3)
+        image: postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
         env:
           POSTGRES_DB: clared
           POSTGRES_USER: prisma-test
@@ -269,16 +251,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 24
-          cache: pnpm
+      - uses: ./.github/actions/setup-pnpm-ci # zizmor: ignore[self-repository]
 
       - run: pnpm install --frozen-lockfile
 
       - name: Install squawk-cli
+        # zizmor: ignore[adhoc-packages] — Plan 03: squawk-cli@2.64.0 npm-global, not a lockfile dep
         run: npm install -g squawk-cli@2.64.0
 
       - name: Lint committed Prisma migrations
@@ -311,7 +289,7 @@ jobs:
 
   ci:
     timeout-minutes: 5
-    needs: [changes, lint, desktop-test, backend-unit, backend-e2e, squawk]
+    needs: [changes, desktop-web, desktop-rust, backend-test, squawk]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -321,7 +299,33 @@ jobs:
           egress-policy: audit
 
       - name: Check job results
+        env:
+          AREA_DESKTOP_WEB: ${{ needs.changes.outputs.desktop-web }}
+          AREA_DESKTOP_RUST: ${{ needs.changes.outputs.desktop-rust }}
+          AREA_BACKEND: ${{ needs.changes.outputs.backend }}
+          AREA_SHARED: ${{ needs.changes.outputs.shared }}
+          AREA_TAX_ENGINE: ${{ needs.changes.outputs.tax-engine }}
+          RES_CHANGES: ${{ needs.changes.result }}
+          RES_DESKTOP_WEB: ${{ needs.desktop-web.result }}
+          RES_DESKTOP_RUST: ${{ needs.desktop-rust.result }}
+          RES_BACKEND_TEST: ${{ needs.backend-test.result }}
+          RES_SQUAWK: ${{ needs.squawk.result }}
         run: |
+          {
+            echo "## CI"
+            echo "### Changed areas"
+            echo "- desktop-web: ${AREA_DESKTOP_WEB}"
+            echo "- desktop-rust: ${AREA_DESKTOP_RUST}"
+            echo "- backend: ${AREA_BACKEND}"
+            echo "- shared: ${AREA_SHARED}"
+            echo "- tax-engine: ${AREA_TAX_ENGINE}"
+            echo "### Job results"
+            echo "- changes: ${RES_CHANGES}"
+            echo "- desktop-web: ${RES_DESKTOP_WEB}"
+            echo "- desktop-rust: ${RES_DESKTOP_RUST}"
+            echo "- backend-test: ${RES_BACKEND_TEST}"
+            echo "- squawk: ${RES_SQUAWK}"
+          } >> "$GITHUB_STEP_SUMMARY"
           check() {
             local name="$1"
             local result="$2"
@@ -330,9 +334,8 @@ jobs:
               exit 1
             fi
           }
-          check changes "${{ needs.changes.result }}"
-          check lint "${{ needs.lint.result }}"
-          check desktop-test "${{ needs.desktop-test.result }}"
-          check backend-unit "${{ needs.backend-unit.result }}"
-          check backend-e2e "${{ needs.backend-e2e.result }}"
-          check squawk "${{ needs.squawk.result }}"
+          check changes "$RES_CHANGES"
+          check desktop-web "$RES_DESKTOP_WEB"
+          check desktop-rust "$RES_DESKTOP_RUST"
+          check backend-test "$RES_BACKEND_TEST"
+          check squawk "$RES_SQUAWK"

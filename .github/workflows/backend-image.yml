@@ -1,13 +1,13 @@
 # GHA builds Nest images; Coolify only pulls them.
-# API: default stage (CMD node dist/main.js) tag sha-<7>.
+# API: default stage (CMD prisma migrate deploy && node dist/main.js) tag sha-<7>.
 # Worker: --target worker (CMD node dist/worker.js) tag sha-<7>-worker.
 # Coolify 4.3.14 dockerimage pack ignores start_command.
-# Prisma migrate deploy runs once in the migrate job (environment production)
-# before Coolify deploy. API replicas must not race migrate at process start.
+# API container CMD is the only migrator. Multi-replica later needs exactly one
+# external migrator (brief 6.6) — do not activate.
 # Deploy job: PATCH tag + POST /deploy when vars.COOLIFY_IMAGE_DEPLOY=true.
 # Official Coolify pattern: GHCR push + deploy API (coolify.io/docs/applications/ci-cd/github/actions).
 # Vs the sample workflow: path filter, buildx GHA cache, metadata-action, immutable sha- tag,
-# one build / two deploys, linux/amd64 only.
+# one build / one ordered deploy (API then worker), linux/amd64 only.
 # TECH-DEBT: provenance and sbom stay false — Coolify cannot pull attestation
 # indexes; re-enable after a Coolify upgrade that can.
 
@@ -20,13 +20,11 @@ on:
     paths:
       - apps/backend/**
       - packages/tax-engine/**
-      - apps/backend/Dockerfile
       - package.json
       - pnpm-lock.yaml
       - pnpm-workspace.yaml
       - .npmrc
       - .dockerignore
-      - packages/tax-engine/src/schema/clared-tax-rule-dsl-schema.json
       - .github/workflows/backend-image.yml
   workflow_dispatch:
     inputs:
@@ -44,6 +42,7 @@ permissions:
 
 jobs:
   build:
+    if: github.ref == 'refs/heads/main'
     timeout-minutes: 45
     concurrency:
       group: backend-image-build-${{ github.ref }}
@@ -64,6 +63,8 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
 
@@ -81,14 +82,18 @@ jobs:
             latest=false
           tags: |
             type=sha,prefix=sha-,format=short
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-            type=ref,event=branch,enable=${{ github.ref != 'refs/heads/main' }}
 
       - id: image
+        env:
+          IMAGE_REF: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         run: |
-          echo "image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
           echo "sha_tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
+      # A5 / D-20: Bake aborted. bake-action exposes one metadata JSON blob, not
+      # named DIGEST_API / DIGEST_WORKER outputs. Feeding cosign would need extra
+      # fromJSON/jq; sha vs sha-*-worker tags stay clearer with two build-push
+      # steps (each outputs.digest). provenance/sbom stay false.
       # TECH-DEBT: GHCR attestations stay off — Coolify cannot pull
       # attestation indexes. Re-enable after a Coolify upgrade that can.
       # G8 SBOM/cosign below uses Syft + keyless sigstore, not buildx attestations.
@@ -164,6 +169,10 @@ jobs:
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
 
+      # ponytail: cosign-installer has no checksum input; the SHA-pinned action
+      # verifies the v3.0.6 release blob internally (bootstrap_linux_amd64_sha).
+      # Residual risk: compromised github.com release at job runtime — upgrade
+      # path: vendor binary or newer installer with explicit digest inputs.
       - uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
         with:
           cosign-release: v3.0.6
@@ -180,52 +189,20 @@ jobs:
           cosign sign --yes "${IMAGE}@${DIGEST_API}"
           cosign sign --yes "${IMAGE}@${DIGEST_WORKER}"
 
-  migrate:
-    needs: build
-    if: |
-      needs.build.result == 'success' &&
-      vars.COOLIFY_IMAGE_DEPLOY == 'true' &&
-      github.ref == 'refs/heads/main' &&
-      (github.event_name != 'workflow_dispatch' || inputs.deploy)
-    environment: production
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
-        with:
-          egress-policy: audit
-
-      - name: Skip migrate when DATABASE_URL is unset
-        if: ${{ env.DATABASE_URL == '' }}
+      - name: Step summary
+        if: always()
+        env:
+          IMAGE: ${{ steps.image.outputs.image }}
+          SHA_TAG: ${{ steps.image.outputs.sha_tag }}
         run: |
-          echo "No GitHub Environment production DATABASE_URL."
-          echo "Coolify Postgres uses Docker-internal DNS; GitHub-hosted runners cannot reach it."
-          echo "API image CMD still runs prisma migrate deploy (single replica)."
-
-      - if: ${{ env.DATABASE_URL != '' }}
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - if: ${{ env.DATABASE_URL != '' }}
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-
-      - if: ${{ env.DATABASE_URL != '' }}
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - if: ${{ env.DATABASE_URL != '' }}
-        run: pnpm install --frozen-lockfile
-
-      - name: Apply Prisma migrations
-        if: ${{ env.DATABASE_URL != '' }}
-        run: pnpm --filter ./apps/backend exec prisma migrate deploy
+          {
+            echo "## backend-image build"
+            echo "- API: ${IMAGE}:${SHA_TAG}"
+            echo "- worker: ${IMAGE}:${SHA_TAG}-worker"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   deploy:
-    needs: [build, migrate]
+    needs: [build]
     if: |
       needs.build.result == 'success' &&
       vars.COOLIFY_IMAGE_DEPLOY == 'true' &&
@@ -239,53 +216,104 @@ jobs:
     concurrency:
       group: coolify-nest-deploy
       cancel-in-progress: false
-    strategy:
-      fail-fast: false
-      max-parallel: 1
-      matrix:
-        app:
-          - name: clared-api
-            uuid_var: COOLIFY_APP_API
-            tag_suffix: ""
-          - name: clared-worker
-            uuid_var: COOLIFY_APP_WORKER
-            tag_suffix: "-worker"
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
 
-      - name: Pin sha tag and deploy
+      - name: Deploy API then worker
         env:
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
           COOLIFY_URL: ${{ vars.COOLIFY_URL }}
-          APP_UUID: ${{ vars[matrix.app.uuid_var] }}
-          APP_NAME: ${{ matrix.app.name }}
-          SHA_TAG: ${{ needs.build.outputs.sha_tag }}${{ matrix.app.tag_suffix }}
+          API_UUID: ${{ vars.COOLIFY_APP_API }}
+          WORKER_UUID: ${{ vars.COOLIFY_APP_WORKER }}
+          SHA_TAG: ${{ needs.build.outputs.sha_tag }}
           IMAGE: ${{ needs.build.outputs.image }}
         run: |
           set -euo pipefail
           test -n "$COOLIFY_TOKEN"
           test -n "$COOLIFY_URL"
-          test -n "$APP_UUID"
+          test -n "$API_UUID"
+          test -n "$WORKER_UUID"
           test -n "$SHA_TAG"
-          test -n "$APP_NAME"
-          APP_JSON=$(curl -fsS -X GET "${COOLIFY_URL}/api/v1/applications/${APP_UUID}" \
-            -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
-            -H "Accept: application/json")
-          PREV_TAG=$(printf '%s' "$APP_JSON" | jq -r '.docker_registry_image_tag // empty')
-          curl -fsS -X PATCH "${COOLIFY_URL}/api/v1/applications/${APP_UUID}" \
-            -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            -d "{\"docker_registry_image_name\":\"${IMAGE}\",\"docker_registry_image_tag\":\"${SHA_TAG}\"}"
-          # Coolify 4.3.14: GET /api/v1/deploy is 405; POST JSON body is the working verb.
-          curl -fsS -X POST "${COOLIFY_URL}/api/v1/deploy" \
-            -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            -d "{\"uuid\":\"${APP_UUID}\",\"force\":true}"
+          test -n "$IMAGE"
+          {
+            echo "## backend-image deploy"
+            echo "- API tag: ${SHA_TAG}"
+            echo "- worker tag: ${SHA_TAG}-worker"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          coolify_get() {
+            curl -fsS -X GET "${COOLIFY_URL}/api/v1/applications/${1}" \
+              -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+              -H "Accept: application/json"
+          }
+
+          coolify_pin() {
+            local uuid="$1" tag="$2"
+            curl -fsS -X PATCH "${COOLIFY_URL}/api/v1/applications/${uuid}" \
+              -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+              -H "Accept: application/json" \
+              -H "Content-Type: application/json" \
+              -d "{\"docker_registry_image_name\":\"${IMAGE}\",\"docker_registry_image_tag\":\"${tag}\"}"
+            # Coolify 4.3.14: GET /api/v1/deploy is 405; POST JSON body is the working verb.
+            curl -fsS -X POST "${COOLIFY_URL}/api/v1/deploy" \
+              -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+              -H "Accept: application/json" \
+              -H "Content-Type: application/json" \
+              -d "{\"uuid\":\"${uuid}\",\"force\":true}"
+          }
+
+          changed_api=0
+          changed_worker=0
+
+          rollback_changed() {
+            echo "Rolling back already-changed apps"
+            local rollback_failed=0
+            if [ "$changed_worker" = "1" ]; then
+              if [ -n "$PREV_WORKER" ]; then
+                if coolify_pin "$WORKER_UUID" "$PREV_WORKER"; then
+                  echo "- worker rollback: succeeded (${PREV_WORKER})" >> "$GITHUB_STEP_SUMMARY"
+                else
+                  echo "- worker rollback: FAILED (${PREV_WORKER})" >> "$GITHUB_STEP_SUMMARY"
+                  rollback_failed=1
+                fi
+              else
+                echo "Rollback impossible for clared-worker (previous docker_registry_image_tag is empty)"
+                echo "- worker rollback: impossible (no previous tag)" >> "$GITHUB_STEP_SUMMARY"
+                rollback_failed=1
+              fi
+            fi
+            if [ "$changed_api" = "1" ]; then
+              if [ -n "$PREV_API" ]; then
+                if coolify_pin "$API_UUID" "$PREV_API"; then
+                  echo "- API rollback: succeeded (${PREV_API})" >> "$GITHUB_STEP_SUMMARY"
+                else
+                  echo "- API rollback: FAILED (${PREV_API})" >> "$GITHUB_STEP_SUMMARY"
+                  rollback_failed=1
+                fi
+              else
+                echo "Rollback impossible for clared-api (previous docker_registry_image_tag is empty)"
+                echo "- API rollback: impossible (no previous tag)" >> "$GITHUB_STEP_SUMMARY"
+                rollback_failed=1
+              fi
+            fi
+            echo "- outcome: rollback attempted" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$rollback_failed" = "1" ]; then
+              exit 1
+            fi
+          }
+
+          API_JSON=$(coolify_get "$API_UUID")
+          WORKER_JSON=$(coolify_get "$WORKER_UUID")
+          PREV_API=$(printf '%s' "$API_JSON" | jq -r '.docker_registry_image_tag // empty')
+          PREV_WORKER=$(printf '%s' "$WORKER_JSON" | jq -r '.docker_registry_image_tag // empty')
+
+          trap rollback_changed ERR
+
+          coolify_pin "$API_UUID" "$SHA_TAG"
+          changed_api=1
 
           # F-B5 / audit 6.2: poll /health/ready 30×10s then PATCH PREV_TAG.
           # Live GET https://clared-api.puzzlessdev.online/health/ready was HTTP 200
@@ -293,44 +321,45 @@ jobs:
           # Do not add a simulate-fail input that would roll back production.
           poll_ok=0
           for _ in $(seq 1 30); do
-            if [ "$APP_NAME" = "clared-api" ]; then
-              code=$(curl -sS -o /dev/null -w "%{http_code}" \
-                "https://clared-api.puzzlessdev.online/health/ready" || true)
-              if [ "$code" = "200" ]; then
-                poll_ok=1
-                break
-              fi
-            else
-              STATUS_JSON=$(curl -fsS -X GET "${COOLIFY_URL}/api/v1/applications/${APP_UUID}" \
-                -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
-                -H "Accept: application/json" || true)
-              STATUS=$(printf '%s' "${STATUS_JSON:-}" | jq -r '.status // empty' 2>/dev/null || true)
-              STATUS_LC=$(printf '%s' "$STATUS" | tr '[:upper:]' '[:lower:]')
-              case "$STATUS_LC" in
-                *running*)
-                  poll_ok=1
-                  break
-                  ;;
-              esac
+            API_POLL_JSON=$(coolify_get "$API_UUID" || true)
+            LIVE_TAG=$(printf '%s' "${API_POLL_JSON:-}" | jq -r '.docker_registry_image_tag // empty' 2>/dev/null || true)
+            code=$(curl -sS -o /dev/null -w "%{http_code}" \
+              "https://clared-api.puzzlessdev.online/health/ready" || true)
+            if [ "$LIVE_TAG" = "$SHA_TAG" ] && [ "$code" = "200" ]; then
+              poll_ok=1
+              break
             fi
             sleep 10
           done
-
           if [ "$poll_ok" != "1" ]; then
-            if [ -n "$PREV_TAG" ]; then
-              echo "Health poll failed for ${APP_NAME}; rolling back to ${PREV_TAG}"
-              curl -fsS -X PATCH "${COOLIFY_URL}/api/v1/applications/${APP_UUID}" \
-                -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
-                -H "Accept: application/json" \
-                -H "Content-Type: application/json" \
-                -d "{\"docker_registry_image_name\":\"${IMAGE}\",\"docker_registry_image_tag\":\"${PREV_TAG}\"}"
-              curl -fsS -X POST "${COOLIFY_URL}/api/v1/deploy" \
-                -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
-                -H "Accept: application/json" \
-                -H "Content-Type: application/json" \
-                -d "{\"uuid\":\"${APP_UUID}\",\"force\":true}"
-            else
-              echo "Health poll failed for ${APP_NAME}; rollback is impossible (previous docker_registry_image_tag is empty)"
-            fi
+            echo "Health poll failed for clared-api"
+            rollback_changed
             exit 1
           fi
+
+          coolify_pin "$WORKER_UUID" "${SHA_TAG}-worker"
+          changed_worker=1
+
+          poll_ok=0
+          for _ in $(seq 1 30); do
+            STATUS_JSON=$(curl -fsS -X GET "${COOLIFY_URL}/api/v1/applications/${WORKER_UUID}" \
+              -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+              -H "Accept: application/json" || true)
+            STATUS=$(printf '%s' "${STATUS_JSON:-}" | jq -r '.status // empty' 2>/dev/null || true)
+            STATUS_LC=$(printf '%s' "$STATUS" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+            case "$STATUS_LC" in
+              running|running:healthy)
+                poll_ok=1
+                break
+                ;;
+            esac
+            sleep 10
+          done
+          if [ "$poll_ok" != "1" ]; then
+            echo "Status poll failed for clared-worker"
+            rollback_changed
+            exit 1
+          fi
+
+          trap - ERR
+          echo "- outcome: deployed" >> "$GITHUB_STEP_SUMMARY"
