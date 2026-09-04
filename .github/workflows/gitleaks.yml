@@ -15,10 +15,12 @@ permissions: {}
 
 jobs:
   gitleaks:
+    name: gitleaks
     timeout-minutes: 10
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      security-events: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -28,3 +30,17 @@ jobs:
       - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # gitleaks-action uploads a SARIF artifact, not a workspace file for code scanning.
+      - name: Write Gitleaks SARIF
+        if: always()
+        run: |
+          docker run --rm -v "$PWD:/repo" -w /repo \
+            zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f \
+            detect --source . --report-format sarif --report-path gitleaks.sarif --no-banner
+
+      - uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        if: always() && hashFiles('gitleaks.sarif') != ''
+        with:
+          category: gitleaks
+          sarif_file: gitleaks.sarif

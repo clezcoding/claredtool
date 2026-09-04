@@ -1,0 +1,3 @@
+# Clared Gitleaks config (D-11).
+# Defaults only. Allowlist entries require a proven false positive plus a comment.
+# No blanket fixture-path excludes.
