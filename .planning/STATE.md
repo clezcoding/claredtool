@@ -7,7 +7,7 @@ status: executing
 stopped_at: Completed 04.4-06-PLAN.md
 last_updated: "2026-09-04T04:44:44.880Z"
 last_activity: 2026-09-04
-last_activity_desc: Completed 04.4-05 Dependabot caps and nestjs-major; ready for 04.4-06
+last_activity_desc: Completed 04.4-06 backend-image SHA-only tags, migrate job gone, ordered deploy; ready for 04.4-07
 state_head: 13f434ff3776c60fb590986e1129955aa1629bb1
 progress:
   total_phases: 11
@@ -31,13 +31,13 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 Status: Ready to execute
 Phase: 04.4 (GitHub Actions Optimization) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 7 of 7 (04.4-05 complete)
+Plan: 7 of 7 (04.4-06 complete)
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
-Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–05 done)
+Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–06 done)
 Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 — Completed 04.4-05 (Dependabot caps, monthly Actions/Docker, nestjs-major); next 04.4-06
+Last activity: 2026-09-04 — Completed 04.4-06 (drop GHCR latest, delete migrate job, collapse deploy, Bake abort); next 04.4-07
 
 Progress: [███████░░░] 70%
 
