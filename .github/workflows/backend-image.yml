@@ -344,9 +344,9 @@ jobs:
               -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
               -H "Accept: application/json" || true)
             STATUS=$(printf '%s' "${STATUS_JSON:-}" | jq -r '.status // empty' 2>/dev/null || true)
-            STATUS_LC=$(printf '%s' "$STATUS" | tr '[:upper:]' '[:lower:]')
+            STATUS_LC=$(printf '%s' "$STATUS" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
             case "$STATUS_LC" in
-              *running*)
+              running|running:healthy)
                 poll_ok=1
                 break
                 ;;
