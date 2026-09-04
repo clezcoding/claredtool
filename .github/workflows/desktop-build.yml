@@ -276,14 +276,15 @@ jobs:
             -F "data=${DATA}")
           if [ "$HTTP_CODE" -lt 400 ]; then
             :
-          elif [ "$HTTP_CODE" = "409" ] && grep -q 'already exists' /tmp/fayno-mac.json; then
+          elif grep -qi 'already exists' /tmp/fayno-mac.json; then
             :
           else
             echo "FaynoSync upload failed HTTP ${HTTP_CODE}"
+            cat /tmp/fayno-mac.json
             exit 1
           fi
           echo "FaynoSync macOS upload HTTP ${HTTP_CODE}"
-          jq -c '{version, id}' /tmp/fayno-mac.json
+          jq -c '{version, id}' /tmp/fayno-mac.json 2>/dev/null || echo "duplicate skipped jq"
 
       - name: Upload Windows updater to FaynoSync
         env:
@@ -331,14 +332,15 @@ jobs:
             -F "data=${DATA}")
           if [ "$HTTP_CODE" -lt 400 ]; then
             :
-          elif [ "$HTTP_CODE" = "409" ] && grep -q 'already exists' /tmp/fayno-win.json; then
+          elif grep -qi 'already exists' /tmp/fayno-win.json; then
             :
           else
             echo "FaynoSync upload failed HTTP ${HTTP_CODE}"
+            cat /tmp/fayno-win.json
             exit 1
           fi
           echo "FaynoSync Windows upload HTTP ${HTTP_CODE}"
-          jq -c '{version, id}' /tmp/fayno-win.json
+          jq -c '{version, id}' /tmp/fayno-win.json 2>/dev/null || echo "duplicate skipped jq"
 
       - name: Verify FaynoSync checkVersion (macOS)
         run: |
