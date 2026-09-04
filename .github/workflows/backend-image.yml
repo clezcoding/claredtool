@@ -27,6 +27,7 @@ on:
       - .npmrc
       - .dockerignore
       - .github/workflows/backend-image.yml
+      - .github/scripts/coolify-deploy-nest.sh
   workflow_dispatch:
     inputs:
       deploy:
@@ -224,6 +225,7 @@ jobs:
         with:
           egress-policy: audit
 
+      # 04.5-04 checkpoint: extract-verbatim — fail-closed API→worker order preserved (D-03, D-04).
       - name: Deploy API then worker
         env:
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
