@@ -4,10 +4,10 @@ milestone: v1.0
 current_phase: 05
 current_phase_name: PDF, Audit & Offline Sync
 status: planning
-stopped_at: PR — zizmor cache-poisoning #21/#22 (desktop-build caches off)
-last_updated: "2026-09-04T00:00:00.000Z"
+stopped_at: PR — audit Phase 6 Squawk + SBOM/cosign (Node 24)
+last_updated: "2026-09-04T01:10:00.000Z"
 last_activity: 2026-09-04
-last_activity_desc: Completed quick task 260904-2ix: drop Actions cache from desktop-build.yml (zizmor #21 #22); Node 24 unchanged
+last_activity_desc: Completed quick task 260904-458: audit Phase 6 Squawk/SBOM/cosign; Node 24 unchanged
 state_head: 9604eea45fa76c76ed1c142b5f812772bed3b46a
 progress:
   total_phases: 10
@@ -36,7 +36,7 @@ Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
 Phase 05 (PDF, Audit & Offline Sync) — **NEXT** discuss/plan
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 - Completed quick task 260904-2ix: drop Actions cache from desktop-build.yml (zizmor #21 #22); Node 24 unchanged.
+Last activity: 2026-09-04 - Completed quick task 260904-458: audit Phase 6 Squawk/SBOM/cosign; Node 24 unchanged.
 
 Progress: [███████░░░] 70%
 
@@ -231,6 +231,7 @@ Recent decisions affecting current work:
 - [Phase 05]: getrandom 0.4: fill API + cargo update -p clared (ambiguous -p getrandom); action majors already SHA-pinned by #67; Node 24 unchanged; Dependabot PRs left open
 - [quick-260902-l7q]: Nest 12 lockstep (six packages + terminus 12.0.0) + nestjs-pino ^5.0.0; Jest transformIgnorePatterns + import.meta.url rewrite; pnpm/action-setup SHA 0977fd99… ×6; Node 24 unchanged; Dependabot PRs left open
 - [quick-260903-x8n]: Audit Phase 5+5b YAML — zizmor/gitleaks/CodeQL SHA-pinned; Trivy both GHCR tags after both pushes; Harden Runner audit first uses ×11; Node 24 unchanged; Security-tab triage leftover (D-10)
+- [quick-260904-458]: Audit Phase 6 YAML — squawk-cli 2.64.0 on Node 24 (not composite action Node 20); Syft SBOM + keyless cosign after Trivy; buildx provenance/sbom stay false; /health/ready live 200; Node 24 unchanged
 - [Phase 04.3]: Coolify healthchecks 2026-09-03 — Loki/Tempo/collector `healthcheck.disable` (distroless/scratch, no wget). Gotenberg `curl -fsS /health` → `running:healthy`. Worker stays no-HTTP. Kaneo #87.
 
 ### Pending Todos
@@ -257,6 +258,7 @@ None yet.
 | 9 | Coolify general env/config check: GHCR API+Worker + all services | 2026-09-03 | 9604eea | — |
 | 260903-x8n | Implement audit Phase 5 security baseline (zizmor, gitleaks, Trivy, CodeQL, Harden-Runner audit) | 2026-09-03 | 17ab691 | [260903-x8n-implement-audit-phase-5-security-baselin](./quick/260903-x8n-implement-audit-phase-5-security-baselin/) |
 | 260904-2ix | Fix zizmor cache-poisoning #21 #22: no Actions cache in desktop-build.yml | 2026-09-04 | 740c6dc | [260904-2ix-fix-zizmor-cache-poisoning-alerts-21-and](./quick/260904-2ix-fix-zizmor-cache-poisoning-alerts-21-and/) |
+| 260904-458 | Implement audit Phase 6: Squawk in ci.yml, verify /health/ready + PREV_TAG rollback, SBOM+cosign keyless in backend-image.yml. Node 24 unchanged. Verify Phase 5 first. | 2026-09-04 | 9f92f6a | [260904-458-implement-audit-phase-6-squawk-in-ci-yml](./quick/260904-458-implement-audit-phase-6-squawk-in-ci-yml/) |
 
 ### Roadmap Evolution
 

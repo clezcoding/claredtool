@@ -1,0 +1,10 @@
+# Already-applied Prisma migrations (2026-08-22). Rewriting them is out of
+# scope; new migration directories must still pass blocking-lock and
+# NOT-NULL-without-default rules (audit G5 / Phase 6.1).
+pg_version = "16"
+
+excluded_paths = [
+  "apps/backend/prisma/migrations/20260822014200_init/migration.sql",
+  "apps/backend/prisma/migrations/20260822155017_product_entities_invoices_tax/migration.sql",
+  "apps/backend/prisma/migrations/20260822180000_invoice_dates/migration.sql",
+]

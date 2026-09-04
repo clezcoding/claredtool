@@ -231,9 +231,87 @@ jobs:
 
       - run: pnpm --filter ./apps/backend test:e2e
 
+  # G5: squawk-cli on Node 24. The GitHub composite action (v2.1.0)
+  # hardcodes setup-node node-version 20 — do not uses it.
+  # Prisma 7: migrate deploy then diff --from-config-datasource (no shadow URL).
+  squawk:
+    timeout-minutes: 15
+    needs: changes
+    if: |
+      github.ref == 'refs/heads/main' ||
+      needs.changes.outputs.backend == 'true' ||
+      needs.changes.outputs.shared == 'true' ||
+      needs.changes.outputs.tax-engine == 'true'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: clared
+          POSTGRES_USER: prisma-test
+          POSTGRES_PASSWORD: unused
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U prisma-test -d clared"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://prisma-test:unused@127.0.0.1:5432/clared
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Install squawk-cli
+        run: npm install -g squawk-cli@2.64.0
+
+      - name: Lint committed Prisma migrations
+        run: |
+          set -euo pipefail
+          mapfile -d '' sql < <(
+            find apps/backend/prisma/migrations -name '*.sql' -print0 \
+              | grep -zEv '20260822014200_init|20260822155017_product_entities_invoices_tax|20260822180000_invoice_dates' \
+              || true
+          )
+          if [ ${#sql[@]} -eq 0 ] || [ -z "${sql[0]:-}" ]; then
+            echo "No new migration SQL (20260822 baseline excluded)"
+          else
+            squawk --config .squawk.toml --pg-version 16 "${sql[@]}"
+          fi
+
+      - name: Diff schema vs migrations and lint pending SQL
+        run: |
+          set -euo pipefail
+          pnpm --filter ./apps/backend exec prisma migrate deploy
+          pnpm --filter ./apps/backend exec prisma migrate diff \
+            --from-config-datasource \
+            --to-schema prisma/schema.prisma \
+            --script > "${RUNNER_TEMP}/pending.sql"
+          if grep -Eqv '^[[:space:]]*(--.*)?$' "${RUNNER_TEMP}/pending.sql"; then
+            squawk --pg-version 16 "${RUNNER_TEMP}/pending.sql"
+          else
+            echo "No pending SQL (schema matches applied migrations)"
+          fi
+
   ci:
     timeout-minutes: 5
-    needs: [changes, lint, desktop-test, backend-unit, backend-e2e]
+    needs: [changes, lint, desktop-test, backend-unit, backend-e2e, squawk]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -257,3 +335,4 @@ jobs:
           check desktop-test "${{ needs.desktop-test.result }}"
           check backend-unit "${{ needs.backend-unit.result }}"
           check backend-e2e "${{ needs.backend-e2e.result }}"
+          check squawk "${{ needs.squawk.result }}"
