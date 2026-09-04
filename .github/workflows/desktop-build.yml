@@ -275,16 +275,16 @@ jobs:
             -F "file=@${MAC_FILE}" \
             -F "data=${DATA}")
           if [ "$HTTP_CODE" -lt 400 ]; then
-            :
-          elif grep -qi 'already exists' /tmp/fayno-mac.json; then
-            :
+            echo "FaynoSync macOS upload HTTP ${HTTP_CODE}"
+            jq -e -c '{version, id}' /tmp/fayno-mac.json
+          elif { [ "$HTTP_CODE" = "409" ] || [ "$HTTP_CODE" = "500" ]; } \
+            && grep -q 'app with this name, version, platform, architecture and extension already exists' /tmp/fayno-mac.json; then
+            echo "FaynoSync already has this macOS artifact (HTTP ${HTTP_CODE})"
           else
             echo "FaynoSync upload failed HTTP ${HTTP_CODE}"
             cat /tmp/fayno-mac.json
             exit 1
           fi
-          echo "FaynoSync macOS upload HTTP ${HTTP_CODE}"
-          jq -c '{version, id}' /tmp/fayno-mac.json 2>/dev/null || echo "duplicate skipped jq"
 
       - name: Upload Windows updater to FaynoSync
         env:
@@ -331,16 +331,16 @@ jobs:
             -F "file=@${WIN_FILE}" \
             -F "data=${DATA}")
           if [ "$HTTP_CODE" -lt 400 ]; then
-            :
-          elif grep -qi 'already exists' /tmp/fayno-win.json; then
-            :
+            echo "FaynoSync Windows upload HTTP ${HTTP_CODE}"
+            jq -e -c '{version, id}' /tmp/fayno-win.json
+          elif { [ "$HTTP_CODE" = "409" ] || [ "$HTTP_CODE" = "500" ]; } \
+            && grep -q 'app with this name, version, platform, architecture and extension already exists' /tmp/fayno-win.json; then
+            echo "FaynoSync already has this Windows artifact (HTTP ${HTTP_CODE})"
           else
             echo "FaynoSync upload failed HTTP ${HTTP_CODE}"
             cat /tmp/fayno-win.json
             exit 1
           fi
-          echo "FaynoSync Windows upload HTTP ${HTTP_CODE}"
-          jq -c '{version, id}' /tmp/fayno-win.json 2>/dev/null || echo "duplicate skipped jq"
 
       - name: Verify FaynoSync checkVersion (macOS)
         run: |
