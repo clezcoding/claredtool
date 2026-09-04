@@ -47,6 +47,8 @@ USER node
 # Coolify dockerfile build pack ignores start_command (Nixpacks-only).
 # Last stage stays API. Worker app sets dockerfile_target_build=worker.
 FROM build AS worker
+HEALTHCHECK --interval=5s --timeout=5s --start-period=10s --retries=10 \
+  CMD sh -c 'curl -fsS "http://127.0.0.1:${PORT:-3000}/health" || exit 1'
 CMD ["node", "dist/worker.js"]
 
 FROM build AS api
