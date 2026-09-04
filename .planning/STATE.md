@@ -3,12 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04.4
 current_phase_name: GitHub Actions Optimization
-status: verifying
+status: "Phase 04.4 shipped — PR #111"
 stopped_at: Completed 04.4-07-PLAN.md
-last_updated: "2026-09-04T04:57:54.461Z"
+last_updated: "2026-09-04T08:49:33.213Z"
 last_activity: 2026-09-04
-last_activity_desc: Completed quick task 260904-cjp: CodeQL Rust off PR, parallel backend-unit/e2e, desktop runners windows-2025 + macos-26
-state_head: 54288bc69893c122a5ba40a4e7d651b4d9ef2e91
+state_head: 5d7e6f46ec97925123edfc2f3cb5e1d39d3316ed
 progress:
   total_phases: 11
   completed_phases: 7
@@ -28,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Phase complete — ready for verification
+Status: Phase 04.4 shipped — PR #111
 Phase: 04.4 (GitHub Actions Optimization) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
 Plan: 7 of 7 (04.4-06 complete)
@@ -37,7 +36,7 @@ Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–06 done
 Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 - Completed quick task 260904-cjp: Re-verify GitHub Actions brief after main merge; speed CodeQL analyze-rust, backend-test, desktop-build; split PR vs main triggers; bump desktop runners to current 2026 labels
+Last activity: 2026-09-04
 
 Progress: [███████░░░] 70%
 
