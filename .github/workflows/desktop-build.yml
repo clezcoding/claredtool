@@ -55,7 +55,7 @@ jobs:
           node-version: 24
           package-manager-cache: false
 
-      - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # master
+      - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # v1
         with:
           toolchain: "1.97.1"
           components: ""
@@ -139,6 +139,7 @@ jobs:
           merge-multiple: true
 
       - name: Create GitHub Release
+        # zizmor: ignore[superfluous-actions] — Plan 04 GH Release job; keep SHA-pinned action
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           files: |
@@ -211,6 +212,7 @@ jobs:
       - name: Upload macOS updater to FaynoSync
         env:
           FAYNOSYNC_CI_TOKEN: ${{ secrets.FAYNOSYNC_CI_TOKEN }}
+          FS_VERSION: ${{ steps.meta.outputs.version }}
         run: |
           set -euo pipefail
           mapfile -t MAC_FILES < <(find artifacts -type f -name '*.app.tar.gz' ! -name '*.sig' | sort)
@@ -230,9 +232,9 @@ jobs:
           esac
           SIG=$(tr -d '\n' < "$MAC_SIG_FILE")
           DATA=$(jq -nc \
-            --arg version "${{ steps.meta.outputs.version }}" \
+            --arg version "$FS_VERSION" \
             --arg signature "$SIG" \
-            --arg changelog "Clared ${{ steps.meta.outputs.version }} (macOS aarch64)" \
+            --arg changelog "Clared ${FS_VERSION} (macOS aarch64)" \
             '{
               app_name: "clared",
               version: $version,
@@ -254,6 +256,7 @@ jobs:
       - name: Upload Windows updater to FaynoSync
         env:
           FAYNOSYNC_CI_TOKEN: ${{ secrets.FAYNOSYNC_CI_TOKEN }}
+          FS_VERSION: ${{ steps.meta.outputs.version }}
         run: |
           set -euo pipefail
           mapfile -t WIN_FILES < <(find artifacts -type f -path '*/nsis/*.exe' ! -name '*.sig' | sort)
@@ -276,9 +279,9 @@ jobs:
           esac
           SIG=$(tr -d '\n' < "$WIN_SIG_FILE")
           DATA=$(jq -nc \
-            --arg version "${{ steps.meta.outputs.version }}" \
+            --arg version "$FS_VERSION" \
             --arg signature "$SIG" \
-            --arg changelog "Clared ${{ steps.meta.outputs.version }} (Windows x86_64)" \
+            --arg changelog "Clared ${FS_VERSION} (Windows x86_64)" \
             '{
               app_name: "clared",
               version: $version,

@@ -84,8 +84,10 @@ jobs:
             type=ref,event=branch,enable=${{ github.ref != 'refs/heads/main' }}
 
       - id: image
+        env:
+          IMAGE_REF: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         run: |
-          echo "image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
           echo "sha_tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       # A5 / D-20: Bake aborted. bake-action exposes one metadata JSON blob, not

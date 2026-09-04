@@ -25,6 +25,8 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
@@ -75,8 +77,10 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: ./.github/actions/setup-pnpm-ci
+      - uses: ./.github/actions/setup-pnpm-ci # zizmor: ignore[self-repository]
 
       - run: pnpm install --frozen-lockfile --filter ./apps/desktop...
 
@@ -100,6 +104,8 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install Tauri Linux dependencies
         run: |
@@ -115,7 +121,7 @@ jobs:
           echo "apt-get failed after 3 attempts"
           exit 1
 
-      - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # master
+      - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # v1
         with:
           toolchain: "1.97.1"
           components: rustfmt, clippy
@@ -139,7 +145,8 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16-alpine
+        # postgres:16-alpine — index digest re-inspected 2026-09-04 (A3)
+        image: postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
         env:
           POSTGRES_DB: clared
           POSTGRES_USER: prisma-test
@@ -152,7 +159,8 @@ jobs:
           --health-timeout 5s
           --health-retries 5
       redis:
-        image: redis:7-alpine
+        # redis:7-alpine — index digest re-inspected 2026-09-04 (A3)
+        image: redis:7-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
         ports:
           - 6379:6379
         options: >-
@@ -170,8 +178,10 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-      - uses: ./.github/actions/setup-pnpm-ci
+      - uses: ./.github/actions/setup-pnpm-ci # zizmor: ignore[self-repository]
 
       - run: pnpm install --frozen-lockfile --filter @clared/tax-engine... --filter ./apps/backend...
 
@@ -203,7 +213,8 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16-alpine
+        # postgres:16-alpine — index digest re-inspected 2026-09-04 (A3)
+        image: postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
         env:
           POSTGRES_DB: clared
           POSTGRES_USER: prisma-test
@@ -227,11 +238,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/setup-pnpm-ci
+      - uses: ./.github/actions/setup-pnpm-ci # zizmor: ignore[self-repository]
 
       - run: pnpm install --frozen-lockfile
 
       - name: Install squawk-cli
+        # zizmor: ignore[adhoc-packages] — Plan 03: squawk-cli@2.64.0 npm-global, not a lockfile dep
         run: npm install -g squawk-cli@2.64.0
 
       - name: Lint committed Prisma migrations
