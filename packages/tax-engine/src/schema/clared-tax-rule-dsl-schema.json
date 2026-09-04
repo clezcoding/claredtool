@@ -19,13 +19,39 @@
             { "type": "array", "items": { "type": "string" } }
           ]
         },
-        "customer_country": { "type": ["string", "array"] },
+        "customer_country": {
+          "anyOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } }
+          ]
+        },
         "supplier_is_business": { "type": "boolean" },
         "customer_is_business": { "type": "boolean" },
-        "supplier_vat_registered": { "type": ["boolean", "string"] },
-        "customer_vat_registered": { "type": ["boolean", "string"] },
-        "supply_type": { "type": ["string", "array"] },
-        "channel": { "type": ["string", "array", "null"] },
+        "supplier_vat_registered": {
+          "anyOf": [
+            { "type": "boolean" },
+            { "type": "string" }
+          ]
+        },
+        "customer_vat_registered": {
+          "anyOf": [
+            { "type": "boolean" },
+            { "type": "string" }
+          ]
+        },
+        "supply_type": {
+          "anyOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } }
+          ]
+        },
+        "channel": {
+          "anyOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } },
+            { "type": "null" }
+          ]
+        },
         "effective_from": { "type": ["string", "null"], "format": "date" },
         "effective_to": { "type": ["string", "null"], "format": "date" },
         "threshold_amount": { "type": ["number", "null"] },
@@ -38,7 +64,12 @@
       "properties": {
         "place_of_supply_country": { "type": "string" },
         "tax_liability_party": { "type": "string", "enum": ["supplier", "customer"] },
-        "invoice_tax_rate": { "type": ["number", "string"] },
+        "invoice_tax_rate": {
+          "anyOf": [
+            { "type": "number" },
+            { "type": "string" }
+          ]
+        },
         "invoice_tax_shown": { "type": "boolean" },
         "reverse_charge_flag": { "type": "boolean" },
         "legal_reference": { "type": "string" },
