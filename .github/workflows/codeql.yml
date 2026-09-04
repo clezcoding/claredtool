@@ -25,13 +25,9 @@ on:
       - "**/*.jsx"
       - "**/*.ts"
       - "**/*.tsx"
-      - "**/*.rs"
       - "package.json"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
-      - "**/Cargo.toml"
-      - "**/Cargo.lock"
-      - "rust-toolchain.toml"
       - ".github/workflows/codeql.yml"
   schedule:
     - cron: "18 5 * * 1"
@@ -92,6 +88,9 @@ jobs:
           if [ "$EVENT_NAME" = "schedule" ] || [ "$EVENT_NAME" = "workflow_dispatch" ]; then
             echo "javascript-typescript=true" >> "$GITHUB_OUTPUT"
             echo "rust=true" >> "$GITHUB_OUTPUT"
+          elif [ "$EVENT_NAME" = "pull_request" ]; then
+            echo "javascript-typescript=${FILTER_JS}" >> "$GITHUB_OUTPUT"
+            echo "rust=false" >> "$GITHUB_OUTPUT"
           else
             echo "javascript-typescript=${FILTER_JS}" >> "$GITHUB_OUTPUT"
             echo "rust=${FILTER_RS}" >> "$GITHUB_OUTPUT"
@@ -132,7 +131,7 @@ jobs:
     needs: detect
     if: |
       needs.detect.outputs.rust == 'true' &&
-      (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
+      github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       actions: read
