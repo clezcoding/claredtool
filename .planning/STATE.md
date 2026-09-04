@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04.4
 current_phase_name: GitHub Actions Optimization
-status: planning
-stopped_at: Phase 04.4 plans revised (checker iteration 2)
-last_updated: "2026-09-04T03:34:13.498Z"
+status: executing
+stopped_at: Completed 04.4-01-PLAN.md
+last_updated: "2026-09-04T03:52:32.653Z"
 last_activity: 2026-09-04
-last_activity_desc: Phase 04.4 plans revised — CodeQL workflow paths, D-16 tag-only GH Release verify, junit desktop-web, zizmor close, D-36 substitute
-state_head: 812faf0f49975fa29e2aa058f3897f35aebcae6b
+last_activity_desc: Completed 04.4-01 trigger/concurrency remainder; ready for 04.4-02
+state_head: c4661ebfcdf862127a917a63e69bdd2804acefdc
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 54
-  completed_plans: 47
+  completed_plans: 48
 milestone_name: milestone
 ---
 
@@ -28,16 +28,16 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Plans revised — ready to execute
-Phase: 04.4 (GitHub Actions Optimization) — READY TO EXECUTE
+Status: Executing Phase 04.4
+Phase: 04.4 (GitHub Actions Optimization) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 7 plans (04.4-01 … 04.4-07), D-33 seven-commit map
+Plan: 2 of 7 (04.4-01 complete)
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
-Phase 04.4 (GitHub Actions Optimization) — **NEXT** execute
+Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plan 01 done)
 Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 — Phase 04.4 plans revised (checker iteration 2: CodeQL on.paths, D-16 verify, junit desktop-web, zizmor exit 0, D-36 substitute)
+Last activity: 2026-09-04 — Completed 04.4-01 (rebase + trigger/concurrency); next 04.4-02
 
 Progress: [███████░░░] 70%
 
@@ -112,6 +112,7 @@ Progress: [███████░░░] 70%
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P06 | 7 min | 3 tasks | 1 files |
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P07 | 90min | 3 tasks | 1 files |
 | Phase 04.3 P08 | 19h wall | 3 tasks | 3 files |
+| Phase 04.4 P01 | 8 min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -234,6 +235,9 @@ Recent decisions affecting current work:
 - [quick-260903-x8n]: Audit Phase 5+5b YAML — zizmor/gitleaks/CodeQL SHA-pinned; Trivy both GHCR tags after both pushes; Harden Runner audit first uses ×11; Node 24 unchanged; Security-tab triage leftover (D-10)
 - [quick-260904-458]: Audit Phase 6 YAML — squawk-cli 2.64.0 on Node 24 (not composite action Node 20); Syft SBOM + keyless cosign after Trivy; buildx provenance/sbom stay false; /health/ready live 200; Node 24 unchanged
 - [Phase 04.3]: Coolify healthchecks 2026-09-03 — Loki/Tempo/collector `healthcheck.disable` (distroless/scratch, no wget). Gotenberg `curl -fsS /health` → `running:healthy`. Worker stays no-HTTP. Kaneo #87.
+- [Phase 04.4]: Wave 0 rebase onto origin/main (no merge commit) so D-33 stays seven linear commits
+- [Phase 04.4]: run-name format strings omit # because GitHub expressions treat # as a comment
+- [Phase 04.4]: Plan 01 keeps origin ci.yml job names; desktop-web/backend-test split waits for 04.4-02
 
 ### Pending Todos
 
@@ -279,9 +283,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-04T02:35:00.000Z
-Stopped at: Phase 04.4 plans written
-Resume file: .planning/phases/04.4-github-actions-optimization-ci-fan-out-security-workflows-de/04.4-01-PLAN.md
+Last session: 2026-09-04T03:52:32.535Z
+Stopped at: Completed 04.4-01-PLAN.md
+Resume file: None
 
 ## Rebuild Log
 

@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 32
+open_count: 33
 waived_count: 1
 fixed_count: 3
-total_count: 36
-last_updated: 2026-08-29T04:41:07.137Z
+total_count: 37
+last_updated: 2026-09-04T03:52:31.413Z
 ---
 
 # Broken Windows Ledger
@@ -51,6 +51,7 @@ last_updated: 2026-08-29T04:41:07.137Z
 | 34 | 04.2 | unrun-verify | apps/desktop/package.json |  | Full desktop vitest suite: clipboard.test.ts fails on pre-existing clipboard.ts stub | fixed |  | 2026-08-28T04:54:25.264Z | 2026-08-28T14:54:50.667Z |
 | 35 | 04.3 | deviation | apps/desktop/src-tauri/src/lib.rs |  | PRAGMA key via sqlite3_auto_extension (plugin has no after_connect) | open |  | 2026-08-29T02:29:14.221Z |  |
 | 36 | 04.3 | stub | .planning/phases/04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze/04.3-MONITOR-OPS.md |  | Beszel KEY/TOKEN pending-h4 until Plan 08 H4 | open |  | 2026-08-29T04:41:07.137Z |  |
+| 37 | 04.4 | deviation | .github/workflows/desktop-build.yml | 74 | Origin SC2129: Actionlint+ShellCheck style on desktop-build.yml; Plan 01 did not edit this file | open |  | 2026-09-04T03:52:31.413Z |  |
 
 ````json
 [
@@ -484,6 +485,18 @@ last_updated: 2026-08-29T04:41:07.137Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-29T04:41:07.137Z",
+    "resolved_at": null
+  },
+  {
+    "id": 37,
+    "kind": "deviation",
+    "phase": "04.4",
+    "file": ".github/workflows/desktop-build.yml",
+    "line": 74,
+    "description": "Origin SC2129: Actionlint+ShellCheck style on desktop-build.yml; Plan 01 did not edit this file",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-04T03:52:31.413Z",
     "resolved_at": null
   }
 ]
