@@ -273,8 +273,14 @@ jobs:
             -H "Authorization: Bearer $FAYNOSYNC_CI_TOKEN" \
             -F "file=@${MAC_FILE}" \
             -F "data=${DATA}")
-          cat /tmp/fayno-mac.json
-          test "$HTTP_CODE" -lt 400 || grep -q 'already exists' /tmp/fayno-mac.json
+          if [ "$HTTP_CODE" -lt 400 ]; then
+            :
+          elif [ "$HTTP_CODE" = "409" ] && grep -q 'already exists' /tmp/fayno-mac.json; then
+            :
+          else
+            echo "FaynoSync upload failed HTTP ${HTTP_CODE}"
+            exit 1
+          fi
 
       - name: Upload Windows updater to FaynoSync
         env:
@@ -320,8 +326,14 @@ jobs:
             -H "Authorization: Bearer $FAYNOSYNC_CI_TOKEN" \
             -F "file=@${WIN_FILE}" \
             -F "data=${DATA}")
-          cat /tmp/fayno-win.json
-          test "$HTTP_CODE" -lt 400 || grep -q 'already exists' /tmp/fayno-win.json
+          if [ "$HTTP_CODE" -lt 400 ]; then
+            :
+          elif [ "$HTTP_CODE" = "409" ] && grep -q 'already exists' /tmp/fayno-win.json; then
+            :
+          else
+            echo "FaynoSync upload failed HTTP ${HTTP_CODE}"
+            exit 1
+          fi
 
       - name: Verify FaynoSync checkVersion (macOS)
         run: |
