@@ -1,18 +1,9 @@
 name: desktop-build
-# Signed Win/macOS bundles run on path-filtered main, v* tags, and workflow_dispatch; typecheck/tests stay in ci.yml.
+# Signed Win/macOS bundles run on v* tags and workflow_dispatch; typecheck/tests stay in ci.yml.
 
 on:
   push:
-    branches: [main]
     tags: ['v*']
-    paths:
-      - apps/desktop/**
-      - packages/ui/**
-      - package.json
-      - pnpm-lock.yaml
-      - pnpm-workspace.yaml
-      - .npmrc
-      - .github/workflows/desktop-build.yml
   workflow_dispatch:
     inputs:
       target:
@@ -35,14 +26,15 @@ permissions:
 jobs:
   tauri:
     timeout-minutes: 90
-    # cancel-in-progress: false for v* tags and workflow_dispatch (F-E2)
+    # cancel-in-progress: false for v* tags and workflow_dispatch (D-14, D-31)
     concurrency:
       group: desktop-tauri-${{ startsWith(github.ref, 'refs/tags/v') && 'production' || (github.event_name == 'workflow_dispatch' && 'manual' || 'staging') }}-${{ github.ref }}-${{ matrix.os }}
-      cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/v') && github.event_name != 'workflow_dispatch' }}
+      cancel-in-progress: false
     strategy:
-      fail-fast: false
+      fail-fast: ${{ github.event_name == 'workflow_dispatch' && !startsWith(github.ref, 'refs/tags/v') }}
       matrix:
-        os: [windows-latest, macos-latest]
+        # D-17: pin generations after staging test may swap to windows-2025 or macos-14.
+        os: [windows-2022, macos-15]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Harden Runner
@@ -51,6 +43,8 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
 
@@ -64,7 +58,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@6c977a6ca4077a0ceb28ffbe03f59d46e9ac8772 # master
         with:
           toolchain: "1.97.1"
-          components: rustfmt, clippy
+          components: ""
 
       - run: pnpm install --frozen-lockfile
 
@@ -118,14 +112,13 @@ jobs:
 
   publish-faynosync:
     timeout-minutes: 20
-    # cancel-in-progress: false for v* tags and workflow_dispatch (F-E2)
+    # cancel-in-progress: false for v* tags and workflow_dispatch (D-14, D-31)
     concurrency:
       group: desktop-publish-${{ startsWith(github.ref, 'refs/tags/v') && 'production' || (github.event_name == 'workflow_dispatch' && 'manual' || 'staging') }}-${{ github.ref }}
-      cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/v') && github.event_name != 'workflow_dispatch' }}
+      cancel-in-progress: false
     needs: tauri
     if: >
       (github.event_name == 'workflow_dispatch' && inputs.publish == true) ||
-      (github.ref == 'refs/heads/main' && github.event_name == 'push') ||
       startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment: ${{ github.event_name == 'workflow_dispatch' && inputs.target || (startsWith(github.ref, 'refs/tags/v') && 'production' || 'staging') }}
@@ -138,6 +131,8 @@ jobs:
           egress-policy: audit
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Resolve FaynoSync base URL
         run: |
