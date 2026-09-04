@@ -2,7 +2,7 @@
 
 ## Overview
 
-Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. It is **paid subscription SaaS**: backend, Postgres, Redis, and Authentik run on the **founder's Coolify**, not on the customer's machine, not as open source, not for free. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to the vendor Coolify API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 is a full premium redesign (Crafted Minimal) — brand tokens, theme, motion. Phase 4.1 converts approved Google Stitch HTML for the 5 v1 routes into Tauri TSX/React via stitch-build. Phase 4.2 hardens the desktop platform (Tauri plugins, Sentry, updater). Phase 4.3 deploys PDF/audit/offline prep infra (Gotenberg, monitoring, OTel, desktop SQL/dialog/fs). Phase 5 closes the loop with PDF, tax-decision audit, and offline sync. Phase 5.1 converts the remaining Stitch catalog. Phase 6 closes 1:1 fidelity on the 5 routes. Stripe/seats (`SAAS-01`) stay v2.
+Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. It is **paid subscription SaaS**: backend, Postgres, Redis, and Authentik run on the **founder's Coolify**, not on the customer's machine, not as open source, not for free. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to the vendor Coolify API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 is a full premium redesign (Crafted Minimal) — brand tokens, theme, motion. Phase 4.1 converts approved Google Stitch HTML for the 5 v1 routes into Tauri TSX/React via stitch-build. Phase 4.2 hardens the desktop platform (Tauri plugins, Sentry, updater). Phase 4.3 deploys PDF/audit/offline prep infra (Gotenberg, monitoring, OTel, desktop SQL/dialog/fs). Phase 4.4 lands the GitHub Actions optimization brief before the PDF product wave. Phase 5 closes the loop with PDF, tax-decision audit, and offline sync. Phase 5.1 converts the remaining Stitch catalog. Phase 6 closes 1:1 fidelity on the 5 routes. Stripe/seats (`SAAS-01`) stay v2.
 
 ## Phases
 
@@ -20,6 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4.1: Stitch→React 5-route conversion** (INSERTED) - stitch-build HTML→TSX for Rechnung · Entities · Kunden · Tax · PDF (completed 2026-08-28)
 - [x] **Phase 4.2: Desktop Platform Hardening** (INSERTED) - Tauri plugins, Sentry, updater, desktop polish (completed 2026-08-28)
 - [x] **Phase 4.3: Infra & Prep for PDF, Offline & Audit** (INSERTED) - Gotenberg, monitoring, OTel, desktop/backend scaffolding before Phase 5 (completed 2026-08-30)
+- [ ] **Phase 4.4: GitHub Actions Optimization** (INSERTED) - CI fan-out, security workflows, desktop-release, Dependabot (`docs/claredtool-github-actions-optimierungsauftrag.md`)
 - [ ] **Phase 5: PDF, Audit & Offline Sync** - Download PDF, inspect tax audit trail, work offline and sync
 - [ ] **Phase 5.1: Stitch→React extended catalog** (INSERTED) - remaining Stitch screens after PDF loop ships
 - [ ] **Phase 6: Mockup 1:1 Fidelity Closure** - pixel-match approved mockups 02–07 on the 5 routes
@@ -168,6 +169,52 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **UI hint**: yes
 
+### Phase 04.4: GitHub Actions Optimization — CI fan-out, security workflows, desktop-release, Dependabot (INSERTED)
+
+**Goal:** Implement `docs/claredtool-github-actions-optimierungsauftrag.md` in full — cut runner fan-out and cost without weakening the `ci` aggregator, signing, or deploy safety
+**Requirements**: CI-OPT remainder (01–06 already shipped in quicks 260828-5c8 / 260828-mn3); SSOT is the brief
+**Depends on:** Phase 4.3
+**Success Criteria** (what must be TRUE):
+
+  1. Brief Phases 1–2: `ci.yml` respects path filters on `main`, draft-PR gating, desktop-web vs desktop-rust split, consolidated backend-test with walltime guard
+  2. Brief Phases 3–4: security workflows (Gitleaks/Zizmor/Actionlint/CodeQL path+language) as specified; signed desktop-build only on `v*` tags and `workflow_dispatch` (no automatic signed `main` publish)
+  3. Brief Phases 5–8: Dependabot lockstep/limits, backend-image/deploy cleanup, checkout/digest/permissions hardening, step summaries — no new reporting SaaS
+  4. Required check still named exactly `ci`; no `pull_request_target`; no `workflow_run` for desktop/backend deploy; SHA-pinned actions; `package-manager-cache: false` on signed desktop jobs
+  5. Validation table from the brief covered (docs-only, draft, JS/TS, Rust, backend, workflow-YAML, `v*` tag, staging dispatch)
+
+**Plans:** 7 plans
+**UI hint**: no (CI/CD only)
+
+Plans:
+
+**Wave 1**
+
+- [ ] 04.4-01-PLAN.md — Rebase/ff origin/main; ci.yml draft + path-on-main; D-31 concurrency (D-33 commit 1)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 04.4-02-PLAN.md — desktop-web / desktop-rust split; backend-test; filtered pnpm (D-33 commit 2)
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 04.4-03-PLAN.md — Gitleaks SARIF, Actionlint in zizmor, CodeQL detect + language-split (D-33 commit 3)
+
+**Wave 4** *(blocked on Wave 3; D-14 human gate)*
+
+- [ ] 04.4-04-PLAN.md — Signed desktop tags+dispatch only; GH Release; runner pins (D-33 commit 4)
+
+**Wave 5** *(blocked on Wave 4)*
+
+- [ ] 04.4-05-PLAN.md — Dependabot caps, monthly Actions/Docker, Nest major group (D-33 commit 5)
+
+**Wave 6** *(blocked on Wave 5; D-24 human gate)*
+
+- [ ] 04.4-06-PLAN.md — Drop GHCR latest; delete migrate job; collapse deploy (D-33 commit 6)
+
+**Wave 7** *(blocked on Wave 6)*
+
+- [ ] 04.4-07-PLAN.md — persist-credentials, digests, summaries, JUnit, founder checklist (D-33 commit 7)
+
 ### Phase 04.3: Infra & Prep for PDF, Offline & Audit (INSERTED)
 
 **Goal:** Deploy supporting Coolify infra and wire desktop/backend scaffolding so Phase 5 focuses on product flows (generate PDF, audit trail, offline sync) — not plumbing
@@ -304,7 +351,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 → 5 → 5.1 → 6
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 → 4.4 → 5 → 5.1 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -315,6 +362,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 →
 | 4.1 Stitch→React 5-route conversion | 7/7 | Complete    | 2026-08-28 |
 | 4.2 Desktop Platform Hardening | 8/8 | Complete    | 2026-08-28 |
 | 4.3 Infra & Prep for PDF/Offline/Audit | 8/8 | Complete    | 2026-08-30 |
+| 4.4 GitHub Actions Optimization | 0/7 | Planned | - |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |
 | 6. Mockup 1:1 Fidelity Closure | 0/? | Not started | - |

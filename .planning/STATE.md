@@ -4,15 +4,15 @@ milestone: v1.0
 current_phase: 04.4
 current_phase_name: GitHub Actions Optimization
 status: planning
-stopped_at: Phase 04.4 context gathered
-last_updated: "2026-09-04T02:21:14.874Z"
+stopped_at: Phase 04.4 plans revised (checker iteration 2)
+last_updated: "2026-09-04T03:34:13.498Z"
 last_activity: 2026-09-04
-last_activity_desc: Phase 04.4 context gathered; origin/main includes audit Phase 6 (#98)
-state_head: b398e821ad0a1f52dd836f79878a169ec87560e7
+last_activity_desc: Phase 04.4 plans revised — CodeQL workflow paths, D-16 tag-only GH Release verify, junit desktop-web, zizmor close, D-36 substitute
+state_head: 812faf0f49975fa29e2aa058f3897f35aebcae6b
 progress:
   total_phases: 11
   completed_phases: 7
-  total_plans: 47
+  total_plans: 54
   completed_plans: 47
 milestone_name: milestone
 ---
@@ -28,16 +28,16 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Ready to plan
-Phase: 04.4 — GitHub Actions Optimization
+Status: Plans revised — ready to execute
+Phase: 04.4 (GitHub Actions Optimization) — READY TO EXECUTE
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: Not started
+Plan: 7 plans (04.4-01 … 04.4-07), D-33 seven-commit map
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
-Phase 04.4 (GitHub Actions Optimization) — **NEXT** discuss/plan
+Phase 04.4 (GitHub Actions Optimization) — **NEXT** execute
 Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 — Phase 04.4 inserted after 4.3; origin/main includes audit Phase 6 (#98)
+Last activity: 2026-09-04 — Phase 04.4 plans revised (checker iteration 2: CodeQL on.paths, D-16 verify, junit desktop-web, zizmor exit 0, D-36 substitute)
 
 Progress: [███████░░░] 70%
 
@@ -279,9 +279,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-04T02:21:14.714Z
-Stopped at: Phase 04.4 context gathered
-Resume file: .planning/phases/04.4-github-actions-optimization-ci-fan-out-security-workflows-de/04.4-CONTEXT.md
+Last session: 2026-09-04T02:35:00.000Z
+Stopped at: Phase 04.4 plans written
+Resume file: .planning/phases/04.4-github-actions-optimization-ci-fan-out-security-workflows-de/04.4-01-PLAN.md
 
 ## Rebuild Log
 
