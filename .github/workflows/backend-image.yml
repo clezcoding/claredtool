@@ -269,20 +269,38 @@ jobs:
 
           rollback_changed() {
             echo "Rolling back already-changed apps"
-            echo "- outcome: rollback attempted" >> "$GITHUB_STEP_SUMMARY"
+            local rollback_failed=0
             if [ "$changed_worker" = "1" ]; then
               if [ -n "$PREV_WORKER" ]; then
-                coolify_pin "$WORKER_UUID" "$PREV_WORKER" || true
+                if coolify_pin "$WORKER_UUID" "$PREV_WORKER"; then
+                  echo "- worker rollback: succeeded (${PREV_WORKER})" >> "$GITHUB_STEP_SUMMARY"
+                else
+                  echo "- worker rollback: FAILED (${PREV_WORKER})" >> "$GITHUB_STEP_SUMMARY"
+                  rollback_failed=1
+                fi
               else
                 echo "Rollback impossible for clared-worker (previous docker_registry_image_tag is empty)"
+                echo "- worker rollback: impossible (no previous tag)" >> "$GITHUB_STEP_SUMMARY"
+                rollback_failed=1
               fi
             fi
             if [ "$changed_api" = "1" ]; then
               if [ -n "$PREV_API" ]; then
-                coolify_pin "$API_UUID" "$PREV_API" || true
+                if coolify_pin "$API_UUID" "$PREV_API"; then
+                  echo "- API rollback: succeeded (${PREV_API})" >> "$GITHUB_STEP_SUMMARY"
+                else
+                  echo "- API rollback: FAILED (${PREV_API})" >> "$GITHUB_STEP_SUMMARY"
+                  rollback_failed=1
+                fi
               else
                 echo "Rollback impossible for clared-api (previous docker_registry_image_tag is empty)"
+                echo "- API rollback: impossible (no previous tag)" >> "$GITHUB_STEP_SUMMARY"
+                rollback_failed=1
               fi
+            fi
+            echo "- outcome: rollback attempted" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$rollback_failed" = "1" ]; then
+              exit 1
             fi
           }
 
