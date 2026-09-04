@@ -297,14 +297,15 @@ jobs:
       - name: Diff schema vs migrations and lint pending SQL
         run: |
           set -euo pipefail
+          pnpm --filter ./apps/backend exec prisma migrate deploy
           pnpm --filter ./apps/backend exec prisma migrate diff \
-            --from-migrations prisma/migrations \
+            --from-config-datasource \
             --to-schema prisma/schema.prisma \
             --script > "${RUNNER_TEMP}/pending.sql"
           if grep -Eqv '^[[:space:]]*(--.*)?$' "${RUNNER_TEMP}/pending.sql"; then
             squawk --pg-version 16 "${RUNNER_TEMP}/pending.sql"
           else
-            echo "No pending SQL (schema matches migrations)"
+            echo "No pending SQL (schema matches applied migrations)"
           fi
 
   ci:
