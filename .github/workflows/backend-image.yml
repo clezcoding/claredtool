@@ -320,9 +320,11 @@ jobs:
           # Do not add a simulate-fail input that would roll back production.
           poll_ok=0
           for _ in $(seq 1 30); do
+            API_POLL_JSON=$(coolify_get "$API_UUID" || true)
+            LIVE_TAG=$(printf '%s' "${API_POLL_JSON:-}" | jq -r '.docker_registry_image_tag // empty' 2>/dev/null || true)
             code=$(curl -sS -o /dev/null -w "%{http_code}" \
               "https://clared-api.puzzlessdev.online/health/ready" || true)
-            if [ "$code" = "200" ]; then
+            if [ "$LIVE_TAG" = "$SHA_TAG" ] && [ "$code" = "200" ]; then
               poll_ok=1
               break
             fi
