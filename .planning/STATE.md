@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.4
 current_phase_name: GitHub Actions Optimization
 status: executing
-stopped_at: Completed 04.4-05-PLAN.md
-last_updated: "2026-09-04T04:31:33.921Z"
+stopped_at: Completed 04.4-06-PLAN.md
+last_updated: "2026-09-04T04:44:44.880Z"
 last_activity: 2026-09-04
 last_activity_desc: Completed 04.4-05 Dependabot caps and nestjs-major; ready for 04.4-06
-state_head: beb838ff60ed37f644f7ccc2d5ae4f2ebbb54767
+state_head: 13f434ff3776c60fb590986e1129955aa1629bb1
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 54
-  completed_plans: 52
+  completed_plans: 53
 milestone_name: milestone
 ---
 
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 Status: Ready to execute
 Phase: 04.4 (GitHub Actions Optimization) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 6 of 7 (04.4-05 complete)
+Plan: 7 of 7 (04.4-05 complete)
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
 Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–05 done)
 Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
@@ -117,6 +117,7 @@ Progress: [███████░░░] 70%
 | Phase 04.4 P03 | 5 min | 3 tasks | 5 files |
 | Phase 04.4 P04 | 4 | 3 tasks | 1 files |
 | Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de P05 | 3 min | 2 tasks | 1 files |
+| Phase 04.4 P06 | 4 min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -255,6 +256,10 @@ Recent decisions affecting current work:
 - [Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de]: Two atomic chore commits (caps/cadence then nestjs-major) instead of plan output single D-33 commit; linear, no squash — Executor per-task protocol and 04.4-04 precedent; D-33 still seven logical phase commits
 - [Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de]: nestjs-major applies-to version-updates before npm-patch-minor; expanded YAML lists matching existing groups — Dependabot first-match; security updates stay ungrouped; backend @nestjs/* lockstep
 - [Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de]: github-actions/docker/docker-compose monthly omit schedule.day; glib and Node ignores unchanged — Pitfall 5: day is weekly-only; D-32 keep glib >=0.19.0 and Node >=25
+- [Phase 04.4]: Human selected proceed-drop-latest (locked D-24); type=raw latest removed from metadata-action
+- [Phase 04.4]: Bake aborted (A5): bake-action metadata JSON would obscure DIGEST_API / DIGEST_WORKER for cosign; two origin build-push-action steps remain
+- [Phase 04.4]: Two atomic chore commits (deploy remainder, then Bake abort) instead of plan output single D-33 commit; linear, no squash
+- [Phase 04.4]: Collapsed deploy rolls back API if worker poll fails (matrix fail-fast false could leave API on the new tag)
 
 ### Pending Todos
 
@@ -300,8 +305,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-04T04:31:08.183Z
-Stopped at: Completed 04.4-05-PLAN.md
+Last session: 2026-09-04T04:44:44.738Z
+Stopped at: Completed 04.4-06-PLAN.md
 Resume file: None
 
 ## Rebuild Log
