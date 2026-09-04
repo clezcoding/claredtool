@@ -1,15 +1,17 @@
 name: ci
+run-name: ${{ github.event_name == 'pull_request' && format('CI · {0} · PR #{1} · {2}', github.event_name, github.event.pull_request.number, github.head_ref) || format('CI · {0} · {1}', github.event_name, github.ref_name) }}
 
 on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -52,9 +54,8 @@ jobs:
     timeout-minutes: 15
     needs: changes
     if: |
-      github.ref == 'refs/heads/main' ||
-      needs.changes.outputs.desktop == 'true' ||
-      needs.changes.outputs.shared == 'true'
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (needs.changes.outputs.desktop == 'true' || needs.changes.outputs.shared == 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
@@ -81,9 +82,8 @@ jobs:
     timeout-minutes: 15
     needs: changes
     if: |
-      github.ref == 'refs/heads/main' ||
-      needs.changes.outputs.desktop == 'true' ||
-      needs.changes.outputs.shared == 'true'
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (needs.changes.outputs.desktop == 'true' || needs.changes.outputs.shared == 'true')
     runs-on: ubuntu-24.04
     steps:
       - name: Harden Runner
@@ -137,10 +137,8 @@ jobs:
     timeout-minutes: 15
     needs: changes
     if: |
-      github.ref == 'refs/heads/main' ||
-      needs.changes.outputs.backend == 'true' ||
-      needs.changes.outputs.shared == 'true' ||
-      needs.changes.outputs.tax-engine == 'true'
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.tax-engine == 'true')
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: postgresql://prisma-test:unused@127.0.0.1:5432/clared
@@ -177,10 +175,8 @@ jobs:
     timeout-minutes: 20
     needs: changes
     if: |
-      github.ref == 'refs/heads/main' ||
-      needs.changes.outputs.backend == 'true' ||
-      needs.changes.outputs.shared == 'true' ||
-      needs.changes.outputs.tax-engine == 'true'
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.tax-engine == 'true')
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -238,10 +234,8 @@ jobs:
     timeout-minutes: 15
     needs: changes
     if: |
-      github.ref == 'refs/heads/main' ||
-      needs.changes.outputs.backend == 'true' ||
-      needs.changes.outputs.shared == 'true' ||
-      needs.changes.outputs.tax-engine == 'true'
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.tax-engine == 'true')
     runs-on: ubuntu-latest
     services:
       postgres:
