@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 35
+open_count: 36
 waived_count: 1
 fixed_count: 3
-total_count: 39
-last_updated: 2026-09-04T04:12:49.092Z
+total_count: 40
+last_updated: 2026-09-04T04:57:54.775Z
 ---
 
 # Broken Windows Ledger
@@ -54,6 +54,7 @@ last_updated: 2026-09-04T04:12:49.092Z
 | 37 | 04.4 | deviation | .github/workflows/desktop-build.yml | 74 | Origin SC2129: Actionlint+ShellCheck style on desktop-build.yml; Plan 01 did not edit this file | open |  | 2026-09-04T03:52:31.413Z |  |
 | 38 | 04.4 | deviation | .github/workflows/desktop-build.yml | 83 | Folded SC2129 GITHUB_OUTPUT redirects so in-workflow Actionlint can fail closed | open |  | 2026-09-04T04:12:49.010Z |  |
 | 39 | 04.4 | deviation | .github/workflows/gitleaks.yml | 34 | upload-sarif and CLI SARIF use if: always() so findings still reach the Security tab when the job fails | open |  | 2026-09-04T04:12:49.092Z |  |
+| 40 | 04.4 | deviation | .github/zizmor.yml |  | Ignore artipacked on sync-labels.yml (D-36 frozen file) | open |  | 2026-09-04T04:57:54.775Z |  |
 
 ````json
 [
@@ -523,6 +524,18 @@ last_updated: 2026-09-04T04:12:49.092Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-09-04T04:12:49.092Z",
+    "resolved_at": null
+  },
+  {
+    "id": 40,
+    "kind": "deviation",
+    "phase": "04.4",
+    "file": ".github/zizmor.yml",
+    "line": null,
+    "description": "Ignore artipacked on sync-labels.yml (D-36 frozen file)",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-04T04:57:54.775Z",
     "resolved_at": null
   }
 ]
