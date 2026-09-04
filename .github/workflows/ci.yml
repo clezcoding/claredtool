@@ -82,11 +82,14 @@ jobs:
 
       - uses: ./.github/actions/setup-pnpm-ci # zizmor: ignore[self-repository]
 
-      - run: pnpm install --frozen-lockfile --filter ./apps/desktop...
+      # @clared/ui must be a selected installer: `desktop...` links the
+      # workspace package but does not write packages/ui/node_modules, and
+      # tsc follows source exports from there.
+      - run: pnpm install --frozen-lockfile --filter ./apps/desktop... --filter @clared/ui
 
       - run: pnpm --filter ./apps/desktop exec tsc --noEmit
 
-      - run: pnpm --filter ./apps/desktop test -- --reporter=default --reporter=junit --outputFile=junit.xml
+      - run: pnpm --filter ./apps/desktop exec vitest run --reporter=default --reporter=junit --outputFile=junit.xml
 
       - name: Upload Vitest JUnit
         if: failure()
@@ -201,13 +204,15 @@ jobs:
 
       - run: pnpm --filter ./apps/backend exec nest build
 
-      - run: pnpm --filter ./apps/backend test -- --reporters=default --reporters=github-actions
+      # pnpm 11 inserts `--` before extra `run` args (`jest -- --reporters`
+      # then matches no tests). `exec` passes flags through.
+      - run: pnpm --filter ./apps/backend exec jest --reporters=default --reporters=github-actions
 
-      - run: pnpm --filter @clared/tax-engine test -- --reporters=default --reporters=github-actions
+      - run: pnpm --filter @clared/tax-engine exec jest --reporters=default --reporters=github-actions
 
       - run: pnpm --filter ./apps/backend exec prisma migrate deploy
 
-      - run: pnpm --filter ./apps/backend test:e2e -- --reporters=default --reporters=github-actions
+      - run: pnpm --filter ./apps/backend exec jest --config ./test/jest-e2e.json --reporters=default --reporters=github-actions
 
   # G5: squawk-cli on Node 24. The GitHub composite action (v2.1.0)
   # hardcodes setup-node node-version 20 — do not uses it.
