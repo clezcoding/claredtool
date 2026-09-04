@@ -332,6 +332,7 @@ jobs:
           done
           if [ "$poll_ok" != "1" ]; then
             echo "Health poll failed for clared-api"
+            rollback_changed
             exit 1
           fi
 
@@ -355,6 +356,7 @@ jobs:
           done
           if [ "$poll_ok" != "1" ]; then
             echo "Status poll failed for clared-worker"
+            rollback_changed
             exit 1
           fi
 
