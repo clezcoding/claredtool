@@ -1,5 +1,5 @@
 name: gitleaks
-run-name: ${{ github.event_name == 'pull_request' && format('gitleaks · {0} · PR #{1}', github.event_name, github.event.pull_request.number) || format('gitleaks · {0} · {1}', github.event_name, github.ref_name) }}
+run-name: ${{ github.event_name == 'pull_request' && format('gitleaks · {0} · PR {1}', github.event_name, github.event.pull_request.number) || format('gitleaks · {0} · {1}', github.event_name, github.ref_name) }}
 
 on:
   push:

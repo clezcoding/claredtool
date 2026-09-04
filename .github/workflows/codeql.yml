@@ -1,5 +1,5 @@
 name: codeql
-run-name: ${{ github.event_name == 'pull_request' && format('codeql · {0} · PR #{1}', github.event_name, github.event.pull_request.number) || format('codeql · {0} · {1}', github.event_name, github.ref_name) }}
+run-name: ${{ github.event_name == 'pull_request' && format('codeql · {0} · PR {1}', github.event_name, github.event.pull_request.number) || format('codeql · {0} · {1}', github.event_name, github.ref_name) }}
 
 on:
   push:
