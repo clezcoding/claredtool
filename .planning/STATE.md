@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 05
-current_phase_name: PDF, Audit & Offline Sync
+current_phase: 04.4
+current_phase_name: GitHub Actions Optimization
 status: planning
-stopped_at: PR — audit Phase 6 Squawk + SBOM/cosign (Node 24)
-last_updated: "2026-09-04T01:10:00.000Z"
+stopped_at: Phase 04.4 context gathered
+last_updated: "2026-09-04T02:21:14.874Z"
 last_activity: 2026-09-04
-last_activity_desc: Completed quick task 260904-458: audit Phase 6 Squawk/SBOM/cosign; Node 24 unchanged
-state_head: 9604eea45fa76c76ed1c142b5f812772bed3b46a
+last_activity_desc: Phase 04.4 context gathered; origin/main includes audit Phase 6 (#98)
+state_head: b398e821ad0a1f52dd836f79878a169ec87560e7
 progress:
-  total_phases: 10
+  total_phases: 11
   completed_phases: 7
   total_plans: 47
   completed_plans: 47
@@ -24,19 +24,20 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-30)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 05 — PDF, Audit & Offline Sync
+**Current focus:** Phase 04.4 — GitHub Actions Optimization
 
 ## Current Position
 
 Status: Ready to plan
-Phase: 05 — PDF, Audit & Offline Sync
+Phase: 04.4 — GitHub Actions Optimization
 Phase 04.1 merged: PR #39 (`30e331a`)
 Plan: Not started
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
-Phase 05 (PDF, Audit & Offline Sync) — **NEXT** discuss/plan
+Phase 04.4 (GitHub Actions Optimization) — **NEXT** discuss/plan
+Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
-Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 - Completed quick task 260904-458: audit Phase 6 Squawk/SBOM/cosign; Node 24 unchanged.
+Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
+Last activity: 2026-09-04 — Phase 04.4 inserted after 4.3; origin/main includes audit Phase 6 (#98)
 
 Progress: [███████░░░] 70%
 
@@ -266,6 +267,7 @@ None yet.
 - Phase 5.1 inserted after Phase 5: Stitch→React extended catalog (out-of-nav + P2 R-10–R-14) (URGENT)
 - Phase 04.2 inserted after Phase 4: Desktop Platform Hardening — Tauri plugins, sentry, tauri-ui batteries, updater infra (URGENT)
 - Phase 04.3 inserted after Phase 4: Infra & Prep for PDF/Offline/Audit — Gotenberg, Uptime Kuma, Beszel, OTel/Grafana, Pino, dialog/fs/sharekit/sql scaffold, BullMQ skeleton (URGENT)
+- Phase 04.4 inserted after Phase 4: GitHub Actions Optimization — CI fan-out, security workflows, desktop-release, Dependabot (URGENT)
 
 ## Deferred Items
 
@@ -277,9 +279,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-03T21:16:00Z
-Stopped at: Coolify healthcheck compose patched + restarted; Kaneo #87. Docs OTEL-OPS/PDF-OPS/VERIFICATION committed.
-Resume file: None
+Last session: 2026-09-04T02:21:14.714Z
+Stopped at: Phase 04.4 context gathered
+Resume file: .planning/phases/04.4-github-actions-optimization-ci-fan-out-security-workflows-de/04.4-CONTEXT.md
 
 ## Rebuild Log
 
