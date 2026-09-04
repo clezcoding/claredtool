@@ -43,7 +43,9 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  # REL-04 / D-13: push-api and push-worker run in parallel (was sequential in build).
+  # Rollback: restore sequential push steps in a single job (04.5-PATTERNS.md).
+  push-api:
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 45
     concurrency:
@@ -56,8 +58,7 @@ jobs:
       id-token: write
       actions: write
     outputs:
-      sha_tag: ${{ steps.image.outputs.sha_tag }}
-      image: ${{ steps.image.outputs.image }}
+      digest: ${{ steps.push-api.outputs.digest }}
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -113,6 +114,54 @@ jobs:
           cache-from: type=gha,scope=clared-backend
           cache-to: type=gha,scope=clared-backend,mode=max
 
+  push-worker:
+    if: github.ref == 'refs/heads/main'
+    timeout-minutes: 45
+    concurrency:
+      group: backend-image-build-${{ github.ref }}
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      actions: write
+    outputs:
+      digest: ${{ steps.push-worker.outputs.digest }}
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          flavor: |
+            latest=false
+          tags: |
+            type=sha,prefix=sha-,format=short
+
+      - id: image
+        env:
+          IMAGE_REF: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        run: |
+          echo "image=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
+          echo "sha_tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
       # Coolify 4.3.14 dockerimage pack ignores start_command (same as dockerfile).
       # Worker stage CMD is node dist/worker.js — separate tag, not an override.
       # TECH-DEBT: GHCR attestations stay off — Coolify cannot pull
@@ -130,6 +179,38 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.image.outputs.sha_tag }}-worker
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=clared-backend
+
+  build:
+    needs: [push-api, push-worker]
+    if: github.ref == 'refs/heads/main'
+    timeout-minutes: 45
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      actions: write
+    outputs:
+      sha_tag: ${{ steps.image.outputs.sha_tag }}
+      image: ${{ steps.image.outputs.image }}
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - id: image
+        env:
+          IMAGE_REF: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        run: |
+          echo "image=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
+          echo "sha_tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
@@ -181,8 +262,8 @@ jobs:
 
       - name: Sign images (keyless OIDC)
         env:
-          DIGEST_API: ${{ steps.push-api.outputs.digest }}
-          DIGEST_WORKER: ${{ steps.push-worker.outputs.digest }}
+          DIGEST_API: ${{ needs.push-api.outputs.digest }}
+          DIGEST_WORKER: ${{ needs.push-worker.outputs.digest }}
           IMAGE: ${{ steps.image.outputs.image }}
         run: |
           set -euo pipefail
