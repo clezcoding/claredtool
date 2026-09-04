@@ -81,7 +81,6 @@ jobs:
             latest=false
           tags: |
             type=sha,prefix=sha-,format=short
-            type=ref,event=branch,enable=${{ github.ref != 'refs/heads/main' }}
 
       - id: image
         env:
