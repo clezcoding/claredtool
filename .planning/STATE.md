@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.4
 current_phase_name: GitHub Actions Optimization
 status: executing
-stopped_at: Completed 04.4-01-PLAN.md
-last_updated: "2026-09-04T03:52:32.653Z"
+stopped_at: Completed 04.4-02-PLAN.md
+last_updated: "2026-09-04T04:03:56.454Z"
 last_activity: 2026-09-04
-last_activity_desc: Completed 04.4-01 trigger/concurrency remainder; ready for 04.4-02
-state_head: c4661ebfcdf862127a917a63e69bdd2804acefdc
+last_activity_desc: Completed 04.4-02 CI job split; ready for 04.4-03
+state_head: 34ecaaee5f646ac64bd9a6b1d3daa0fb5522bbd2
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 54
-  completed_plans: 48
+  completed_plans: 49
 milestone_name: milestone
 ---
 
@@ -31,13 +31,13 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 Status: Executing Phase 04.4
 Phase: 04.4 (GitHub Actions Optimization) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 2 of 7 (04.4-01 complete)
+Plan: 3 of 7 (04.4-02 complete)
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
-Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plan 01 done)
+Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–02 done)
 Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 — Completed 04.4-01 (rebase + trigger/concurrency); next 04.4-02
+Last activity: 2026-09-04 — Completed 04.4-02 (job split + filtered installs); next 04.4-03
 
 Progress: [███████░░░] 70%
 
@@ -113,6 +113,7 @@ Progress: [███████░░░] 70%
 | Phase 04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze P07 | 90min | 3 tasks | 1 files |
 | Phase 04.3 P08 | 19h wall | 3 tasks | 3 files |
 | Phase 04.4 P01 | 8 min | 3 tasks | 5 files |
+| Phase 04.4 P02 | 5 min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -238,6 +239,9 @@ Recent decisions affecting current work:
 - [Phase 04.4]: Wave 0 rebase onto origin/main (no merge commit) so D-33 stays seven linear commits
 - [Phase 04.4]: run-name format strings omit # because GitHub expressions treat # as a comment
 - [Phase 04.4]: Plan 01 keeps origin ci.yml job names; desktop-web/backend-test split waits for 04.4-02
+- [Phase 04.4]: Create setup-pnpm-ci because three unsigned twins remain (desktop-web, backend-test, squawk) — D-30/BRIEF-2.4: extract only if ≥2 identical Node 24 + pnpm cache setups remain after the split.
+- [Phase 04.4]: desktop-rust has no pnpm/Node; build.rs is serde_json only — Local cargo path reads tauri.conf.json via serde_json; no Node in build.rs.
+- [Phase 04.4]: backend-test timeout-minutes 30 so sequential unit+e2e cannot inherit the old 15/20 split budgets — Consolidated job runs origin unit then e2e; 15 or 20 would be a false timeout.
 
 ### Pending Todos
 
@@ -283,8 +287,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-04T03:52:32.535Z
-Stopped at: Completed 04.4-01-PLAN.md
+Last session: 2026-09-04T04:02:57.205Z
+Stopped at: Completed 04.4-02-PLAN.md
 Resume file: None
 
 ## Rebuild Log
