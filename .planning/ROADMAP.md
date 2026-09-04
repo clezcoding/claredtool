@@ -231,16 +231,16 @@ Post-merge live facts (backend job split, runner matrix, founder manual tasks): 
   4. No Phase 5 product scope (PDF download, audit_logs UI, offline sync), no tenant billing, no new tax collision semantics, no signed-desktop cache, no Harden-Runner `block` without measured allowlist
   5. Walltime improvements (if any) report before/after for PR `desktop-rust`, `main` Rust CodeQL, and backend-image deploy baselines from the handoff
 
-**Plans:** 6 plans
+**Plans:** 3/6 plans executed
 **UI hint**: no (reliability / perf / maintainability only)
 
 Plans:
 
 **Wave 1**
 
-- [ ] 04.5-01-PLAN.md — Baselines, POST-MERGE addendum, graph tooling (REL-04, REL-06, REL-05 Wave 0)
-- [ ] 04.5-02-PLAN.md — AJV anyOf schema zero-warning gate (REL-03)
-- [ ] 04.5-04-PLAN.md — Coolify deploy script extract + mock tests (REL-01)
+- [x] 04.5-01-PLAN.md — Baselines, POST-MERGE addendum, graph tooling (REL-04, REL-06, REL-05 Wave 0)
+- [x] 04.5-02-PLAN.md — AJV anyOf schema zero-warning gate (REL-03)
+- [x] 04.5-04-PLAN.md — Coolify deploy script extract + mock tests (REL-01)
 
 **Wave 2** *(04.5-03 blocked on 01)*
 
@@ -402,7 +402,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 →
 | 4.2 Desktop Platform Hardening | 8/8 | Complete    | 2026-08-28 |
 | 4.3 Infra & Prep for PDF/Offline/Audit | 8/8 | Complete    | 2026-08-30 |
 | 4.4 GitHub Actions Optimization | 7/7 | Complete | 2026-09-04 |
-| 4.5 Repository Reliability, Performance & Maintainability Hardening | 0/? | Not started | - |
+| 4.5 Repository Reliability, Performance & Maintainability Hardening | 3/6 | In Progress|  |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |
 | 6. Mockup 1:1 Fidelity Closure | 0/? | Not started | - |
