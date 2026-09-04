@@ -281,6 +281,8 @@ jobs:
             echo "FaynoSync upload failed HTTP ${HTTP_CODE}"
             exit 1
           fi
+          echo "FaynoSync macOS upload HTTP ${HTTP_CODE}"
+          jq -c '{version, id}' /tmp/fayno-mac.json
 
       - name: Upload Windows updater to FaynoSync
         env:
@@ -334,6 +336,8 @@ jobs:
             echo "FaynoSync upload failed HTTP ${HTTP_CODE}"
             exit 1
           fi
+          echo "FaynoSync Windows upload HTTP ${HTTP_CODE}"
+          jq -c '{version, id}' /tmp/fayno-win.json
 
       - name: Verify FaynoSync checkVersion (macOS)
         run: |
