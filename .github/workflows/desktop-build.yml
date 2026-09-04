@@ -117,6 +117,7 @@ jobs:
 
       - name: Step summary
         if: always()
+        shell: bash
         env:
           TARGET: ${{ steps.build_env.outputs.target }}
           EVENT: ${{ github.event_name }}
