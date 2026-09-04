@@ -4,10 +4,38 @@ run-name: ${{ github.event_name == 'pull_request' && format('codeql · {0} · PR
 on:
   push:
     branches: [main]
+    paths:
+      - "**/*.js"
+      - "**/*.jsx"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.rs"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
+      - "rust-toolchain.toml"
+      - ".github/workflows/codeql.yml"
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "**/*.js"
+      - "**/*.jsx"
+      - "**/*.ts"
+      - "**/*.tsx"
+      - "**/*.rs"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
+      - "rust-toolchain.toml"
+      - ".github/workflows/codeql.yml"
   schedule:
     - cron: "18 5 * * 1"
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,17 +44,64 @@ concurrency:
 permissions: {}
 
 jobs:
-  analyze:
+  detect:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      javascript-typescript: ${{ steps.set.outputs.javascript-typescript }}
+      rust: ${{ steps.set.outputs.rust }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        id: filter
+        if: github.event_name != 'schedule' && github.event_name != 'workflow_dispatch'
+        with:
+          filters: |
+            javascript-typescript:
+              - '**/*.js'
+              - '**/*.jsx'
+              - '**/*.ts'
+              - '**/*.tsx'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - '.github/workflows/codeql.yml'
+            rust:
+              - '**/*.rs'
+              - '**/Cargo.toml'
+              - '**/Cargo.lock'
+              - '.github/workflows/codeql.yml'
+
+      - id: set
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          FILTER_JS: ${{ steps.filter.outputs.javascript-typescript }}
+          FILTER_RS: ${{ steps.filter.outputs.rust }}
+        run: |
+          if [ "$EVENT_NAME" = "schedule" ] || [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "javascript-typescript=true" >> "$GITHUB_OUTPUT"
+            echo "rust=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "javascript-typescript=${FILTER_JS}" >> "$GITHUB_OUTPUT"
+            echo "rust=${FILTER_RS}" >> "$GITHUB_OUTPUT"
+          fi
+
+  analyze-js-typescript:
     timeout-minutes: 45
+    needs: detect
+    if: |
+      needs.detect.outputs.javascript-typescript == 'true' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
       security-events: write
-    strategy:
-      fail-fast: false
-      matrix:
-        language: ["javascript-typescript", "rust"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -34,10 +109,34 @@ jobs:
 
       - uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
         with:
-          languages: ${{ matrix.language }}
-
-      - uses: github/codeql-action/autobuild@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+          languages: javascript-typescript
+          build-mode: none
 
       - uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
         with:
-          category: /language:${{ matrix.language }}
+          category: /language:javascript-typescript
+
+  analyze-rust:
+    timeout-minutes: 45
+    needs: detect
+    if: |
+      needs.detect.outputs.rust == 'true' &&
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        with:
+          languages: rust
+          build-mode: none
+
+      - uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        with:
+          category: /language:rust
