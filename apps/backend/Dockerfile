@@ -50,7 +50,7 @@ FROM build AS worker
 CMD ["node", "dist/worker.js"]
 
 FROM build AS api
-# ponytail: Coolify Postgres is Docker-internal DNS. GitHub-hosted runners cannot
-# reach it, so prisma migrate deploy stays in CMD while swarm_replicas=1.
-# GHA migrate job is the scale-out path once a reachable DATABASE_URL exists.
+# API container CMD is the only migrator. Coolify Postgres is Docker-internal DNS;
+# GitHub-hosted runners cannot reach it. Multi-replica later needs exactly one
+# external migrator (brief 6.6) — do not activate.
 CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/main.js"]
