@@ -39,7 +39,8 @@ apps/backend/src/generated/
 stitch-output/
 
 # Stitch QA scripts + root mockup symlinks (canonical: .planning/phases/.../mockups/)
-/scripts/
+/scripts/*
+!/scripts/assert-ajv-zero-warnings.sh
 mockups/
 
 # Pixel-harness captures (large PNGs; paths live in 04.1-QA.md)
