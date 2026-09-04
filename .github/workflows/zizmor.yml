@@ -8,6 +8,7 @@ on:
       - ".github/workflows/**"
       - ".github/actions/**"
       - ".github/dependabot.yml"
+      - ".github/zizmor.yml"
       - "action.yml"
       - "action.yaml"
   pull_request:
@@ -15,6 +16,7 @@ on:
       - ".github/workflows/**"
       - ".github/actions/**"
       - ".github/dependabot.yml"
+      - ".github/zizmor.yml"
       - "action.yml"
       - "action.yaml"
   workflow_dispatch:

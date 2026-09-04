@@ -104,6 +104,13 @@ updates:
       - dependency-name: node
         versions:
           - ">=25"
+    groups:
+      docker-patch-minor:
+        update-types:
+          - patch
+          - minor
+        patterns:
+          - "*"
 
   - package-ecosystem: docker-compose
     directory: /
@@ -120,3 +127,10 @@ updates:
     commit-message:
       prefix: "chore"
       include: scope
+    groups:
+      compose-patch-minor:
+        update-types:
+          - patch
+          - minor
+        patterns:
+          - "*"

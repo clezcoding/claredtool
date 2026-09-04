@@ -79,6 +79,15 @@ jobs:
               - 'pnpm-lock.yaml'
               - 'pnpm-workspace.yaml'
               - '.npmrc'
+              - '.github/actions/**'
+              - '.github/workflows/ci.yml'
+            database:
+              - 'apps/backend/prisma/**'
+              - 'apps/backend/prisma.config.ts'
+              - 'apps/backend/package.json'
+              - 'pnpm-lock.yaml'
+              - '.squawk.toml'
+              - '.github/actions/setup-pnpm-ci/action.yml'
               - '.github/workflows/ci.yml'
     outputs:
       desktop-web: ${{ steps.filter.outputs.desktop-web }}
@@ -86,6 +95,7 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
       tax-engine: ${{ steps.filter.outputs.tax-engine }}
       shared: ${{ steps.filter.outputs.shared }}
+      database: ${{ steps.filter.outputs.database }}
 
   desktop-web:
     timeout-minutes: 15
@@ -123,7 +133,9 @@ jobs:
           path: apps/desktop/junit.xml
           retention-days: 5
 
-      - run: pnpm --filter ./apps/desktop build
+      # TypeScript was checked above; calling the package build script here
+      # would run `tsc` a second time before Vite.
+      - run: pnpm --filter ./apps/desktop exec vite build
 
   desktop-rust:
     timeout-minutes: 15
@@ -276,7 +288,7 @@ jobs:
     needs: changes
     if: |
       (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
-      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.tax-engine == 'true')
+      needs.changes.outputs.database == 'true'
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -307,7 +319,7 @@ jobs:
 
       - uses: ./.github/actions/setup-pnpm-ci # zizmor: ignore[self-repository]
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --filter @clared/tax-engine... --filter ./apps/backend...
 
       - name: Install squawk-cli
         # zizmor: ignore[adhoc-packages] — Plan 03: squawk-cli@2.64.0 npm-global, not a lockfile dep
@@ -360,6 +372,7 @@ jobs:
           AREA_BACKEND: ${{ needs.changes.outputs.backend }}
           AREA_SHARED: ${{ needs.changes.outputs.shared }}
           AREA_TAX_ENGINE: ${{ needs.changes.outputs.tax-engine }}
+          AREA_DATABASE: ${{ needs.changes.outputs.database }}
           RES_PREFLIGHT: ${{ needs.preflight.result }}
           RES_CHANGES: ${{ needs.changes.result }}
           RES_DESKTOP_WEB: ${{ needs.desktop-web.result }}
@@ -376,6 +389,7 @@ jobs:
             echo "- backend: ${AREA_BACKEND}"
             echo "- shared: ${AREA_SHARED}"
             echo "- tax-engine: ${AREA_TAX_ENGINE}"
+            echo "- database: ${AREA_DATABASE}"
             echo "### Job results"
             echo "- preflight: ${RES_PREFLIGHT} skip=${SHOULD_SKIP}"
             echo "- changes: ${RES_CHANGES}"

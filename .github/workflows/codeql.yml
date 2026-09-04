@@ -15,7 +15,7 @@ on:
       - "pnpm-workspace.yaml"
       - "**/Cargo.toml"
       - "**/Cargo.lock"
-      - "rust-toolchain.toml"
+      - "**/rust-toolchain.toml"
       - ".github/workflows/codeql.yml"
   schedule:
     - cron: "18 5 * * 1"
@@ -64,7 +64,7 @@ jobs:
               - '**/*.rs'
               - '**/Cargo.toml'
               - '**/Cargo.lock'
-              - 'rust-toolchain.toml'
+              - '**/rust-toolchain.toml'
               - '.github/workflows/codeql.yml'
 
       - id: set

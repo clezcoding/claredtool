@@ -1,4 +1,5 @@
 name: desktop-build
+run-name: ${{ github.event_name == 'workflow_dispatch' && format('desktop-build · {0} · {1} · publish={2}', inputs.target, github.ref_name, inputs.publish) || format('desktop-build · release · {0}', github.ref_name) }}
 # Signed Win/macOS bundles run on v* tags and workflow_dispatch; typecheck/tests stay in ci.yml.
 
 on:
@@ -24,7 +25,26 @@ permissions:
   contents: read
 
 jobs:
+  validate-ref:
+    name: validate signing ref
+    timeout-minutes: 2
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Allow only main or v* tags
+        env:
+          BUILD_REF: ${{ github.ref }}
+        run: |
+          case "$BUILD_REF" in
+            refs/heads/main|refs/tags/v*) ;;
+            *)
+              echo "Signed desktop builds are restricted to main and v* tags; got ${BUILD_REF}"
+              exit 1
+              ;;
+          esac
+
   tauri:
+    needs: validate-ref
     timeout-minutes: 90
     # cancel-in-progress: false for v* tags and workflow_dispatch (D-14, D-31)
     concurrency:
