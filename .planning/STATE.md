@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.4
 current_phase_name: GitHub Actions Optimization
 status: executing
-stopped_at: Completed 04.4-02-PLAN.md
-last_updated: "2026-09-04T04:03:56.454Z"
+stopped_at: Completed 04.4-03-PLAN.md
+last_updated: "2026-09-04T04:12:50.738Z"
 last_activity: 2026-09-04
-last_activity_desc: Completed 04.4-02 CI job split; ready for 04.4-03
-state_head: 34ecaaee5f646ac64bd9a6b1d3daa0fb5522bbd2
+last_activity_desc: Completed 04.4-03 security workflows + Actionlint; ready for 04.4-04
+state_head: efdb1a86562653962afa997590cfd45481247750
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 54
-  completed_plans: 49
+  completed_plans: 50
 milestone_name: milestone
 ---
 
@@ -28,16 +28,16 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Executing Phase 04.4
+Status: Ready to execute
 Phase: 04.4 (GitHub Actions Optimization) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 3 of 7 (04.4-02 complete)
+Plan: 4 of 7 (04.4-03 complete)
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
-Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–02 done)
+Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–03 done)
 Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 — Completed 04.4-02 (job split + filtered installs); next 04.4-03
+Last activity: 2026-09-04 — Completed 04.4-03 (Gitleaks SARIF, Actionlint, CodeQL split); next 04.4-04
 
 Progress: [███████░░░] 70%
 
@@ -114,6 +114,7 @@ Progress: [███████░░░] 70%
 | Phase 04.3 P08 | 19h wall | 3 tasks | 3 files |
 | Phase 04.4 P01 | 8 min | 3 tasks | 5 files |
 | Phase 04.4 P02 | 5 min | 3 tasks | 2 files |
+| Phase 04.4 P03 | 5 min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -242,6 +243,10 @@ Recent decisions affecting current work:
 - [Phase 04.4]: Create setup-pnpm-ci because three unsigned twins remain (desktop-web, backend-test, squawk) — D-30/BRIEF-2.4: extract only if ≥2 identical Node 24 + pnpm cache setups remain after the split.
 - [Phase 04.4]: desktop-rust has no pnpm/Node; build.rs is serde_json only — Local cargo path reads tauri.conf.json via serde_json; no Node in build.rs.
 - [Phase 04.4]: backend-test timeout-minutes 30 so sequential unit+e2e cannot inherit the old 15/20 split budgets — Consolidated job runs origin unit then e2e; 15 or 20 would be a false timeout.
+- [Phase 04.4]: gitleaks-action does not write workspace SARIF; CLI is zricethezav/gitleaks:v8.30.1 digest plus upload-sarif if: always() — Official gitleaks-action only uploads a SARIF artifact. gitleaks/gitleaks is not a public Docker Hub image. Job fail stays the merge gate; SARIF still needs to land when the scan fails (D-10, Pitfall 7).
+- [Phase 04.4]: A2 Actionlint 1.7.12 index digest unchanged from RESEARCH — docker buildx imagetools inspect rhysd/actionlint:1.7.12 still sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+- [Phase 04.4]: CodeQL JS/TS and Rust use build-mode none; drafts skip analyze; schedule/dispatch both languages — GitHub compiled-languages docs list None as default-setup for Rust. Revert analyze-rust to autobuild only if a scheduled run is empty.
+- [Phase 04.4]: D-09 gitleaks required check and D-12 Secret Scanning stay founder-after-merge — Plan 03 must not call GitHub Branch Protection, Environments, or Secret Scanning APIs (D-06, D-09, D-12).
 
 ### Pending Todos
 
@@ -287,8 +292,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-04T04:02:57.205Z
-Stopped at: Completed 04.4-02-PLAN.md
+Last session: 2026-09-04T04:12:50.612Z
+Stopped at: Completed 04.4-03-PLAN.md
 Resume file: None
 
 ## Rebuild Log

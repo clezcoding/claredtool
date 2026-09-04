@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 33
+open_count: 35
 waived_count: 1
 fixed_count: 3
-total_count: 37
-last_updated: 2026-09-04T03:52:31.413Z
+total_count: 39
+last_updated: 2026-09-04T04:12:49.092Z
 ---
 
 # Broken Windows Ledger
@@ -52,6 +52,8 @@ last_updated: 2026-09-04T03:52:31.413Z
 | 35 | 04.3 | deviation | apps/desktop/src-tauri/src/lib.rs |  | PRAGMA key via sqlite3_auto_extension (plugin has no after_connect) | open |  | 2026-08-29T02:29:14.221Z |  |
 | 36 | 04.3 | stub | .planning/phases/04.3-infra-prep-for-pdf-offline-audit-gotenberg-uptime-kuma-besze/04.3-MONITOR-OPS.md |  | Beszel KEY/TOKEN pending-h4 until Plan 08 H4 | open |  | 2026-08-29T04:41:07.137Z |  |
 | 37 | 04.4 | deviation | .github/workflows/desktop-build.yml | 74 | Origin SC2129: Actionlint+ShellCheck style on desktop-build.yml; Plan 01 did not edit this file | open |  | 2026-09-04T03:52:31.413Z |  |
+| 38 | 04.4 | deviation | .github/workflows/desktop-build.yml | 83 | Folded SC2129 GITHUB_OUTPUT redirects so in-workflow Actionlint can fail closed | open |  | 2026-09-04T04:12:49.010Z |  |
+| 39 | 04.4 | deviation | .github/workflows/gitleaks.yml | 34 | upload-sarif and CLI SARIF use if: always() so findings still reach the Security tab when the job fails | open |  | 2026-09-04T04:12:49.092Z |  |
 
 ````json
 [
@@ -497,6 +499,30 @@ last_updated: 2026-09-04T03:52:31.413Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-09-04T03:52:31.413Z",
+    "resolved_at": null
+  },
+  {
+    "id": 38,
+    "kind": "deviation",
+    "phase": "04.4",
+    "file": ".github/workflows/desktop-build.yml",
+    "line": 83,
+    "description": "Folded SC2129 GITHUB_OUTPUT redirects so in-workflow Actionlint can fail closed",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-04T04:12:49.010Z",
+    "resolved_at": null
+  },
+  {
+    "id": 39,
+    "kind": "deviation",
+    "phase": "04.4",
+    "file": ".github/workflows/gitleaks.yml",
+    "line": 34,
+    "description": "upload-sarif and CLI SARIF use if: always() so findings still reach the Security tab when the job fails",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-04T04:12:49.092Z",
     "resolved_at": null
   }
 ]
