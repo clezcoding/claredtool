@@ -1,16 +1,17 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 04.4
-current_phase_name: GitHub Actions Optimization
-status: "Phase 04.4 shipped — PR #111"
-stopped_at: Completed 04.4-07-PLAN.md
-last_updated: "2026-09-04T08:49:33.213Z"
+current_phase: 5
+current_phase_name: PDF, Audit & Offline Sync
+status: planning
+stopped_at: Health+forensics remediations complete
+last_updated: "2026-09-04T11:30:00.000Z"
 last_activity: 2026-09-04
-state_head: 5d7e6f46ec97925123edfc2f3cb5e1d39d3316ed
+last_activity_desc: "Completed quick task 260904-ile: Dependabot qs/mysql2 patches + stale GitHub epics closed"
+state_head: a004b8edb76d524f02e30accc5ac622dac86a86e
 progress:
   total_phases: 11
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 54
   completed_plans: 54
 milestone_name: milestone
@@ -23,28 +24,28 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-30)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 04.4 — GitHub Actions Optimization
+**Current focus:** Phase 5 — PDF, Audit & Offline Sync
 
 ## Current Position
 
-Status: Phase 04.4 shipped — PR #111
-Phase: 04.4 (GitHub Actions Optimization) — EXECUTING
+Status: Ready to plan
+Phase: 5 — PDF, Audit & Offline Sync
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 7 of 7 (04.4-06 complete)
+Plan: Not started
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
-Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–06 done)
-Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
+Phase 04.4 (GitHub Actions Optimization) — complete 2026-09-04 (PR #111)
+Phase 05 (PDF, Audit & Offline Sync) — current, not started
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 - Completed quick task 260904-f60: Audit all GitHub Actions workflows: optimize/simplify, adjust frequency, define which workflows are required vs skippable by change type and PR
+Last activity: 2026-09-04 — Phase 04.4 complete, transitioned to Phase 5
 
-Progress: [███████░░░] 70%
+Progress: [████████░░] 73%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 47
+- Total plans completed: 54
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -60,6 +61,7 @@ Progress: [███████░░░] 70%
 | 04.1 | 7 | - | - |
 | 04.2 | 8 | - | - |
 | 04.3 | 8 | - | - |
+| 04.4 | 7 | - | - |
 
 **Recent Trend:**
 
@@ -264,6 +266,7 @@ Recent decisions affecting current work:
 - [Phase 04.4]: Three atomic 04.4-07 commits instead of one D-33 commit 7; linear no squash — Executor per-task protocol and 04.4-05/06 precedent
 - [Phase 04.4]: Dependabot cooldown default-days 7; zizmor.yml ignores sync-labels artipacked (D-36) — zizmor 1.30.0 must exit 0; cannot edit sync-labels.yml
 - [quick-260904-cjp]: CodeQL analyze-rust off pull_request (stay on main/schedule/dispatch); backend-unit || backend-e2e; desktop runners pinned windows-2025 + macos-26 (overrides 04.4 D-17); signed job still no Actions cache
+- [quick-260904-ile]: pnpm-workspace overrides qs@6.16.0 + mysql2@3.23.1 (Dependabot #6–#8); closed stale phase epics #100 #99 #51 #29 #27 #11 #17; human UAT #15/#20 and Phase 06 #37 stay open
 
 ### Pending Todos
 
@@ -292,6 +295,7 @@ None yet.
 | 260904-458 | Implement audit Phase 6: Squawk in ci.yml, verify /health/ready + PREV_TAG rollback, SBOM+cosign keyless in backend-image.yml. Node 24 unchanged. Verify Phase 5 first. | 2026-09-04 | 9f92f6a | [260904-458-implement-audit-phase-6-squawk-in-ci-yml](./quick/260904-458-implement-audit-phase-6-squawk-in-ci-yml/) |
 | 260904-cjp | Re-verify GitHub Actions brief after main merge; speed CodeQL analyze-rust, backend-test, desktop-build; split PR vs main triggers; bump desktop runners to current 2026 labels | 2026-09-04 | dc7b973 | [260904-cjp-re-verify-github-actions-brief-after-mai](./quick/260904-cjp-re-verify-github-actions-brief-after-mai/) |
 | 260904-f60 | Audit all GitHub Actions workflows: optimize/simplify, adjust frequency, define which workflows are required vs skippable by change type and PR | 2026-09-04 | 2d67a63 | [260904-f60-audit-all-github-actions-workflows-optim](./quick/260904-f60-audit-all-github-actions-workflows-optim/) |
+| 260904-ile | Kümmere dich um alle offenen Issues sowie Security Warnings in der Repo. Sie sollen gefixt werden NICHT einfach ignoriert. Verwende Context7 | 2026-09-04 | 02a9517 | [260904-ile-k-mmere-dich-um-alle-offenen-issues-sowi](./quick/260904-ile-k-mmere-dich-um-alle-offenen-issues-sowi/) |
 
 ### Roadmap Evolution
 
@@ -311,9 +315,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-04T04:57:54.326Z
-Stopped at: Completed 04.4-07-PLAN.md
-Resume file: None
+Last session: 2026-09-04T10:09:45.727Z
+Stopped at: Health+forensics remediations complete
+Resume file: .planning/forensics/report-20260904-120305.md
 
 ## Rebuild Log
 
