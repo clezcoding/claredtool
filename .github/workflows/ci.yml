@@ -233,6 +233,7 @@ jobs:
 
   # G5: squawk-cli on Node 24. The GitHub composite action (v2.1.0)
   # hardcodes setup-node node-version 20 — do not uses it.
+  # Prisma 7: migrate deploy then diff --from-config-datasource (no shadow URL).
   squawk:
     timeout-minutes: 15
     needs: changes
