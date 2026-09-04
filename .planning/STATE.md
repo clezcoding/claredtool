@@ -7,7 +7,7 @@ status: verifying
 stopped_at: Completed 04.4-07-PLAN.md
 last_updated: "2026-09-04T04:57:54.461Z"
 last_activity: 2026-09-04
-last_activity_desc: Completed 04.4-06 backend-image SHA-only tags, migrate job gone, ordered deploy; ready for 04.4-07
+last_activity_desc: Completed quick task 260904-cjp: CodeQL Rust off PR, parallel backend-unit/e2e, desktop runners windows-2025 + macos-26
 state_head: 54288bc69893c122a5ba40a4e7d651b4d9ef2e91
 progress:
   total_phases: 11
@@ -37,7 +37,7 @@ Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–06 done
 Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 — Completed 04.4-06 (drop GHCR latest, delete migrate job, collapse deploy, Bake abort); next 04.4-07
+Last activity: 2026-09-04 - Completed quick task 260904-cjp: Re-verify GitHub Actions brief after main merge; speed CodeQL analyze-rust, backend-test, desktop-build; split PR vs main triggers; bump desktop runners to current 2026 labels
 
 Progress: [███████░░░] 70%
 
@@ -290,6 +290,7 @@ None yet.
 | 260903-x8n | Implement audit Phase 5 security baseline (zizmor, gitleaks, Trivy, CodeQL, Harden-Runner audit) | 2026-09-03 | 17ab691 | [260903-x8n-implement-audit-phase-5-security-baselin](./quick/260903-x8n-implement-audit-phase-5-security-baselin/) |
 | 260904-2ix | Fix zizmor cache-poisoning #21 #22: no Actions cache in desktop-build.yml | 2026-09-04 | 740c6dc | [260904-2ix-fix-zizmor-cache-poisoning-alerts-21-and](./quick/260904-2ix-fix-zizmor-cache-poisoning-alerts-21-and/) |
 | 260904-458 | Implement audit Phase 6: Squawk in ci.yml, verify /health/ready + PREV_TAG rollback, SBOM+cosign keyless in backend-image.yml. Node 24 unchanged. Verify Phase 5 first. | 2026-09-04 | 9f92f6a | [260904-458-implement-audit-phase-6-squawk-in-ci-yml](./quick/260904-458-implement-audit-phase-6-squawk-in-ci-yml/) |
+| 260904-cjp | Re-verify GitHub Actions brief after main merge; speed CodeQL analyze-rust, backend-test, desktop-build; split PR vs main triggers; bump desktop runners to current 2026 labels | 2026-09-04 | dc7b973 | [260904-cjp-re-verify-github-actions-brief-after-mai](./quick/260904-cjp-re-verify-github-actions-brief-after-mai/) |
 
 ### Roadmap Evolution
 
