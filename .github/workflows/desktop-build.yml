@@ -114,6 +114,26 @@ jobs:
           compression-level: 0
           retention-days: ${{ startsWith(github.ref, 'refs/tags/v') && 14 || 3 }}
 
+      - name: Step summary
+        if: always()
+        env:
+          TARGET: ${{ steps.build_env.outputs.target }}
+          EVENT: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          RUNNER_OS: ${{ runner.os }}
+        run: |
+          {
+            echo "## desktop-build"
+            echo "- event: ${EVENT}"
+            echo "- ref: ${REF_NAME}"
+            echo "- target: ${TARGET}"
+            if [ "$RUNNER_OS" = "Windows" ]; then
+              echo "- artifacts: windows-bundle (nsis exe+sig, msi)"
+            else
+              echo "- artifacts: macos-bundle (dmg, app.tar.gz+sig)"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
   github-release:
     timeout-minutes: 10
     needs: tauri

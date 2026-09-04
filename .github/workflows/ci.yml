@@ -86,7 +86,15 @@ jobs:
 
       - run: pnpm --filter ./apps/desktop exec tsc --noEmit
 
-      - run: pnpm --filter ./apps/desktop test
+      - run: pnpm --filter ./apps/desktop test -- --reporter=default --reporter=junit --outputFile=junit.xml
+
+      - name: Upload Vitest JUnit
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: desktop-web-junit
+          path: apps/desktop/junit.xml
+          retention-days: 5
 
       - run: pnpm --filter ./apps/desktop build
 
@@ -193,13 +201,13 @@ jobs:
 
       - run: pnpm --filter ./apps/backend exec nest build
 
-      - run: pnpm --filter ./apps/backend test
+      - run: pnpm --filter ./apps/backend test -- --reporters=default --reporters=github-actions
 
-      - run: pnpm --filter @clared/tax-engine test
+      - run: pnpm --filter @clared/tax-engine test -- --reporters=default --reporters=github-actions
 
       - run: pnpm --filter ./apps/backend exec prisma migrate deploy
 
-      - run: pnpm --filter ./apps/backend test:e2e
+      - run: pnpm --filter ./apps/backend test:e2e -- --reporters=default --reporters=github-actions
 
   # G5: squawk-cli on Node 24. The GitHub composite action (v2.1.0)
   # hardcodes setup-node node-version 20 — do not uses it.
@@ -286,7 +294,33 @@ jobs:
           egress-policy: audit
 
       - name: Check job results
+        env:
+          AREA_DESKTOP_WEB: ${{ needs.changes.outputs.desktop-web }}
+          AREA_DESKTOP_RUST: ${{ needs.changes.outputs.desktop-rust }}
+          AREA_BACKEND: ${{ needs.changes.outputs.backend }}
+          AREA_SHARED: ${{ needs.changes.outputs.shared }}
+          AREA_TAX_ENGINE: ${{ needs.changes.outputs.tax-engine }}
+          RES_CHANGES: ${{ needs.changes.result }}
+          RES_DESKTOP_WEB: ${{ needs.desktop-web.result }}
+          RES_DESKTOP_RUST: ${{ needs.desktop-rust.result }}
+          RES_BACKEND_TEST: ${{ needs.backend-test.result }}
+          RES_SQUAWK: ${{ needs.squawk.result }}
         run: |
+          {
+            echo "## CI"
+            echo "### Changed areas"
+            echo "- desktop-web: ${AREA_DESKTOP_WEB}"
+            echo "- desktop-rust: ${AREA_DESKTOP_RUST}"
+            echo "- backend: ${AREA_BACKEND}"
+            echo "- shared: ${AREA_SHARED}"
+            echo "- tax-engine: ${AREA_TAX_ENGINE}"
+            echo "### Job results"
+            echo "- changes: ${RES_CHANGES}"
+            echo "- desktop-web: ${RES_DESKTOP_WEB}"
+            echo "- desktop-rust: ${RES_DESKTOP_RUST}"
+            echo "- backend-test: ${RES_BACKEND_TEST}"
+            echo "- squawk: ${RES_SQUAWK}"
+          } >> "$GITHUB_STEP_SUMMARY"
           check() {
             local name="$1"
             local result="$2"
@@ -295,8 +329,8 @@ jobs:
               exit 1
             fi
           }
-          check changes "${{ needs.changes.result }}"
-          check desktop-web "${{ needs.desktop-web.result }}"
-          check desktop-rust "${{ needs.desktop-rust.result }}"
-          check backend-test "${{ needs.backend-test.result }}"
-          check squawk "${{ needs.squawk.result }}"
+          check changes "$RES_CHANGES"
+          check desktop-web "$RES_DESKTOP_WEB"
+          check desktop-rust "$RES_DESKTOP_RUST"
+          check backend-test "$RES_BACKEND_TEST"
+          check squawk "$RES_SQUAWK"

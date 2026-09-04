@@ -185,6 +185,18 @@ jobs:
           cosign sign --yes "${IMAGE}@${DIGEST_API}"
           cosign sign --yes "${IMAGE}@${DIGEST_WORKER}"
 
+      - name: Step summary
+        if: always()
+        env:
+          IMAGE: ${{ steps.image.outputs.image }}
+          SHA_TAG: ${{ steps.image.outputs.sha_tag }}
+        run: |
+          {
+            echo "## backend-image build"
+            echo "- API: ${IMAGE}:${SHA_TAG}"
+            echo "- worker: ${IMAGE}:${SHA_TAG}-worker"
+          } >> "$GITHUB_STEP_SUMMARY"
+
   deploy:
     needs: [build]
     if: |
@@ -222,6 +234,11 @@ jobs:
           test -n "$WORKER_UUID"
           test -n "$SHA_TAG"
           test -n "$IMAGE"
+          {
+            echo "## backend-image deploy"
+            echo "- API tag: ${SHA_TAG}"
+            echo "- worker tag: ${SHA_TAG}-worker"
+          } >> "$GITHUB_STEP_SUMMARY"
 
           coolify_get() {
             curl -fsS -X GET "${COOLIFY_URL}/api/v1/applications/${1}" \
@@ -249,6 +266,7 @@ jobs:
 
           rollback_changed() {
             echo "Rolling back already-changed apps"
+            echo "- outcome: rollback attempted" >> "$GITHUB_STEP_SUMMARY"
             if [ "$changed_worker" = "1" ]; then
               if [ -n "$PREV_WORKER" ]; then
                 coolify_pin "$WORKER_UUID" "$PREV_WORKER" || true
@@ -318,3 +336,4 @@ jobs:
           fi
 
           trap - ERR
+          echo "- outcome: deployed" >> "$GITHUB_STEP_SUMMARY"
