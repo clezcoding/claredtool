@@ -2,6 +2,7 @@
 name = "clared"
 version = "0.1.1"
 description = "Clared desktop"
+# D-34 rust-only probe
 authors = ["you"]
 edition = "2021"
 
