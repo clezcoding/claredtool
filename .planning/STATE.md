@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.4
 current_phase_name: GitHub Actions Optimization
 status: executing
-stopped_at: Completed 04.4-03-PLAN.md
-last_updated: "2026-09-04T04:12:50.738Z"
+stopped_at: Completed 04.4-04-PLAN.md
+last_updated: "2026-09-04T04:24:56.136Z"
 last_activity: 2026-09-04
-last_activity_desc: Completed 04.4-03 security workflows + Actionlint; ready for 04.4-04
-state_head: efdb1a86562653962afa997590cfd45481247750
+last_activity_desc: Completed 04.4-04 desktop-release remainder; ready for 04.4-05
+state_head: 3a316f40c2274aa66aef04b095bf02c44e58069c
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 54
-  completed_plans: 50
+  completed_plans: 51
 milestone_name: milestone
 ---
 
@@ -31,13 +31,13 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 Status: Ready to execute
 Phase: 04.4 (GitHub Actions Optimization) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 4 of 7 (04.4-03 complete)
+Plan: 5 of 7 (04.4-04 complete)
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
-Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–03 done)
+Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–04 done)
 Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 — Completed 04.4-03 (Gitleaks SARIF, Actionlint, CodeQL split); next 04.4-04
+Last activity: 2026-09-04 — Completed 04.4-04 (signed desktop tags+dispatch only, GH Release, runner pins); next 04.4-05
 
 Progress: [███████░░░] 70%
 
@@ -115,6 +115,7 @@ Progress: [███████░░░] 70%
 | Phase 04.4 P01 | 8 min | 3 tasks | 5 files |
 | Phase 04.4 P02 | 5 min | 3 tasks | 2 files |
 | Phase 04.4 P03 | 5 min | 3 tasks | 5 files |
+| Phase 04.4 P04 | 4 | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -247,6 +248,9 @@ Recent decisions affecting current work:
 - [Phase 04.4]: A2 Actionlint 1.7.12 index digest unchanged from RESEARCH — docker buildx imagetools inspect rhysd/actionlint:1.7.12 still sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
 - [Phase 04.4]: CodeQL JS/TS and Rust use build-mode none; drafts skip analyze; schedule/dispatch both languages — GitHub compiled-languages docs list None as default-setup for Rust. Revert analyze-rust to autobuild only if a scheduled run is empty.
 - [Phase 04.4]: D-09 gitleaks required check and D-12 Secret Scanning stay founder-after-merge — Plan 03 must not call GitHub Branch Protection, Environments, or Secret Scanning APIs (D-06, D-09, D-12).
+- [Phase 04.4]: Human selected proceed-drop-main; desktop-build.yml no longer signs on main (D-14)
+- [Phase 04.4]: Matrix pinned windows-2022 + macos-15; D-17 staging swap after merge (D-34)
+- [Phase 04.4]: GH Release is v* tags only; production dispatch stays FaynoSync-only (D-16)
 
 ### Pending Todos
 
@@ -292,8 +296,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-04T04:12:50.612Z
-Stopped at: Completed 04.4-03-PLAN.md
+Last session: 2026-09-04T04:24:55.986Z
+Stopped at: Completed 04.4-04-PLAN.md
 Resume file: None
 
 ## Rebuild Log
