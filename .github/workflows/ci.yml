@@ -135,46 +135,8 @@ jobs:
 
       - run: cargo test --locked --manifest-path apps/desktop/src-tauri/Cargo.toml
 
-  backend-unit:
-    timeout-minutes: 15
-    needs: changes
-    if: |
-      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
-      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.tax-engine == 'true')
-    runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: postgresql://prisma-test:unused@127.0.0.1:5432/clared
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
-      - run: pnpm --filter @clared/tax-engine build
-
-      - run: pnpm --filter ./apps/backend exec prisma generate
-
-      - run: pnpm --filter ./apps/backend exec prisma validate
-
-      - run: pnpm --filter ./apps/backend exec nest build
-
-      - run: pnpm --filter ./apps/backend test
-
-      - run: pnpm --filter @clared/tax-engine test
-
-  backend-e2e:
-    timeout-minutes: 20
+  backend-test:
+    timeout-minutes: 30
     needs: changes
     if: |
       (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
@@ -221,9 +183,19 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --filter @clared/tax-engine... --filter ./apps/backend...
 
       - run: pnpm --filter @clared/tax-engine build
+
+      - run: pnpm --filter ./apps/backend exec prisma generate
+
+      - run: pnpm --filter ./apps/backend exec prisma validate
+
+      - run: pnpm --filter ./apps/backend exec nest build
+
+      - run: pnpm --filter ./apps/backend test
+
+      - run: pnpm --filter @clared/tax-engine test
 
       - run: pnpm --filter ./apps/backend exec prisma migrate deploy
 
@@ -307,7 +279,7 @@ jobs:
 
   ci:
     timeout-minutes: 5
-    needs: [changes, desktop-web, desktop-rust, backend-unit, backend-e2e, squawk]
+    needs: [changes, desktop-web, desktop-rust, backend-test, squawk]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -329,6 +301,5 @@ jobs:
           check changes "${{ needs.changes.result }}"
           check desktop-web "${{ needs.desktop-web.result }}"
           check desktop-rust "${{ needs.desktop-rust.result }}"
-          check backend-unit "${{ needs.backend-unit.result }}"
-          check backend-e2e "${{ needs.backend-e2e.result }}"
+          check backend-test "${{ needs.backend-test.result }}"
           check squawk "${{ needs.squawk.result }}"
