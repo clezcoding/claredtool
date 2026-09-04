@@ -88,6 +88,10 @@ jobs:
           echo "image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" >> "$GITHUB_OUTPUT"
           echo "sha_tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
+      # A5 / D-20: Bake aborted. bake-action exposes one metadata JSON blob, not
+      # named DIGEST_API / DIGEST_WORKER outputs. Feeding cosign would need extra
+      # fromJSON/jq; sha vs sha-*-worker tags stay clearer with two build-push
+      # steps (each outputs.digest). provenance/sbom stay false.
       # TECH-DEBT: GHCR attestations stay off — Coolify cannot pull
       # attestation indexes. Re-enable after a Coolify upgrade that can.
       # G8 SBOM/cosign below uses Syft + keyless sigstore, not buildx attestations.
