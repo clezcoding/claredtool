@@ -30,9 +30,19 @@ jobs:
         id: filter
         with:
           filters: |
-            desktop:
-              - 'apps/desktop/**'
+            desktop-web:
+              - 'apps/desktop/src/**'
+              - 'apps/desktop/index.html'
+              - 'apps/desktop/package.json'
+              - 'apps/desktop/vite.config.ts'
+              - 'apps/desktop/vitest.config.ts'
+              - 'apps/desktop/tsconfig.json'
+              - 'apps/desktop/tsconfig.node.json'
+              - 'apps/desktop/scripts/**'
               - 'packages/ui/**'
+            desktop-rust:
+              - 'apps/desktop/src-tauri/**'
+              - 'apps/desktop/src-tauri/rust-toolchain.toml'
             backend:
               - 'apps/backend/**'
               - 'packages/tax-engine/src/schema/clared-tax-rule-dsl-schema.json'
@@ -45,17 +55,18 @@ jobs:
               - '.npmrc'
               - '.github/workflows/ci.yml'
     outputs:
-      desktop: ${{ steps.filter.outputs.desktop }}
+      desktop-web: ${{ steps.filter.outputs.desktop-web }}
+      desktop-rust: ${{ steps.filter.outputs.desktop-rust }}
       backend: ${{ steps.filter.outputs.backend }}
       tax-engine: ${{ steps.filter.outputs.tax-engine }}
       shared: ${{ steps.filter.outputs.shared }}
 
-  lint:
+  desktop-web:
     timeout-minutes: 15
     needs: changes
     if: |
       (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
-      (needs.changes.outputs.desktop == 'true' || needs.changes.outputs.shared == 'true')
+      (needs.changes.outputs.desktop-web == 'true' || needs.changes.outputs.shared == 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
@@ -72,18 +83,20 @@ jobs:
           node-version: 24
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile --filter ./apps/desktop...
 
       - run: pnpm --filter ./apps/desktop exec tsc --noEmit
 
+      - run: pnpm --filter ./apps/desktop test
+
       - run: pnpm --filter ./apps/desktop build
 
-  desktop-test:
+  desktop-rust:
     timeout-minutes: 15
     needs: changes
     if: |
       (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
-      (needs.changes.outputs.desktop == 'true' || needs.changes.outputs.shared == 'true')
+      (needs.changes.outputs.desktop-rust == 'true' || needs.changes.outputs.shared == 'true')
     runs-on: ubuntu-24.04
     steps:
       - name: Harden Runner
@@ -116,22 +129,11 @@ jobs:
         with:
           workspaces: apps/desktop/src-tauri
 
-      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: 24
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-
       - run: cargo fmt --check --manifest-path apps/desktop/src-tauri/Cargo.toml
 
       - run: cargo clippy --locked --manifest-path apps/desktop/src-tauri/Cargo.toml -- -D warnings
 
       - run: cargo test --locked --manifest-path apps/desktop/src-tauri/Cargo.toml
-
-      - run: pnpm --filter ./apps/desktop test
 
   backend-unit:
     timeout-minutes: 15
@@ -305,7 +307,7 @@ jobs:
 
   ci:
     timeout-minutes: 5
-    needs: [changes, lint, desktop-test, backend-unit, backend-e2e, squawk]
+    needs: [changes, desktop-web, desktop-rust, backend-unit, backend-e2e, squawk]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -325,8 +327,8 @@ jobs:
             fi
           }
           check changes "${{ needs.changes.result }}"
-          check lint "${{ needs.lint.result }}"
-          check desktop-test "${{ needs.desktop-test.result }}"
+          check desktop-web "${{ needs.desktop-web.result }}"
+          check desktop-rust "${{ needs.desktop-rust.result }}"
           check backend-unit "${{ needs.backend-unit.result }}"
           check backend-e2e "${{ needs.backend-e2e.result }}"
           check squawk "${{ needs.squawk.result }}"
