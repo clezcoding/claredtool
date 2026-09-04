@@ -147,8 +147,43 @@ jobs:
 
       - run: cargo test --locked --manifest-path apps/desktop/src-tauri/Cargo.toml
 
-  backend-test:
-    timeout-minutes: 30
+  backend-unit:
+    timeout-minutes: 15
+    needs: changes
+    if: |
+      (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.tax-engine == 'true')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-pnpm-ci # zizmor: ignore[self-repository]
+
+      - run: pnpm install --frozen-lockfile --filter @clared/tax-engine... --filter ./apps/backend...
+
+      - run: pnpm --filter @clared/tax-engine build
+
+      - run: pnpm --filter ./apps/backend exec prisma generate
+
+      - run: pnpm --filter ./apps/backend exec prisma validate
+
+      - run: pnpm --filter ./apps/backend exec nest build
+
+      # pnpm 11 inserts `--` before extra `run` args (`jest -- --reporters`
+      # then matches no tests). `exec` passes flags through.
+      - run: pnpm --filter ./apps/backend exec jest --reporters=default --reporters=github-actions
+
+      - run: pnpm --filter @clared/tax-engine exec jest --reporters=default --reporters=github-actions
+
+  backend-e2e:
+    timeout-minutes: 20
     needs: changes
     if: |
       (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
@@ -199,16 +234,6 @@ jobs:
       - run: pnpm --filter @clared/tax-engine build
 
       - run: pnpm --filter ./apps/backend exec prisma generate
-
-      - run: pnpm --filter ./apps/backend exec prisma validate
-
-      - run: pnpm --filter ./apps/backend exec nest build
-
-      # pnpm 11 inserts `--` before extra `run` args (`jest -- --reporters`
-      # then matches no tests). `exec` passes flags through.
-      - run: pnpm --filter ./apps/backend exec jest --reporters=default --reporters=github-actions
-
-      - run: pnpm --filter @clared/tax-engine exec jest --reporters=default --reporters=github-actions
 
       - run: pnpm --filter ./apps/backend exec prisma migrate deploy
 
@@ -289,7 +314,7 @@ jobs:
 
   ci:
     timeout-minutes: 5
-    needs: [changes, desktop-web, desktop-rust, backend-test, squawk]
+    needs: [changes, desktop-web, desktop-rust, backend-unit, backend-e2e, squawk]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -308,7 +333,8 @@ jobs:
           RES_CHANGES: ${{ needs.changes.result }}
           RES_DESKTOP_WEB: ${{ needs.desktop-web.result }}
           RES_DESKTOP_RUST: ${{ needs.desktop-rust.result }}
-          RES_BACKEND_TEST: ${{ needs.backend-test.result }}
+          RES_BACKEND_UNIT: ${{ needs.backend-unit.result }}
+          RES_BACKEND_E2E: ${{ needs.backend-e2e.result }}
           RES_SQUAWK: ${{ needs.squawk.result }}
         run: |
           {
@@ -323,7 +349,8 @@ jobs:
             echo "- changes: ${RES_CHANGES}"
             echo "- desktop-web: ${RES_DESKTOP_WEB}"
             echo "- desktop-rust: ${RES_DESKTOP_RUST}"
-            echo "- backend-test: ${RES_BACKEND_TEST}"
+            echo "- backend-unit: ${RES_BACKEND_UNIT}"
+            echo "- backend-e2e: ${RES_BACKEND_E2E}"
             echo "- squawk: ${RES_SQUAWK}"
           } >> "$GITHUB_STEP_SUMMARY"
           check() {
@@ -337,5 +364,6 @@ jobs:
           check changes "$RES_CHANGES"
           check desktop-web "$RES_DESKTOP_WEB"
           check desktop-rust "$RES_DESKTOP_RUST"
-          check backend-test "$RES_BACKEND_TEST"
+          check backend-unit "$RES_BACKEND_UNIT"
+          check backend-e2e "$RES_BACKEND_E2E"
           check squawk "$RES_SQUAWK"
