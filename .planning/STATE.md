@@ -264,6 +264,7 @@ Recent decisions affecting current work:
 - [Phase 04.4]: Kept backend-image build actions: write for GHA cache-from/cache-to type=gha — docker/build-push-action GHA cache needs actions: write; dropping it would break CI cache
 - [Phase 04.4]: Three atomic 04.4-07 commits instead of one D-33 commit 7; linear no squash — Executor per-task protocol and 04.4-05/06 precedent
 - [Phase 04.4]: Dependabot cooldown default-days 7; zizmor.yml ignores sync-labels artipacked (D-36) — zizmor 1.30.0 must exit 0; cannot edit sync-labels.yml
+- [quick-260904-cjp]: CodeQL analyze-rust off pull_request (stay on main/schedule/dispatch); backend-unit || backend-e2e; desktop runners pinned windows-2025 + macos-26 (overrides 04.4 D-17); signed job still no Actions cache
 
 ### Pending Todos
 
