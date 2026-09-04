@@ -5,14 +5,19 @@ import pino from "pino";
 import { initOtel } from "./telemetry/otel";
 import { pinoBaseOptions } from "./telemetry/pino-options";
 import { WorkerModule } from "./worker.module";
+import { listenWorkerHealth } from "./worker-health";
 
 async function bootstrap() {
   initOtel({ serviceName: "clared-worker" });
   const log = pino(pinoBaseOptions("clared-worker"));
   log.info("Worker gestartet");
   const app = await NestFactory.createApplicationContext(WorkerModule);
+  const health = listenWorkerHealth(Number(process.env.PORT) || 3000);
   const shutdown = async (signal: string) => {
     try {
+      await new Promise<void>((resolve, reject) => {
+        health.close((err) => (err ? reject(err) : resolve()));
+      });
       await app.close();
       process.exit(0);
     } catch (err) {
