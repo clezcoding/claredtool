@@ -4,7 +4,22 @@ run-name: ${{ github.event_name == 'pull_request' && format('zizmor · {0} · PR
 on:
   push:
     branches: [main]
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+      - ".github/dependabot.yml"
+      - "action.yml"
+      - "action.yaml"
   pull_request:
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+      - ".github/dependabot.yml"
+      - "action.yml"
+      - "action.yaml"
+  workflow_dispatch:
+  schedule:
+    - cron: "42 4 * * 3"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -24,5 +39,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: actionlint
+        run: |
+          docker run --rm -v "$PWD:/repo" -w /repo \
+            rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
 
       - uses: zizmorcore/zizmor-action@6fc4b006235f201fdab3722e17240ab420d580e5 # v0.6.1

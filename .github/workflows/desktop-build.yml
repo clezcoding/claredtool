@@ -80,9 +80,11 @@ jobs:
             ENDPOINT="https://updates-staging.puzzlessdev.online/checkVersion?app_name=clared&version={{current_version}}&platform={{target}}&arch={{arch}}&channel=stable&updater=tauri&owner=admin"
             SENTRY_ENV="staging"
           fi
-          echo "target=$TARGET" >> "$GITHUB_OUTPUT"
-          echo "updater_endpoint=$ENDPOINT" >> "$GITHUB_OUTPUT"
-          echo "sentry_environment=$SENTRY_ENV" >> "$GITHUB_OUTPUT"
+          {
+            echo "target=$TARGET"
+            echo "updater_endpoint=$ENDPOINT"
+            echo "sentry_environment=$SENTRY_ENV"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Build desktop bundles (signed updater artifacts)
         env:
