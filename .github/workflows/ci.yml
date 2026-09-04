@@ -15,8 +15,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Skip push-to-main when the same tree already passed on the PR.
+  preflight:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@b974a9395958c231af965b70070979a577efa578 # v5.3.2
+        with:
+          concurrent_skipping: never
+          skip_after_successful_duplicate: "true"
+          do_not_skip: '["pull_request", "workflow_dispatch", "schedule"]'
+
   changes:
     timeout-minutes: 5
+    needs: preflight
+    if: needs.preflight.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
@@ -319,7 +343,7 @@ jobs:
 
   ci:
     timeout-minutes: 5
-    needs: [changes, desktop-web, desktop-rust, backend-unit, backend-e2e, squawk]
+    needs: [preflight, changes, desktop-web, desktop-rust, backend-unit, backend-e2e, squawk]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -330,11 +354,13 @@ jobs:
 
       - name: Check job results
         env:
+          SHOULD_SKIP: ${{ needs.preflight.outputs.should_skip }}
           AREA_DESKTOP_WEB: ${{ needs.changes.outputs.desktop-web }}
           AREA_DESKTOP_RUST: ${{ needs.changes.outputs.desktop-rust }}
           AREA_BACKEND: ${{ needs.changes.outputs.backend }}
           AREA_SHARED: ${{ needs.changes.outputs.shared }}
           AREA_TAX_ENGINE: ${{ needs.changes.outputs.tax-engine }}
+          RES_PREFLIGHT: ${{ needs.preflight.result }}
           RES_CHANGES: ${{ needs.changes.result }}
           RES_DESKTOP_WEB: ${{ needs.desktop-web.result }}
           RES_DESKTOP_RUST: ${{ needs.desktop-rust.result }}
@@ -351,6 +377,7 @@ jobs:
             echo "- shared: ${AREA_SHARED}"
             echo "- tax-engine: ${AREA_TAX_ENGINE}"
             echo "### Job results"
+            echo "- preflight: ${RES_PREFLIGHT} skip=${SHOULD_SKIP}"
             echo "- changes: ${RES_CHANGES}"
             echo "- desktop-web: ${RES_DESKTOP_WEB}"
             echo "- desktop-rust: ${RES_DESKTOP_RUST}"
@@ -366,6 +393,11 @@ jobs:
               exit 1
             fi
           }
+          check preflight "$RES_PREFLIGHT"
+          if [ "$SHOULD_SKIP" = "true" ]; then
+            echo "skip-duplicate: same tree already passed"
+            exit 0
+          fi
           check changes "$RES_CHANGES"
           check desktop-web "$RES_DESKTOP_WEB"
           check desktop-rust "$RES_DESKTOP_RUST"

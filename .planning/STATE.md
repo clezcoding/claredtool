@@ -36,7 +36,7 @@ Phase 04.4 (GitHub Actions Optimization) — **IN PROGRESS** (plans 01–06 done
 Phase 05 (PDF, Audit & Offline Sync) — after Phase 4.4
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04
+Last activity: 2026-09-04 - Completed quick task 260904-f60: Audit all GitHub Actions workflows: optimize/simplify, adjust frequency, define which workflows are required vs skippable by change type and PR
 
 Progress: [███████░░░] 70%
 
@@ -291,6 +291,7 @@ None yet.
 | 260904-2ix | Fix zizmor cache-poisoning #21 #22: no Actions cache in desktop-build.yml | 2026-09-04 | 740c6dc | [260904-2ix-fix-zizmor-cache-poisoning-alerts-21-and](./quick/260904-2ix-fix-zizmor-cache-poisoning-alerts-21-and/) |
 | 260904-458 | Implement audit Phase 6: Squawk in ci.yml, verify /health/ready + PREV_TAG rollback, SBOM+cosign keyless in backend-image.yml. Node 24 unchanged. Verify Phase 5 first. | 2026-09-04 | 9f92f6a | [260904-458-implement-audit-phase-6-squawk-in-ci-yml](./quick/260904-458-implement-audit-phase-6-squawk-in-ci-yml/) |
 | 260904-cjp | Re-verify GitHub Actions brief after main merge; speed CodeQL analyze-rust, backend-test, desktop-build; split PR vs main triggers; bump desktop runners to current 2026 labels | 2026-09-04 | dc7b973 | [260904-cjp-re-verify-github-actions-brief-after-mai](./quick/260904-cjp-re-verify-github-actions-brief-after-mai/) |
+| 260904-f60 | Audit all GitHub Actions workflows: optimize/simplify, adjust frequency, define which workflows are required vs skippable by change type and PR | 2026-09-04 | 2d67a63 | [260904-f60-audit-all-github-actions-workflows-optim](./quick/260904-f60-audit-all-github-actions-workflows-optim/) |
 
 ### Roadmap Evolution
 
