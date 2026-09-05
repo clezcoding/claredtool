@@ -262,6 +262,40 @@ importers:
         specifier: ^4.1.11
         version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.4.0)(jsdom@30.0.1(@noble/hashes@1.8.0))(vite@8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0))
 
+  packages/pdf-templates:
+    dependencies:
+      '@takumi-rs/helpers':
+        specifier: 2.13.6
+        version: 2.13.6(react@19.1.0)
+      react:
+        specifier: 19.1.0
+        version: 19.1.0
+      takumi-pdf:
+        specifier: 0.14.2
+        version: 0.14.2(react@19.1.0)
+    devDependencies:
+      '@types/jest':
+        specifier: ^30.0.0
+        version: 30.0.0
+      '@types/node':
+        specifier: ^26.4.0
+        version: 26.4.0
+      '@types/react':
+        specifier: ^19.1.0
+        version: 19.2.18
+      '@typescript/native':
+        specifier: npm:typescript@^7.0.2
+        version: typescript@7.0.2
+      jest:
+        specifier: ^30.4.2
+        version: 30.4.2(@types/node@26.4.0)(supports-color@8.1.1)
+      ts-jest:
+        specifier: ^29.2.5
+        version: 29.4.12(@babel/core@7.29.7(supports-color@8.1.1))(@jest/transform@30.4.1(supports-color@8.1.1))(@jest/types@30.4.1)(@typescript/typescript6@6.0.2)(babel-jest@30.4.1(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(esbuild@0.28.2)(jest-util@30.4.1)(jest@30.4.2(@types/node@26.4.0)(supports-color@8.1.1))
+      typescript:
+        specifier: npm:@typescript/typescript6@^6.0.2
+        version: '@typescript/typescript6@6.0.2'
+
   packages/tax-engine:
     dependencies:
       ajv:
@@ -3064,6 +3098,18 @@ packages:
     resolution: {integrity: sha512-yYU8cogLeSh/ms2jh8Fj7jaba/EWa7Ja6GoUqYZaraEuCI5YS6ms6ObZgjjedm+jm6XZjdNRWBpPP6Z86oOxcw==}
     peerDependencies:
       vite: ^5.2.0 || ^6 || ^7 || ^8
+
+  '@takumi-rs/helpers@2.13.6':
+    resolution: {integrity: sha512-p9Z6lDSecbyBRqmQYaCDQm+huuyctabnokpyJBWUxryLujNd+XiShyeLdKWcZGhDBvS5QRUdCuOVee3Bxi98fg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      preact: ^10.0.0
+      react: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      preact:
+        optional: true
+      react:
+        optional: true
 
   '@tauri-apps/api@2.11.1':
     resolution: {integrity: sha512-M2FPuYND2m+wh5hfW9ZpSdxMPdEJovPBWwoHJmwUpysTYNHaOkVFN419m/K0LIgjb/7KU2vBgsUepJWugQCvAA==}
@@ -6138,6 +6184,10 @@ packages:
       '@types/react':
         optional: true
 
+  react@19.1.0:
+    resolution: {integrity: sha512-FS+XFBNvn3GTAWq26joslQgWNoFu08F4kl0J4CgdNKADkdSGXQyTCnKteIAJy96Br6YbpEU1LSzV5dYtjMkMDg==}
+    engines: {node: '>=0.10.0'}
+
   react@19.2.8:
     resolution: {integrity: sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw==}
     engines: {node: '>=0.10.0'}
@@ -6511,6 +6561,15 @@ packages:
 
   tailwindcss@4.3.3:
     resolution: {integrity: sha512-gOhV3P7ufE62QDGg1zVaTgCR+EtPv92k2nIhVcVKcLmxT1sUBsQGhnZj175j+MqRt4zLF7ic+sCYjfhxMxj7YQ==}
+
+  takumi-pdf@0.14.2:
+    resolution: {integrity: sha512-LS0M+lJEbRD93eZYquOB3uYz7PeOyGQBbtlWlmoCD+N/X6wgvQVZClIQFdfyMbNjIPC5+09B/Sj8p6IDLrG3DQ==}
+    engines: {node: '>=20.19'}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   tapable@2.3.3:
     resolution: {integrity: sha512-uxc/zpqFg6x7C8vOE7lh6Lbda8eEL9zmVm/PLeTPBRhh1xCgdWaQ+J1CUieGpIfm2HdtsUpRv+HshiasBMcc6A==}
@@ -9998,6 +10057,10 @@ snapshots:
       tailwindcss: 4.3.3
       vite: 8.2.2(@types/node@26.4.0)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.50.0)(yaml@2.9.0)
 
+  '@takumi-rs/helpers@2.13.6(react@19.1.0)':
+    optionalDependencies:
+      react: 19.1.0
+
   '@tauri-apps/api@2.11.1': {}
 
   '@tauri-apps/cli-darwin-arm64@2.11.4':
@@ -13214,6 +13277,8 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.18
 
+  react@19.1.0: {}
+
   react@19.2.8: {}
 
   readable-stream@3.6.2:
@@ -13633,6 +13698,14 @@ snapshots:
   tailwind-merge@3.6.0: {}
 
   tailwindcss@4.3.3: {}
+
+  takumi-pdf@0.14.2(react@19.1.0):
+    dependencies:
+      '@takumi-rs/helpers': 2.13.6(react@19.1.0)
+    optionalDependencies:
+      react: 19.1.0
+    transitivePeerDependencies:
+      - preact
 
   tapable@2.3.3: {}
 

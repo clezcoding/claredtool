@@ -14,3 +14,6 @@ allowBuilds:
   unrs-resolver: false
   msgpackr-extract: false
   protobufjs: false
+minimumReleaseAgeExclude:
+  - '@takumi-rs/helpers@2.13.6'
+  - takumi-pdf@0.14.2
