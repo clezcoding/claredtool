@@ -332,4 +332,72 @@ describe("InvoicePdfService", () => {
       expect(result.xrechnungXml.contentType).toBe("application/xml");
     });
   });
+
+  describe("AE reverse-charge + B2G Leitweg (D-19, D-26)", () => {
+    it("DE reverse-charge AE returns hybrid PDF + XRechnung with exemption", async () => {
+      const pdfBytes = new TextEncoder().encode("%PDF-1.4 factur-x.xml mock");
+      renderInvoiceMock.mockResolvedValue({
+        bytes: pdfBytes,
+        contentType: "application/pdf",
+      });
+
+      const legal =
+        "Steuerschuldnerschaft des Leistungsempfängers (§ 13b UStG).";
+      const result = await service.render({
+        ...validInput(),
+        tax: {
+          ...validInput().tax,
+          place_of_supply_country: "DE",
+          tax_liability_party: "customer",
+          invoice_tax_rate: 0,
+          invoice_tax_shown: false,
+          reverse_charge_flag: true,
+          legal_reference: legal,
+          invoice_text_block_id: "de-rc",
+          applied_rule_id: "de-reverse-charge",
+        },
+      });
+
+      expect(result.pdf.contentType).toBe("application/pdf");
+      expect(Buffer.from(result.pdf.bytes).toString("latin1")).toContain(
+        "factur-x.xml",
+      );
+      const ubl = new TextDecoder().decode(result.xrechnungXml.bytes);
+      expect(ubl).toContain("<cbc:ID>AE</cbc:ID>");
+      expect(ubl).toContain(
+        `<cbc:TaxExemptionReason>${legal}</cbc:TaxExemptionReason>`,
+      );
+      expect(ubl).toContain(
+        `<cbc:ElectronicMail>${SELLER_EMAIL}</cbc:ElectronicMail>`,
+      );
+      // B2B without Leitweg remains valid — no BuyerReference required
+      expect(ubl).not.toContain("<cbc:BuyerReference>");
+    });
+
+    it("B2G Leitweg buyer emits BT-10 BuyerReference in XRechnung (D-19)", async () => {
+      const pdfBytes = new TextEncoder().encode("%PDF-1.4 factur-x.xml mock");
+      renderInvoiceMock.mockResolvedValue({
+        bytes: pdfBytes,
+        contentType: "application/pdf",
+      });
+
+      const leitweg = "991-12345-67";
+      const result = await service.render({
+        ...validInput(),
+        customer: {
+          ...validInput().customer,
+          name: "Stadt Musterhausen",
+          leitwegId: leitweg,
+          buyerReference: "should-not-win-over-leitweg",
+        },
+      });
+
+      const ubl = new TextDecoder().decode(result.xrechnungXml.bytes);
+      expect(ubl).toContain(
+        `<cbc:BuyerReference>${leitweg}</cbc:BuyerReference>`,
+      );
+      expect(ubl).toContain(`<cbc:CustomizationID>${BT24}</cbc:CustomizationID>`);
+      expect(result.pdf.contentType).toBe("application/pdf");
+    });
+  });
 });
