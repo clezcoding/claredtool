@@ -53,11 +53,20 @@ export function legalBlockLines(
   return lines;
 }
 
-const renderer = new PdfRenderer();
+let renderer = new PdfRenderer();
 
 // Takumi concurrency contract undocumented — serialize shared PdfRenderer.
 // ponytail: global lock; upgrade to confirmed re-entrant renderer or per-call instance if needed.
 let renderLock: Promise<void> = Promise.resolve();
+
+function recreateRenderer(): void {
+  try {
+    renderer.free();
+  } catch {
+    /* ignore free errors on panicked instance */
+  }
+  renderer = new PdfRenderer();
+}
 
 function withRendererExclusive<T>(fn: () => Promise<T>): Promise<T> {
   const run = renderLock.then(fn);
@@ -207,16 +216,22 @@ export async function renderInvoice(
 
   let bytes: Uint8Array;
   try {
-    bytes = await withRendererExclusive(() =>
-      renderer.render(node, {
-        size: "a4",
-        margin: 0,
-        // Paper color under everything — without this, below-content area is viewer white.
-        backgroundColor: CRAFTED.oatmeal,
-        fonts: fonts(),
-        fontFamilies: ["Inter", "Instrument Serif", "sans-serif"],
-      })
-    );
+    bytes = await withRendererExclusive(async () => {
+      try {
+        return await renderer.render(node, {
+          size: "a4",
+          margin: 0,
+          // Paper color under everything — without this, below-content area is viewer white.
+          backgroundColor: CRAFTED.oatmeal,
+          fonts: fonts(),
+          fontFamilies: ["Inter", "Instrument Serif", "sans-serif"],
+        });
+      } catch {
+        // WASM panic / internal error — drop instance so later renders can recover.
+        recreateRenderer();
+        throw new Error(RENDER_FAILED);
+      }
+    });
   } catch {
     throw new Error(RENDER_FAILED);
   }
