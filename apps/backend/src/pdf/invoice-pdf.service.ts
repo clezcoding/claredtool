@@ -126,10 +126,7 @@ export class InvoicePdfService {
         locale: knobs.locale,
         vatLine: knobs.vatLine,
       });
-    } catch (err) {
-      if (err instanceof RenderFailedError) {
-        throw err;
-      }
+    } catch {
       throw new RenderFailedError();
     }
 
