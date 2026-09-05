@@ -4,6 +4,8 @@ import { assertAmountsEqual, roundEur, type MoneyTotals } from "./amounts";
 import { EInvoiceError } from "./errors";
 import type { En16931Facts } from "./facts";
 
+// D-06: XML-only — import zugferd + EN16931 profile; never call PDF-embed APIs.
+
 function moneyStr(n: number): string {
   return roundEur(n).toFixed(2);
 }
