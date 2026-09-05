@@ -8,8 +8,10 @@ cd "$REPO_ROOT"
 OUTPUT="$(pnpm --filter @clared/tax-engine test 2>&1)"
 printf '%s\n' "$OUTPUT"
 
-if printf '%s\n' "$OUTPUT" | rg -q 'strict mode:'; then
-  WARN_COUNT="$(printf '%s\n' "$OUTPUT" | rg -c 'strict mode:')"
+# Portable grep — Ubuntu GHA runners lack ripgrep; `rg` inside `if` exits 127
+# without tripping set -e and silently reports OK (REL-03 false pass).
+if printf '%s\n' "$OUTPUT" | grep -F 'strict mode:' >/dev/null; then
+  WARN_COUNT="$(printf '%s\n' "$OUTPUT" | grep -F -c 'strict mode:' || true)"
   echo "FAIL: found ${WARN_COUNT} AJV strict mode warning(s)" >&2
   exit 1
 fi
