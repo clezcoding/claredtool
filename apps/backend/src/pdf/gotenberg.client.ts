@@ -7,9 +7,9 @@ import { EmptyHtmlError } from "./empty-html.error";
 
 const CONVERT_PATH = "/forms/chromium/convert/html";
 
-function basicAuthHeader(): string {
-  const user = process.env.GOTENBERG_API_BASIC_AUTH_USERNAME;
-  const password = process.env.GOTENBERG_API_BASIC_AUTH_PASSWORD;
+export function gotenbergAuthHeader(): string {
+  const user = process.env.GOTENBERG_API_BASIC_AUTH_USERNAME?.trim();
+  const password = process.env.GOTENBERG_API_BASIC_AUTH_PASSWORD?.trim();
   if (!user || !password) {
     throw new Error(
       "GOTENBERG_API_BASIC_AUTH_USERNAME and GOTENBERG_API_BASIC_AUTH_PASSWORD are required",
@@ -42,7 +42,7 @@ export async function convertHtmlToPdf(html: string): Promise<PdfBytes> {
   body.set("paperHeight", PDF_PAPER_A4.paperHeight);
   const res = await fetch(`${gotenbergOrigin()}${CONVERT_PATH}`, {
     method: "POST",
-    headers: { Authorization: basicAuthHeader() },
+    headers: { Authorization: gotenbergAuthHeader() },
     body,
     signal: AbortSignal.timeout(30_000),
   });

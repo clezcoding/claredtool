@@ -1,6 +1,7 @@
 import { Controller, Get } from "@nestjs/common";
 import { HealthCheck, HealthCheckService, HealthIndicatorResult, PrismaHealthIndicator } from "@nestjs/terminus";
 import { Public } from "../auth/public.decorator";
+import { gotenbergAuthHeader } from "../pdf/gotenberg.client";
 import { PrismaService } from "../prisma/prisma.service";
 import { RedisService } from "../redis/redis.service";
 
@@ -41,6 +42,7 @@ export class HealthController {
         }
         const origin = raw.replace(/\/$/, "");
         const res = await fetch(`${origin}/health`, {
+          headers: { Authorization: gotenbergAuthHeader() },
           signal: AbortSignal.timeout(2_000),
         });
         if (!res.ok) {
