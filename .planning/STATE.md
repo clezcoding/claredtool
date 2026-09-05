@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.6
 current_phase_name: Takumi+pdfcn PDF Engine Cutover
 status: executing
-stopped_at: Completed 04.6-02-PLAN.md
-last_updated: "2026-09-05T17:01:02.354Z"
+stopped_at: Completed 04.6-03-PLAN.md
+last_updated: "2026-09-05T17:09:22.923Z"
 last_activity: 2026-09-05
 last_activity_desc: Phase 04.6 execution started
-state_head: 5f49794d3885f14eb4ab0b21116f154f947b08bd
+state_head: 75032c2380521e907b186a5e5db09965ecce32ac
 progress:
   total_phases: 14
   completed_phases: 9
   total_plans: 65
-  completed_plans: 62
+  completed_plans: 63
 milestone_name: milestone
 ---
 
@@ -118,6 +118,7 @@ Progress: [█████████░] 75%
 | Phase 04.4 P06 | 4 min | 3 tasks | 2 files |
 | Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de P07 | 8 min | 3 tasks | 7 files |
 | Phase 04.6 P02 | 4min | 2 tasks | 8 files |
+| Phase 04.6 P03 | 5min | 3 tasks | 19 files |
 
 ## Accumulated Context
 
@@ -272,6 +273,9 @@ Recent decisions affecting current work:
 - [Phase 4.6/4.7]: E-invoice XML (Factur-X Comfort + XRechnung + PDF/A-3b) moved to inserted Phase 4.7. 4.6 is visual Takumi engine only. Order 4.6 → 4.7 → 5.
 - [Phase 04.6]: RC sentence via legalBlockLines locale strings; fixtures keep explicit knobs (D-21); defaultsFromCountry for Nest later
 - [Phase 04.6]: Jest 30 verify uses --testPathPatterns (plan said --testPathPattern)
+- [Phase 04.6]: InvoicePdfService maps Entity/Customer/Invoice + TaxDecision + knobs to renderInvoice sync (D-02)
+- [Phase 04.6]: Fail-closed RenderFailedError; Ready is postgres+redis+build only (D-25, D-26)
+- [Phase 04.6]: BullMQ/Gotenberg/worker bootstrap removed from Nest API path (D-03)
 
 ### Pending Todos
 
@@ -323,8 +327,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-05T17:01:01.962Z
-Stopped at: Completed 04.6-02-PLAN.md
+Last session: 2026-09-05T17:09:22.723Z
+Stopped at: Completed 04.6-03-PLAN.md
 Resume file: None
 
 ## Rebuild Log
