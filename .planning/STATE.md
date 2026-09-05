@@ -4,8 +4,8 @@ milestone: v1.0
 current_phase: 04.7
 current_phase_name: Factur-X / ZUGFeRD / XRechnung e-invoice XML
 status: "Phase 04.6 shipped — PR #124"
-stopped_at: Phase 04.7 UI-SPEC approved
-last_updated: "2026-09-05T21:56:57.631Z"
+stopped_at: Phase 04.7 RESEARCH complete
+last_updated: "2026-09-05T22:15:00.000Z"
 last_activity: 2026-09-05
 state_head: bb5c698e143cd4562a527e15351680f38c6dd330
 progress:
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 Status: Phase 04.6 shipped — PR #124
 Phase: 04.7 — Factur-X / ZUGFeRD / XRechnung e-invoice XML
-Plan: Not started
+Plan: Not started — RESEARCH.md ready for `/gsd-plan-phase`
 Phase 04.6 (Takumi+pdfcn PDF Engine Cutover) — complete 2026-09-05 (verification 10/10)
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
@@ -336,8 +336,8 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-09-05T21:56:57.396Z
-Stopped at: Phase 04.7 UI-SPEC approved
-Resume file: .planning/phases/04.7-factur-x-zugferd-xrechnung-e-invoice-xml/04.7-UI-SPEC.md
+Stopped at: Phase 04.7 RESEARCH complete
+Resume file: .planning/phases/04.7-factur-x-zugferd-xrechnung-e-invoice-xml/04.7-RESEARCH.md
 
 ## Rebuild Log
 
