@@ -67,6 +67,16 @@ if [[ "$joined" == *"PATCH"* && "$joined" == *"/applications/"* ]]; then
 fi
 
 if [[ "$joined" == *"POST"* && "$joined" == *"/deploy"* ]]; then
+  if [ "$scenario" = "term_after_api_pin" ]; then
+    count="$(cat "${MOCK_DEPLOY_POST_COUNT_FILE:-/dev/null}" 2>/dev/null || echo 0)"
+    echo $((count + 1)) > "${MOCK_DEPLOY_POST_COUNT_FILE:-/dev/null}"
+    if [ "$count" -eq 0 ]; then
+      # Hang until the test SIGTERMs the deploy script. Bypass PATH sleep stub.
+      exec /bin/sleep 30
+    fi
+    printf '%s\n' '{"deployments":[{"deployment_uuid":"api-rollback"}]}'
+    exit 0
+  fi
   if [[ "$joined" == *"${WORKER_UUID}"* ]]; then
     if [ "$scenario" = "success" ]; then
       printf '%s\n' '{"deployments":[{"deployment_uuid":"worker-forward"}]}'
@@ -211,6 +221,77 @@ if [ "$worker_rb_line" -ge "$api_rb_line" ]; then
   exit 1
 fi
 assert_no_token_leak "worker_deploy_fail"
+
+echo "test: SIGTERM after API pin rolls back via EXIT trap"
+export MOCK_SCENARIO="term_after_api_pin"
+export MOCK_HEALTH_CODE="200"
+: > "$PIN_LOG"
+: > "$OUTPUT_FILE"
+: > "$SUMMARY_FILE"
+echo 0 > "${STUB_DIR}/api_get_count"
+echo 0 > "${STUB_DIR}/worker_get_count"
+echo 0 > "${STUB_DIR}/worker_post_count"
+echo 0 > "${STUB_DIR}/deploy_post_count"
+export MOCK_API_GET_COUNT_FILE="${STUB_DIR}/api_get_count"
+export MOCK_WORKER_GET_COUNT_FILE="${STUB_DIR}/worker_get_count"
+export MOCK_WORKER_POST_COUNT_FILE="${STUB_DIR}/worker_post_count"
+export MOCK_DEPLOY_POST_COUNT_FILE="${STUB_DIR}/deploy_post_count"
+set -m
+bash "$SCRIPT" >"$OUTPUT_FILE" 2>&1 &
+deploy_pid=$!
+set +m
+pin_seen=0
+for _ in $(seq 1 50); do
+  if grep -Fq "pin:${API_UUID}:${SHA_TAG}" "$PIN_LOG" 2>/dev/null; then
+    pin_seen=1
+    break
+  fi
+  /bin/sleep 0.1
+done
+if [ "$pin_seen" != "1" ]; then
+  kill -TERM -"$deploy_pid" 2>/dev/null || kill -TERM "$deploy_pid" 2>/dev/null || true
+  echo "FAIL: API pin never appeared before TERM" >&2
+  cat "$PIN_LOG" >&2
+  cat "$OUTPUT_FILE" >&2
+  exit 1
+fi
+# Process-group TERM hits the deploy shell and the hung curl child so the
+# EXIT trap runs even on bash 3.2 (which defers traps until children exit).
+kill -TERM -"$deploy_pid" 2>/dev/null || kill -TERM "$deploy_pid" 2>/dev/null || true
+term_wait_end=$((SECONDS + 2))
+while kill -0 "$deploy_pid" 2>/dev/null && [ "$SECONDS" -lt "$term_wait_end" ]; do
+  /bin/sleep 0.05
+done
+if kill -0 "$deploy_pid" 2>/dev/null; then
+  kill -KILL -"$deploy_pid" 2>/dev/null || kill -KILL "$deploy_pid" 2>/dev/null || true
+  wait "$deploy_pid" 2>/dev/null || true
+  echo "FAIL: deploy script still running 2s after SIGTERM" >&2
+  cat "$OUTPUT_FILE" >&2
+  cat "$PIN_LOG" >&2
+  exit 1
+fi
+set +e
+wait "$deploy_pid"
+term_rc=$?
+set -e
+if [ "$term_rc" -eq 0 ]; then
+  echo "FAIL: expected non-zero exit after SIGTERM" >&2
+  cat "$OUTPUT_FILE" >&2
+  cat "$PIN_LOG" >&2
+  exit 1
+fi
+if ! grep_pin "pin:${API_UUID}:prev-api" | grep -q .; then
+  echo "FAIL: expected API rollback pin after SIGTERM" >&2
+  cat "$PIN_LOG" >&2
+  cat "$OUTPUT_FILE" >&2
+  exit 1
+fi
+if grep_pin "pin:${WORKER_UUID}:${SHA_TAG}-worker" | grep -q .; then
+  echo "FAIL: worker forward pin must not run when TERM hits after API pin" >&2
+  cat "$PIN_LOG" >&2
+  exit 1
+fi
+assert_no_token_leak "term_after_api_pin"
 
 echo "test: happy path deploy completes without token leak"
 export MOCK_SCENARIO="success"
