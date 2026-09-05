@@ -6,7 +6,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest --testPathPatterns=render-invoice"
+    "test": "jest"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
