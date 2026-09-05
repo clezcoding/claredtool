@@ -16,6 +16,9 @@ importers:
 
   apps/backend:
     dependencies:
+      '@clared/pdf-templates':
+        specifier: workspace:*
+        version: link:../../packages/pdf-templates
       '@clared/tax-engine':
         specifier: workspace:*
         version: link:../../packages/tax-engine
