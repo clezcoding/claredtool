@@ -62,6 +62,7 @@ export class InvoicesService {
                 menge: row.menge,
                 einzelpreis: row.einzelpreis,
                 netto: row.menge * row.einzelpreis,
+                unit: row.unit ?? "C62",
               })),
             },
           },
@@ -144,6 +145,7 @@ export class InvoicesService {
             menge: row.menge,
             einzelpreis: row.einzelpreis,
             netto: row.menge * row.einzelpreis,
+            unit: row.unit ?? "C62",
           })),
         };
         // ponytail: Prisma @updatedAt does not fire on nested-only invoice updates (D-17 sort)
