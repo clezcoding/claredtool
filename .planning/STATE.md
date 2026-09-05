@@ -3,12 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04.7
 current_phase_name: Factur-X / ZUGFeRD / XRechnung e-invoice XML
-status: planning
+status: "Phase 04.6 shipped — PR #124"
 stopped_at: Phase 04.6 complete, ready to plan Phase 04.7
-last_updated: "2026-09-05T17:34:13.496Z"
+last_updated: "2026-09-05T19:13:10.814Z"
 last_activity: 2026-09-05
-last_activity_desc: Phase 04.6 complete, transitioned to Phase 04.7
-state_head: afed7f1ba1792cd94068f15feac274ad57a6a566
+state_head: 8682009693d1e6cd27bce02f25bfa8203df44ae1
 progress:
   total_phases: 14
   completed_phases: 10
@@ -28,14 +27,14 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Ready to plan
+Status: Phase 04.6 shipped — PR #124
 Phase: 04.7 — Factur-X / ZUGFeRD / XRechnung e-invoice XML
 Plan: Not started
 Phase 04.6 (Takumi+pdfcn PDF Engine Cutover) — complete 2026-09-05 (verification 10/10)
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 stitch-build; 4.2 desktop; 4.3 infra; 4.4 GHA; 4.5 hardening; 4.6 Takumi+pdfcn cutover (no Gotenberg); 5.1 catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-05 — Phase 04.6 complete, transitioned to Phase 04.7
+Last activity: 2026-09-05
 
 Progress: [█████████░] 75%
 
