@@ -1,4 +1,4 @@
-import { assertAmountsEqual, roundEur } from "./amounts";
+import { assertAmountsEqual, normalizeUnitCode, roundEur } from "./amounts";
 import { EInvoiceError } from "./errors";
 
 describe("amounts", () => {
@@ -18,5 +18,19 @@ describe("amounts", () => {
       expect(err).toBeInstanceOf(EInvoiceError);
       expect((err as EInvoiceError).code).toBe("AMOUNT_MISMATCH");
     }
+  });
+});
+
+describe("unit-c62", () => {
+  it("unit-c62: known allowlist codes pass through", () => {
+    for (const code of ["C62", "HUR", "DAY", "MON", "KGM", "MTR", "H87"]) {
+      expect(normalizeUnitCode(code)).toBe(code);
+    }
+  });
+
+  it("unit-c62: unknown unit code falls back to C62", () => {
+    expect(normalizeUnitCode("XYZ")).toBe("C62");
+    expect(normalizeUnitCode("")).toBe("C62");
+    expect(normalizeUnitCode("  ")).toBe("C62");
   });
 });

@@ -1,4 +1,4 @@
-import { buildFacts } from "./facts";
+import { buildFacts, buildFactsAe } from "./facts";
 import { EInvoiceError } from "./errors";
 import { serializeUblXRechnung } from "./serialize-ubl";
 import { assertAmountsEqual, roundEur } from "./amounts";
@@ -29,6 +29,21 @@ describe("serialize-ubl-xrechnung", () => {
     const noPhone = buildFacts();
     noPhone.seller.phone = "";
     expect(() => serializeUblXRechnung(noPhone)).toThrow(EInvoiceError);
+  });
+
+  it("cii-comfort-ae via UBL: AE reverse charge with exemption and BG-6", () => {
+    const facts = buildFactsAe();
+    const xml = serializeUblXRechnung(facts);
+    expect(xml).toContain("<cbc:ID>AE</cbc:ID>");
+    expect(xml).toContain(
+      `<cbc:TaxExemptionReason>${facts.vat.exemptionReason}</cbc:TaxExemptionReason>`,
+    );
+    expect(xml).toContain(
+      `<cbc:ElectronicMail>${facts.seller.email}</cbc:ElectronicMail>`,
+    );
+    expect(xml).toContain(
+      `<cbc:Telephone>${facts.seller.phone}</cbc:Telephone>`,
+    );
   });
 
   it("amounts-parity: visual totals equal UBL monetary totals", () => {

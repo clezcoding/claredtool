@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { assertAmountsEqual, roundEur } from "./amounts";
-import { buildFacts } from "./facts";
+import { buildFacts, buildFactsAe } from "./facts";
 import { EInvoiceError } from "./errors";
 import { serializeCiiComfort } from "./serialize-cii";
 
@@ -43,6 +43,27 @@ describe("serialize-cii-comfort-s", () => {
     expect(src).not.toContain(forbidden);
     expect(src).toMatch(/from ["']node-zugferd["']/);
     expect(src).toMatch(/node-zugferd\/profile\/en16931/);
+  });
+});
+
+describe("cii-comfort-ae", () => {
+  it("cii-comfort-ae: AE reverse charge with exemption text and BG-6", async () => {
+    const facts = buildFactsAe();
+    expect(facts.vat.category).toBe("AE");
+    expect(facts.vat.rate).toBe(0);
+    expect(facts.vat.exemptionReason).toBeTruthy();
+    expect(facts.seller.email).toBeTruthy();
+    expect(facts.seller.phone).toBeTruthy();
+    expect(facts.seller.vatId).toBeTruthy();
+    expect(facts.buyer.vatId).toBeTruthy();
+
+    const xml = await serializeCiiComfort(facts);
+    expect(xml).toContain(">AE<");
+    expect(xml).toContain(facts.vat.exemptionReason!);
+    expect(xml).toContain("ExemptionReason");
+    expect(xml).toContain(facts.seller.email);
+    expect(xml).toContain(facts.seller.phone);
+    expect(xml).toContain("DefinedTradeContact");
   });
 });
 
