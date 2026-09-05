@@ -28,6 +28,7 @@ RUN pnpm --filter @clared/tax-engine build
 WORKDIR /app/apps/backend
 
 ARG DATABASE_URL=postgresql://build:build@127.0.0.1:5432/clared
+ARG GIT_SHA=unknown
 
 RUN rm -f tsconfig.build.tsbuildinfo \
   && pnpm exec prisma generate \
@@ -37,6 +38,7 @@ RUN rm -f tsconfig.build.tsbuildinfo \
 
 ENV DATABASE_URL=
 ENV NODE_ENV=production
+ENV GIT_SHA=${GIT_SHA}
 
 # Build residue. Not a runtime path.
 RUN rm -rf /root/.cache /tmp/*

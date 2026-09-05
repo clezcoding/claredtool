@@ -40,7 +40,13 @@ scenario="${MOCK_SCENARIO:-}"
 
 if [[ "$joined" == *"health/ready"* ]]; then
   if [[ "$joined" == *"%{http_code}"* ]]; then
-    printf '%s' "${MOCK_HEALTH_CODE:-200}"
+    if [ "${MOCK_HEALTH_CODE:-200}" = "200" ]; then
+      printf '%s\n%s' \
+        "{\"status\":\"ok\",\"details\":{\"build\":{\"status\":\"up\",\"sha\":\"${SHA_TAG}\"}}}" \
+        "200"
+    else
+      printf '%s\n%s' '{"status":"error"}' "${MOCK_HEALTH_CODE:-503}"
+    fi
     exit 0
   fi
 fi
@@ -204,7 +210,13 @@ scenario="${MOCK_SCENARIO:-}"
 
 if [[ "$joined" == *"health/ready"* ]]; then
   if [[ "$joined" == *"%{http_code}"* ]]; then
-    printf '%s' "${MOCK_HEALTH_CODE:-200}"
+    if [ "${MOCK_HEALTH_CODE:-200}" = "200" ]; then
+      printf '%s\n%s' \
+        "{\"status\":\"ok\",\"details\":{\"build\":{\"status\":\"up\",\"sha\":\"${SHA_TAG}\"}}}" \
+        "200"
+    else
+      printf '%s\n%s' '{"status":"error"}' "${MOCK_HEALTH_CODE:-503}"
+    fi
     exit 0
   fi
 fi

@@ -129,6 +129,8 @@ jobs:
           sbom: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GIT_SHA=${{ steps.image.outputs.sha_tag }}
           cache-from: type=gha,scope=clared-backend
           cache-to: type=gha,scope=clared-backend,mode=max
 
@@ -196,6 +198,8 @@ jobs:
           sbom: false
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.image.outputs.sha_tag }}-worker
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GIT_SHA=${{ steps.image.outputs.sha_tag }}
           cache-from: type=gha,scope=clared-backend
           cache-to: type=gha,scope=clared-backend,mode=max
 

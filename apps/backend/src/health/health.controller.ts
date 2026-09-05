@@ -30,6 +30,10 @@ export class HealthController {
         return { redis: { status: "up" } };
       },
       async (): Promise<HealthIndicatorResult> => {
+        const sha = process.env.GIT_SHA?.trim() || "unknown";
+        return { build: { status: "up", sha } };
+      },
+      async (): Promise<HealthIndicatorResult> => {
         const raw = process.env.GOTENBERG_URL?.trim();
         if (!raw) {
           // Phase 5: worker queue depth deferred; Uptime Kuma covers external PDF path when GOTENBERG_URL is set in prod.
