@@ -55,6 +55,19 @@ export function legalBlockLines(
 
 const renderer = new PdfRenderer();
 
+// Takumi concurrency contract undocumented — serialize shared PdfRenderer.
+// ponytail: global lock; upgrade to confirmed re-entrant renderer or per-call instance if needed.
+let renderLock: Promise<void> = Promise.resolve();
+
+function withRendererExclusive<T>(fn: () => Promise<T>): Promise<T> {
+  const run = renderLock.then(fn);
+  renderLock = run.then(
+    () => undefined,
+    () => undefined
+  );
+  return run;
+}
+
 function fontsDir(): string {
   return path.join(__dirname, "..", "fonts");
 }
@@ -194,14 +207,16 @@ export async function renderInvoice(
 
   let bytes: Uint8Array;
   try {
-    bytes = await renderer.render(node, {
-      size: "a4",
-      margin: 0,
-      // Paper color under everything — without this, below-content area is viewer white.
-      backgroundColor: CRAFTED.oatmeal,
-      fonts: fonts(),
-      fontFamilies: ["Inter", "Instrument Serif", "sans-serif"],
-    });
+    bytes = await withRendererExclusive(() =>
+      renderer.render(node, {
+        size: "a4",
+        margin: 0,
+        // Paper color under everything — without this, below-content area is viewer white.
+        backgroundColor: CRAFTED.oatmeal,
+        fonts: fonts(),
+        fontFamilies: ["Inter", "Instrument Serif", "sans-serif"],
+      })
+    );
   } catch {
     throw new Error(RENDER_FAILED);
   }
