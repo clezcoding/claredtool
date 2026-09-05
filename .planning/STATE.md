@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.7
 current_phase_name: Factur-X / ZUGFeRD / XRechnung e-invoice XML
 status: executing
-stopped_at: Completed 04.7-04-PLAN.md
-last_updated: "2026-09-05T23:41:45.338Z"
+stopped_at: Completed 04.7-06-PLAN.md
+last_updated: "2026-09-05T23:55:47.073Z"
 last_activity: 2026-09-06
 last_activity_desc: Phase 04.7 execution started
-state_head: 153f429fe54a6f82b1784c6eb40cc1f415d6d441
+state_head: 7db06cd219ba46d5bfc4b99bccdc6334d1e9b7f8
 progress:
   total_phases: 14
   completed_phases: 10
   total_plans: 72
-  completed_plans: 71
+  completed_plans: 72
 milestone_name: milestone
 ---
 
@@ -129,6 +129,7 @@ Progress: [█████████░] 86%
 | Phase 04.7 P05 | 5min | 3 tasks | 9 files |
 | Phase 04.7 P03 | 7min | 2 tasks | 6 files |
 | Phase 04.7 P04 | 7min | 3 tasks | 6 files |
+| Phase 04.7 P06 | 11min | 3 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -304,6 +305,8 @@ Recent decisions affecting current work:
 - [Phase 04.7]: Nest empty ciiXml fail-closed until 04.7-04 wires serializeCiiComfort
 - [Phase 04.7]: Nest builds En16931Facts via toFacts(); fixture buildFacts stays package-local
 - [Phase 04.7]: Leitweg-ID preferred over buyerReference for XRechnung BT-10
+- [Phase 04.7]: Mustang Comfort CI uses --no-notices; KoSIT gates XRechnung UBL
+- [Phase 04.7]: UBL requires EndpointID+Contact Name+PaymentMeans for KoSIT; no invented IBAN
 
 ### Pending Todos
 
@@ -355,8 +358,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-05T23:41:45.130Z
-Stopped at: Completed 04.7-04-PLAN.md
+Last session: 2026-09-05T23:55:46.873Z
+Stopped at: Completed 04.7-06-PLAN.md
 Resume file: None
 Next: `/gsd-execute-phase 04.7`
 
