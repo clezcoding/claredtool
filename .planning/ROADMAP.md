@@ -316,13 +316,23 @@ Plans:
 **UI hint**: yes (stammdaten dialog extensions only; download is Phase 5)
 
 Plans:
+**Wave 1**
 
 - [ ] 04.7-01-PLAN.md — `@clared/e-invoice` tracer: facts → Comfort CII + XRechnung UBL + BG-6 + amount parity
-- [ ] 04.7-01b-PLAN.md — AE/RC + unit C62 + versions.lock + backend workspace dep
 - [ ] 04.7-02-PLAN.md — Prisma structured stammdaten (email/phone/HRB) + blocking db push + DTOs
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 04.7-01b-PLAN.md — AE/RC + unit C62 + versions.lock + backend workspace dep
 - [ ] 04.7-03-PLAN.md — Takumi PDF/A-3b + factur-x.xml XMP hybrid fixtures
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 04.7-04-PLAN.md — Nest InvoicePdfService EInvoiceArtifacts + fail-closed (incl. BG-6)
 - [ ] 04.7-05-PLAN.md — Desktop Entity/Customer/Rechnung stammdaten UI + i18n
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 04.7-06-PLAN.md — CI e-invoice-validate Mustang + KoSIT + Dev/UAT note
 
 ### Phase 04.3: Infra & Prep for PDF, Offline & Audit (INSERTED)
