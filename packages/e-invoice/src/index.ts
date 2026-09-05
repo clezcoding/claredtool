@@ -1,8 +1,8 @@
-export { roundEur, assertAmountsEqual } from "./amounts";
+export { roundEur, assertAmountsEqual, normalizeUnitCode } from "./amounts";
 export type { MoneyTotals } from "./amounts";
 export { EInvoiceError } from "./errors";
 export type { EInvoiceErrorCode } from "./errors";
-export { buildFacts } from "./facts";
+export { buildFacts, buildFactsAe } from "./facts";
 export type {
   En16931Facts,
   InvoiceLine,

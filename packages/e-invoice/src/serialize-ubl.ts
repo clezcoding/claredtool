@@ -62,7 +62,12 @@ export function serializeUblXRechnung(facts: En16931Facts): string {
       <cbc:Name>${escapeXml(line.name)}</cbc:Name>
       <cac:ClassifiedTaxCategory>
         <cbc:ID>${facts.vat.category}</cbc:ID>
-        <cbc:Percent>${moneyStr(facts.vat.rate)}</cbc:Percent>
+        <cbc:Percent>${moneyStr(facts.vat.rate)}</cbc:Percent>${
+          facts.vat.exemptionReason
+            ? `
+        <cbc:TaxExemptionReason>${escapeXml(facts.vat.exemptionReason)}</cbc:TaxExemptionReason>`
+            : ""
+        }
         <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>
@@ -145,7 +150,12 @@ export function serializeUblXRechnung(facts: En16931Facts): string {
       <cbc:TaxAmount currencyID="${facts.currency}">${moneyStr(facts.totals.taxTotal)}</cbc:TaxAmount>
       <cac:TaxCategory>
         <cbc:ID>${facts.vat.category}</cbc:ID>
-        <cbc:Percent>${moneyStr(facts.vat.rate)}</cbc:Percent>
+        <cbc:Percent>${moneyStr(facts.vat.rate)}</cbc:Percent>${
+          facts.vat.exemptionReason
+            ? `
+        <cbc:TaxExemptionReason>${escapeXml(facts.vat.exemptionReason)}</cbc:TaxExemptionReason>`
+            : ""
+        }
         <cac:TaxScheme>
           <cbc:ID>VAT</cbc:ID>
         </cac:TaxScheme>

@@ -12,6 +12,22 @@ export type MoneyTotals = {
   grandTotal: number;
 };
 
+/** UNECE unit allowlist (D-30). Unknown → Stück C62. */
+const UNIT_ALLOWLIST = new Set([
+  "C62",
+  "HUR",
+  "DAY",
+  "MON",
+  "KGM",
+  "MTR",
+  "H87",
+]);
+
+export function normalizeUnitCode(code: string): string {
+  const trimmed = code.trim();
+  return UNIT_ALLOWLIST.has(trimmed) ? trimmed : "C62";
+}
+
 export function assertAmountsEqual(
   visual: MoneyTotals,
   xml: MoneyTotals,

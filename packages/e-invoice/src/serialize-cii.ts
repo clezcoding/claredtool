@@ -56,7 +56,7 @@ export async function serializeCiiComfort(facts: En16931Facts): Promise<string> 
         tradeDelivery: {
           billedQuantity: {
             amount: line.quantity.toFixed(4),
-            unitMeasureCode: line.unitCode as "C62",
+            unitMeasureCode: line.unitCode as "C62" | "HUR" | "DAY" | "MON" | "KGM" | "MTR" | "H87",
           },
         },
         tradeSettlement: {
@@ -64,6 +64,9 @@ export async function serializeCiiComfort(facts: En16931Facts): Promise<string> 
             typeCode: "VAT" as const,
             categoryCode: facts.vat.category,
             rateApplicablePercent: String(facts.vat.rate),
+            ...(facts.vat.exemptionReason
+              ? { exemptionReasonText: facts.vat.exemptionReason }
+              : {}),
           },
           monetarySummation: { lineTotalAmount: moneyStr(line.netAmount) },
         },
@@ -106,6 +109,12 @@ export async function serializeCiiComfort(facts: En16931Facts): Promise<string> 
             basisAmount: moneyStr(facts.totals.taxBasis),
             categoryCode: facts.vat.category,
             rateApplicablePercent: moneyStr(facts.vat.rate),
+            ...(facts.vat.exemptionReason
+              ? {
+                  exemptionReasonText: facts.vat.exemptionReason,
+                  exemptionReasonCode: "VATEX-EU-AE" as const,
+                }
+              : {}),
           },
         ],
         paymentTerms: { dueDate: facts.dueDate },
