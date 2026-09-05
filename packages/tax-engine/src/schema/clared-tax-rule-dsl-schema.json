@@ -52,10 +52,30 @@
             { "type": "null" }
           ]
         },
-        "effective_from": { "type": ["string", "null"], "format": "date" },
-        "effective_to": { "type": ["string", "null"], "format": "date" },
-        "threshold_amount": { "type": ["number", "null"] },
-        "threshold_currency": { "type": ["string", "null"] }
+        "effective_from": {
+          "anyOf": [
+            { "type": "string", "format": "date" },
+            { "type": "null" }
+          ]
+        },
+        "effective_to": {
+          "anyOf": [
+            { "type": "string", "format": "date" },
+            { "type": "null" }
+          ]
+        },
+        "threshold_amount": {
+          "anyOf": [
+            { "type": "number" },
+            { "type": "null" }
+          ]
+        },
+        "threshold_currency": {
+          "anyOf": [
+            { "type": "string" },
+            { "type": "null" }
+          ]
+        }
       },
       "additionalProperties": true
     },
