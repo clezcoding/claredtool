@@ -75,6 +75,8 @@ jobs:
             tax-engine:
               - 'packages/tax-engine/**'
               - 'scripts/assert-ajv-zero-warnings.sh'
+            pdf-templates:
+              - 'packages/pdf-templates/**'
             shared:
               - 'package.json'
               - 'pnpm-lock.yaml'
@@ -95,6 +97,7 @@ jobs:
       desktop-rust: ${{ steps.filter.outputs.desktop-rust }}
       backend: ${{ steps.filter.outputs.backend }}
       tax-engine: ${{ steps.filter.outputs.tax-engine }}
+      pdf-templates: ${{ steps.filter.outputs.pdf-templates }}
       shared: ${{ steps.filter.outputs.shared }}
       database: ${{ steps.filter.outputs.database }}
 
@@ -189,7 +192,7 @@ jobs:
     needs: changes
     if: |
       (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
-      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.tax-engine == 'true')
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.tax-engine == 'true' || needs.changes.outputs.pdf-templates == 'true')
     runs-on: ubuntu-latest
     # Prisma 7 prisma.config.ts calls env("DATABASE_URL") at generate/validate.
     # Dummy URL is enough; do not start postgres/redis here (e2e owns those).
@@ -208,9 +211,13 @@ jobs:
 
       - uses: ./.github/actions/setup-pnpm-ci # zizmor: ignore[self-repository]
 
-      - run: pnpm install --frozen-lockfile --filter @clared/tax-engine... --filter ./apps/backend...
+      - run: pnpm install --frozen-lockfile --filter @clared/tax-engine... --filter @clared/pdf-templates... --filter ./apps/backend...
 
       - run: pnpm --filter @clared/tax-engine build
+
+      - run: pnpm --filter @clared/pdf-templates build
+
+      - run: pnpm --filter @clared/pdf-templates test
 
       - name: AJV strict mode zero-warning gate (REL-03)
         run: bash scripts/assert-ajv-zero-warnings.sh
@@ -230,7 +237,7 @@ jobs:
     needs: changes
     if: |
       (github.event_name != 'pull_request' || github.event.pull_request.draft == false) &&
-      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.tax-engine == 'true')
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.shared == 'true' || needs.changes.outputs.tax-engine == 'true' || needs.changes.outputs.pdf-templates == 'true')
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -272,9 +279,11 @@ jobs:
 
       - uses: ./.github/actions/setup-pnpm-ci # zizmor: ignore[self-repository]
 
-      - run: pnpm install --frozen-lockfile --filter @clared/tax-engine... --filter ./apps/backend...
+      - run: pnpm install --frozen-lockfile --filter @clared/tax-engine... --filter @clared/pdf-templates... --filter ./apps/backend...
 
       - run: pnpm --filter @clared/tax-engine build
+
+      - run: pnpm --filter @clared/pdf-templates build
 
       - run: pnpm --filter ./apps/backend exec prisma generate
 
@@ -374,6 +383,7 @@ jobs:
           AREA_BACKEND: ${{ needs.changes.outputs.backend }}
           AREA_SHARED: ${{ needs.changes.outputs.shared }}
           AREA_TAX_ENGINE: ${{ needs.changes.outputs.tax-engine }}
+          AREA_PDF_TEMPLATES: ${{ needs.changes.outputs.pdf-templates }}
           AREA_DATABASE: ${{ needs.changes.outputs.database }}
           RES_PREFLIGHT: ${{ needs.preflight.result }}
           RES_CHANGES: ${{ needs.changes.result }}
@@ -391,6 +401,7 @@ jobs:
             echo "- backend: ${AREA_BACKEND}"
             echo "- shared: ${AREA_SHARED}"
             echo "- tax-engine: ${AREA_TAX_ENGINE}"
+            echo "- pdf-templates: ${AREA_PDF_TEMPLATES}"
             echo "- database: ${AREA_DATABASE}"
             echo "### Job results"
             echo "- preflight: ${RES_PREFLIGHT} skip=${SHOULD_SKIP}"

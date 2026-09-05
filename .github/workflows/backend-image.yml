@@ -1,13 +1,12 @@
-# GHA builds Nest images; Coolify only pulls them.
+# GHA builds Nest API image; Coolify only pulls it.
 # API: default stage (CMD prisma migrate deploy && node dist/main.js) tag sha-<7>.
-# Worker: --target worker (CMD node dist/worker.js) tag sha-<7>-worker.
-# Coolify 4.3.14 dockerimage pack ignores start_command.
-# API container CMD is the only migrator. Multi-replica later needs exactly one
-# external migrator (brief 6.6) — do not activate.
+# Worker stage/tag removed (D-09 / 04.6 Takumi cutover). Coolify 4.3.14 dockerimage
+# pack ignores start_command. API container CMD is the only migrator. Multi-replica
+# later needs exactly one external migrator (brief 6.6) — do not activate.
 # Deploy job: PATCH tag + POST /deploy when vars.COOLIFY_IMAGE_DEPLOY=true.
 # Official Coolify pattern: GHCR push + deploy API (coolify.io/docs/applications/ci-cd/github/actions).
 # Vs the sample workflow: path filter, buildx GHA cache, metadata-action, immutable sha- tag,
-# one build / one ordered deploy (API then worker), linux/amd64 only.
+# one build / one API-only deploy, linux/amd64 only.
 # TECH-DEBT: provenance and sbom stay false — Coolify cannot pull attestation
 # indexes; re-enable after a Coolify upgrade that can.
 
@@ -21,6 +20,7 @@ on:
     paths:
       - apps/backend/**
       - packages/tax-engine/**
+      - packages/pdf-templates/**
       - package.json
       - pnpm-lock.yaml
       - pnpm-workspace.yaml
@@ -32,7 +32,7 @@ on:
   workflow_dispatch:
     inputs:
       deploy:
-        description: Redeploy clared-api and clared-worker after push
+        description: Redeploy clared-api after push
         type: boolean
         default: true
 
@@ -45,13 +45,10 @@ permissions:
 
 # No workflow-level concurrency: cancel-in-progress at workflow scope cancels
 # EVERY job in the prior run, including an in-flight Coolify deploy (half-pin).
-# Cancel stale builds only via per-job groups below. push-api and push-worker
-# MUST use distinct groups — a shared cancel group cancels sibling parallel
-# pushes (REL-04 regression). Deploy: coolify-nest-deploy, cancel-in-progress: false.
+# Cancel stale builds only via per-job groups below.
+# Deploy: coolify-nest-deploy, cancel-in-progress: false.
 
 jobs:
-  # REL-04 / D-13: push-api and push-worker run in parallel (was sequential in build).
-  # Rollback: restore sequential push steps in a single job (04.5-PATTERNS.md).
   deploy-script-test:
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 10
@@ -122,10 +119,6 @@ jobs:
           echo "image=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
           echo "sha_tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
-      # A5 / D-20: Bake aborted. bake-action exposes one metadata JSON blob, not
-      # named DIGEST_API / DIGEST_WORKER outputs. Feeding cosign would need extra
-      # fromJSON/jq; sha vs sha-*-worker tags stay clearer with two build-push
-      # steps (each outputs.digest). provenance/sbom stay false.
       # TECH-DEBT: GHCR attestations stay off — Coolify cannot pull
       # attestation indexes. Re-enable after a Coolify upgrade that can.
       # G8 SBOM/cosign below uses Syft + keyless sigstore, not buildx attestations.
@@ -145,77 +138,8 @@ jobs:
           cache-from: type=gha,scope=clared-backend-api
           cache-to: type=gha,scope=clared-backend-api,mode=max
 
-  push-worker:
-    if: github.ref == 'refs/heads/main'
-    timeout-minutes: 45
-    runs-on: ubuntu-latest
-    concurrency:
-      group: backend-image-${{ github.ref }}-push-worker
-      cancel-in-progress: true
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-      actions: write
-    outputs:
-      digest: ${{ steps.push-worker.outputs.digest }}
-    steps:
-      - name: Harden Runner
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
-        with:
-          egress-policy: audit
-
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-
-      - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
-
-      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - id: meta
-        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=false
-          tags: |
-            type=sha,prefix=sha-,format=short
-
-      - id: image
-        env:
-          IMAGE_REF: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-        run: |
-          echo "image=${IMAGE_REF}" >> "$GITHUB_OUTPUT"
-          echo "sha_tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
-
-      # Coolify 4.3.14 dockerimage pack ignores start_command (same as dockerfile).
-      # Worker stage CMD is node dist/worker.js — separate tag, not an override.
-      # TECH-DEBT: GHCR attestations stay off — Coolify cannot pull
-      # attestation indexes. Re-enable after a Coolify upgrade that can.
-      - id: push-worker
-        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
-        with:
-          context: .
-          file: apps/backend/Dockerfile
-          target: worker
-          platforms: linux/amd64
-          push: true
-          provenance: false
-          sbom: false
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.image.outputs.sha_tag }}-worker
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            GIT_SHA=${{ steps.image.outputs.sha_tag }}
-          cache-from: type=gha,scope=clared-backend-worker
-          cache-to: type=gha,scope=clared-backend-worker,mode=max
-
   build:
-    needs: [deploy-script-test, push-api, push-worker]
+    needs: [deploy-script-test, push-api]
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 45
     runs-on: ubuntu-latest
@@ -257,31 +181,11 @@ jobs:
           severity: HIGH,CRITICAL
           skip-files: '**/typescript-linux-x64/lib/tsc'
 
-      - uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
-        with:
-          image-ref: ${{ steps.image.outputs.image }}:${{ steps.image.outputs.sha_tag }}-worker
-          scan-type: image
-          format: table
-          scanners: vuln
-          exit-code: '1'
-          ignore-unfixed: true
-          severity: HIGH,CRITICAL
-          skip-files: '**/typescript-linux-x64/lib/tsc'
-
       - uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
         with:
           image: ${{ steps.image.outputs.image }}:${{ steps.image.outputs.sha_tag }}
           format: spdx-json
           artifact-name: clared-api-${{ steps.image.outputs.sha_tag }}.spdx.json
-          upload-release-assets: false
-          registry-username: ${{ github.actor }}
-          registry-password: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: anchore/sbom-action@3ad7283483fc7af8ff2b4ea19663c2d5ca935e26 # v0.24.2
-        with:
-          image: ${{ steps.image.outputs.image }}:${{ steps.image.outputs.sha_tag }}-worker
-          format: spdx-json
-          artifact-name: clared-worker-${{ steps.image.outputs.sha_tag }}.spdx.json
           upload-release-assets: false
           registry-username: ${{ github.actor }}
           registry-password: ${{ secrets.GITHUB_TOKEN }}
@@ -297,14 +201,11 @@ jobs:
       - name: Sign images (keyless OIDC)
         env:
           DIGEST_API: ${{ needs.push-api.outputs.digest }}
-          DIGEST_WORKER: ${{ needs.push-worker.outputs.digest }}
           IMAGE: ${{ steps.image.outputs.image }}
         run: |
           set -euo pipefail
           test -n "$DIGEST_API"
-          test -n "$DIGEST_WORKER"
           cosign sign --yes "${IMAGE}@${DIGEST_API}"
-          cosign sign --yes "${IMAGE}@${DIGEST_WORKER}"
 
       - name: Step summary
         if: always()
@@ -315,7 +216,6 @@ jobs:
           {
             echo "## backend-image build"
             echo "- API: ${IMAGE}:${SHA_TAG}"
-            echo "- worker: ${IMAGE}:${SHA_TAG}-worker"
           } >> "$GITHUB_STEP_SUMMARY"
 
   deploy:
@@ -329,7 +229,6 @@ jobs:
     # main plus v* tags; do not add a wait timer that blocks this private-repo CI.
     environment: production
     runs-on: ubuntu-latest
-    # Includes enough time for a fail-closed two-application rollback.
     timeout-minutes: 30
     concurrency:
       group: coolify-nest-deploy
@@ -344,13 +243,12 @@ jobs:
         with:
           persist-credentials: false
 
-      # 04.5-04 checkpoint: extract-verbatim — fail-closed API→worker order preserved (D-03, D-04).
-      - name: Deploy API then worker
+      # D-09: API-only pin + /health/ready poll (04.5 worker half superseded).
+      - name: Deploy API
         env:
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
           COOLIFY_URL: ${{ vars.COOLIFY_URL }}
           API_UUID: ${{ vars.COOLIFY_APP_API }}
-          WORKER_UUID: ${{ vars.COOLIFY_APP_WORKER }}
           SHA_TAG: ${{ needs.build.outputs.sha_tag }}
           IMAGE: ${{ needs.build.outputs.image }}
         run: bash .github/scripts/coolify-deploy-nest.sh
