@@ -56,6 +56,12 @@ describe("renderInvoice fixture 1", () => {
       )
     ).toBe("%PDF");
 
+    // One content page only — empty trailing page was a layout bug (minHeight + margin footer).
+    const pageObjects = Buffer.from(result.bytes)
+      .toString("latin1")
+      .match(/\/Type\s*\/Page(?![s])/g);
+    expect(pageObjects?.length ?? 0).toBe(1);
+
     const outDir = path.join(__dirname, "..", "tmp");
     mkdirSync(outDir, { recursive: true });
     writeFileSync(path.join(outDir, "fixture-1-de-b2b.pdf"), result.bytes);

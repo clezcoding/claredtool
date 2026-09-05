@@ -2,8 +2,12 @@
  * Crafted Minimal restyle of pdfcn Invoice Minimal (Takumi registry block).
  * Layout: header Entity.name (text only) · bill-to · line table · totals · legal block.
  * No logo (D-13), no Zahlungsblock (D-14), no draft watermark (D-17).
+ *
+ * Footer is fixed inside the page (not Takumi margin band) so Oatmeal is full-bleed —
+ * render() margin:0. PageNumber/TotalPages still work in fixed boxes.
  */
 import type { ReactElement } from "react";
+import { PageNumber, TotalPages } from "takumi-pdf/primitives";
 import { Document, Page, Text, View, StyleSheet } from "./lib/pdf-primitives";
 
 /** Crafted tokens from apps/desktop/src/styles/globals.css */
@@ -74,11 +78,24 @@ const styles = StyleSheet.create({
   page: {
     backgroundColor: CRAFTED.oatmeal,
     boxSizing: "border-box",
-    minHeight: 841,
+    // No minHeight: full A4 + Takumi footer margin overflowed onto empty page 2.
+    width: "100%",
     padding: 36,
-    paddingBottom: 48,
+    paddingBottom: 56,
     position: "relative",
     fontFamily: "Inter",
+  },
+  footer: {
+    position: "fixed",
+    bottom: 20,
+    left: 36,
+    right: 36,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    color: CRAFTED.muted,
+    fontFamily: "Inter",
+    fontSize: 10,
   },
   headerRow: {
     flexDirection: "row",
@@ -210,16 +227,21 @@ const styles = StyleSheet.create({
   legal: {
     marginTop: 20,
     color: CRAFTED.muted,
-    fontSize: 8,
+    // ~10% larger than prior 8px (user feedback on bottom legal/footer text)
+    fontSize: 9,
     lineHeight: 1.4,
   },
 });
 
 export function InvoiceMinimal(props: InvoiceMinimalProps): ReactElement {
   const { model, money, legalReference, labels } = props;
+  const footerLeft = `${model.entity.name} · ${model.entity.legalForm} · ${model.entity.country}`;
 
   return (
-    <Document title={`Invoice ${model.invoice.number}`}>
+    <Document
+      title={`Invoice ${model.invoice.number}`}
+      style={{ backgroundColor: CRAFTED.oatmeal }}
+    >
       <Page size="A4" style={styles.page}>
         <View style={styles.headerRow}>
           <View style={{ flex: 1 }}>
@@ -306,6 +328,15 @@ export function InvoiceMinimal(props: InvoiceMinimalProps): ReactElement {
         {legalReference ? (
           <Text style={styles.legal}>{legalReference}</Text>
         ) : null}
+
+        <View style={styles.footer} fixed>
+          <Text style={{ fontSize: 10, color: CRAFTED.muted }}>{footerLeft}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", fontSize: 10, color: CRAFTED.muted }}>
+            <PageNumber />
+            <Text style={{ fontSize: 10, color: CRAFTED.muted }}> / </Text>
+            <TotalPages />
+          </View>
+        </View>
       </Page>
     </Document>
   );
