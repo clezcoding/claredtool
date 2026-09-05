@@ -34,7 +34,23 @@ export class HealthController {
     return this.health.check([
       () => this.prismaHealth.pingCheck("postgres", this.prisma, { timeout: 400 }),
       async (): Promise<HealthIndicatorResult> => {
-        await this.redis.ping();
+        const timeoutMs = 400;
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        try {
+          await Promise.race([
+            this.redis.ping(),
+            new Promise<never>((_, reject) => {
+              timer = setTimeout(
+                () => reject(new Error("Redis ping timeout")),
+                timeoutMs,
+              );
+            }),
+          ]);
+        } finally {
+          if (timer !== undefined) {
+            clearTimeout(timer);
+          }
+        }
         return { redis: { status: "up" } };
       },
       async (): Promise<HealthIndicatorResult> => {

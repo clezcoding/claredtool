@@ -13,7 +13,7 @@ test -n "$IMAGE"
 } >> "$GITHUB_STEP_SUMMARY"
 
 coolify_get() {
-  curl -fsS -X GET "${COOLIFY_URL}/api/v1/applications/${1}" \
+  curl -fsS --connect-timeout 5 --max-time 30 -X GET "${COOLIFY_URL}/api/v1/applications/${1}" \
     -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
     -H "Accept: application/json"
 }
@@ -22,14 +22,14 @@ coolify_pin() {
   local uuid="$1" tag="$2" deploy_json payload
   payload=$(jq -cn --arg image "$IMAGE" --arg tag "$tag" \
     '{docker_registry_image_name: $image, docker_registry_image_tag: $tag}')
-  curl -fsS -X PATCH "${COOLIFY_URL}/api/v1/applications/${uuid}" \
+  curl -fsS --connect-timeout 5 --max-time 30 -X PATCH "${COOLIFY_URL}/api/v1/applications/${uuid}" \
     -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
     -d "$payload" \
     -o /dev/null
   # Coolify 4.3.14: GET /api/v1/deploy is 405; POST JSON body is the working verb.
-  deploy_json=$(curl -fsS -X POST "${COOLIFY_URL}/api/v1/deploy" \
+  deploy_json=$(curl -fsS --connect-timeout 5 --max-time 30 -X POST "${COOLIFY_URL}/api/v1/deploy" \
     -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
@@ -42,7 +42,7 @@ wait_for_deployment() {
   local name="$1" deployment_uuid="$2" attempts="$3"
   local deployment_json status last_status="unavailable"
   for _ in $(seq 1 "$attempts"); do
-    deployment_json=$(curl -fsS -X GET \
+    deployment_json=$(curl -fsS --connect-timeout 5 --max-time 30 -X GET \
       "${COOLIFY_URL}/api/v1/deployments/${deployment_uuid}" \
       -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
       -H "Accept: application/json" || true)
@@ -164,7 +164,7 @@ consecutive_ok=0
 for _ in $(seq 1 24); do
   API_POLL_JSON=$(coolify_get "$API_UUID" || true)
   LIVE_TAG=$(printf '%s' "${API_POLL_JSON:-}" | jq -r '.docker_registry_image_tag // empty' 2>/dev/null || true)
-  http_response=$(curl -sS -w "\n%{http_code}" \
+  http_response=$(curl -sS --connect-timeout 5 --max-time 15 -w "\n%{http_code}" \
     "https://clared-api.puzzlessdev.online/health/build" 2>/dev/null || true)
   code=$(printf '%s' "$http_response" | tail -1)
   ready_body=$(printf '%s' "$http_response" | sed '$d')
