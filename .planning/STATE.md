@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 4.6
 current_phase_name: Takumi+pdfcn PDF Engine Cutover
-status: completed
-stopped_at: Phase 4.6 context gathered
-last_updated: "2026-09-05T05:47:21.733Z"
+status: planning
+stopped_at: Phase 4.6 plans written
+last_updated: "2026-09-05T17:20:00.000Z"
 last_activity: 2026-09-05
 state_head: 6168a586295797a7b067e7380198bbae11686711
 progress:
@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Phase 04.5 complete — 4.6 next (visual engine); e-invoice XML is 4.7
-Phase: 4.6 (Takumi+pdfcn PDF Engine Cutover) — NOT STARTED
+Status: Phase 04.6 planned — 5 plans, execute next; e-invoice XML is 4.7
+Phase: 4.6 (Takumi+pdfcn PDF Engine Cutover) — PLANNED (not executed)
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 stitch-build; 4.2 desktop; 4.3 infra; 4.4 GHA; 4.5 hardening; 4.6 Takumi+pdfcn cutover (no Gotenberg); 5.1 catalog after Phase 5; Crafted Minimal
