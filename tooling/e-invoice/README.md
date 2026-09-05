@@ -29,3 +29,5 @@ GHA job `e-invoice-validate` runs the same scripts with Temurin 17 (D-27). Never
 ## Local Java
 
 Mustang 2.26 needs **JRE 11+** (CI uses Temurin **17**). Local OpenJDK 8 is insufficient — install Temurin 17+ for manual validate, or rely on the `e-invoice-validate` GitHub Actions job.
+
+See also: [DEV-UAT-VALIDATORS.md](./DEV-UAT-VALIDATORS.md) (D-29 online validators).
