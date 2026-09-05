@@ -42,6 +42,7 @@ function isFiniteNumber(value: unknown): value is number {
 /** Coerce Prisma Decimal / string numerics at the service edge. */
 function toNum(value: unknown): number {
   if (typeof value === "number") return value;
+  if (typeof value === "string" && value.trim() === "") return Number.NaN;
   if (value == null) return Number.NaN;
   return Number(String(value));
 }
