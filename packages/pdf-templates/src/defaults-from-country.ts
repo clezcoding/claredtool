@@ -1,8 +1,12 @@
-/** D-22: country → default locale + vatLine. DE/AT only for de — not EU-27. */
+/** D-22: country → default locale + vatLine. DE/AT only for de — not EU-27.
+ * Country defaults always omit a zero-VAT line; `vatLine: "zero"` is knob-only
+ * (explicit InvoicePdfKnobs / RenderInvoiceInput), never chosen here.
+ */
 
 export type CountryDefaults = {
   locale: "de" | "en";
-  vatLine: "omit" | "zero";
+  /** Country path is omit-only; use knobs for `"zero"`. */
+  vatLine: "omit";
 };
 
 export function defaultsFromCountry(country: string): CountryDefaults {
