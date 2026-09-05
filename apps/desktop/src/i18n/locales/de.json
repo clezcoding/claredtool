@@ -155,6 +155,16 @@
     "entity": "Entity",
     "legalName": "Unternehmensname",
     "address": "Adresse",
+    "street": "Straße",
+    "addressLine2": "Adresszusatz",
+    "postalCode": "PLZ",
+    "city": "Ort",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "hrb": "Handelsregister / HRB",
+    "managingDirector": "Geschäftsführer",
+    "leitwegId": "Leitweg-ID",
+    "buyerReference": "Buyer-Reference",
     "vatId": "USt-Id",
     "taxNumber": "Steuernummer",
     "accountHolder": "Kontoinhaber",
@@ -173,6 +183,9 @@
     "entityRequired": "Bitte Entity wählen.",
     "entityModalBody": "Name, Land und Rechtsform der Geschäftseinheit.",
     "kundeModalBody": "Firma und Stammdaten des Kunden.",
+    "errors": {
+      "incompleteAddress": "Adresse unvollständig. Straße, PLZ und Ort sind erforderlich."
+    },
     "tabs": {
       "master": "Stammdaten",
       "tax": "Steuer",

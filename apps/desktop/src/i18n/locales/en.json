@@ -155,6 +155,16 @@
     "entity": "Entity",
     "legalName": "Legal name",
     "address": "Address",
+    "street": "Street",
+    "addressLine2": "Address line 2",
+    "postalCode": "Postal code",
+    "city": "City",
+    "email": "Email",
+    "phone": "Phone",
+    "hrb": "Commercial register / HRB",
+    "managingDirector": "Managing director",
+    "leitwegId": "Leitweg-ID",
+    "buyerReference": "Buyer reference",
     "vatId": "VAT ID",
     "taxNumber": "Tax number",
     "accountHolder": "Account holder",
@@ -173,6 +183,9 @@
     "entityRequired": "Please choose an entity.",
     "entityModalBody": "Name, country, and legal form for the business entity.",
     "kundeModalBody": "Company and master data for the customer.",
+    "errors": {
+      "incompleteAddress": "Address incomplete. Street, postal code, and city are required."
+    },
     "tabs": {
       "master": "Master data",
       "tax": "Tax",

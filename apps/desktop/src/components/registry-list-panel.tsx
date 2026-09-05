@@ -36,6 +36,12 @@ export type RegistryListRow = {
   incorporationDate?: string;
   fiscalYearEnd?: string;
   status?: "Active" | "Inactive";
+  email?: string;
+  phone?: string;
+  iban?: string;
+  bic?: string;
+  leitwegId?: string;
+  buyerReference?: string;
   people?: RegistryPerson[];
   documents?: RegistryDocument[];
   activity?: RegistryActivity[];
@@ -119,7 +125,7 @@ function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="mb-1.5 text-[12px] text-muted-foreground">{label}</p>
-      <p className="min-h-11 rounded-lg border border-border/70 bg-card px-3 py-2.5 text-sm text-foreground">
+      <p className="min-h-11 whitespace-pre-line break-words rounded-lg border border-border/70 bg-card px-3 py-2.5 text-sm text-foreground">
         {value}
       </p>
     </div>
@@ -520,11 +526,35 @@ export function RegistryListPanel({
                         label={t("registry.address")}
                         value={selectedRow.address || "—"}
                       />
+                      {selectedRow.email ? (
+                        <Field label={t("registry.email")} value={selectedRow.email} />
+                      ) : null}
+                      {selectedRow.phone ? (
+                        <Field label={t("registry.phone")} value={selectedRow.phone} />
+                      ) : null}
+                      {selectedRow.leitwegId ? (
+                        <Field
+                          label={t("registry.leitwegId")}
+                          value={selectedRow.leitwegId}
+                        />
+                      ) : null}
+                      {selectedRow.buyerReference ? (
+                        <Field
+                          label={t("registry.buyerReference")}
+                          value={selectedRow.buyerReference}
+                        />
+                      ) : null}
                     </CollapsibleSection>
                     <CollapsibleSection
                       title={t("registry.sections.management")}
                       defaultOpen={false}
                     >
+                      {selectedRow.registrationNumber ? (
+                        <Field
+                          label={t("registry.hrb")}
+                          value={selectedRow.registrationNumber}
+                        />
+                      ) : null}
                       {selectedRow.people?.length ? (
                         <ul className="flex flex-col gap-2">
                           {selectedRow.people.map((person) => (
@@ -536,18 +566,14 @@ export function RegistryListPanel({
                             </li>
                           ))}
                         </ul>
-                      ) : (
+                      ) : !selectedRow.registrationNumber ? (
                         <p className="text-sm text-muted-foreground">—</p>
-                      )}
+                      ) : null}
                     </CollapsibleSection>
                   </>
                 ) : activeTab === "tax" ? (
                   <CollapsibleSection title={t("registry.tabs.tax")}>
                     <Field label={t("registry.vatId")} value={selectedRow.taxId ?? "—"} />
-                    <Field
-                      label={t("registry.taxNumber")}
-                      value={selectedRow.registrationNumber ?? "—"}
-                    />
                   </CollapsibleSection>
                 ) : (
                   <CollapsibleSection title={t("registry.sections.bank")}>
@@ -555,9 +581,15 @@ export function RegistryListPanel({
                       label={t("registry.accountHolder")}
                       value={selectedRow.legalName ?? selectedRow.name}
                     />
-                    <Field label={t("registry.bankName")} value="—" />
-                    <Field label={t("registry.iban")} value="—" />
-                    <Field label={t("registry.bic")} value="—" />
+                    {selectedRow.iban ? (
+                      <Field label={t("registry.iban")} value={selectedRow.iban} />
+                    ) : null}
+                    {selectedRow.bic ? (
+                      <Field label={t("registry.bic")} value={selectedRow.bic} />
+                    ) : null}
+                    {!selectedRow.iban && !selectedRow.bic ? (
+                      <p className="text-sm text-muted-foreground">—</p>
+                    ) : null}
                   </CollapsibleSection>
                 )}
               </div>
