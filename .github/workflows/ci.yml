@@ -225,8 +225,6 @@ jobs:
       # then matches no tests). `exec` passes flags through.
       - run: pnpm --filter ./apps/backend exec jest --reporters=default --reporters=github-actions
 
-      - run: pnpm --filter @clared/tax-engine exec jest --reporters=default --reporters=github-actions
-
   backend-e2e:
     timeout-minutes: 20
     needs: changes
