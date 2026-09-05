@@ -83,11 +83,11 @@ Open gap (INFO, not a blocker): ExecutionEngine step 4 expects collision logic i
 | Supabase self-hosted BaaS | Optional PRD alternative; not v1; vendor Nest+Postgres instead | ✓ Locked (out) |
 | Kuma/Beszel/Grafana: app login, no Authentik in front (D-05/D-22) | Monitors stay up if Authentik is down | ✓ Phase 04.3 |
 | Gotenberg internal-only Chromium HTML; no Gotenberg OTEL (D-16) | Invoice PDF pipe (superseded by 4.6 Takumi+pdfcn) | ✓ Phase 04.3; renderer retired in 04.6 |
-| Takumi + pdfcn Invoice Minimal visual PDF; Gotenberg fully removed | JSX in-process Nest API; no Chrome, no PDF worker; e-invoice XML is 4.7 | Phase 04.6 in progress |
+| Takumi + pdfcn Invoice Minimal visual PDF; Gotenberg fully removed | JSX in-process Nest API; no Chrome, no PDF worker; e-invoice XML is 4.7 | ✓ Phase 04.6 (2026-09-05) |
 | PDF paper = Crafted oatmeal `#F7F7F5` in 4.6; Entity brand/paper color later | Founder UAT option 3 (2026-09-05); Kaneo #98 with Phase 6 logo | ✓ Locked for 4.6; backlog Phase 6+ |
 | Factur-X/ZUGFeRD Comfort CII + XRechnung + PDF/A-3b embed | Same Takumi render path; no pdf-lib second pass | Phase 04.7 pending |
 | Same Nest image, two processes: API migrate+main, worker `node dist/worker.js` | Coolify start_command is Nixpacks-only | ✓ Phase 04.3 |
 | SQLCipher keychain + empty `_init` schema; no sync yet | OFFL-01 product sync is Phase 5 | ✓ Phase 04.3 |
 
 ---
-*Last updated: 2026-09-05 after Phase 04.6 insert (Takumi+pdfcn cutover)*
+*Last updated: 2026-09-05 after Phase 04.6 complete (Takumi+pdfcn cutover)*

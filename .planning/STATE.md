@@ -24,13 +24,14 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-30)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 04.6 — Takumi+pdfcn PDF Engine Cutover
+**Current focus:** Phase 04.7 — Factur-X / ZUGFeRD / XRechnung e-invoice XML
 
 ## Current Position
 
 Status: Ready to plan
 Phase: 04.7 — Factur-X / ZUGFeRD / XRechnung e-invoice XML
 Plan: Not started
+Phase 04.6 (Takumi+pdfcn PDF Engine Cutover) — complete 2026-09-05 (verification 10/10)
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 stitch-build; 4.2 desktop; 4.3 infra; 4.4 GHA; 4.5 hardening; 4.6 Takumi+pdfcn cutover (no Gotenberg); 5.1 catalog after Phase 5; Crafted Minimal
