@@ -1,4 +1,4 @@
-import { writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import {
   renderInvoice,
@@ -6,7 +6,6 @@ import {
   swapRendererCtorFirst,
 } from "./render-invoice";
 import { formatMoney } from "./format-money";
-import { readFileSync } from "node:fs";
 
 /** Guards WR-01: free-then-ctor must not leave slot on a freed instance. */
 describe("swapRendererCtorFirst", () => {
@@ -99,6 +98,14 @@ const TAX_DE_B2B_19 = {
     "Umsatzsteuer nach § 12 Abs. 1 UStG (Regelsteuersatz 19 %).",
 } as const;
 
+/** Minimal CII placeholder for RED/GREEN packaging until Task 2 wires @clared/e-invoice. */
+const GOLDEN_CII_XML = `<?xml version="1.0" encoding="UTF-8"?>
+<rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100">
+  <rsm:ExchangedDocument>
+    <ram:ID xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100">RE-2026-0001</ram:ID>
+  </rsm:ExchangedDocument>
+</rsm:CrossIndustryInvoice>`;
+
 function assertPdfMagic(bytes: Uint8Array): void {
   expect(bytes.byteLength).toBeGreaterThanOrEqual(5);
   expect(
@@ -113,8 +120,8 @@ function assertSinglePage(bytes: Uint8Array): void {
   expect(pageObjects?.length ?? 0).toBe(1);
 }
 
-function assertNoFacturXFilename(bytes: Uint8Array): void {
-  expect(Buffer.from(bytes).toString("latin1")).not.toContain("factur-x.xml");
+function assertHasFacturXFilename(bytes: Uint8Array): void {
+  expect(Buffer.from(bytes).toString("latin1")).toContain("factur-x.xml");
 }
 
 function writeFixture(name: string, bytes: Uint8Array): void {
@@ -129,6 +136,7 @@ describe("renderInvoice money guards (D-26 package path)", () => {
       renderInvoice({
         locale: "de",
         vatLine: "omit",
+        ciiXml: GOLDEN_CII_XML,
         model: {
           ...FIXTURE_1_MODEL,
           items: [
@@ -150,6 +158,7 @@ describe("renderInvoice money guards (D-26 package path)", () => {
       renderInvoice({
         locale: "de",
         vatLine: "omit",
+        ciiXml: GOLDEN_CII_XML,
         model: { ...FIXTURE_1_MODEL, items: [...FIXTURE_1_MODEL.items] },
         tax: {
           ...TAX_DE_B2B_19,
@@ -158,6 +167,48 @@ describe("renderInvoice money guards (D-26 package path)", () => {
       })
     ).rejects.toThrow("Render fehlgeschlagen");
   });
+
+  it("rejects empty ciiXml fail-closed (D-12)", async () => {
+    await expect(
+      renderInvoice({
+        locale: "de",
+        vatLine: "omit",
+        ciiXml: "   ",
+        model: { ...FIXTURE_1_MODEL, items: [...FIXTURE_1_MODEL.items] },
+        tax: { ...TAX_DE_B2B_19 },
+      })
+    ).rejects.toThrow("Render fehlgeschlagen");
+  });
+});
+
+/** D-13 / PDF-01: hybrid-embed — PDF/A-3b carries factur-x.xml */
+describe("hybrid-embed Factur-X packaging", () => {
+  it("returns %PDF- bytes whose latin1 payload contains factur-x.xml", async () => {
+    const result = await renderInvoice({
+      locale: "de",
+      vatLine: "omit",
+      ciiXml: GOLDEN_CII_XML,
+      model: { ...FIXTURE_1_MODEL, items: [...FIXTURE_1_MODEL.items] },
+      tax: { ...TAX_DE_B2B_19 },
+    });
+
+    expect(result.contentType).toBe("application/pdf");
+    assertPdfMagic(result.bytes);
+    assertHasFacturXFilename(result.bytes);
+
+    const src = readFileSync(
+      path.join(__dirname, "render-invoice.ts"),
+      "utf8"
+    );
+    expect(src).toContain("factur-x.xml");
+    expect(src).toContain('pdfa: "3b"');
+    expect(src).toContain('relationship: "data"');
+    expect(src).not.toMatch(/\btagged\b|\bua1\b/);
+
+    const xmpSrc = readFileSync(path.join(__dirname, "factur-xmp.ts"), "utf8");
+    expect(xmpSrc).toContain("EN 16931");
+    expect(xmpSrc).toContain('"1.0"');
+  }, 60_000);
 });
 
 /** D-23 fixture 1: DE locale, DE B2B 19%, tax shown, issued number/date/due */
@@ -166,6 +217,7 @@ describe("D-23 fixture 1 — DE B2B 19%", () => {
     const result = await renderInvoice({
       locale: "de",
       vatLine: "omit",
+      ciiXml: GOLDEN_CII_XML,
       model: { ...FIXTURE_1_MODEL, items: [...FIXTURE_1_MODEL.items] },
       tax: { ...TAX_DE_B2B_19 },
     });
@@ -173,7 +225,7 @@ describe("D-23 fixture 1 — DE B2B 19%", () => {
     expect(result.contentType).toBe("application/pdf");
     assertPdfMagic(result.bytes);
     assertSinglePage(result.bytes);
-    assertNoFacturXFilename(result.bytes);
+    assertHasFacturXFilename(result.bytes);
     writeFixture("fixture-1-de-b2b.pdf", result.bytes);
   }, 60_000);
 });
@@ -190,6 +242,7 @@ describe("D-23 fixture 2 — EN same facts", () => {
     const result = await renderInvoice({
       locale: "en",
       vatLine: "omit",
+      ciiXml: GOLDEN_CII_XML,
       model: { ...FIXTURE_1_MODEL, items: [...FIXTURE_1_MODEL.items] },
       tax: { ...TAX_DE_B2B_19 },
     });
@@ -197,7 +250,7 @@ describe("D-23 fixture 2 — EN same facts", () => {
     expect(result.contentType).toBe("application/pdf");
     assertPdfMagic(result.bytes);
     assertSinglePage(result.bytes);
-    assertNoFacturXFilename(result.bytes);
+    assertHasFacturXFilename(result.bytes);
     writeFixture("fixture-2-en-b2b.pdf", result.bytes);
   }, 60_000);
 });
@@ -244,6 +297,7 @@ describe("D-23 fixture 3 — DE reverse-charge", () => {
     const result = await renderInvoice({
       locale: "de",
       vatLine: "omit",
+      ciiXml: GOLDEN_CII_XML,
       model: {
         entity: {
           name: "Nordlicht Handel GmbH",
@@ -283,17 +337,10 @@ describe("D-23 fixture 3 — DE reverse-charge", () => {
     expect(result.contentType).toBe("application/pdf");
     assertPdfMagic(result.bytes);
     assertSinglePage(result.bytes);
-    assertNoFacturXFilename(result.bytes);
-
-    // Render source must not set archival/file-embed or Factur-X filename (D-06)
-    const src = readFileSync(
-      path.join(__dirname, "render-invoice.ts"),
-      "utf8"
+    assertHasFacturXFilename(result.bytes);
+    expect(readFileSync(path.join(__dirname, "render-invoice.ts"), "utf8")).not.toMatch(
+      /ENTWURF|draft watermark/i
     );
-    expect(src).not.toContain("factur-x.xml");
-    expect(src).not.toContain("archival-profile");
-    expect(src).not.toContain("file-embed");
-    expect(src).not.toMatch(/ENTWURF|draft watermark/i);
 
     writeFixture("fixture-3-de-reverse-charge.pdf", result.bytes);
   }, 60_000);

@@ -20,6 +20,8 @@ export type RenderInvoiceInput = {
   /** D-21: fixture 1 uses de + omit */
   locale: "de" | "en";
   vatLine: "omit" | "zero";
+  /** Comfort CII from @clared/e-invoice — required for hybrid PDF/A-3b (D-06, D-12) */
+  ciiXml: string;
 };
 
 export type PdfBytes = {
