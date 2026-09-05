@@ -60,12 +60,15 @@ let renderer = new PdfRenderer();
 let renderLock: Promise<void> = Promise.resolve();
 
 function recreateRenderer(): void {
+  const previous = renderer;
   try {
-    renderer.free();
+    previous.free();
   } catch {
     /* ignore free errors on panicked instance */
   }
-  renderer = new PdfRenderer();
+  // Assign only after ctor succeeds — else module still pointed at freed instance.
+  const next = new PdfRenderer();
+  renderer = next;
 }
 
 function withRendererExclusive<T>(fn: () => Promise<T>): Promise<T> {
