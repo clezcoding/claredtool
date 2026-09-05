@@ -78,6 +78,43 @@ function writeFixture(name: string, bytes: Uint8Array): void {
   writeFileSync(path.join(outDir, name), bytes);
 }
 
+describe("renderInvoice money guards (D-26 package path)", () => {
+  it("rejects non-finite line netto before emit", async () => {
+    await expect(
+      renderInvoice({
+        locale: "de",
+        vatLine: "omit",
+        model: {
+          ...FIXTURE_1_MODEL,
+          items: [
+            {
+              bezeichnung: "Bad",
+              menge: 1,
+              einzelpreis: 10,
+              netto: Number.NaN,
+            },
+          ],
+        },
+        tax: { ...TAX_DE_B2B_19 },
+      })
+    ).rejects.toThrow("Render fehlgeschlagen");
+  });
+
+  it("rejects non-finite tax rate (no silent 0% via || 0)", async () => {
+    await expect(
+      renderInvoice({
+        locale: "de",
+        vatLine: "omit",
+        model: { ...FIXTURE_1_MODEL, items: [...FIXTURE_1_MODEL.items] },
+        tax: {
+          ...TAX_DE_B2B_19,
+          invoice_tax_rate: Number.NaN,
+        },
+      })
+    ).rejects.toThrow("Render fehlgeschlagen");
+  });
+});
+
 /** D-23 fixture 1: DE locale, DE B2B 19%, tax shown, issued number/date/due */
 describe("D-23 fixture 1 — DE B2B 19%", () => {
   it("returns PdfBytes starting with %PDF-", async () => {

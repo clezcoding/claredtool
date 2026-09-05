@@ -149,6 +149,32 @@ function assertPdfMagic(bytes: Uint8Array): void {
   }
 }
 
+function assertFinite(...vals: number[]): void {
+  if (vals.some((n) => !Number.isFinite(n))) {
+    throw new Error(RENDER_FAILED);
+  }
+}
+
+/** Package-level money sanity — match Nest InvoicePdfService gates (D-26 fail-closed). */
+function assertSaneMoney(
+  items: InvoiceModel["items"],
+  taxRate: number
+): void {
+  assertFinite(taxRate);
+  if (taxRate < 0) {
+    throw new Error(RENDER_FAILED);
+  }
+  for (const item of items) {
+    const menge = Number(item.menge);
+    const einzelpreis = Number(item.einzelpreis);
+    const netto = Number(item.netto);
+    assertFinite(menge, einzelpreis, netto);
+    if (menge <= 0 || einzelpreis < 0 || netto < 0) {
+      throw new Error(RENDER_FAILED);
+    }
+  }
+}
+
 /** Round to EUR cents so printed net + tax equals printed total. */
 export function roundEur(n: number): number {
   return Math.round((n + Number.EPSILON) * 100) / 100;
@@ -167,12 +193,18 @@ export async function renderInvoice(
   }
 
   const { model, tax, locale, vatLine } = input;
+  if (!Array.isArray(model.items) || model.items.length === 0) {
+    throw new Error(RENDER_FAILED);
+  }
+
+  const rate = Number(tax.invoice_tax_rate);
+  assertSaneMoney(model.items, rate);
+
   const labels = labelsFor(locale);
 
   const subtotal = roundEur(
     model.items.reduce((sum, line) => sum + Number(line.netto), 0)
   );
-  const rate = Number(tax.invoice_tax_rate) || 0;
   const showTax = tax.invoice_tax_shown === true;
   const taxAmount = showTax ? roundEur(subtotal * (rate / 100)) : 0;
   const total = roundEur(subtotal + taxAmount);
