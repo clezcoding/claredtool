@@ -274,7 +274,7 @@ Plans:
   9. Fonts vendored in the image (Inter + Instrument Serif WOFF2). No `googleFonts()` network fetch at Coolify render time
   10. Ops addendum (do not rewrite 04.3 PLAN/SUMMARY): 04.3-PDF-OPS / MONITOR-OPS + `.env.example` without `GOTENBERG_*`. Fixture: Invoice+TaxDecision → `%PDF-` bytes, no Chrome, no XML attachment
 
-**Plans:** 1/5 plans executed
+**Plans:** 2/5 plans executed
 **UI hint**: no (engine/infra; JSX templates are not desktop UI)
 
 Plans:
@@ -285,7 +285,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 04.6-02-PLAN.md — D-18/D-22 helpers + D-23 fixtures 2–3 + paper layout locks
+- [x] 04.6-02-PLAN.md — D-18/D-22 helpers + D-23 fixtures 2–3 + paper layout locks
 
 **Wave 3** *(blocked on Wave 2)*
 
@@ -468,7 +468,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 →
 | 4.3 Infra & Prep for PDF/Offline/Audit | 8/8 | Complete    | 2026-08-30 |
 | 4.4 GitHub Actions Optimization | 7/7 | Complete | 2026-09-04 |
 | 4.5 Repository Reliability, Performance & Maintainability Hardening | 6/6 | Complete | 2026-09-05 |
-| 4.6 Takumi+pdfcn PDF Engine Cutover | 1/5 | In Progress|  |
+| 4.6 Takumi+pdfcn PDF Engine Cutover | 2/5 | In Progress|  |
 | 4.7 Factur-X / ZUGFeRD / XRechnung e-invoice XML | 0/? | Not started | - |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |

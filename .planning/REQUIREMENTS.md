@@ -35,7 +35,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### PDF, Offline & Audit
 
-- [ ] **PDF-01**: User can download and view a backend-rendered PDF (templates + TaxDecision text blocks; multilingual DE/EN)
+- [x] **PDF-01**: User can download and view a backend-rendered PDF (templates + TaxDecision text blocks; multilingual DE/EN)
 - [x] **OFFL-01**: User can work with recently used data offline (IndexedDB/SQLite) and sync when the connection returns
 - [ ] **AUDT-01**: Each tax decision is persisted in `audit_logs`; application logs exist in the backend; monitoring can run as additional Coolify services (Grafana, Prometheus)
 
@@ -107,7 +107,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INV-01 | Phase 3 | Pending |
 | TAX-01 | Phase 3 | Pending |
 | TAX-02 | Phase 3 | Pending |
-| PDF-01 | Phase 5 | Pending |
+| PDF-01 | Phase 5 | Complete |
 | OFFL-01 | Phase 5 | Complete |
 | AUDT-01 | Phase 5 | Pending |
 

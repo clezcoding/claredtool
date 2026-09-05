@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.6
 current_phase_name: Takumi+pdfcn PDF Engine Cutover
 status: executing
-stopped_at: Phase 4.6 plans written
-last_updated: "2026-09-05T16:17:53.696Z"
+stopped_at: Completed 04.6-02-PLAN.md
+last_updated: "2026-09-05T17:01:02.354Z"
 last_activity: 2026-09-05
 last_activity_desc: Phase 04.6 execution started
-state_head: 685ebc1a681d402380b80fd8c63f4ea7b68bfe12
+state_head: 5f49794d3885f14eb4ab0b21116f154f947b08bd
 progress:
   total_phases: 14
   completed_phases: 9
   total_plans: 65
-  completed_plans: 60
+  completed_plans: 62
 milestone_name: milestone
 ---
 
@@ -28,12 +28,13 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Executing Phase 04.6
+Status: Executing Phase 04.6 — Plan 02 complete; next 04.6-03
 Phase: 04.6 (Takumi+pdfcn PDF Engine Cutover) — EXECUTING
+Plan: 02/05 complete (Intl + D-23 fixtures 2–3)
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 stitch-build; 4.2 desktop; 4.3 infra; 4.4 GHA; 4.5 hardening; 4.6 Takumi+pdfcn cutover (no Gotenberg); 5.1 catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-05 — Phase 04.6 execution started
+Last activity: 2026-09-05 — Completed 04.6-02 (format-money, defaultsFromCountry, fixtures 2–3)
 
 Progress: [█████████░] 75%
 
@@ -116,6 +117,7 @@ Progress: [█████████░] 75%
 | Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de P05 | 3 min | 2 tasks | 1 files |
 | Phase 04.4 P06 | 4 min | 3 tasks | 2 files |
 | Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de P07 | 8 min | 3 tasks | 7 files |
+| Phase 04.6 P02 | 4min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -268,6 +270,8 @@ Recent decisions affecting current work:
 - [Phase 4.6]: Research locked SC 6–10 (Dockerfile pdf-templates+wasm, GHA API-only, npm deny-list, vendored Inter+Instrument Serif, ops addendum+fixture). Public generate HTTP stays Phase 5. PDF/A-3b without XML still discuss. Founder report stale: Takumi now has pdfa 3b + attachments; XML still out of 4.6.
 - [Phase 4.6]: Founder lock 2026-09-05: PDF/A-3b WITH Factur-X EN 16931 Comfort XML (not visual-only); pdfcn Invoice Minimal; PDF/UA-1 off. XRechnung out. Embed via Takumi attachments+xmp, not pdf-lib. XML lib plan-phase (node-zugferd toXML() candidate, WIP).
 - [Phase 4.6/4.7]: E-invoice XML (Factur-X Comfort + XRechnung + PDF/A-3b) moved to inserted Phase 4.7. 4.6 is visual Takumi engine only. Order 4.6 → 4.7 → 5.
+- [Phase 04.6]: RC sentence via legalBlockLines locale strings; fixtures keep explicit knobs (D-21); defaultsFromCountry for Nest later
+- [Phase 04.6]: Jest 30 verify uses --testPathPatterns (plan said --testPathPattern)
 
 ### Pending Todos
 
@@ -319,9 +323,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-05T17:20:00.000Z
-Stopped at: Phase 4.6 plans written
-Resume file: /Users/puzzless/Desktop/claredtool/.planning/phases/04.6-takumi-pdfcn-pdf-engine-cutover/04.6-01-PLAN.md
+Last session: 2026-09-05T17:01:01.962Z
+Stopped at: Completed 04.6-02-PLAN.md
+Resume file: None
 
 ## Rebuild Log
 
