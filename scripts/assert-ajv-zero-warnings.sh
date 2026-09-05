@@ -6,8 +6,16 @@ cd "$REPO_ROOT"
 
 # pnpm 11 inserts `--` before extra `run` args (`jest -- --reporters`
 # then matches no tests). `exec` passes flags through.
+# Capture under set +e so a failing Jest run still prints logs/annotations
+# before we exit (set -e would abort inside $() and discard stdout).
+set +e
 OUTPUT="$(pnpm --filter @clared/tax-engine exec jest --reporters=default --reporters=github-actions 2>&1)"
+rc=$?
+set -e
 printf '%s\n' "$OUTPUT"
+if [ "$rc" -ne 0 ]; then
+  exit "$rc"
+fi
 
 # Portable grep — Ubuntu GHA runners lack ripgrep; `rg` inside `if` exits 127
 # without tripping set -e and silently reports OK (REL-03 false pass).
