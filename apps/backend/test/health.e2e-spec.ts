@@ -5,6 +5,7 @@ import { AppModule } from "../src/app.module";
 import { RuleSeedService } from "../src/tax/rule-seed";
 
 process.env.AUTH_TEST_MODE = "1";
+process.env.GIT_SHA = "e2e-health-build-sha";
 process.env.DATABASE_URL ??=
   "postgresql://clared_app:clared_app_dev@127.0.0.1:5432/clared";
 
@@ -35,6 +36,11 @@ describe("Health (e2e)", () => {
     for (const key of PII_KEYS) {
       expect(json).not.toContain(key);
     }
+  });
+
+  it("GET /health/build returns 200 with top-level sha equal to GIT_SHA", async () => {
+    const res = await request(app.getHttpServer()).get("/health/build").expect(200);
+    expect(res.body).toEqual({ status: "ok", sha: "e2e-health-build-sha" });
   });
 
   it("GET /health/ready returns 200 or 503 with postgres and redis in the body", async () => {

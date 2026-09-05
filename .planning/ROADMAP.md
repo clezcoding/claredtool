@@ -2,7 +2,7 @@
 
 ## Overview
 
-Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. It is **paid subscription SaaS**: backend, Postgres, Redis, and Authentik run on the **founder's Coolify**, not on the customer's machine, not as open source, not for free. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to the vendor Coolify API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 is a full premium redesign (Crafted Minimal) — brand tokens, theme, motion. Phase 4.1 converts approved Google Stitch HTML for the 5 v1 routes into Tauri TSX/React via stitch-build. Phase 4.2 hardens the desktop platform (Tauri plugins, Sentry, updater). Phase 4.3 deploys PDF/audit/offline prep infra (Gotenberg, monitoring, OTel, desktop SQL/dialog/fs). Phase 4.4 lands the GitHub Actions optimization brief before the PDF product wave. Phase 5 closes the loop with PDF, tax-decision audit, and offline sync. Phase 5.1 converts the remaining Stitch catalog. Phase 6 closes 1:1 fidelity on the 5 routes. Stripe/seats (`SAAS-01`) stay v2.
+Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. It is **paid subscription SaaS**: backend, Postgres, Redis, and Authentik run on the **founder's Coolify**, not on the customer's machine, not as open source, not for free. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to the vendor Coolify API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 is a full premium redesign (Crafted Minimal) — brand tokens, theme, motion. Phase 4.1 converts approved Google Stitch HTML for the 5 v1 routes into Tauri TSX/React via stitch-build. Phase 4.2 hardens the desktop platform (Tauri plugins, Sentry, updater). Phase 4.3 deploys PDF/audit/offline prep infra (Gotenberg, monitoring, OTel, desktop SQL/dialog/fs). Phase 4.4 lands the GitHub Actions optimization brief before the PDF product wave. Phase 4.5 closes measurable reliability, performance, and maintainability debt before Phase 5. Phase 5 closes the loop with PDF, tax-decision audit, and offline sync. Phase 5.1 converts the remaining Stitch catalog. Phase 6 closes 1:1 fidelity on the 5 routes. Stripe/seats (`SAAS-01`) stay v2.
 
 ## Phases
 
@@ -20,7 +20,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4.1: Stitch→React 5-route conversion** (INSERTED) - stitch-build HTML→TSX for Rechnung · Entities · Kunden · Tax · PDF (completed 2026-08-28)
 - [x] **Phase 4.2: Desktop Platform Hardening** (INSERTED) - Tauri plugins, Sentry, updater, desktop polish (completed 2026-08-28)
 - [x] **Phase 4.3: Infra & Prep for PDF, Offline & Audit** (INSERTED) - Gotenberg, monitoring, OTel, desktop/backend scaffolding before Phase 5 (completed 2026-08-30)
-- [ ] **Phase 4.4: GitHub Actions Optimization** (INSERTED) - CI fan-out, security workflows, desktop-release, Dependabot (`docs/claredtool-github-actions-optimierungsauftrag.md`)
+- [x] **Phase 4.4: GitHub Actions Optimization** (INSERTED) - CI fan-out, security workflows, desktop-release, Dependabot (`docs/claredtool-github-actions-optimierungsauftrag.md`) (completed 2026-09-04)
+- [ ] **Phase 4.5: Repository Reliability, Performance & Maintainability Hardening** (INSERTED) - close measurable tech-debt before Phase 5 product work (`docs/CURSOR_GSD_PHASE_04.5_HANDOFF.md`)
 - [ ] **Phase 5: PDF, Audit & Offline Sync** - Download PDF, inspect tax audit trail, work offline and sync
 - [ ] **Phase 5.1: Stitch→React extended catalog** (INSERTED) - remaining Stitch screens after PDF loop ships
 - [ ] **Phase 6: Mockup 1:1 Fidelity Closure** - pixel-match approved mockups 02–07 on the 5 routes
@@ -176,7 +177,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Depends on:** Phase 4.3
 **Success Criteria** (what must be TRUE):
 
-  1. Brief Phases 1–2: `ci.yml` respects path filters on `main`, draft-PR gating, desktop-web vs desktop-rust split, consolidated backend-test with walltime guard
+  1. Brief Phases 1–2: `ci.yml` respects path filters on `main`, draft-PR gating, desktop-web vs desktop-rust split, live `backend-unit` + `backend-e2e` jobs (post-PR #115 split) with walltime guard
   2. Brief Phases 3–4: security workflows (Gitleaks/Zizmor/Actionlint/CodeQL path+language) as specified; signed desktop-build only on `v*` tags and `workflow_dispatch` (no automatic signed `main` publish)
   3. Brief Phases 5–8: Dependabot lockstep/limits, backend-image/deploy cleanup, checkout/digest/permissions hardening, step summaries — no new reporting SaaS
   4. Required check still named exactly `ci`; no `pull_request_target`; no `workflow_run` for desktop/backend deploy; SHA-pinned actions; `package-manager-cache: false` on signed desktop jobs
@@ -186,6 +187,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **UI hint**: no (CI/CD only)
 
 Plans:
+
+Post-merge live facts (backend job split, runner matrix, founder manual tasks): see [`04.4-POST-MERGE-ADDENDUM.md`](./phases/04.4-github-actions-optimization-ci-fan-out-security-workflows-de/04.4-POST-MERGE-ADDENDUM.md).
 
 **Wave 1**
 
@@ -214,6 +217,42 @@ Plans:
 **Wave 7** *(blocked on Wave 6)*
 
 - [x] 04.4-07-PLAN.md — persist-credentials, digests, summaries, JUnit, founder checklist (D-33 commit 7)
+
+### Phase 04.5: Repository Reliability, Performance & Maintainability Hardening (INSERTED)
+
+**Goal:** Close measurable quality, maintainability, performance, and verification debt on `origin/main` after Phase 04.4 — without shipping new product features or reopening Phase 5 scope
+**Requirements**: REL-01 (deploy script), REL-02 (desktop bundle verify), REL-03 (AJV zero-warning), REL-04 (CI baselines/experiments), REL-05 (repo hygiene), REL-06 (docs addendum); PRD: `docs/CURSOR_GSD_PHASE_04.5_HANDOFF.md`
+**Depends on:** Phase 04.4
+**Success Criteria** (what must be TRUE):
+
+  1. Research on `origin/main` confirms which handoff candidates are real debt vs already fixed; rejected ideas documented with evidence
+  2. Each accepted item has baseline metric, target threshold, rollback path, and an automated check (not “cleaner” or “faster” without numbers)
+  3. CI/workflow changes pass Actionlint, Zizmor, Gitleaks, YAML parse, and ShellCheck; app changes pass the existing desktop/backend/tax-engine/Rust gates for touched areas
+  4. No Phase 5 product scope (PDF download, audit_logs UI, offline sync), no tenant billing, no new tax collision semantics, no signed-desktop cache, no Harden-Runner `block` without measured allowlist
+  5. Walltime improvements (if any) report before/after for PR `desktop-rust`, `main` Rust CodeQL, and backend-image deploy baselines from the handoff
+
+**Plans:** 6/6 plans executed
+**UI hint**: no (reliability / perf / maintainability only)
+
+Plans:
+
+**Wave 1**
+
+- [x] 04.5-01-PLAN.md — Baselines, POST-MERGE addendum, graph tooling (REL-04, REL-06, REL-05 Wave 0)
+- [x] 04.5-02-PLAN.md — AJV anyOf schema zero-warning gate (REL-03)
+- [x] 04.5-04-PLAN.md — Coolify deploy script extract + mock tests (REL-01)
+
+**Wave 2** *(04.5-03 blocked on 01)*
+
+- [x] 04.5-03-PLAN.md — Desktop bundle verify-only; split rejected by gzip gate (REL-02)
+
+**Wave 3** *(blocked on 01 + 03)*
+
+- [x] 04.5-06-PLAN.md — Graph-first repo hygiene; zero-caller deletions only (REL-05)
+
+**Wave 4** *(blocked on 01 + 04 + 06)*
+
+- [x] 04.5-05-PLAN.md — CI walltime experiments on three baselines (REL-04)
 
 ### Phase 04.3: Infra & Prep for PDF, Offline & Audit (INSERTED)
 
@@ -351,7 +390,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 → 4.4 → 5 → 5.1 → 6
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 → 4.4 → 4.5 → 5 → 5.1 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -362,7 +401,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 →
 | 4.1 Stitch→React 5-route conversion | 7/7 | Complete    | 2026-08-28 |
 | 4.2 Desktop Platform Hardening | 8/8 | Complete    | 2026-08-28 |
 | 4.3 Infra & Prep for PDF/Offline/Audit | 8/8 | Complete    | 2026-08-30 |
-| 4.4 GitHub Actions Optimization | 7/7 | In Progress|  |
+| 4.4 GitHub Actions Optimization | 7/7 | Complete | 2026-09-04 |
+| 4.5 Repository Reliability, Performance & Maintainability Hardening | 6/6 | In Progress|  |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |
 | 6. Mockup 1:1 Fidelity Closure | 0/? | Not started | - |

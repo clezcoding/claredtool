@@ -74,6 +74,7 @@ jobs:
               - 'packages/tax-engine/src/schema/clared-tax-rule-dsl-schema.json'
             tax-engine:
               - 'packages/tax-engine/**'
+              - 'scripts/assert-ajv-zero-warnings.sh'
             shared:
               - 'package.json'
               - 'pnpm-lock.yaml'
@@ -211,6 +212,9 @@ jobs:
 
       - run: pnpm --filter @clared/tax-engine build
 
+      - name: AJV strict mode zero-warning gate (REL-03)
+        run: bash scripts/assert-ajv-zero-warnings.sh
+
       - run: pnpm --filter ./apps/backend exec prisma generate
 
       - run: pnpm --filter ./apps/backend exec prisma validate
@@ -220,8 +224,6 @@ jobs:
       # pnpm 11 inserts `--` before extra `run` args (`jest -- --reporters`
       # then matches no tests). `exec` passes flags through.
       - run: pnpm --filter ./apps/backend exec jest --reporters=default --reporters=github-actions
-
-      - run: pnpm --filter @clared/tax-engine exec jest --reporters=default --reporters=github-actions
 
   backend-e2e:
     timeout-minutes: 20

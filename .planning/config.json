@@ -44,26 +44,15 @@
     "max_concurrent_agents": 3,
     "min_plans_for_parallel": 2
   },
-  "gates": {
-    "confirm_project": true,
-    "confirm_phases": true,
-    "confirm_roadmap": true,
-    "confirm_breakdown": true,
-    "confirm_plan": true,
-    "execute_next_plan": true,
-    "issues_review": true,
-    "confirm_transition": true
-  },
-  "safety": {
-    "always_confirm_destructive": true,
-    "always_confirm_external_services": true
-  },
   "hooks": {
     "context_warnings": true
   },
   "project_code": null,
   "agent_skills": {},
-  "claude_md_path": "./.claude/CLAUDE.md",
   "response_language": "de-DE",
-  "model_profile": "inherit"
+  "model_profile": "inherit",
+  "graphify": {
+    "enabled": true
+  },
+  "runtime": "cursor"
 }

@@ -1,19 +1,19 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 5
-current_phase_name: PDF, Audit & Offline Sync
-status: planning
-stopped_at: Health+forensics remediations complete
-last_updated: "2026-09-04T11:30:00.000Z"
-last_activity: 2026-09-04
-last_activity_desc: "Completed quick task 260904-ile: Dependabot qs/mysql2 patches + stale GitHub epics closed"
-state_head: a004b8edb76d524f02e30accc5ac622dac86a86e
+current_phase: 04.5
+current_phase_name: Repository Reliability, Performance & Maintainability Hardening
+status: executing
+stopped_at: Config runtime=cursor; archived duplicate INGEST-CONFLICTS.md
+last_updated: "2026-09-05T00:42:06.783Z"
+last_activity: 2026-09-05
+last_activity_desc: Phase 04.5 code review --fix --all --auto converged clean (0/0/0)
+state_head: 6dd3dfbb823c74776ab8a55d42fc402f4aa6c56c
 progress:
-  total_phases: 11
-  completed_phases: 8
-  total_plans: 54
-  completed_plans: 54
+  total_phases: 12
+  completed_phases: 7
+  total_plans: 60
+  completed_plans: 60
 milestone_name: milestone
 ---
 
@@ -24,20 +24,21 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-30)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 5 — PDF, Audit & Offline Sync
+**Current focus:** Phase 04.5 — Repository Reliability, Performance & Maintainability Hardening
 
 ## Current Position
 
-Status: Ready to plan
-Phase: 5 — PDF, Audit & Offline Sync
+Status: Executing Phase 04.5
+Phase: 04.5 (Repository Reliability, Performance & Maintainability Hardening) — EXECUTING
 Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: Not started
+Plan: 1 of 6
 Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
-Phase 04.4 (GitHub Actions Optimization) — complete 2026-09-04 (PR #111)
-Phase 05 (PDF, Audit & Offline Sync) — current, not started
+Phase 04.4 (GitHub Actions Optimization) — complete 2026-09-04 (PR #115)
+Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — current, not started
+Phase 05 (PDF, Audit & Offline Sync) — after Phase 04.5
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
-Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-04 — Phase 04.4 complete, transitioned to Phase 5
+Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 4.5 = reliability/perf/maintainability hardening before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
+Last activity: 2026-09-05 — Phase 04.5 execution started
 
 Progress: [████████░░] 73%
 
@@ -304,6 +305,7 @@ None yet.
 - Phase 04.2 inserted after Phase 4: Desktop Platform Hardening — Tauri plugins, sentry, tauri-ui batteries, updater infra (URGENT)
 - Phase 04.3 inserted after Phase 4: Infra & Prep for PDF/Offline/Audit — Gotenberg, Uptime Kuma, Beszel, OTel/Grafana, Pino, dialog/fs/sharekit/sql scaffold, BullMQ skeleton (URGENT)
 - Phase 04.4 inserted after Phase 4: GitHub Actions Optimization — CI fan-out, security workflows, desktop-release, Dependabot (URGENT)
+- Phase 04.5 inserted after Phase 4: Repository Reliability, Performance & Maintainability Hardening (URGENT)
 
 ## Deferred Items
 
@@ -315,9 +317,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-04T10:09:45.727Z
-Stopped at: Health+forensics remediations complete
-Resume file: .planning/forensics/report-20260904-120305.md
+Last session: 2026-09-05T00:42:06.595Z
+Stopped at: Config runtime=cursor; archived duplicate INGEST-CONFLICTS.md
+Resume file: .planning/forensics/report-20260905-023336.md
 
 ## Rebuild Log
 
