@@ -16,6 +16,8 @@ function scrubMessage(message: string): string {
 
 export type EInvoiceErrorCode =
   | "MISSING_SELLER_CONTACT"
+  | "MISSING_BUYER_ENDPOINT"
+  | "MISSING_PAYMENT_MEANS"
   | "TAX_MAPPING"
   | "AMOUNT_MISMATCH"
   | "SERIALIZE_FAILED";

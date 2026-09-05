@@ -47,6 +47,8 @@ export type InvoicePdfEntity = StructuredPartyBase & {
 export type InvoicePdfCustomer = StructuredPartyBase & {
   leitwegId?: string | null;
   buyerReference?: string | null;
+  /** Optional BT-49 buyer EndpointID (scheme EM) when known at generate. */
+  email?: string | null;
 };
 
 export type InvoicePdfLine = {
@@ -151,6 +153,11 @@ function validateInput(input: InvoicePdfInput): void {
     throw new RenderFailedError();
   }
 
+  // XRechnung CIUS: BG-16 PaymentMeans + buyer EndpointID (do not invent IBAN — D-18)
+  if (!isNonEmptyString(entity.iban) || !isNonEmptyString(customer.email)) {
+    throw new RenderFailedError();
+  }
+
   if (
     !isNonEmptyString(entity.legalForm) ||
     !isNonEmptyString(invoice.number) ||
@@ -234,6 +241,9 @@ function toFacts(input: InvoicePdfInput): En16931Facts {
       vatId: (input.entity.vatId ?? "").trim(),
       email: input.entity.email.trim(),
       phone: input.entity.phone.trim(),
+      ...(isNonEmptyString(input.entity.iban)
+        ? { iban: input.entity.iban.trim() }
+        : {}),
     },
     buyer: {
       name: input.customer.name.trim(),
@@ -242,6 +252,9 @@ function toFacts(input: InvoicePdfInput): En16931Facts {
       city: input.customer.city.trim(),
       countryCode: input.customer.country.trim(),
       vatId: (input.customer.vatId ?? "").trim(),
+      ...(isNonEmptyString(input.customer.email)
+        ? { email: input.customer.email.trim() }
+        : {}),
     },
     ...(buyerRef ? { buyerReference: buyerRef } : {}),
     lines: input.items.map((item, index) => ({

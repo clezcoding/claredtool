@@ -10,11 +10,15 @@ export type PartyAddress = {
   city: string;
   countryCode: string;
   vatId: string;
+  /** BT-34/BT-49 EndpointID (scheme EM) — required for XRechnung UBL (PEPPOL R010/R020). */
+  email?: string;
 };
 
 export type SellerParty = PartyAddress & {
   email: string;
   phone: string;
+  /** BG-16 PayeeFinancialAccount — fixture/test IBAN OK; never invent on live path (D-18). */
+  iban?: string;
 };
 
 export type InvoiceLine = {
@@ -83,6 +87,8 @@ const SELLER: SellerParty = {
   vatId: "DE123456789",
   email: "seller@example.com",
   phone: "+498912345678",
+  // D-18: non-existent but checksum-valid test IBAN (KoSIT sample pattern)
+  iban: "DE79000000001234567890",
 };
 
 const BUYER: PartyAddress = {
@@ -92,6 +98,7 @@ const BUYER: PartyAddress = {
   city: "Berlin",
   countryCode: "DE",
   vatId: "DE987654321",
+  email: "buyer@example.com",
 };
 
 function buildFromTax(

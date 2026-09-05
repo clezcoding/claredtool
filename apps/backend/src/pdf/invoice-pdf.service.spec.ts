@@ -32,6 +32,8 @@ function validInput() {
       legalForm: "GmbH",
       email: SELLER_EMAIL,
       phone: SELLER_PHONE,
+      // D-18: test IBAN only in fixtures/tests — never invent on live path
+      iban: "DE79000000001234567890",
     },
     customer: {
       name: "Beispiel AG",
@@ -40,6 +42,7 @@ function validInput() {
       city: "München",
       vatId: "DE987654321",
       country: "DE",
+      email: "buyer@example.com",
     },
     invoice: {
       number: "RE-2026-0001",
@@ -293,21 +296,18 @@ describe("InvoicePdfService", () => {
       });
     });
 
-    it("empty IBAN on live path OK — omit payment means; do not invent IBAN (D-18)", async () => {
-      const pdfBytes = new TextEncoder().encode("%PDF-1.4 factur-x.xml mock");
-      renderInvoiceMock.mockResolvedValue({
-        bytes: pdfBytes,
-        contentType: "application/pdf",
-      });
-
-      const input = {
+    it("empty IBAN → RenderFailedError — do not invent IBAN; XRechnung needs BG-16 (D-18, BR-DE-1)", async () => {
+      await expectScrubbedFail({
         ...validInput(),
-        entity: { ...validInput().entity, iban: undefined, bic: undefined },
-      };
-      expect(input.entity.iban).toBeUndefined();
-      const result = await service.render(input);
-      expect(result.pdf.contentType).toBe("application/pdf");
-      expect(result.xrechnungXml.bytes.byteLength).toBeGreaterThan(0);
+        entity: { ...validInput().entity, iban: "" },
+      });
+    });
+
+    it("missing buyer email → RenderFailedError — XRechnung needs BT-49 EndpointID", async () => {
+      await expectScrubbedFail({
+        ...validInput(),
+        customer: { ...validInput().customer, email: "" },
+      });
     });
 
     // Q2: HRB / Geschäftsführer optional — absence alone does not fail-closed

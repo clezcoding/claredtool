@@ -26,6 +26,15 @@ function assertSellerContact(facts: En16931Facts): void {
   }
 }
 
+function assertXrechnungExtras(facts: En16931Facts): void {
+  if (!facts.buyer.email?.trim()) {
+    throw new EInvoiceError("MISSING_BUYER_ENDPOINT");
+  }
+  if (!facts.seller.iban?.trim()) {
+    throw new EInvoiceError("MISSING_PAYMENT_MEANS");
+  }
+}
+
 function isoDate(d: Date): string {
   return d.toISOString().slice(0, 10);
 }
@@ -50,6 +59,11 @@ function extractUblTotals(xml: string): MoneyTotals {
 /** Hand-rolled XRechnung 3.0.2 UBL Invoice (D-01, D-02, D-08). */
 export function serializeUblXRechnung(facts: En16931Facts): string {
   assertSellerContact(facts);
+  assertXrechnungExtras(facts);
+
+  const sellerEmail = facts.seller.email.trim();
+  const buyerEmail = facts.buyer.email!.trim();
+  const iban = facts.seller.iban!.trim();
 
   const linesXml = facts.lines
     .map(
@@ -98,6 +112,7 @@ export function serializeUblXRechnung(facts: En16931Facts): string {
   }
   <cac:AccountingSupplierParty>
     <cac:Party>
+      <cbc:EndpointID schemeID="EM">${escapeXml(sellerEmail)}</cbc:EndpointID>
       <cac:PartyName>
         <cbc:Name>${escapeXml(facts.seller.name)}</cbc:Name>
       </cac:PartyName>
@@ -119,13 +134,15 @@ export function serializeUblXRechnung(facts: En16931Facts): string {
         <cbc:RegistrationName>${escapeXml(facts.seller.name)}</cbc:RegistrationName>
       </cac:PartyLegalEntity>
       <cac:Contact>
+        <cbc:Name>${escapeXml(facts.seller.name)}</cbc:Name>
         <cbc:Telephone>${escapeXml(facts.seller.phone)}</cbc:Telephone>
-        <cbc:ElectronicMail>${escapeXml(facts.seller.email)}</cbc:ElectronicMail>
+        <cbc:ElectronicMail>${escapeXml(sellerEmail)}</cbc:ElectronicMail>
       </cac:Contact>
     </cac:Party>
   </cac:AccountingSupplierParty>
   <cac:AccountingCustomerParty>
     <cac:Party>
+      <cbc:EndpointID schemeID="EM">${escapeXml(buyerEmail)}</cbc:EndpointID>
       <cac:PartyName>
         <cbc:Name>${escapeXml(facts.buyer.name)}</cbc:Name>
       </cac:PartyName>
@@ -148,6 +165,12 @@ export function serializeUblXRechnung(facts: En16931Facts): string {
       </cac:PartyLegalEntity>
     </cac:Party>
   </cac:AccountingCustomerParty>
+  <cac:PaymentMeans>
+    <cbc:PaymentMeansCode>58</cbc:PaymentMeansCode>
+    <cac:PayeeFinancialAccount>
+      <cbc:ID>${escapeXml(iban)}</cbc:ID>
+    </cac:PayeeFinancialAccount>
+  </cac:PaymentMeans>
   <cac:TaxTotal>
     <cbc:TaxAmount currencyID="${facts.currency}">${moneyStr(facts.totals.taxTotal)}</cbc:TaxAmount>
     <cac:TaxSubtotal>

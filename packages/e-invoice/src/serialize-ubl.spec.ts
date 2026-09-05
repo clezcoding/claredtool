@@ -64,4 +64,20 @@ describe("serialize-ubl-xrechnung", () => {
       grandTotal: pick("TaxInclusiveAmount"),
     });
   });
+
+  it("throws when buyer EndpointID or seller IBAN missing", () => {
+    const noBuyerEmail = buildFacts();
+    delete noBuyerEmail.buyer.email;
+    expect(() => serializeUblXRechnung(noBuyerEmail)).toThrow(EInvoiceError);
+    expect(() => serializeUblXRechnung(noBuyerEmail)).toThrow(
+      expect.objectContaining({ code: "MISSING_BUYER_ENDPOINT" }),
+    );
+
+    const noIban = buildFacts();
+    delete noIban.seller.iban;
+    expect(() => serializeUblXRechnung(noIban)).toThrow(EInvoiceError);
+    expect(() => serializeUblXRechnung(noIban)).toThrow(
+      expect.objectContaining({ code: "MISSING_PAYMENT_MEANS" }),
+    );
+  });
 });
