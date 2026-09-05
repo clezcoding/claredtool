@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.7
 current_phase_name: Factur-X / ZUGFeRD / XRechnung e-invoice XML
 status: executing
-stopped_at: Completed 04.7-01b-PLAN.md
-last_updated: "2026-09-05T23:15:18.946Z"
+stopped_at: Completed 04.7-05-PLAN.md
+last_updated: "2026-09-05T23:23:37.225Z"
 last_activity: 2026-09-06
 last_activity_desc: Phase 04.7 execution started
-state_head: 182b87ec0907c28926df81bb572b9e687d343d70
+state_head: f7940781bc39a4799ef22439f6a7283696f97524
 progress:
   total_phases: 14
   completed_phases: 10
   total_plans: 72
-  completed_plans: 68
+  completed_plans: 69
 milestone_name: milestone
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 Status: Ready to execute
 Phase: 04.7 (Factur-X / ZUGFeRD / XRechnung e-invoice XML) — EXECUTING
-Plan: 4 of 7
+Plan: 6 of 7
 Phase 04.6 (Takumi+pdfcn PDF Engine Cutover) — complete 2026-09-05 (verification 10/10)
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
@@ -126,6 +126,7 @@ Progress: [█████████░] 75%
 | Phase 04.7 P01 | 5min | 2 tasks | 16 files |
 | Phase 04.7 P02 | 5min | 3 tasks | 15 files |
 | Phase 04.7 P01b | 4min | 2 tasks | 12 files |
+| Phase 04.7 P05 | 5min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -295,6 +296,8 @@ Recent decisions affecting current work:
 - [Phase 04.7]: Stammdaten DTOs: structured address + optional IBAN/BIC/email/phone/HRB/GF/Leitweg; InvoiceItem.unit defaults C62
 - [Phase 04.7]: AE exemption text from TaxDecision.legal_reference; CII emits VATEX-EU-AE
 - [Phase 04.7]: XMP Version locked to 1.0 in tooling/e-invoice/versions.lock.json (A4)
+- [Phase 04.7]: Detail address = newline-stacked lines + whitespace-pre-line (E5)
+- [Phase 04.7]: Invoice-level supplyType only; mixed hard-reject via allowlist + scrubbed banner
 
 ### Pending Todos
 
@@ -346,8 +349,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-05T23:15:18.708Z
-Stopped at: Completed 04.7-01b-PLAN.md
+Last session: 2026-09-05T23:23:21.541Z
+Stopped at: Completed 04.7-05-PLAN.md
 Resume file: None
 Next: `/gsd-execute-phase 04.7`
 
