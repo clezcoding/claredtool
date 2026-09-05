@@ -82,6 +82,7 @@ function validateInput(input: InvoicePdfInput): void {
     !Array.isArray(items) ||
     items.length === 0 ||
     !isFiniteNumber(tax.invoice_tax_rate) ||
+    tax.invoice_tax_rate < 0 ||
     typeof tax.invoice_tax_shown !== "boolean" ||
     typeof tax.reverse_charge_flag !== "boolean" ||
     !isNonEmptyString(tax.legal_reference)
@@ -93,7 +94,10 @@ function validateInput(input: InvoicePdfInput): void {
       !isNonEmptyString(item?.bezeichnung) ||
       !isFiniteNumber(item.menge) ||
       !isFiniteNumber(item.einzelpreis) ||
-      !isFiniteNumber(item.netto)
+      !isFiniteNumber(item.netto) ||
+      item.menge <= 0 ||
+      item.einzelpreis < 0 ||
+      item.netto < 0
     ) {
       throw new RenderFailedError();
     }

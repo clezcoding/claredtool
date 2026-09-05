@@ -106,6 +106,70 @@ describe("InvoicePdfService", () => {
     expect(renderInvoiceMock).not.toHaveBeenCalled();
   });
 
+  it("throws on empty-string numeric fields (no silent 0 coercion)", async () => {
+    await expect(
+      service.render({
+        ...validInput(),
+        items: [
+          {
+            bezeichnung: LINE_BEZEICHNUNG,
+            menge: "" as unknown as number,
+            einzelpreis: 1000,
+            netto: 1000,
+          },
+        ],
+      }),
+    ).rejects.toThrow("Render fehlgeschlagen");
+
+    await expect(
+      service.render({
+        ...validInput(),
+        tax: { ...validInput().tax, invoice_tax_rate: "   " as unknown as number },
+      }),
+    ).rejects.toThrow("Render fehlgeschlagen");
+
+    expect(renderInvoiceMock).not.toHaveBeenCalled();
+  });
+
+  it("throws on negative menge / preis / netto / tax rate (credits are a separate path)", async () => {
+    await expect(
+      service.render({
+        ...validInput(),
+        items: [
+          {
+            bezeichnung: LINE_BEZEICHNUNG,
+            menge: -1,
+            einzelpreis: 1000,
+            netto: 1000,
+          },
+        ],
+      }),
+    ).rejects.toThrow("Render fehlgeschlagen");
+
+    await expect(
+      service.render({
+        ...validInput(),
+        items: [
+          {
+            bezeichnung: LINE_BEZEICHNUNG,
+            menge: 1,
+            einzelpreis: -10,
+            netto: 1000,
+          },
+        ],
+      }),
+    ).rejects.toThrow("Render fehlgeschlagen");
+
+    await expect(
+      service.render({
+        ...validInput(),
+        tax: { ...validInput().tax, invoice_tax_rate: -1 },
+      }),
+    ).rejects.toThrow("Render fehlgeschlagen");
+
+    expect(renderInvoiceMock).not.toHaveBeenCalled();
+  });
+
   it("throws when renderInvoice returns non-PDF; message has no seller or line text (D-26)", async () => {
     renderInvoiceMock.mockResolvedValue({
       bytes: new TextEncoder().encode("<html>not-pdf</html>"),
