@@ -1,0 +1,106 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-09-05T05:50:56.660Z",
+  "phase": "04.6",
+  "phase_name": "takumi-pdfcn-pdf-engine-cutover",
+  "phase_dir": ".planning/phases/04.6-takumi-pdfcn-pdf-engine-cutover",
+  "plan": null,
+  "task": 0,
+  "total_tasks": 0,
+  "status": "paused",
+  "completed_tasks": [
+    {
+      "id": "research",
+      "name": "04.6-RESEARCH.md",
+      "status": "done",
+      "commit": null,
+      "note": "On disk and untracked — not in the 04.6 context commits"
+    },
+    {
+      "id": "discuss",
+      "name": "04.6-CONTEXT.md + 04.6-DISCUSSION-LOG.md",
+      "status": "done",
+      "commit": "6168a58"
+    },
+    {
+      "id": "state-session",
+      "name": "STATE.md session record",
+      "status": "done",
+      "commit": "663b8ee"
+    }
+  ],
+  "remaining_tasks": [
+    {
+      "id": "commit-research",
+      "name": "Commit untracked 04.6-RESEARCH.md (and related ROADMAP/PROJECT 4.6 insert) or fold into plan-phase docs commit",
+      "status": "not_started"
+    },
+    {
+      "id": "plan",
+      "name": "/gsd-plan-phase 4.6",
+      "status": "not_started"
+    },
+    {
+      "id": "execute",
+      "name": "Execute 04.6 plans (engine + Gotenberg/worker decommission)",
+      "status": "not_started"
+    }
+  ],
+  "blockers": [],
+  "async_jobs": [],
+  "human_actions_pending": [],
+  "decisions": [
+    {
+      "decision": "Takumi+pdfcn Invoice Minimal sole renderer; sync Nest API; drop BullMQ pdf-generation and clared-worker",
+      "rationale": "Founder complete cutover; ~26ms in-process; no dual-run",
+      "phase": "04.6"
+    },
+    {
+      "decision": "No Gotenberg fallback/toggle; delete Coolify gotenberg+worker in the same execute wave after API ready is green",
+      "rationale": "Corpse containers and Kuma false alerts; rollback is image pin",
+      "phase": "04.6"
+    },
+    {
+      "decision": "TaxDecision legal block under totals; print only legal_reference plus reverse-charge sentence",
+      "rationale": "PDF-01 readable paper text; audit fields stay Phase 5",
+      "phase": "04.6"
+    },
+    {
+      "decision": "locale + vatLine render knobs; defaultsFromCountry(DE/AT → de+omit, else en+omit); no Settings UI or Prisma columns in 4.6",
+      "rationale": "Product intent captured; 4.6 has no desktop UI",
+      "phase": "04.6"
+    },
+    {
+      "decision": "Three fixtures: DE 19%, EN same facts, DE reverse-charge; issued-looking; no ENTWURF watermark",
+      "rationale": "Prove i18n and the legal block in CI",
+      "phase": "04.6"
+    },
+    {
+      "decision": "/health/ready drops Gotenberg; throw fail-closed on render; no IBAN; company name as text",
+      "rationale": "Deploy gate must not wasm-ping; empty bytes hide bugs; schema has no bank/logo",
+      "phase": "04.6"
+    },
+    {
+      "decision": "Factur-X / XRechnung / PDF/A-3b is Phase 4.7; PDF/UA-1 off; Forme never",
+      "rationale": "Split after discuss; founder report stale on PDF/A-3 container",
+      "phase": "04.6"
+    }
+  ],
+  "uncommitted_files": [
+    ".planning/PROJECT.md",
+    ".planning/ROADMAP.md",
+    ".planning/WINDOWS.md",
+    ".planning/config.json",
+    ".planning/phases/01-tauri-desktop-mockup-first-ui/01-VERIFICATION.md",
+    ".planning/phases/04.5-repository-reliability-performance-maintainability-hardening/04.5-VALIDATION.md",
+    ".planning/forensics/report-20260905-044632.md",
+    ".planning/forensics/report-20260905-073450.md",
+    ".planning/phases/04.6-takumi-pdfcn-pdf-engine-cutover/.gitkeep",
+    ".planning/phases/04.6-takumi-pdfcn-pdf-engine-cutover/04.6-RESEARCH.md",
+    ".planning/phases/04.7-factur-x-zugferd-xrechnung-e-invoice-xml/",
+    ".planning/state.json",
+    "docs/clared-takumi-pdfcn-report.md"
+  ],
+  "next_action": "/clear then /gsd-plan-phase 4.6. Read 04.6-CONTEXT.md first. Do not re-run discuss. Commit or include 04.6-RESEARCH.md — it is still untracked.",
+  "context_notes": "Paused immediately after discuss-phase 4.6 --batch. CONTEXT and DISCUSSION-LOG are committed on gsd/phase-04.6-takumi-pdfcn-pdf-engine-cutover (6168a58, 663b8ee). STATE body still says Phase 4.6 NOT STARTED — ignore that; stopped_at is context gathered. No PLANs yet. Kaneo #96 (cvfjfgg8ep9sirl0k8hcjabn) has a CONTEXT comment, status still to-do. claude-mem observer 429 this morning — not blocking. 04.5 D-03 API→worker deploy is superseded. Coolify UUIDs: clared-gotenberg iokfnlnzidksuvrabx7ixxiv, clared-worker vwhnsihwpezppgwepvwxrk2h — delete at execute, not at plan."
+}
