@@ -312,7 +312,7 @@ Plans:
   4. Visual PDF amounts = XML amounts. Fixture covers hybrid PDF + XRechnung XML. PDF/UA-1 stays off
   5. Out of scope: PDF-01 desktop download/view, AUDT-01, OFFL-01, public generate HTTP (Phase 5). XML library: plan-phase legitimacy (first candidate `node-zugferd` `toXML()` only; WIP/beta)
 
-**Plans:** 2/7 plans executed
+**Plans:** 3/7 plans executed
 **UI hint**: yes (stammdaten dialog extensions only; download is Phase 5)
 
 Plans:
@@ -485,7 +485,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 →
 | 4.4 GitHub Actions Optimization | 7/7 | Complete | 2026-09-04 |
 | 4.5 Repository Reliability, Performance & Maintainability Hardening | 6/6 | Complete | 2026-09-05 |
 | 4.6 Takumi+pdfcn PDF Engine Cutover | 5/5 | Complete    | 2026-09-05 |
-| 4.7 Factur-X / ZUGFeRD / XRechnung e-invoice XML | 2/7 | In Progress|  |
+| 4.7 Factur-X / ZUGFeRD / XRechnung e-invoice XML | 3/7 | In Progress|  |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |
 | 6. Mockup 1:1 Fidelity Closure | 0/? | Not started | - |
