@@ -5,6 +5,7 @@ test -n "$COOLIFY_URL"
 test -n "$API_UUID"
 test -n "$SHA_TAG"
 test -n "$IMAGE"
+test -n "$API_HEALTH_URL"
 {
   echo "## backend-image deploy"
   echo "- API tag: ${SHA_TAG}"
@@ -142,7 +143,7 @@ for _ in $(seq 1 24); do
   API_POLL_JSON=$(coolify_get "$API_UUID" || true)
   LIVE_TAG=$(printf '%s' "${API_POLL_JSON:-}" | jq -r '.docker_registry_image_tag // empty' 2>/dev/null || true)
   http_response=$(curl -sS --connect-timeout 5 --max-time 15 -w "\n%{http_code}" \
-    "https://clared-api.puzzlessdev.online/health/ready" 2>/dev/null || true)
+    "$API_HEALTH_URL" 2>/dev/null || true)
   code=$(printf '%s' "$http_response" | tail -1)
   ready_body=$(printf '%s' "$http_response" | sed '$d')
   ready_sha=$(printf '%s' "$ready_body" | jq -r '.details.build.sha // .info.build.sha // empty' 2>/dev/null || true)

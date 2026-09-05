@@ -249,6 +249,7 @@ jobs:
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
           COOLIFY_URL: ${{ vars.COOLIFY_URL }}
           API_UUID: ${{ vars.COOLIFY_APP_API }}
+          API_HEALTH_URL: ${{ vars.API_HEALTH_URL }}
           SHA_TAG: ${{ needs.build.outputs.sha_tag }}
           IMAGE: ${{ needs.build.outputs.image }}
         run: bash .github/scripts/coolify-deploy-nest.sh
