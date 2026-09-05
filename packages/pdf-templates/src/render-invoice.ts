@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { PdfRenderer } from "takumi-pdf";
 import { InvoiceMinimal, type InvoiceModel, CRAFTED } from "./invoice-minimal";
+import { formatMoney, formatInvoiceDate } from "./format-money";
 
 export type { InvoiceModel, InvoiceLine } from "./invoice-minimal";
 
@@ -27,6 +28,30 @@ export type PdfBytes = {
 };
 
 const RENDER_FAILED = "Render fehlgeschlagen";
+
+const REVERSE_CHARGE_SENTENCE = {
+  de: "Steuerschuldnerschaft des Leistungsempfängers (Reverse Charge).",
+  en: "Tax liability of the recipient (reverse charge).",
+} as const;
+
+/**
+ * D-11/D-12: printable legal lines only — legal_reference + RC sentence.
+ * Never include applied_rule_id, applied_rule_version, audit_trace, invoice_text_block_id.
+ */
+export function legalBlockLines(
+  tax: TaxDecisionLike,
+  locale: "de" | "en"
+): string[] {
+  const lines: string[] = [];
+  const ref = tax.legal_reference?.trim();
+  if (ref) {
+    lines.push(ref);
+  }
+  if (tax.reverse_charge_flag === true) {
+    lines.push(REVERSE_CHARGE_SENTENCE[locale]);
+  }
+  return lines;
+}
 
 const renderer = new PdfRenderer();
 
@@ -59,31 +84,6 @@ function fonts(): Array<{ name: string; data: Buffer }> {
     cachedFonts = loadFonts();
   }
   return cachedFonts;
-}
-
-function formatMoney(amount: number, locale: "de" | "en"): string {
-  return new Intl.NumberFormat(locale === "de" ? "de-DE" : "en-US", {
-    style: "currency",
-    currency: "EUR",
-  }).format(amount);
-}
-
-function formatDate(isoOrDisplay: string, locale: "de" | "en"): string {
-  if (/^\d{4}-\d{2}-\d{2}/.test(isoOrDisplay)) {
-    const d = new Date(isoOrDisplay);
-    if (Number.isNaN(d.getTime())) {
-      return isoOrDisplay;
-    }
-    if (locale === "de") {
-      return new Intl.DateTimeFormat("de-DE", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      }).format(d);
-    }
-    return isoOrDisplay.slice(0, 10);
-  }
-  return isoOrDisplay;
 }
 
 function labelsFor(locale: "de" | "en") {
@@ -173,15 +173,13 @@ export async function renderInvoice(
     ...model,
     invoice: {
       ...model.invoice,
-      date: formatDate(model.invoice.date, locale),
-      dueDate: formatDate(model.invoice.dueDate, locale),
+      date: formatInvoiceDate(model.invoice.date, locale),
+      dueDate: formatInvoiceDate(model.invoice.dueDate, locale),
     },
   };
 
-  const legalReference =
-    tax.legal_reference && tax.legal_reference.trim().length > 0
-      ? tax.legal_reference
-      : null;
+  const legalLines = legalBlockLines(tax, locale);
+  const legalReference = legalLines.length > 0 ? legalLines.join("\n") : null;
 
   const node = createElement(InvoiceMinimal, {
     model: displayModel,

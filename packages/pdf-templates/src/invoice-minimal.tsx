@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   legal: {
-    marginTop: 20,
+    marginTop: 8,
     color: CRAFTED.muted,
     // ~10% larger than prior 8px (user feedback on bottom legal/footer text)
     fontSize: 9,
@@ -325,9 +325,19 @@ export function InvoiceMinimal(props: InvoiceMinimalProps): ReactElement {
           </View>
         </View>
 
-        {legalReference ? (
-          <Text style={styles.legal}>{legalReference}</Text>
-        ) : null}
+        {legalReference
+          ? legalReference.split("\n").map((line, i) => (
+              <Text
+                key={i}
+                style={{
+                  ...styles.legal,
+                  ...(i === 0 ? { marginTop: 20 } : null),
+                }}
+              >
+                {line}
+              </Text>
+            ))
+          : null}
 
         <View style={styles.footer} fixed>
           <Text style={{ fontSize: 10, color: CRAFTED.muted }}>{footerLeft}</Text>

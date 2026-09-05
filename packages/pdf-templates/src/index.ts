@@ -1,4 +1,4 @@
-export { renderInvoice } from "./render-invoice";
+export { renderInvoice, legalBlockLines } from "./render-invoice";
 export type {
   InvoiceModel,
   InvoiceLine,
