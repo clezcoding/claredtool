@@ -74,6 +74,7 @@ jobs:
               - 'packages/tax-engine/src/schema/clared-tax-rule-dsl-schema.json'
             tax-engine:
               - 'packages/tax-engine/**'
+              - 'scripts/assert-ajv-zero-warnings.sh'
             shared:
               - 'package.json'
               - 'pnpm-lock.yaml'
@@ -210,6 +211,9 @@ jobs:
       - run: pnpm install --frozen-lockfile --filter @clared/tax-engine... --filter ./apps/backend...
 
       - run: pnpm --filter @clared/tax-engine build
+
+      - name: AJV strict mode zero-warning gate (REL-03)
+        run: bash scripts/assert-ajv-zero-warnings.sh
 
       - run: pnpm --filter ./apps/backend exec prisma generate
 
