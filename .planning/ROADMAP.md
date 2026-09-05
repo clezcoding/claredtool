@@ -312,17 +312,18 @@ Plans:
   4. Visual PDF amounts = XML amounts. Fixture covers hybrid PDF + XRechnung XML. PDF/UA-1 stays off
   5. Out of scope: PDF-01 desktop download/view, AUDT-01, OFFL-01, public generate HTTP (Phase 5). XML library: plan-phase legitimacy (first candidate `node-zugferd` `toXML()` only; WIP/beta)
 
-**Plans:** 6 plans
+**Plans:** 7 plans
 **UI hint**: yes (stammdaten dialog extensions only; download is Phase 5)
 
 Plans:
 
-- [ ] 04.7-01-PLAN.md — `@clared/e-invoice` tracer: facts → Comfort CII + XRechnung UBL + VAT map
-- [ ] 04.7-02-PLAN.md — Prisma structured stammdaten + blocking db push + DTOs
+- [ ] 04.7-01-PLAN.md — `@clared/e-invoice` tracer: facts → Comfort CII + XRechnung UBL + BG-6 + amount parity
+- [ ] 04.7-01b-PLAN.md — AE/RC + unit C62 + versions.lock + backend workspace dep
+- [ ] 04.7-02-PLAN.md — Prisma structured stammdaten (email/phone/HRB) + blocking db push + DTOs
 - [ ] 04.7-03-PLAN.md — Takumi PDF/A-3b + factur-x.xml XMP hybrid fixtures
-- [ ] 04.7-04-PLAN.md — Nest InvoicePdfService EInvoiceArtifacts + fail-closed
+- [ ] 04.7-04-PLAN.md — Nest InvoicePdfService EInvoiceArtifacts + fail-closed (incl. BG-6)
 - [ ] 04.7-05-PLAN.md — Desktop Entity/Customer/Rechnung stammdaten UI + i18n
-- [ ] 04.7-06-PLAN.md — CI Mustang + KoSIT + Dev/UAT online-validator note
+- [ ] 04.7-06-PLAN.md — CI e-invoice-validate Mustang + KoSIT + Dev/UAT note
 
 ### Phase 04.3: Infra & Prep for PDF, Offline & Audit (INSERTED)
 
