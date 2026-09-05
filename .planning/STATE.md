@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04.7
 current_phase_name: Factur-X / ZUGFeRD / XRechnung e-invoice XML
-status: Phase 04.7 planned — 7 plans ready (revised after checker)
-stopped_at: Phase 04.7 PLAN revised — ready for execute
-last_updated: "2026-09-05T22:40:19.412Z"
+status: executing
+stopped_at: Completed 04.7-01-PLAN.md
+last_updated: "2026-09-05T22:52:53.696Z"
 last_activity: 2026-09-06
-last_activity_desc: Phase 04.7 planning complete
-state_head: ab48682c751c0ffe9635a931fbbdd7d915105f52
+last_activity_desc: Phase 04.7 execution started
+state_head: 113bba248e45a8d725537fb2ce3c2ffec805cc6c
 progress:
   total_phases: 14
   completed_phases: 10
   total_plans: 72
-  completed_plans: 65
+  completed_plans: 66
 milestone_name: milestone
 ---
 
@@ -28,14 +28,14 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Phase 04.7 planned — 7 plans ready (01, 01b, 02–06)
-Phase: 04.7 (Factur-X / ZUGFeRD / XRechnung e-invoice XML) — READY TO EXECUTE
-Plan: 04.7-01 through 04.7-06 (+01b) authored — run `/gsd-execute-phase 04.7`
+Status: Ready to execute
+Phase: 04.7 (Factur-X / ZUGFeRD / XRechnung e-invoice XML) — EXECUTING
+Plan: 2 of 7
 Phase 04.6 (Takumi+pdfcn PDF Engine Cutover) — complete 2026-09-05 (verification 10/10)
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 stitch-build; 4.2 desktop; 4.3 infra; 4.4 GHA; 4.5 hardening; 4.6 Takumi+pdfcn cutover (no Gotenberg); 5.1 catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-06 — Phase 04.7 planning complete
+Last activity: 2026-09-06 — Phase 04.7 execution started
 
 Progress: [█████████░] 75%
 
@@ -123,6 +123,7 @@ Progress: [█████████░] 75%
 | Phase 04.6 P03 | 5min | 3 tasks | 19 files |
 | Phase 04.6 P04 | 4min | 3 tasks | 5 files |
 | Phase 04.6 P05 | 7min | 3 tasks | 4 files |
+| Phase 04.7 P01 | 5min | 2 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -285,6 +286,9 @@ Recent decisions affecting current work:
 - [Phase 04.6]: Mock tests fail closed if WORKER_UUID / COOLIFY_APP_WORKER / -worker reappear
 - [Phase 04.6]: 04.6-05 proceed-delete: removed Coolify gotenberg+worker and Kuma monitor; rollback=API image pin
 - [Phase 04.6]: 04.6-05 live UUIDs: worker mwdbgkc8grcth77wx0cseom8, API ucmhsb0srwr7ewt9wxejc4e9 (plan UUIDs stale)
+- [Phase 04.7]: node-zugferd EN16931 toXML with strict:false; xsd-schema-validator allowBuilds false (Mustang/KoSIT owns Schematron in CI)
+- [Phase 04.7]: Wave 1 mapVatCategory returns S only; AE deferred to 04.7-01b
+- [Phase 04.7]: embedInPdf string split in Jest guard so package-wide grep stays clean
 
 ### Pending Todos
 
@@ -336,9 +340,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-05T22:30:00.000Z
-Stopped at: Phase 04.7 PLAN revised after checker — 7 plans (04.7-01, 01b, 02–06)
-Resume file: .planning/phases/04.7-factur-x-zugferd-xrechnung-e-invoice-xml/04.7-01-PLAN.md
+Last session: 2026-09-05T22:52:53.482Z
+Stopped at: Completed 04.7-01-PLAN.md
+Resume file: None
 Next: `/gsd-execute-phase 04.7`
 
 ## Rebuild Log
