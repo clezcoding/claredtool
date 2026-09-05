@@ -137,14 +137,23 @@ fi
 # on 2026-09-04. A fail-deploy drill stays human (phasenplan 4b).
 # Do not add a simulate-fail input that would roll back production.
 poll_ok=0
+consecutive_ok=0
 for _ in $(seq 1 24); do
   API_POLL_JSON=$(coolify_get "$API_UUID" || true)
   LIVE_TAG=$(printf '%s' "${API_POLL_JSON:-}" | jq -r '.docker_registry_image_tag // empty' 2>/dev/null || true)
-  code=$(curl -sS -o /dev/null -w "%{http_code}" \
-    "https://clared-api.puzzlessdev.online/health/ready" || true)
-  if [ "$LIVE_TAG" = "$SHA_TAG" ] && [ "$code" = "200" ]; then
-    poll_ok=1
-    break
+  http_response=$(curl -sS -w "\n%{http_code}" \
+    "https://clared-api.puzzlessdev.online/health/ready" 2>/dev/null || true)
+  code=$(printf '%s' "$http_response" | tail -1)
+  ready_body=$(printf '%s' "$http_response" | sed '$d')
+  ready_sha=$(printf '%s' "$ready_body" | jq -r '.details.build.sha // empty' 2>/dev/null || true)
+  if [ "$LIVE_TAG" = "$SHA_TAG" ] && [ "$code" = "200" ] && [ "$ready_sha" = "$SHA_TAG" ]; then
+    consecutive_ok=$((consecutive_ok + 1))
+    if [ "$consecutive_ok" -ge 2 ]; then
+      poll_ok=1
+      break
+    fi
+  else
+    consecutive_ok=0
   fi
   sleep 5
 done
@@ -182,9 +191,15 @@ for _ in $(seq 1 12); do
     continue
   fi
   case "$STATUS_LC" in
-    running|running:healthy)
+    running:healthy)
       poll_ok=1
       break
+      ;;
+    running)
+      if [ "$HEALTH_ENABLED" != "true" ]; then
+        poll_ok=1
+        break
+      fi
       ;;
     running:unknown)
       # A background worker has no HTTP endpoint. Coolify reports
