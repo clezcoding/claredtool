@@ -19,19 +19,21 @@ coolify_get() {
 }
 
 coolify_pin() {
-  local uuid="$1" tag="$2" deploy_json
+  local uuid="$1" tag="$2" deploy_json payload
+  payload=$(jq -cn --arg image "$IMAGE" --arg tag "$tag" \
+    '{docker_registry_image_name: $image, docker_registry_image_tag: $tag}')
   curl -fsS -X PATCH "${COOLIFY_URL}/api/v1/applications/${uuid}" \
     -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
-    -d "{\"docker_registry_image_name\":\"${IMAGE}\",\"docker_registry_image_tag\":\"${tag}\"}" \
+    -d "$payload" \
     -o /dev/null
   # Coolify 4.3.14: GET /api/v1/deploy is 405; POST JSON body is the working verb.
   deploy_json=$(curl -fsS -X POST "${COOLIFY_URL}/api/v1/deploy" \
     -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
     -H "Accept: application/json" \
     -H "Content-Type: application/json" \
-    -d "{\"uuid\":\"${uuid}\",\"force\":true}")
+    -d "$(jq -cn --arg uuid "$uuid" '{uuid: $uuid, force: true}')")
   printf '%s' "$deploy_json" \
     | jq -er '.deployments[0].deployment_uuid | strings | select(length > 0)'
 }
