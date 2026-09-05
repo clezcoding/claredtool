@@ -90,7 +90,12 @@ export function serializeUblXRechnung(facts: En16931Facts): string {
   <cbc:IssueDate>${isoDate(facts.issueDate)}</cbc:IssueDate>
   <cbc:DueDate>${isoDate(facts.dueDate)}</cbc:DueDate>
   <cbc:InvoiceTypeCode>${facts.typeCode}</cbc:InvoiceTypeCode>
-  <cbc:DocumentCurrencyCode>${facts.currency}</cbc:DocumentCurrencyCode>
+  <cbc:DocumentCurrencyCode>${facts.currency}</cbc:DocumentCurrencyCode>${
+    facts.buyerReference?.trim()
+      ? `
+  <cbc:BuyerReference>${escapeXml(facts.buyerReference.trim())}</cbc:BuyerReference>`
+      : ""
+  }
   <cac:AccountingSupplierParty>
     <cac:Party>
       <cac:PartyName>

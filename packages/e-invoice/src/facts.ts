@@ -31,9 +31,11 @@ export type En16931Facts = {
   dueDate: Date;
   currency: "EUR";
   typeCode: "380";
-  supplyType: "service";
+  supplyType: "goods" | "service";
   seller: SellerParty;
   buyer: PartyAddress;
+  /** BT-10 Buyer reference — Leitweg-ID for B2G when present (D-19). */
+  buyerReference?: string;
   lines: InvoiceLine[];
   vat: {
     category: "S" | "AE";
