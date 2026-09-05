@@ -115,6 +115,7 @@ export class InvoicePdfService {
 
     let result: PdfBytes;
     try {
+      // Hybrid packaging requires CII (D-12). Nest serialize+wire lands in 04.7-04.
       result = await renderInvoice({
         model: {
           entity: normalized.entity,
@@ -130,6 +131,7 @@ export class InvoicePdfService {
         },
         locale: knobs.locale,
         vatLine: knobs.vatLine,
+        ciiXml: "",
       });
     } catch {
       throw new RenderFailedError();

@@ -4,6 +4,7 @@ import path from "node:path";
 import { PdfRenderer } from "takumi-pdf";
 import { InvoiceMinimal, type InvoiceModel, CRAFTED } from "./invoice-minimal";
 import { formatMoney, formatInvoiceDate } from "./format-money";
+import { facturXmp } from "./factur-xmp";
 
 export type { InvoiceModel, InvoiceLine } from "./invoice-minimal";
 
@@ -204,7 +205,8 @@ export function roundEur(n: number): number {
 
 /**
  * Render InvoiceModel + TaxDecision to PDF bytes via Takumi + Crafted Invoice Minimal.
- * Fail-closed: never returns empty PdfBytes (D-26).
+ * Hybrid PDF/A-3b + factur-x.xml attachment + Factur-X XMP (D-06, D-09, D-10).
+ * Fail-closed: never returns empty PdfBytes (D-26); empty CII → no visual-only (D-12).
  * margin:0 + backgroundColor — full-bleed Oatmeal paper (content alone only painted its own box).
  */
 export async function renderInvoice(
@@ -214,7 +216,10 @@ export async function renderInvoice(
     throw new Error(RENDER_FAILED);
   }
 
-  const { model, tax, locale, vatLine } = input;
+  const { model, tax, locale, vatLine, ciiXml } = input;
+  if (!ciiXml?.trim()) {
+    throw new Error(RENDER_FAILED);
+  }
   if (!Array.isArray(model.items) || model.items.length === 0) {
     throw new Error(RENDER_FAILED);
   }
@@ -271,6 +276,9 @@ export async function renderInvoice(
     labels,
   });
 
+  // Prefer ISO date from model for reproducible CreationDate (RESEARCH Pattern 2).
+  const creationDate = model.invoice.date.trim();
+
   let bytes: Uint8Array;
   try {
     bytes = await withRendererExclusive(async () => {
@@ -282,6 +290,22 @@ export async function renderInvoice(
           backgroundColor: CRAFTED.oatmeal,
           fonts: fonts(),
           fontFamilies: ["Inter", "Instrument Serif", "sans-serif"],
+          pdfa: "3b",
+          // PDF/UA structure option stays off (success criterion 4).
+          metadata: {
+            title: `Invoice ${model.invoice.number}`,
+            creationDate,
+            xmp: [facturXmp()],
+          },
+          attachments: [
+            {
+              name: "factur-x.xml",
+              data: ciiXml,
+              mimeType: "text/xml",
+              description: "Factur-X EN 16931 invoice data",
+              relationship: "data",
+            },
+          ],
         });
       } catch {
         // WASM panic / internal error — drop instance so later renders can recover.

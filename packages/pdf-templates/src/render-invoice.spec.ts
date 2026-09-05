@@ -203,7 +203,7 @@ describe("hybrid-embed Factur-X packaging", () => {
     expect(src).toContain("factur-x.xml");
     expect(src).toContain('pdfa: "3b"');
     expect(src).toContain('relationship: "data"');
-    expect(src).not.toMatch(/\btagged\b|\bua1\b/);
+    expect(src).not.toMatch(/\btagged\s*:|\bua1\b/);
 
     const xmpSrc = readFileSync(path.join(__dirname, "factur-xmp.ts"), "utf8");
     expect(xmpSrc).toContain("EN 16931");
