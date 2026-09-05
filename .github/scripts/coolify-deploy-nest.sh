@@ -70,8 +70,15 @@ wait_for_deployment() {
 
 changed_api=0
 changed_worker=0
+deploy_succeeded=0
+rollback_started=0
 
 rollback_changed() {
+  # Idempotent: ERR + EXIT (or explicit call + EXIT) must not double-pin.
+  if [ "$rollback_started" = "1" ]; then
+    return 0
+  fi
+  rollback_started=1
   echo "Rolling back already-changed apps"
   local rollback_failed=0
   if [ "$changed_worker" = "1" ]; then
@@ -112,12 +119,28 @@ rollback_changed() {
   fi
 }
 
+# GHA cancel / job timeout deliver SIGTERM (EXIT), not ERR. Roll back partial
+# pins on abnormal exit without undoing a completed deploy.
+rollback_on_exit() {
+  if [ "$deploy_succeeded" = "1" ]; then
+    return 0
+  fi
+  if [ "$changed_api" = "1" ] || [ "$changed_worker" = "1" ]; then
+    rollback_changed || true
+  fi
+}
+
 API_JSON=$(coolify_get "$API_UUID")
 WORKER_JSON=$(coolify_get "$WORKER_UUID")
 PREV_API=$(printf '%s' "$API_JSON" | jq -r '.docker_registry_image_tag // empty')
 PREV_WORKER=$(printf '%s' "$WORKER_JSON" | jq -r '.docker_registry_image_tag // empty')
 
+trap rollback_on_exit EXIT
 trap rollback_changed ERR
+# INT/TERM also hit EXIT after the shell terminates; keep explicit handlers so
+# cancel/timeout paths are obvious and always re-enter rollback_on_exit.
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 changed_api=1
 if ! API_DEPLOYMENT_UUID=$(coolify_pin "$API_UUID" "$SHA_TAG"); then
@@ -218,5 +241,6 @@ if [ "$poll_ok" != "1" ]; then
   exit 1
 fi
 
-trap - ERR
+deploy_succeeded=1
+trap - ERR EXIT INT TERM
 echo "- outcome: deployed" >> "$GITHUB_STEP_SUMMARY"
