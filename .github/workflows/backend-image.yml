@@ -68,6 +68,11 @@ jobs:
         with:
           persist-credentials: false
 
+      # uv/uvx not on ubuntu-24.04 runners; needed for zizmor in coolify-deploy-nest.test.sh
+      - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "0.8.15"
+
       - name: Coolify deploy mock tests (REL-01)
         run: bash .github/scripts/coolify-deploy-nest.test.sh
 
