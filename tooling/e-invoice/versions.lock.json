@@ -1,0 +1,20 @@
+{
+  "$schema_comment": "D-08 Spec / CI pins for Phase 04.7 e-invoice. Jars downloaded in 04.7-06 CI only — do not fetch here.",
+  "nodeZugferd": "0.1.1-beta.1",
+  "xrechnung": "3.0.2",
+  "xrechnungBt24": "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0",
+  "mustangCli": "2.26.0",
+  "kositValidator": "1.6.3",
+  "kositConfig": "2026-08-31",
+  "facturX": {
+    "profile": "EN 16931 Comfort",
+    "guideline": "urn:cen.eu:en16931:2017",
+    "attachmentFilename": "factur-x.xml",
+    "xmp": {
+      "ConformanceLevel": "EN 16931",
+      "Version": "1.0",
+      "DocumentFileName": "factur-x.xml",
+      "DocumentType": "INVOICE"
+    }
+  }
+}

@@ -16,6 +16,9 @@ importers:
 
   apps/backend:
     dependencies:
+      '@clared/e-invoice':
+        specifier: workspace:*
+        version: link:../../packages/e-invoice
       '@clared/pdf-templates':
         specifier: workspace:*
         version: link:../../packages/pdf-templates
