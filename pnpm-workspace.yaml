@@ -14,6 +14,8 @@ allowBuilds:
   unrs-resolver: false
   msgpackr-extract: false
   protobufjs: false
+  # node-zugferd optional XSD; Nest path uses strict:false; Mustang/KoSIT in CI (D-27)
+  xsd-schema-validator: false
 minimumReleaseAgeExclude:
   - '@takumi-rs/helpers@2.13.6'
   - takumi-pdf@0.14.2
