@@ -39,6 +39,29 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
 }
 
+/** Coerce Prisma Decimal / string numerics at the service edge. */
+function toNum(value: unknown): number {
+  if (typeof value === "number") return value;
+  if (value == null) return Number.NaN;
+  return Number(String(value));
+}
+
+function normalizeNumericFields(input: InvoicePdfInput): InvoicePdfInput {
+  return {
+    ...input,
+    tax: {
+      ...input.tax,
+      invoice_tax_rate: toNum(input.tax?.invoice_tax_rate as unknown),
+    },
+    items: (input.items ?? []).map((item) => ({
+      ...item,
+      menge: toNum(item?.menge as unknown),
+      einzelpreis: toNum(item?.einzelpreis as unknown),
+      netto: toNum(item?.netto as unknown),
+    })),
+  };
+}
+
 function validateInput(input: InvoicePdfInput): void {
   if (!input?.entity || !input.customer || !input.invoice || !input.tax) {
     throw new RenderFailedError();
@@ -79,25 +102,26 @@ function validateInput(input: InvoicePdfInput): void {
 @Injectable()
 export class InvoicePdfService {
   async render(input: InvoicePdfInput): Promise<PdfBytes> {
-    validateInput(input);
+    const normalized = normalizeNumericFields(input);
+    validateInput(normalized);
 
     const knobs =
-      input.knobs ?? defaultsFromCountry(input.entity.country);
+      normalized.knobs ?? defaultsFromCountry(normalized.entity.country);
 
     let result: PdfBytes;
     try {
       result = await renderInvoice({
         model: {
-          entity: input.entity,
-          customer: input.customer,
-          invoice: input.invoice,
-          items: input.items,
+          entity: normalized.entity,
+          customer: normalized.customer,
+          invoice: normalized.invoice,
+          items: normalized.items,
         },
         tax: {
-          invoice_tax_rate: input.tax.invoice_tax_rate,
-          invoice_tax_shown: input.tax.invoice_tax_shown,
-          reverse_charge_flag: input.tax.reverse_charge_flag,
-          legal_reference: input.tax.legal_reference,
+          invoice_tax_rate: normalized.tax.invoice_tax_rate,
+          invoice_tax_shown: normalized.tax.invoice_tax_shown,
+          reverse_charge_flag: normalized.tax.reverse_charge_flag,
+          legal_reference: normalized.tax.legal_reference,
         },
         locale: knobs.locale,
         vatLine: knobs.vatLine,
