@@ -28,13 +28,13 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Executing Phase 04.6 — Plan 02 complete; next 04.6-03
+Status: Executing Phase 04.6 — Plan 03 complete; next 04.6-04
 Phase: 04.6 (Takumi+pdfcn PDF Engine Cutover) — EXECUTING
-Plan: 02/05 complete (Intl + D-23 fixtures 2–3)
+Plan: 03/05 complete (Nest InvoicePdfService + drop queue/worker; Ready D-25)
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 stitch-build; 4.2 desktop; 4.3 infra; 4.4 GHA; 4.5 hardening; 4.6 Takumi+pdfcn cutover (no Gotenberg); 5.1 catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-05 — Completed 04.6-02 (format-money, defaultsFromCountry, fixtures 2–3)
+Last activity: 2026-09-05 — Completed 04.6-03 (InvoicePdfService sync; BullMQ/Gotenberg/worker gone; Ready postgres+redis+build)
 
 Progress: [█████████░] 75%
 
