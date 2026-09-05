@@ -35,9 +35,17 @@ export class HealthController {
       async (): Promise<HealthIndicatorResult> => {
         const timeoutMs = 400;
         let timer: ReturnType<typeof setTimeout> | undefined;
+        const ping = this.redis.ping().then(
+          (v) => v,
+          () => {
+            throw new Error("Redis ping failed");
+          },
+        );
+        // Prevent orphan rejection if timeout wins the race.
+        ping.catch(() => undefined);
         try {
           await Promise.race([
-            this.redis.ping(),
+            ping,
             new Promise<never>((_, reject) => {
               timer = setTimeout(
                 () => reject(new Error("Redis ping timeout")),
