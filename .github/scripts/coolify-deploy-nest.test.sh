@@ -307,6 +307,18 @@ if ! grep -Fq "outcome: deployed" "$SUMMARY_FILE"; then
   cat "$SUMMARY_FILE" >&2
   exit 1
 fi
+api_pin_line="$(grep -n -Fx "pin:${API_UUID}:${SHA_TAG}" "$PIN_LOG" | head -1 | cut -d: -f1 || true)"
+worker_pin_line="$(grep -n -Fx "pin:${WORKER_UUID}:${SHA_TAG}-worker" "$PIN_LOG" | head -1 | cut -d: -f1 || true)"
+if [ -z "$api_pin_line" ] || [ -z "$worker_pin_line" ]; then
+  echo "FAIL: success path missing forward pins" >&2
+  cat "$PIN_LOG" >&2
+  exit 1
+fi
+if [ "$api_pin_line" -ge "$worker_pin_line" ]; then
+  echo "FAIL: API pin must precede worker pin (api@${api_pin_line} worker@${worker_pin_line})" >&2
+  cat "$PIN_LOG" >&2
+  exit 1
+fi
 assert_no_token_leak "success"
 
 line_count="$(wc -l < "$SCRIPT" | tr -d ' ')"
