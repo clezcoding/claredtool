@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 36
+open_count: 37
 waived_count: 1
 fixed_count: 3
-total_count: 40
-last_updated: 2026-09-04T04:57:54.775Z
+total_count: 41
+last_updated: 2026-09-05T00:00:33.809Z
 ---
 
 # Broken Windows Ledger
@@ -55,6 +55,7 @@ last_updated: 2026-09-04T04:57:54.775Z
 | 38 | 04.4 | deviation | .github/workflows/desktop-build.yml | 83 | Folded SC2129 GITHUB_OUTPUT redirects so in-workflow Actionlint can fail closed | open |  | 2026-09-04T04:12:49.010Z |  |
 | 39 | 04.4 | deviation | .github/workflows/gitleaks.yml | 34 | upload-sarif and CLI SARIF use if: always() so findings still reach the Security tab when the job fails | open |  | 2026-09-04T04:12:49.092Z |  |
 | 40 | 04.4 | deviation | .github/zizmor.yml |  | Ignore artipacked on sync-labels.yml (D-36 frozen file) | open |  | 2026-09-04T04:57:54.775Z |  |
+| 41 | 04.5 | unrun-verify | .planning/phases/04.5-repository-reliability-performance-maintainability-hardening/04.5-VALIDATION.md |  | backend-image after-run walltime pending post-merge gh run view | open |  | 2026-09-05T00:00:33.809Z |  |
 
 ````json
 [
@@ -536,6 +537,18 @@ last_updated: 2026-09-04T04:57:54.775Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-09-04T04:57:54.775Z",
+    "resolved_at": null
+  },
+  {
+    "id": 41,
+    "kind": "unrun-verify",
+    "phase": "04.5",
+    "file": ".planning/phases/04.5-repository-reliability-performance-maintainability-hardening/04.5-VALIDATION.md",
+    "line": null,
+    "description": "backend-image after-run walltime pending post-merge gh run view",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-05T00:00:33.809Z",
     "resolved_at": null
   }
 ]
