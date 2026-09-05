@@ -68,6 +68,10 @@ fi
 
 if [[ "$joined" == *"POST"* && "$joined" == *"/deploy"* ]]; then
   if [[ "$joined" == *"${WORKER_UUID}"* ]]; then
+    if [ "$scenario" = "success" ]; then
+      printf '%s\n' '{"deployments":[{"deployment_uuid":"worker-forward"}]}'
+      exit 0
+    fi
     count="$(cat "${MOCK_WORKER_POST_COUNT_FILE:-/dev/null}" 2>/dev/null || echo 0)"
     echo $((count + 1)) > "${MOCK_WORKER_POST_COUNT_FILE:-/dev/null}"
     if [ "$scenario" = "worker_deploy_fail" ] && [ "$count" -eq 0 ]; then
@@ -82,7 +86,7 @@ if [[ "$joined" == *"POST"* && "$joined" == *"/deploy"* ]]; then
 fi
 
 if [[ "$joined" == *"GET"* && "$joined" == *"/deployments/"* ]]; then
-  if [[ "$joined" == *"worker-forward"* ]]; then
+  if [ "$scenario" != "success" ] && [[ "$joined" == *"worker-forward"* ]]; then
     printf '%s\n' '{"status":"failed"}'
     exit 0
   fi
@@ -92,6 +96,18 @@ fi
 
 if [[ "$joined" == *"GET"* && "$joined" == *"/applications/"* ]]; then
   if [[ "$joined" == *"${WORKER_UUID}"* ]]; then
+    if [ "$scenario" = "success" ]; then
+      count="$(cat "${MOCK_WORKER_GET_COUNT_FILE:-/dev/null}" 2>/dev/null || echo 0)"
+      echo $((count + 1)) > "${MOCK_WORKER_GET_COUNT_FILE:-/dev/null}"
+      if [ "$count" -ge 1 ]; then
+        printf '%s\n' \
+          "{\"docker_registry_image_tag\":\"${SHA_TAG}-worker\",\"status\":\"running:healthy\",\"health_check_enabled\":false}"
+      else
+        printf '%s\n' \
+          '{"docker_registry_image_tag":"prev-worker","status":"running:healthy","health_check_enabled":false}'
+      fi
+      exit 0
+    fi
     printf '%s\n' \
       '{"docker_registry_image_tag":"prev-worker","status":"running:healthy","health_check_enabled":false}'
     exit 0
@@ -199,84 +215,6 @@ assert_no_token_leak "worker_deploy_fail"
 echo "test: happy path deploy completes without token leak"
 export MOCK_SCENARIO="success"
 export MOCK_HEALTH_CODE="200"
-# Re-stub curl so worker-forward deployment finishes and worker status poll passes.
-cat > "${STUB_DIR}/bin/curl" <<'STUB'
-#!/usr/bin/env bash
-set -euo pipefail
-
-joined="$*"
-PIN_LOG="${MOCK_PIN_LOG:-/dev/null}"
-scenario="${MOCK_SCENARIO:-}"
-
-if [[ "$joined" == *"health/ready"* ]]; then
-  if [[ "$joined" == *"%{http_code}"* ]]; then
-    if [ "${MOCK_HEALTH_CODE:-200}" = "200" ]; then
-      printf '%s\n%s' \
-        "{\"status\":\"ok\",\"details\":{\"build\":{\"status\":\"up\",\"sha\":\"${SHA_TAG}\"}}}" \
-        "200"
-    else
-      printf '%s\n%s' '{"status":"error"}' "${MOCK_HEALTH_CODE:-503}"
-    fi
-    exit 0
-  fi
-fi
-
-if [[ "$joined" == *"PATCH"* && "$joined" == *"/applications/"* ]]; then
-  uuid=""
-  tag=""
-  if [[ "$joined" =~ /applications/([^[:space:]/\"]+) ]]; then
-    uuid="${BASH_REMATCH[1]}"
-  fi
-  if [[ "$joined" =~ docker_registry_image_tag.?:\"([^\"]+) ]]; then
-    tag="${BASH_REMATCH[1]}"
-  fi
-  if [ -n "$uuid" ] && [ -n "$tag" ]; then
-    echo "pin:${uuid}:${tag}" >> "$PIN_LOG"
-  fi
-  exit 0
-fi
-
-if [[ "$joined" == *"POST"* && "$joined" == *"/deploy"* ]]; then
-  if [[ "$joined" == *"${WORKER_UUID}"* ]]; then
-    printf '%s\n' '{"deployments":[{"deployment_uuid":"worker-forward"}]}'
-  else
-    printf '%s\n' '{"deployments":[{"deployment_uuid":"api-forward"}]}'
-  fi
-  exit 0
-fi
-
-if [[ "$joined" == *"GET"* && "$joined" == *"/deployments/"* ]]; then
-  printf '%s\n' '{"status":"finished"}'
-  exit 0
-fi
-
-if [[ "$joined" == *"GET"* && "$joined" == *"/applications/"* ]]; then
-  if [[ "$joined" == *"${WORKER_UUID}"* ]]; then
-    count="$(cat "${MOCK_WORKER_GET_COUNT_FILE:-/dev/null}" 2>/dev/null || echo 0)"
-    echo $((count + 1)) > "${MOCK_WORKER_GET_COUNT_FILE:-/dev/null}"
-    if [ "$count" -ge 1 ]; then
-      printf '%s\n' \
-        "{\"docker_registry_image_tag\":\"${SHA_TAG}-worker\",\"status\":\"running:healthy\",\"health_check_enabled\":false}"
-    else
-      printf '%s\n' \
-        '{"docker_registry_image_tag":"prev-worker","status":"running:healthy","health_check_enabled":false}'
-    fi
-    exit 0
-  fi
-  count="$(cat "${MOCK_API_GET_COUNT_FILE:-/dev/null}" 2>/dev/null || echo 0)"
-  echo $((count + 1)) > "${MOCK_API_GET_COUNT_FILE:-/dev/null}"
-  if [ "$count" -ge 1 ]; then
-    printf '%s\n' "{\"docker_registry_image_tag\":\"${SHA_TAG}\"}"
-  else
-    printf '%s\n' '{"docker_registry_image_tag":"prev-api"}'
-  fi
-  exit 0
-fi
-
-echo "unexpected curl: $joined" >&2
-exit 1
-STUB
-chmod +x "${STUB_DIR}/bin/curl"
 
 if ! run_deploy; then
   echo "FAIL: expected success path to exit 0" >&2
