@@ -43,6 +43,14 @@ env:
 permissions:
   contents: read
 
+# Workflow-level: supersede stale runs on the same ref.
+# Do NOT put push-api / push-worker / build in one cancel-in-progress job group —
+# that cancels sibling parallel pushes (REL-04 regression). Deploy keeps its own
+# coolify-nest-deploy group with cancel-in-progress: false.
+concurrency:
+  group: backend-image-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # REL-04 / D-13: push-api and push-worker run in parallel (was sequential in build).
   # Rollback: restore sequential push steps in a single job (04.5-PATTERNS.md).
@@ -67,9 +75,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 45
     runs-on: ubuntu-latest
-    concurrency:
-      group: backend-image-build-${{ github.ref }}
-      cancel-in-progress: true
     permissions:
       contents: read
       packages: write
@@ -138,9 +143,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 45
     runs-on: ubuntu-latest
-    concurrency:
-      group: backend-image-build-${{ github.ref }}
-      cancel-in-progress: true
     permissions:
       contents: read
       packages: write
@@ -208,9 +210,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 45
     runs-on: ubuntu-latest
-    concurrency:
-      group: backend-image-build-${{ github.ref }}
-      cancel-in-progress: true
     permissions:
       contents: read
       packages: write
