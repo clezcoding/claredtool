@@ -104,7 +104,8 @@ const styles = StyleSheet.create({
   },
   entityName: {
     color: CRAFTED.charcoal,
-    fontFamily: "Instrument Serif",
+    // Inter (latin + latin-ext) — Instrument Serif is latin-only; DE/AT names need umlauts.
+    fontFamily: "Inter",
     fontSize: 22,
     fontWeight: "400",
     marginBottom: 4,
