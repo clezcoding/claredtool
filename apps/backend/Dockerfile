@@ -15,15 +15,18 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY apps/backend/package.json apps/backend/package.json
 COPY packages/tax-engine/package.json packages/tax-engine/package.json
+COPY packages/pdf-templates/package.json packages/pdf-templates/package.json
 
-RUN pnpm install --frozen-lockfile --filter @clared/tax-engine... --filter ./apps/backend...
+RUN pnpm install --frozen-lockfile --filter @clared/tax-engine... --filter @clared/pdf-templates... --filter ./apps/backend...
 
 COPY packages/tax-engine packages/tax-engine
+COPY packages/pdf-templates packages/pdf-templates
 COPY apps/backend apps/backend
 
 WORKDIR /app
 
-RUN pnpm --filter @clared/tax-engine build
+RUN pnpm --filter @clared/tax-engine build \
+  && pnpm --filter @clared/pdf-templates build
 
 WORKDIR /app/apps/backend
 
@@ -33,8 +36,7 @@ ARG GIT_SHA=unknown
 RUN rm -f tsconfig.build.tsbuildinfo \
   && pnpm exec prisma generate \
   && pnpm exec nest build \
-  && test -f dist/main.js \
-  && test -f dist/worker.js
+  && test -f dist/main.js
 
 ENV DATABASE_URL=
 ENV NODE_ENV=production
@@ -47,12 +49,7 @@ RUN chown -R node:node /app
 USER node
 
 # Coolify dockerfile build pack ignores start_command (Nixpacks-only).
-# Last stage stays API. Worker app sets dockerfile_target_build=worker.
-FROM build AS worker
-HEALTHCHECK --interval=5s --timeout=5s --start-period=10s --retries=10 \
-  CMD sh -c 'curl -fsS "http://127.0.0.1:${PORT:-3000}/health" || exit 1'
-CMD ["node", "dist/worker.js"]
-
+# Last stage stays API. Worker stage removed (D-09 / 04.6 Takumi cutover).
 FROM build AS api
 # API container CMD is the only migrator. Coolify Postgres is Docker-internal DNS;
 # GitHub-hosted runners cannot reach it. Multi-replica later needs exactly one
