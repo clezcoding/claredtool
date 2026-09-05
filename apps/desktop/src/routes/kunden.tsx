@@ -41,8 +41,13 @@ type CustomerRow = {
   entityId: string;
   name: string;
   country: string;
-  address: string;
+  street: string;
+  addressLine2?: string | null;
+  postalCode: string;
+  city: string;
   vatId: string | null;
+  leitwegId?: string | null;
+  buyerReference?: string | null;
   entityName: string;
 };
 
@@ -52,8 +57,13 @@ const CREATE_DEFAULTS = {
   entityId: "",
   name: "",
   country: "",
-  address: "",
+  street: "",
+  addressLine2: "",
+  postalCode: "",
+  city: "",
   vatId: "",
+  leitwegId: "",
+  buyerReference: "",
 };
 
 const comboboxTriggerClass =
@@ -62,6 +72,20 @@ const comboboxTriggerClass =
 const PRIMARY_SUBMIT_CLASS =
   "btn-primary mt-2 min-h-11 self-start rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-[scale] active:scale-[0.97] motion-reduce:transition-none motion-reduce:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
+function formatStackedAddress(row: {
+  street: string;
+  addressLine2?: string | null;
+  postalCode: string;
+  city: string;
+  country: string;
+}): string {
+  const lines = [row.street];
+  if (row.addressLine2?.trim()) lines.push(row.addressLine2.trim());
+  lines.push(`${row.postalCode} ${row.city}`.trim());
+  lines.push(row.country);
+  return lines.filter(Boolean).join("\n");
+}
+
 function toRegistryRow(row: CustomerRow): RegistryListRow {
   return {
     id: row.id,
@@ -69,10 +93,17 @@ function toRegistryRow(row: CustomerRow): RegistryListRow {
     subtitle: row.entityName || "—",
     pillLabel: row.entityName,
     countryIso: row.country,
-    address: row.address,
+    address: formatStackedAddress(row),
     taxId: row.vatId,
     linkedAccount: row.entityName,
+    leitwegId: row.leitwegId ?? undefined,
+    buyerReference: row.buyerReference ?? undefined,
   };
+}
+
+function optionalBody(value: string): string | undefined {
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
 }
 
 export interface KundenScreenProps {}
@@ -92,6 +123,7 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
   const [createForm, setCreateForm] = useState(CREATE_DEFAULTS);
   const [entityError, setEntityError] = useState<string | null>(null);
   const [vatError, setVatError] = useState<string | null>(null);
+  const [addressError, setAddressError] = useState<string | null>(null);
   const userClosedRef = useRef(false);
 
   const loadData = useCallback(async () => {
@@ -148,8 +180,17 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
     event.preventDefault();
     setEntityError(null);
     setVatError(null);
+    setAddressError(null);
     if (!createForm.entityId) {
       setEntityError(t("registry.entityRequired"));
+      return;
+    }
+    if (
+      !createForm.street.trim() ||
+      !createForm.postalCode.trim() ||
+      !createForm.city.trim()
+    ) {
+      setAddressError(t("registry.errors.incompleteAddress"));
       return;
     }
     setSubmitting(true);
@@ -158,11 +199,19 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
         entityId: createForm.entityId,
         name: createForm.name,
         country: createForm.country,
-        address: createForm.address,
+        street: createForm.street.trim(),
+        postalCode: createForm.postalCode.trim(),
+        city: createForm.city.trim(),
       };
+      const addressLine2 = optionalBody(createForm.addressLine2);
+      if (addressLine2) body.addressLine2 = addressLine2;
       if (isEuCountry(createForm.country)) {
         body.vatId = createForm.vatId;
       }
+      const leitwegId = optionalBody(createForm.leitwegId);
+      if (leitwegId) body.leitwegId = leitwegId;
+      const buyerReference = optionalBody(createForm.buyerReference);
+      if (buyerReference) body.buyerReference = buyerReference;
 
       const res = await apiFetch("/api/customers", {
         method: "POST",
@@ -190,6 +239,7 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
     setCreateOpen(true);
     setEntityError(null);
     setVatError(null);
+    setAddressError(null);
     setCreateForm(CREATE_DEFAULTS);
   }
 
@@ -197,8 +247,6 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
     userClosedRef.current = false;
     setSelectedId(id);
     setPanelMode("detail");
-    setEntityError(null);
-    setVatError(null);
   }
 
   function closePanel() {
@@ -226,7 +274,7 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
   const createPanel = (
     <form className="flex flex-col gap-4" onSubmit={handleCreate}>
       <div className="flex flex-col gap-1">
-        <Label htmlFor="kunde-entity">Entity</Label>
+        <Label htmlFor="kunde-entity">{t("registry.entity")}</Label>
         <Combobox
           items={entities}
           itemToStringValue={(item) => item.name}
@@ -295,20 +343,112 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
           </ComboboxContent>
         </Combobox>
       </div>
-      <div className="flex flex-col gap-1">
-        <Label htmlFor="kunde-address">Adresse</Label>
-        <Input
-          id="kunde-address"
-          required
-          value={createForm.address}
-          onChange={(event) =>
-            setCreateForm((current) => ({
-              ...current,
-              address: event.target.value,
-            }))
-          }
-        />
+
+      <div className="flex flex-col gap-4">
+        <p className="text-xl font-semibold leading-tight">
+          {t("registry.sections.address")}
+        </p>
+        <div className="flex flex-col gap-1">
+          <Label htmlFor="kunde-street">{t("registry.street")}</Label>
+          <Input
+            id="kunde-street"
+            required
+            aria-required
+            placeholder={t("registry.street")}
+            value={createForm.street}
+            onChange={(event) =>
+              setCreateForm((current) => ({
+                ...current,
+                street: event.target.value,
+              }))
+            }
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <Label htmlFor="kunde-address-line2">
+            {t("registry.addressLine2")}
+          </Label>
+          <Input
+            id="kunde-address-line2"
+            placeholder={t("registry.addressLine2")}
+            value={createForm.addressLine2}
+            onChange={(event) =>
+              setCreateForm((current) => ({
+                ...current,
+                addressLine2: event.target.value,
+              }))
+            }
+          />
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="kunde-postal-code">{t("registry.postalCode")}</Label>
+            <Input
+              id="kunde-postal-code"
+              required
+              aria-required
+              placeholder={t("registry.postalCode")}
+              value={createForm.postalCode}
+              onChange={(event) =>
+                setCreateForm((current) => ({
+                  ...current,
+                  postalCode: event.target.value,
+                }))
+              }
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="kunde-city">{t("registry.city")}</Label>
+            <Input
+              id="kunde-city"
+              required
+              aria-required
+              placeholder={t("registry.city")}
+              value={createForm.city}
+              onChange={(event) =>
+                setCreateForm((current) => ({
+                  ...current,
+                  city: event.target.value,
+                }))
+              }
+            />
+          </div>
+        </div>
+        <div className="flex flex-col gap-1">
+          <Label htmlFor="kunde-leitweg">{t("registry.leitwegId")}</Label>
+          <Input
+            id="kunde-leitweg"
+            placeholder={t("registry.leitwegId")}
+            value={createForm.leitwegId}
+            onChange={(event) =>
+              setCreateForm((current) => ({
+                ...current,
+                leitwegId: event.target.value,
+              }))
+            }
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <Label htmlFor="kunde-buyer-ref">
+            {t("registry.buyerReference")}
+          </Label>
+          <Input
+            id="kunde-buyer-ref"
+            placeholder={t("registry.buyerReference")}
+            value={createForm.buyerReference}
+            onChange={(event) =>
+              setCreateForm((current) => ({
+                ...current,
+                buyerReference: event.target.value,
+              }))
+            }
+          />
+        </div>
       </div>
+
+      {addressError ? (
+        <p className="text-xs text-destructive">{addressError}</p>
+      ) : null}
       {vatError ? (
         <p className="text-xs text-destructive">{vatError}</p>
       ) : null}
@@ -340,45 +480,45 @@ export function KundenScreen(_props: KundenScreenProps = {}) {
 
   return (
     <>
-    <RegistryListPanel
-      title={t("registry.kundenTitle")}
-      count={customers.length}
-      searchPlaceholder={t("registry.searchKunden")}
-      newButtonLabel={t("registry.newKunde")}
-      canCreate={canCreate}
-      createHint="Keine Berechtigung zum Anlegen von Kunden."
-      onNew={openCreate}
-      rows={registryRows}
-      rowTestId="kunden-row"
-      loading={loading}
-      loadError={loadError}
-      onRetry={() => void loadData()}
-      emptyTitle={t("empty.generic.title")}
-      emptyDescription={t("empty.generic.body")}
-      selectedId={selectedId}
-      onSelectRow={selectRow}
-      panelMode={panelMode}
-      onClosePanel={closePanel}
-      selectedRow={selectedRow}
-      nameColumnHeader={t("registry.kundenTitle")}
-      pillColumnHeader={t("registry.entity")}
-      createPanel={null}
-      detailTestId="kunden-detail"
-    />
-    <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-      <DialogContent className="sm:max-w-[560px]" showCloseButton>
-        <DialogHeader>
-          <DialogTitle>{t("registry.newKunde")}</DialogTitle>
-          <DialogDescription>{t("registry.kundeModalBody")}</DialogDescription>
-        </DialogHeader>
-        {createPanel}
-        <DialogFooter>
-          <DialogClose className="inline-flex h-11 items-center rounded-lg border px-5 text-sm">
-            {t("registry.cancel")}
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <RegistryListPanel
+        title={t("registry.kundenTitle")}
+        count={customers.length}
+        searchPlaceholder={t("registry.searchKunden")}
+        newButtonLabel={t("registry.newKunde")}
+        canCreate={canCreate}
+        createHint="Keine Berechtigung zum Anlegen von Kunden."
+        onNew={openCreate}
+        rows={registryRows}
+        rowTestId="kunden-row"
+        loading={loading}
+        loadError={loadError}
+        onRetry={() => void loadData()}
+        emptyTitle={t("empty.generic.title")}
+        emptyDescription={t("empty.generic.body")}
+        selectedId={selectedId}
+        onSelectRow={selectRow}
+        panelMode={panelMode}
+        onClosePanel={closePanel}
+        selectedRow={selectedRow}
+        nameColumnHeader={t("registry.kundenTitle")}
+        pillColumnHeader={t("registry.entity")}
+        createPanel={null}
+        detailTestId="kunden-detail"
+      />
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="sm:max-w-[560px]" showCloseButton>
+          <DialogHeader>
+            <DialogTitle>{t("registry.newKunde")}</DialogTitle>
+            <DialogDescription>{t("registry.kundeModalBody")}</DialogDescription>
+          </DialogHeader>
+          {createPanel}
+          <DialogFooter>
+            <DialogClose className="inline-flex h-11 items-center rounded-lg border px-5 text-sm">
+              {t("registry.cancel")}
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
