@@ -49,5 +49,16 @@ describe("Health (e2e)", () => {
     const body = JSON.stringify(res.body).toLowerCase();
     expect(body).toMatch(/postgres/);
     expect(body).toMatch(/redis/);
+    expect(body).not.toMatch(/gotenberg/);
+  });
+
+  it("GET /health/ready includes build.sha when 200", async () => {
+    const res = await request(app.getHttpServer()).get("/health/ready");
+    expect([200, 503]).toContain(res.status);
+    if (res.status === 200) {
+      const sha =
+        res.body?.details?.build?.sha ?? res.body?.info?.build?.sha;
+      expect(sha).toBe("e2e-health-build-sha");
+    }
   });
 });

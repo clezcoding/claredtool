@@ -2,7 +2,7 @@
 
 ## Overview
 
-Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. It is **paid subscription SaaS**: backend, Postgres, Redis, and Authentik run on the **founder's Coolify**, not on the customer's machine, not as open source, not for free. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to the vendor Coolify API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 is a full premium redesign (Crafted Minimal) — brand tokens, theme, motion. Phase 4.1 converts approved Google Stitch HTML for the 5 v1 routes into Tauri TSX/React via stitch-build. Phase 4.2 hardens the desktop platform (Tauri plugins, Sentry, updater). Phase 4.3 deploys PDF/audit/offline prep infra (Gotenberg, monitoring, OTel, desktop SQL/dialog/fs). Phase 4.4 lands the GitHub Actions optimization brief before the PDF product wave. Phase 4.5 closes measurable reliability, performance, and maintainability debt before Phase 5. Phase 5 closes the loop with PDF, tax-decision audit, and offline sync. Phase 5.1 converts the remaining Stitch catalog. Phase 6 closes 1:1 fidelity on the 5 routes. Stripe/seats (`SAAS-01`) stay v2.
+Clared ships as a stunning Tauri desktop app whose core loop is create invoice → see live tax → get PDF in under 2 minutes. It is **paid subscription SaaS**: backend, Postgres, Redis, and Authentik run on the **founder's Coolify**, not on the customer's machine, not as open source, not for free. Phase 1 puts a real macOS/Windows window on screen with interactive mockups before any feature UI is implemented. Phase 2 connects that shell to the vendor Coolify API and Authentik SSO. Phase 3 is the product: entities, invoices, and a modular tax engine driving live preview. Phase 4 is a full premium redesign (Crafted Minimal) — brand tokens, theme, motion. Phase 4.1 converts approved Google Stitch HTML for the 5 v1 routes into Tauri TSX/React via stitch-build. Phase 4.2 hardens the desktop platform (Tauri plugins, Sentry, updater). Phase 4.3 deploys PDF/audit/offline prep infra (Gotenberg, monitoring, OTel, desktop SQL/dialog/fs). Phase 4.4 lands the GitHub Actions optimization brief before the PDF product wave. Phase 4.5 closes measurable reliability, performance, and maintainability debt before Phase 5. Phase 4.6 replaces Gotenberg/Chromium with Takumi+pdfcn as the sole PDF engine. Phase 4.7 adds Factur-X/ZUGFeRD Comfort XML (and XRechnung) on that engine. Phase 5 closes the loop with PDF download/view, tax-decision audit, and offline sync. Phase 5.1 converts the remaining Stitch catalog. Phase 6 closes 1:1 fidelity on the 5 routes. Stripe/seats (`SAAS-01`) stay v2.
 
 ## Phases
 
@@ -21,7 +21,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4.2: Desktop Platform Hardening** (INSERTED) - Tauri plugins, Sentry, updater, desktop polish (completed 2026-08-28)
 - [x] **Phase 4.3: Infra & Prep for PDF, Offline & Audit** (INSERTED) - Gotenberg, monitoring, OTel, desktop/backend scaffolding before Phase 5 (completed 2026-08-30)
 - [x] **Phase 4.4: GitHub Actions Optimization** (INSERTED) - CI fan-out, security workflows, desktop-release, Dependabot (`docs/claredtool-github-actions-optimierungsauftrag.md`) (completed 2026-09-04)
-- [ ] **Phase 4.5: Repository Reliability, Performance & Maintainability Hardening** (INSERTED) - close measurable tech-debt before Phase 5 product work (`docs/CURSOR_GSD_PHASE_04.5_HANDOFF.md`)
+- [x] **Phase 4.5: Repository Reliability, Performance & Maintainability Hardening** (INSERTED) - close measurable tech-debt before Phase 5 product work (`docs/CURSOR_GSD_PHASE_04.5_HANDOFF.md`) (completed 2026-09-05)
+- [x] **Phase 4.6: Takumi+pdfcn PDF Engine Cutover** (INSERTED) - complete Gotenberg removal; Takumi/pdfcn in-process Nest API (`docs/clared-takumi-pdfcn-report.md`, `.planning/phases/04.6-takumi-pdfcn-pdf-engine-cutover/04.6-RESEARCH.md`) (completed 2026-09-05)
+- [ ] **Phase 4.7: Factur-X / ZUGFeRD / XRechnung e-invoice XML** (INSERTED) - Comfort CII + PDF/A-3b embed + XRechnung on the Takumi engine
 - [ ] **Phase 5: PDF, Audit & Offline Sync** - Download PDF, inspect tax audit trail, work offline and sync
 - [ ] **Phase 5.1: Stitch→React extended catalog** (INSERTED) - remaining Stitch screens after PDF loop ships
 - [ ] **Phase 6: Mockup 1:1 Fidelity Closure** - pixel-match approved mockups 02–07 on the 5 routes
@@ -254,6 +256,69 @@ Plans:
 
 - [x] 04.5-05-PLAN.md — CI walltime experiments on three baselines (REL-04)
 
+### Phase 04.6: Takumi+pdfcn PDF Engine Cutover (INSERTED)
+
+**Goal:** Replace Gotenberg/Chromium completely with Takumi + pdfcn Invoice Minimal as the sole invoice PDF renderer — visual PDF bytes in Nest API, no dual pipeline, no Gotenberg fallback — so Phase 4.7 can attach e-invoice XML and Phase 5 can download
+**Requirements**: PDF-01 (prep) — engine + visual bytes contract; full user download/view stays Phase 5; e-invoice XML is Phase 4.7. SSOT: `docs/clared-takumi-pdfcn-report.md` (stale on PDF/A-3 container — see 04.6-RESEARCH.md). Research: `.planning/phases/04.6-takumi-pdfcn-pdf-engine-cutover/04.6-RESEARCH.md`
+**Depends on:** Phase 4.5
+**Success Criteria** (what must be TRUE):
+
+  1. Nest API produces invoice PDF bytes in-process from InvoiceModel + TaxDecision via Takumi + pdfcn **Invoice Minimal** (Takumi registry, Crafted Minimal tokens, DE/EN, TaxDecision text blocks) — no queue hop
+  2. Gotenberg is gone: Coolify `clared-gotenberg`, compose `gotenberg`, `gotenberg.client.ts`, `GOTENBERG_*` env, Kuma Gotenberg monitor, `/health/ready` Gotenberg probe, Chromium HTML convert path
+  3. PDF job pipe is gone with it: BullMQ `pdf-generation`, `@nestjs/bullmq`/`bullmq`, `PdfProcessor`, `clared-worker` (Coolify + compose + Dockerfile `--target worker` + GHA worker image/deploy), `worker.ts` / `WorkerModule`
+  4. No feature-toggle dual-run; no Gotenberg fallback; no HTML/Handlebars invoice templates
+  5. Out of scope: PDF-01 desktop download/view, AUDT-01, OFFL-01, Factur-X/ZUGFeRD XML, XRechnung, PDF/A-3 embedding, PDF/UA-1 (`tagged: "ua1"`), public generate HTTP route; Redis stays for session KV; MAIL-01 queue is v2
+  6. Dockerfile copies and builds `@clared/pdf-templates`; wasm lands in the API image; `dist/worker.js` assert and `FROM build AS worker` are gone
+  7. GHA + `coolify-deploy-nest.sh` are API-only: no `*-worker` tag, no worker Trivy/SBOM/cosign, no `COOLIFY_APP_WORKER` deploy. 04.5 D-03 API→worker order is superseded
+  8. Runtime deps: pin `takumi-pdf` + `@takumi-rs/helpers` + `react` on pdf-templates. Do not add npm `takumi`, `pdfcn`, `forme`, or `@takumi-rs/core`. pdfcn is shadcn copy-paste (`@pdfcn/takumi/invoice-minimal` — no Forme registry)
+  9. Fonts vendored in the image (Inter + Instrument Serif WOFF2). No `googleFonts()` network fetch at Coolify render time
+  10. Ops addendum (do not rewrite 04.3 PLAN/SUMMARY): 04.3-PDF-OPS / MONITOR-OPS + `.env.example` without `GOTENBERG_*`. Fixture: Invoice+TaxDecision → `%PDF-` bytes, no Chrome, no XML attachment
+
+**Plans:** 5/5 plans complete
+**UI hint**: no (engine/infra; JSX templates are not desktop UI)
+
+Plans:
+
+**Wave 1**
+
+- [x] 04.6-01-PLAN.md — SUS pin + tracer: InvoiceModel+TaxDecision → `%PDF-` via Takumi Invoice Minimal (D-23 fixture 1)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [x] 04.6-02-PLAN.md — D-18/D-22 helpers + D-23 fixtures 2–3 + paper layout locks
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [x] 04.6-03-PLAN.md — Nest InvoicePdfService sync; drop queue/Chromium/worker sources; Ready without Gotenberg (D-25)
+
+**Wave 4** *(blocked on Wave 3)*
+
+- [x] 04.6-04-PLAN.md — Dockerfile pdf-templates+wasm; GHA + deploy script API-only (D-09)
+
+**Wave 5** *(blocked on Wave 4; D-01/D-02 one-way gate)*
+
+- [x] 04.6-05-PLAN.md — compose/env drop; 04.3 ops addendum; Coolify/Kuma deletes (D-24)
+
+### Phase 04.7: Factur-X / ZUGFeRD / XRechnung e-invoice XML (INSERTED)
+
+**Goal:** On the Takumi engine from 4.6, emit a legal German e-invoice: EN 16931 Comfort CII inside PDF/A-3b (Factur-X/ZUGFeRD) plus an XRechnung XML artifact — visual totals must match XML
+**Requirements**: PDF-01 (e-invoice bytes); download/view still Phase 5. SSOT: `docs/clared-takumi-pdfcn-report.md` e-invoicing section + Takumi attachments docs
+**Depends on:** Phase 4.6
+**Success Criteria** (what must be TRUE):
+
+  1. InvoiceModel + TaxDecision produce Factur-X/ZUGFeRD **EN 16931 Comfort** CII XML (not MINIMUM/BASIC WL — those are not German invoices)
+  2. Same render path embeds XML via Takumi `pdfa: "3b"` + `attachments` (`name: "factur-x.xml"`, mimeType, description, relationship `data`) + Factur-X `metadata.xmp`. Takumi does not build XML. No pdf-lib/`embedInPdf` second pass
+  3. XRechnung XML-only artifact from the same facts (UBL or CII as plan-phase picks) — not a second visual PDF
+  4. Visual PDF amounts = XML amounts. Fixture covers hybrid PDF + XRechnung XML. PDF/UA-1 stays off
+  5. Out of scope: PDF-01 desktop download/view, AUDT-01, OFFL-01, public generate HTTP (Phase 5). XML library: plan-phase legitimacy (first candidate `node-zugferd` `toXML()` only; WIP/beta)
+
+**Plans:** 0 plans
+**UI hint**: no (compliance bytes; download is Phase 5)
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 04.7 to break down)
+
 ### Phase 04.3: Infra & Prep for PDF, Offline & Audit (INSERTED)
 
 **Goal:** Deploy supporting Coolify infra and wire desktop/backend scaffolding so Phase 5 focuses on product flows (generate PDF, audit trail, offline sync) — not plumbing
@@ -375,12 +440,12 @@ Plans:
 ### Phase 5: PDF, Audit & Offline Sync
 
 **Goal**: User finishes the two-minute loop with a PDF, can explain a tax decision from the audit trail, and can keep working when offline
-**Depends on**: Phase 4.3
+**Depends on**: Phase 4.7
 **Requirements**: PDF-01, OFFL-01, AUDT-01
 **Success Criteria** (what must be TRUE):
 
   1. Interactive mockups / UI-SPEC for PDF viewer and offline/sync states exist before implementation (satisfied by Phase 4.1 Stitch→React surfaces + remaining offline/sync mockups)
-  2. User can generate, download, and view a multilingual (DE/EN) invoice PDF that includes TaxDecision text blocks (uses Gotenberg + NestJS from 4.3)
+  2. User can generate, download, and view a multilingual (DE/EN) invoice PDF that includes TaxDecision text blocks (Takumi+pdfcn Invoice Minimal from 4.6; Factur-X Comfort + XRechnung from 4.7 already in the bytes; no Gotenberg, no BullMQ worker)
   3. Each tax evaluation leaves a persisted `audit_logs` row (applied rule, audit_trace); backend application logs exist (Pino/OTel from 4.3); Grafana dashboards live
   4. User can open recently used entities, customers, and invoices offline (SQLite sync via 4.3 scaffold) and sync when the connection returns
 
@@ -390,7 +455,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 → 4.4 → 4.5 → 5 → 5.1 → 6
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 → 4.4 → 4.5 → 4.6 → 4.7 → 5 → 5.1 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -402,7 +467,9 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 →
 | 4.2 Desktop Platform Hardening | 8/8 | Complete    | 2026-08-28 |
 | 4.3 Infra & Prep for PDF/Offline/Audit | 8/8 | Complete    | 2026-08-30 |
 | 4.4 GitHub Actions Optimization | 7/7 | Complete | 2026-09-04 |
-| 4.5 Repository Reliability, Performance & Maintainability Hardening | 6/6 | In Progress|  |
+| 4.5 Repository Reliability, Performance & Maintainability Hardening | 6/6 | Complete | 2026-09-05 |
+| 4.6 Takumi+pdfcn PDF Engine Cutover | 5/5 | Complete    | 2026-09-05 |
+| 4.7 Factur-X / ZUGFeRD / XRechnung e-invoice XML | 0/? | Not started | - |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |
 | 6. Mockup 1:1 Fidelity Closure | 0/? | Not started | - |

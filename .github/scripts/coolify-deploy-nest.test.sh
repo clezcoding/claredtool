@@ -16,12 +16,20 @@ trap cleanup EXIT
 export COOLIFY_URL="http://mock.coolify"
 export COOLIFY_TOKEN="secret-mock-token-do-not-log"
 export API_UUID="api-uuid-a"
-export WORKER_UUID="worker-uuid-w"
 export SHA_TAG="sha-deadbeef"
 export IMAGE="ghcr.io/org/clared"
+export API_HEALTH_URL="https://mock-api.example/health/ready"
 export GITHUB_STEP_SUMMARY="$SUMMARY_FILE"
 export MOCK_PIN_LOG="$PIN_LOG"
 export MOCK_SCENARIO=""
+
+# Fail closed: deploy script must stay API-only (D-09).
+if grep -Fq 'WORKER_UUID' "$SCRIPT" \
+  || grep -Fq 'COOLIFY_APP_WORKER' "$SCRIPT" \
+  || grep -Fq -- '-worker' "$SCRIPT"; then
+  echo "FAIL: coolify-deploy-nest.sh still references worker pin/tag" >&2
+  exit 1
+fi
 
 mkdir -p "${STUB_DIR}/bin"
 
@@ -38,11 +46,11 @@ joined="$*"
 PIN_LOG="${MOCK_PIN_LOG:-/dev/null}"
 scenario="${MOCK_SCENARIO:-}"
 
-if [[ "$joined" == *"health/build"* ]]; then
+if [[ "$joined" == *"health/ready"* ]]; then
   if [[ "$joined" == *"%{http_code}"* ]]; then
     if [ "${MOCK_HEALTH_CODE:-200}" = "200" ]; then
       printf '%s\n%s' \
-        "{\"status\":\"ok\",\"sha\":\"${SHA_TAG}\"}" \
+        "{\"status\":\"ok\",\"info\":{\"build\":{\"status\":\"up\",\"sha\":\"${SHA_TAG}\"}},\"details\":{\"build\":{\"status\":\"up\",\"sha\":\"${SHA_TAG}\"}}}" \
         "200"
     else
       printf '%s\n%s' '{"status":"error"}' "${MOCK_HEALTH_CODE:-503}"
@@ -77,51 +85,16 @@ if [[ "$joined" == *"POST"* && "$joined" == *"/deploy"* ]]; then
     printf '%s\n' '{"deployments":[{"deployment_uuid":"api-rollback"}]}'
     exit 0
   fi
-  if [[ "$joined" == *"${WORKER_UUID}"* ]]; then
-    if [ "$scenario" = "success" ]; then
-      printf '%s\n' '{"deployments":[{"deployment_uuid":"worker-forward"}]}'
-      exit 0
-    fi
-    count="$(cat "${MOCK_WORKER_POST_COUNT_FILE:-/dev/null}" 2>/dev/null || echo 0)"
-    echo $((count + 1)) > "${MOCK_WORKER_POST_COUNT_FILE:-/dev/null}"
-    if [ "$scenario" = "worker_deploy_fail" ] && [ "$count" -eq 0 ]; then
-      printf '%s\n' '{"deployments":[{"deployment_uuid":"worker-forward"}]}'
-    else
-      printf '%s\n' '{"deployments":[{"deployment_uuid":"worker-rollback"}]}'
-    fi
-    exit 0
-  fi
   printf '%s\n' '{"deployments":[{"deployment_uuid":"api-forward"}]}'
   exit 0
 fi
 
 if [[ "$joined" == *"GET"* && "$joined" == *"/deployments/"* ]]; then
-  if [ "$scenario" != "success" ] && [[ "$joined" == *"worker-forward"* ]]; then
-    printf '%s\n' '{"status":"failed"}'
-    exit 0
-  fi
   printf '%s\n' '{"status":"finished"}'
   exit 0
 fi
 
 if [[ "$joined" == *"GET"* && "$joined" == *"/applications/"* ]]; then
-  if [[ "$joined" == *"${WORKER_UUID}"* ]]; then
-    if [ "$scenario" = "success" ]; then
-      count="$(cat "${MOCK_WORKER_GET_COUNT_FILE:-/dev/null}" 2>/dev/null || echo 0)"
-      echo $((count + 1)) > "${MOCK_WORKER_GET_COUNT_FILE:-/dev/null}"
-      if [ "$count" -ge 1 ]; then
-        printf '%s\n' \
-          "{\"docker_registry_image_tag\":\"${SHA_TAG}-worker\",\"status\":\"running:healthy\",\"health_check_enabled\":false}"
-      else
-        printf '%s\n' \
-          '{"docker_registry_image_tag":"prev-worker","status":"running:healthy","health_check_enabled":false}'
-      fi
-      exit 0
-    fi
-    printf '%s\n' \
-      '{"docker_registry_image_tag":"prev-worker","status":"running:healthy","health_check_enabled":false}'
-    exit 0
-  fi
   if [ "$scenario" = "health_fail" ] && [[ "$joined" == *"${API_UUID}"* ]]; then
     count="$(cat "${MOCK_API_GET_COUNT_FILE:-/dev/null}" 2>/dev/null || echo 0)"
     echo $((count + 1)) > "${MOCK_API_GET_COUNT_FILE:-/dev/null}"
@@ -166,11 +139,7 @@ run_deploy() {
   : > "$OUTPUT_FILE"
   : > "$SUMMARY_FILE"
   echo 0 > "${STUB_DIR}/api_get_count"
-  echo 0 > "${STUB_DIR}/worker_get_count"
-  echo 0 > "${STUB_DIR}/worker_post_count"
   export MOCK_API_GET_COUNT_FILE="${STUB_DIR}/api_get_count"
-  export MOCK_WORKER_GET_COUNT_FILE="${STUB_DIR}/worker_get_count"
-  export MOCK_WORKER_POST_COUNT_FILE="${STUB_DIR}/worker_post_count"
   set +e
   bash "$SCRIPT" >"$OUTPUT_FILE" 2>&1
   local rc=$?
@@ -182,16 +151,11 @@ grep_pin() {
   grep -F "$1" "$PIN_LOG" || true
 }
 
-echo "test: health poll failure rolls back API before worker pin"
+echo "test: health poll failure rolls back API"
 export MOCK_SCENARIO="health_fail"
 export MOCK_HEALTH_CODE="503"
 if run_deploy; then
   echo "FAIL: expected non-zero exit on health poll failure" >&2
-  exit 1
-fi
-if grep_pin "pin:${WORKER_UUID}:${SHA_TAG}-worker" | grep -q .; then
-  echo "FAIL: worker forward pin ran before health poll passed" >&2
-  cat "$PIN_LOG" >&2
   exit 1
 fi
 if ! grep_pin "pin:${API_UUID}:prev-api" | grep -q .; then
@@ -201,27 +165,6 @@ if ! grep_pin "pin:${API_UUID}:prev-api" | grep -q .; then
 fi
 assert_no_token_leak "health_fail"
 
-echo "test: worker deploy failure rolls back worker before API"
-export MOCK_SCENARIO="worker_deploy_fail"
-export MOCK_HEALTH_CODE="200"
-if run_deploy; then
-  echo "FAIL: expected non-zero exit on worker deploy failure" >&2
-  exit 1
-fi
-worker_rb_line="$(grep -n "pin:${WORKER_UUID}:prev-worker" "$PIN_LOG" | tail -1 | cut -d: -f1 || true)"
-api_rb_line="$(grep -n "pin:${API_UUID}:prev-api" "$PIN_LOG" | tail -1 | cut -d: -f1 || true)"
-if [ -z "$worker_rb_line" ] || [ -z "$api_rb_line" ]; then
-  echo "FAIL: missing rollback pins" >&2
-  cat "$PIN_LOG" >&2
-  exit 1
-fi
-if [ "$worker_rb_line" -ge "$api_rb_line" ]; then
-  echo "FAIL: worker rollback must precede API rollback (worker@${worker_rb_line} api@${api_rb_line})" >&2
-  cat "$PIN_LOG" >&2
-  exit 1
-fi
-assert_no_token_leak "worker_deploy_fail"
-
 echo "test: SIGTERM after API pin rolls back via EXIT trap"
 export MOCK_SCENARIO="term_after_api_pin"
 export MOCK_HEALTH_CODE="200"
@@ -229,12 +172,8 @@ export MOCK_HEALTH_CODE="200"
 : > "$OUTPUT_FILE"
 : > "$SUMMARY_FILE"
 echo 0 > "${STUB_DIR}/api_get_count"
-echo 0 > "${STUB_DIR}/worker_get_count"
-echo 0 > "${STUB_DIR}/worker_post_count"
 echo 0 > "${STUB_DIR}/deploy_post_count"
 export MOCK_API_GET_COUNT_FILE="${STUB_DIR}/api_get_count"
-export MOCK_WORKER_GET_COUNT_FILE="${STUB_DIR}/worker_get_count"
-export MOCK_WORKER_POST_COUNT_FILE="${STUB_DIR}/worker_post_count"
 export MOCK_DEPLOY_POST_COUNT_FILE="${STUB_DIR}/deploy_post_count"
 set -m
 bash "$SCRIPT" >"$OUTPUT_FILE" 2>&1 &
@@ -286,11 +225,6 @@ if ! grep_pin "pin:${API_UUID}:prev-api" | grep -q .; then
   cat "$OUTPUT_FILE" >&2
   exit 1
 fi
-if grep_pin "pin:${WORKER_UUID}:${SHA_TAG}-worker" | grep -q .; then
-  echo "FAIL: worker forward pin must not run when TERM hits after API pin" >&2
-  cat "$PIN_LOG" >&2
-  exit 1
-fi
 assert_no_token_leak "term_after_api_pin"
 
 echo "test: happy path deploy completes without token leak"
@@ -307,25 +241,17 @@ if ! grep -Fq "outcome: deployed" "$SUMMARY_FILE"; then
   cat "$SUMMARY_FILE" >&2
   exit 1
 fi
-api_pin_line="$(grep -n -Fx "pin:${API_UUID}:${SHA_TAG}" "$PIN_LOG" | head -1 | cut -d: -f1 || true)"
-worker_pin_line="$(grep -n -Fx "pin:${WORKER_UUID}:${SHA_TAG}-worker" "$PIN_LOG" | head -1 | cut -d: -f1 || true)"
-if [ -z "$api_pin_line" ] || [ -z "$worker_pin_line" ]; then
-  echo "FAIL: success path missing forward pins" >&2
+if ! grep -Fq -x "pin:${API_UUID}:${SHA_TAG}" "$PIN_LOG"; then
+  echo "FAIL: success path missing API forward pin" >&2
   cat "$PIN_LOG" >&2
   exit 1
 fi
-if [ "$api_pin_line" -ge "$worker_pin_line" ]; then
-  echo "FAIL: API pin must precede worker pin (api@${api_pin_line} worker@${worker_pin_line})" >&2
+if grep -E 'pin:.*-worker|WORKER|worker-uuid' "$PIN_LOG" | grep -q .; then
+  echo "FAIL: worker pin must not appear on API-only deploy" >&2
   cat "$PIN_LOG" >&2
   exit 1
 fi
 assert_no_token_leak "success"
-
-line_count="$(wc -l < "$SCRIPT" | tr -d ' ')"
-if [ "$line_count" -lt 150 ]; then
-  echo "FAIL: deploy script has ${line_count} lines; need >= 150" >&2
-  exit 1
-fi
 
 ACTIONLINT_IMAGE="rhysd/actionlint:1.7.12@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667"
 REPO_ROOT="$(cd "$ROOT/../.." && pwd)"

@@ -1,18 +1,18 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 04.5
-current_phase_name: Repository Reliability, Performance & Maintainability Hardening
-status: "Phase 04.5 shipped — PR #120"
-stopped_at: Forensic investigation complete
-last_updated: "2026-09-05T02:52:42.130Z"
+current_phase: 04.7
+current_phase_name: Factur-X / ZUGFeRD / XRechnung e-invoice XML
+status: "Phase 04.6 shipped — PR #124"
+stopped_at: Phase 04.6 complete, ready to plan Phase 04.7
+last_updated: "2026-09-05T19:13:10.814Z"
 last_activity: 2026-09-05
-state_head: cc9a502a575444a0124dea3fd3b63e91735b27d1
+state_head: 8682009693d1e6cd27bce02f25bfa8203df44ae1
 progress:
-  total_phases: 12
-  completed_phases: 8
-  total_plans: 60
-  completed_plans: 60
+  total_phases: 14
+  completed_phases: 10
+  total_plans: 65
+  completed_plans: 65
 milestone_name: milestone
 ---
 
@@ -23,29 +23,26 @@ milestone_name: milestone
 See: .planning/PROJECT.md (updated 2026-08-30)
 
 **Core value:** Beautiful interactive invoice + live-tax + PDF loop on the desktop — create invoice, see live tax, get PDF — under 2 minutes.
-**Current focus:** Phase 04.5 — Repository Reliability, Performance & Maintainability Hardening
+**Current focus:** Phase 04.7 — Factur-X / ZUGFeRD / XRechnung e-invoice XML
 
 ## Current Position
 
-Status: Phase 04.5 shipped — PR #120
-Phase: 04.5 (Repository Reliability, Performance & Maintainability Hardening) — EXECUTING
-Phase 04.1 merged: PR #39 (`30e331a`)
-Plan: 1 of 6
-Phase 04.3 (Infra & Prep for PDF/Offline/Audit) — complete 2026-08-30
-Phase 04.4 (GitHub Actions Optimization) — complete 2026-09-04 (PR #115)
-Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — current, not started
-Phase 05 (PDF, Audit & Offline Sync) — after Phase 04.5
+Status: Phase 04.6 shipped — PR #124
+Phase: 04.7 — Factur-X / ZUGFeRD / XRechnung e-invoice XML
+Plan: Not started
+Phase 04.6 (Takumi+pdfcn PDF Engine Cutover) — complete 2026-09-05 (verification 10/10)
+Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
-Decided: Option A — 4.1 = 5-route stitch-build before PDF; 4.2 = desktop hardening; 4.3 = infra prep; 4.4 = GitHub Actions brief before PDF; 4.5 = reliability/perf/maintainability hardening before PDF; 5.1 = extended catalog after Phase 5; Crafted Minimal
+Decided: Option A — 4.1 stitch-build; 4.2 desktop; 4.3 infra; 4.4 GHA; 4.5 hardening; 4.6 Takumi+pdfcn cutover (no Gotenberg); 5.1 catalog after Phase 5; Crafted Minimal
 Last activity: 2026-09-05
 
-Progress: [████████░░] 73%
+Progress: [█████████░] 75%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 54
+- Total plans completed: 59
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -62,6 +59,7 @@ Progress: [████████░░] 73%
 | 04.2 | 8 | - | - |
 | 04.3 | 8 | - | - |
 | 04.4 | 7 | - | - |
+| 04.6 | 5 | - | - |
 
 **Recent Trend:**
 
@@ -120,6 +118,10 @@ Progress: [████████░░] 73%
 | Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de P05 | 3 min | 2 tasks | 1 files |
 | Phase 04.4 P06 | 4 min | 3 tasks | 2 files |
 | Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de P07 | 8 min | 3 tasks | 7 files |
+| Phase 04.6 P02 | 4min | 2 tasks | 8 files |
+| Phase 04.6 P03 | 5min | 3 tasks | 19 files |
+| Phase 04.6 P04 | 4min | 3 tasks | 5 files |
+| Phase 04.6 P05 | 7min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -267,6 +269,21 @@ Recent decisions affecting current work:
 - [Phase 04.4]: Dependabot cooldown default-days 7; zizmor.yml ignores sync-labels artipacked (D-36) — zizmor 1.30.0 must exit 0; cannot edit sync-labels.yml
 - [quick-260904-cjp]: CodeQL analyze-rust off pull_request (stay on main/schedule/dispatch); backend-unit || backend-e2e; desktop runners pinned windows-2025 + macos-26 (overrides 04.4 D-17); signed job still no Actions cache
 - [quick-260904-ile]: pnpm-workspace overrides qs@6.16.0 + mysql2@3.23.1 (Dependabot #6–#8); closed stale phase epics #100 #99 #51 #29 #27 #11 #17; human UAT #15/#20 and Phase 06 #37 stay open
+- [Phase 4.6]: Takumi+pdfcn sole PDF engine; Gotenberg fully removed (no toggle, no fallback) — Founder lock 2026-09-05. SSOT docs/clared-takumi-pdfcn-report.md. 4.3 queue/worker stay. PDF-01 download stays Phase 5. E-Invoicing XML/PDF/A-3 later.
+- [Phase 4.6]: PDF render is sync in Nest API; drop BullMQ pdf-generation and clared-worker with Gotenberg — Takumi ~26ms in-process. Queue existed for Chromium latency/isolation. Redis stays for session KV. MAIL-01 may add a queue in v2.
+- [Phase 4.6]: Research locked SC 6–10 (Dockerfile pdf-templates+wasm, GHA API-only, npm deny-list, vendored Inter+Instrument Serif, ops addendum+fixture). Public generate HTTP stays Phase 5. PDF/A-3b without XML still discuss. Founder report stale: Takumi now has pdfa 3b + attachments; XML still out of 4.6.
+- [Phase 4.6]: Founder lock 2026-09-05: PDF/A-3b WITH Factur-X EN 16931 Comfort XML (not visual-only); pdfcn Invoice Minimal; PDF/UA-1 off. XRechnung out. Embed via Takumi attachments+xmp, not pdf-lib. XML lib plan-phase (node-zugferd toXML() candidate, WIP).
+- [Phase 4.6/4.7]: E-invoice XML (Factur-X Comfort + XRechnung + PDF/A-3b) moved to inserted Phase 4.7. 4.6 is visual Takumi engine only. Order 4.6 → 4.7 → 5.
+- [Phase 04.6]: RC sentence via legalBlockLines locale strings; fixtures keep explicit knobs (D-21); defaultsFromCountry for Nest later
+- [Phase 04.6]: Jest 30 verify uses --testPathPatterns (plan said --testPathPattern)
+- [Phase 04.6]: InvoicePdfService maps Entity/Customer/Invoice + TaxDecision + knobs to renderInvoice sync (D-02)
+- [Phase 04.6]: Fail-closed RenderFailedError; Ready is postgres+redis+build only (D-25, D-26)
+- [Phase 04.6]: BullMQ/Gotenberg/worker bootstrap removed from Nest API path (D-03)
+- [Phase 04.6]: API image owns Takumi wasm via node_modules; no worker stage/tag (D-09)
+- [Phase 04.6]: Deploy polls /health/ready build sha after API pin (D-25)
+- [Phase 04.6]: Mock tests fail closed if WORKER_UUID / COOLIFY_APP_WORKER / -worker reappear
+- [Phase 04.6]: 04.6-05 proceed-delete: removed Coolify gotenberg+worker and Kuma monitor; rollback=API image pin
+- [Phase 04.6]: 04.6-05 live UUIDs: worker mwdbgkc8grcth77wx0cseom8, API ucmhsb0srwr7ewt9wxejc4e9 (plan UUIDs stale)
 
 ### Pending Todos
 
@@ -305,6 +322,8 @@ None yet.
 - Phase 04.3 inserted after Phase 4: Infra & Prep for PDF/Offline/Audit — Gotenberg, Uptime Kuma, Beszel, OTel/Grafana, Pino, dialog/fs/sharekit/sql scaffold, BullMQ skeleton (URGENT)
 - Phase 04.4 inserted after Phase 4: GitHub Actions Optimization — CI fan-out, security workflows, desktop-release, Dependabot (URGENT)
 - Phase 04.5 inserted after Phase 4: Repository Reliability, Performance & Maintainability Hardening (URGENT)
+- Phase 4.6 inserted after Phase 4: Takumi+pdfcn PDF Engine Cutover — complete Gotenberg removal; Takumi/pdfcn in-process Nest API (docs/clared-takumi-pdfcn-report.md, 04.6-RESEARCH.md) (URGENT)
+- Phase 4.7 inserted after Phase 4.6: Factur-X / ZUGFeRD / XRechnung e-invoice XML — split out of 4.6 (URGENT)
 
 ## Deferred Items
 
@@ -316,9 +335,9 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-05T02:47:36.299Z
-Stopped at: Forensic investigation complete
-Resume file: .planning/forensics/report-20260905-044632.md
+Last session: 2026-09-05T17:27:02.771Z
+Stopped at: Phase 04.6 complete, ready to plan Phase 04.7
+Resume file: None
 
 ## Rebuild Log
 
