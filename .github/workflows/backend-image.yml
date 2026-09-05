@@ -142,8 +142,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             GIT_SHA=${{ steps.image.outputs.sha_tag }}
-          cache-from: type=gha,scope=clared-backend
-          cache-to: type=gha,scope=clared-backend,mode=max
+          cache-from: type=gha,scope=clared-backend-api
+          cache-to: type=gha,scope=clared-backend-api,mode=max
 
   push-worker:
     if: github.ref == 'refs/heads/main'
@@ -211,8 +211,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             GIT_SHA=${{ steps.image.outputs.sha_tag }}
-          cache-from: type=gha,scope=clared-backend
-          cache-to: type=gha,scope=clared-backend,mode=max
+          cache-from: type=gha,scope=clared-backend-worker
+          cache-to: type=gha,scope=clared-backend-worker,mode=max
 
   build:
     needs: [deploy-script-test, push-api, push-worker]
