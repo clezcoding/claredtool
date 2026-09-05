@@ -110,6 +110,7 @@ jobs:
           category: /language:javascript-typescript
 
   analyze-rust:
+    # D-13 / REL-04 Plan 05: no further walltime win — build-mode none, paths, concurrency kept.
     timeout-minutes: 45
     needs: detect
     if: needs.detect.outputs.rust == 'true'
