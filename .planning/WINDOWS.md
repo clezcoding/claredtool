@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 1
+open_count: 2
 waived_count: 26
 fixed_count: 15
-total_count: 42
-last_updated: 2026-09-05T22:52:51.535Z
+total_count: 43
+last_updated: 2026-09-05T23:56:15.376Z
 ---
 
 # Broken Windows Ledger
@@ -57,6 +57,7 @@ last_updated: 2026-09-05T22:52:51.535Z
 | 40 | 04.4 | deviation | .github/zizmor.yml |  | Ignore artipacked on sync-labels.yml (D-36 frozen file) | waived | documented zizmor artipacked ignore sync-labels D-36 | 2026-09-04T04:57:54.775Z | 2026-09-05T03:01:24.354Z |
 | 41 | 04.5 | unrun-verify | .planning/phases/04.5-repository-reliability-performance-maintainability-hardening/04.5-VALIDATION.md |  | backend-image after-run walltime pending post-merge gh run view | fixed |  | 2026-09-05T00:00:33.809Z | 2026-09-05T03:01:22.257Z |
 | 42 | 04.7 | deviation | packages/e-invoice/src/serialize-cii.ts |  | strict:false + xsd-schema-validator allowBuilds false; Mustang/KoSIT owns XSD/Schematron in CI | open |  | 2026-09-05T22:52:51.535Z |  |
+| 43 | 04.7 | stub | apps/backend/prisma/schema.prisma |  | Customer.email not in Prisma; Nest InvoicePdfCustomer.email generate-path only until stammdaten adds buyer email | open |  | 2026-09-05T23:56:15.376Z |  |
 
 ````json
 [
@@ -562,6 +563,18 @@ last_updated: 2026-09-05T22:52:51.535Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-09-05T22:52:51.535Z",
+    "resolved_at": null
+  },
+  {
+    "id": 43,
+    "kind": "stub",
+    "phase": "04.7",
+    "file": "apps/backend/prisma/schema.prisma",
+    "line": null,
+    "description": "Customer.email not in Prisma; Nest InvoicePdfCustomer.email generate-path only until stammdaten adds buyer email",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-05T23:56:15.376Z",
     "resolved_at": null
   }
 ]
