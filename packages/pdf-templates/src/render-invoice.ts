@@ -59,16 +59,36 @@ let renderer = new PdfRenderer();
 // ponytail: global lock; upgrade to confirmed re-entrant renderer or per-call instance if needed.
 let renderLock: Promise<void> = Promise.resolve();
 
-function recreateRenderer(): void {
-  const previous = renderer;
+/**
+ * Ctor-first slot swap: construct next, assign, then free previous.
+ * If create() throws, slot.current stays the live (unfreed) instance.
+ */
+export function swapRendererCtorFirst<T extends { free(): void }>(
+  slot: { current: T },
+  create: () => T
+): void {
+  const previous = slot.current;
+  const next = create();
+  slot.current = next;
   try {
     previous.free();
   } catch {
     /* ignore free errors on panicked instance */
   }
-  // Assign only after ctor succeeds — else module still pointed at freed instance.
-  const next = new PdfRenderer();
-  renderer = next;
+}
+
+function recreateRenderer(): void {
+  swapRendererCtorFirst(
+    {
+      get current() {
+        return renderer;
+      },
+      set current(value: PdfRenderer) {
+        renderer = value;
+      },
+    },
+    () => new PdfRenderer()
+  );
 }
 
 function withRendererExclusive<T>(fn: () => Promise<T>): Promise<T> {

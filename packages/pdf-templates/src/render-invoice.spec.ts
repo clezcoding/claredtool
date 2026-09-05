@@ -1,8 +1,53 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
-import { renderInvoice, roundEur } from "./render-invoice";
+import {
+  renderInvoice,
+  roundEur,
+  swapRendererCtorFirst,
+} from "./render-invoice";
 import { formatMoney } from "./format-money";
 import { readFileSync } from "node:fs";
+
+/** Guards WR-01: free-then-ctor must not leave slot on a freed instance. */
+describe("swapRendererCtorFirst", () => {
+  it("keeps prior instance unfreed when create throws", () => {
+    let freed = false;
+    const previous = {
+      free() {
+        freed = true;
+      },
+    };
+    const slot = { current: previous };
+    expect(() =>
+      swapRendererCtorFirst(slot, () => {
+        throw new Error("ctor fail");
+      })
+    ).toThrow("ctor fail");
+    expect(slot.current).toBe(previous);
+    expect(freed).toBe(false);
+  });
+
+  it("assigns next then frees previous only after successful create", () => {
+    const order: string[] = [];
+    const previous = {
+      free() {
+        order.push("free");
+      },
+    };
+    const next = {
+      free() {
+        order.push("next-free");
+      },
+    };
+    const slot = { current: previous };
+    swapRendererCtorFirst(slot, () => {
+      order.push("create");
+      return next;
+    });
+    expect(slot.current).toBe(next);
+    expect(order).toEqual(["create", "free"]);
+  });
+});
 
 /** Half-cent VAT must round tax first, then add — printed rows must add. */
 describe("EUR commercial rounding for printed VAT", () => {
