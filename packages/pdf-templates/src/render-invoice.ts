@@ -2,7 +2,7 @@ import { createElement } from "react";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { PdfRenderer } from "takumi-pdf";
-import { InvoiceMinimal, type InvoiceModel } from "./invoice-minimal";
+import { InvoiceMinimal, type InvoiceModel, CRAFTED } from "./invoice-minimal";
 
 export type { InvoiceModel, InvoiceLine } from "./invoice-minimal";
 
@@ -127,7 +127,7 @@ function assertPdfMagic(bytes: Uint8Array): void {
 /**
  * Render InvoiceModel + TaxDecision to PDF bytes via Takumi + Crafted Invoice Minimal.
  * Fail-closed: never returns empty PdfBytes (D-26).
- * margin:0 — full-bleed Oatmeal (no white Takumi auto-margin frame). Footer is fixed in JSX.
+ * margin:0 + backgroundColor — full-bleed Oatmeal paper (content alone only painted its own box).
  */
 export async function renderInvoice(
   input: RenderInvoiceInput
@@ -195,6 +195,8 @@ export async function renderInvoice(
     bytes = await renderer.render(node, {
       size: "a4",
       margin: 0,
+      // Paper color under everything — without this, below-content area is viewer white.
+      backgroundColor: CRAFTED.oatmeal,
       fonts: fonts(),
       fontFamilies: ["Inter", "Instrument Serif", "sans-serif"],
     });
