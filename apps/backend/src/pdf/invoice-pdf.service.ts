@@ -35,6 +35,10 @@ function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
 function validateInput(input: InvoicePdfInput): void {
   if (!input?.entity || !input.customer || !input.invoice || !input.tax) {
     throw new RenderFailedError();
@@ -53,7 +57,7 @@ function validateInput(input: InvoicePdfInput): void {
     !isNonEmptyString(invoice.dueDate) ||
     !Array.isArray(items) ||
     items.length === 0 ||
-    typeof tax.invoice_tax_rate !== "number" ||
+    !isFiniteNumber(tax.invoice_tax_rate) ||
     typeof tax.invoice_tax_shown !== "boolean" ||
     typeof tax.reverse_charge_flag !== "boolean" ||
     !isNonEmptyString(tax.legal_reference)
@@ -63,9 +67,9 @@ function validateInput(input: InvoicePdfInput): void {
   for (const item of items) {
     if (
       !isNonEmptyString(item?.bezeichnung) ||
-      typeof item.menge !== "number" ||
-      typeof item.einzelpreis !== "number" ||
-      typeof item.netto !== "number"
+      !isFiniteNumber(item.menge) ||
+      !isFiniteNumber(item.einzelpreis) ||
+      !isFiniteNumber(item.netto)
     ) {
       throw new RenderFailedError();
     }
