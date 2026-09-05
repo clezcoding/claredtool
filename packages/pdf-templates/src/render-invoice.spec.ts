@@ -1,6 +1,11 @@
 import { writeFileSync, mkdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import {
+  buildFacts,
+  buildFactsAe,
+  serializeCiiComfort,
+} from "@clared/e-invoice";
+import {
   renderInvoice,
   roundEur,
   swapRendererCtorFirst,
@@ -98,13 +103,15 @@ const TAX_DE_B2B_19 = {
     "Umsatzsteuer nach § 12 Abs. 1 UStG (Regelsteuersatz 19 %).",
 } as const;
 
-/** Minimal CII placeholder for RED/GREEN packaging until Task 2 wires @clared/e-invoice. */
-const GOLDEN_CII_XML = `<?xml version="1.0" encoding="UTF-8"?>
-<rsm:CrossIndustryInvoice xmlns:rsm="urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100">
-  <rsm:ExchangedDocument>
-    <ram:ID xmlns:ram="urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100">RE-2026-0001</ram:ID>
-  </rsm:ExchangedDocument>
-</rsm:CrossIndustryInvoice>`;
+let ciiComfortS: string;
+let ciiComfortAe: string;
+
+beforeAll(async () => {
+  ciiComfortS = await serializeCiiComfort(buildFacts());
+  ciiComfortAe = await serializeCiiComfort(buildFactsAe());
+  expect(ciiComfortS).toContain("CrossIndustryInvoice");
+  expect(ciiComfortAe).toContain("CrossIndustryInvoice");
+}, 60_000);
 
 function assertPdfMagic(bytes: Uint8Array): void {
   expect(bytes.byteLength).toBeGreaterThanOrEqual(5);
@@ -136,7 +143,7 @@ describe("renderInvoice money guards (D-26 package path)", () => {
       renderInvoice({
         locale: "de",
         vatLine: "omit",
-        ciiXml: GOLDEN_CII_XML,
+        ciiXml: ciiComfortS,
         model: {
           ...FIXTURE_1_MODEL,
           items: [
@@ -158,7 +165,7 @@ describe("renderInvoice money guards (D-26 package path)", () => {
       renderInvoice({
         locale: "de",
         vatLine: "omit",
-        ciiXml: GOLDEN_CII_XML,
+        ciiXml: ciiComfortS,
         model: { ...FIXTURE_1_MODEL, items: [...FIXTURE_1_MODEL.items] },
         tax: {
           ...TAX_DE_B2B_19,
@@ -181,13 +188,13 @@ describe("renderInvoice money guards (D-26 package path)", () => {
   });
 });
 
-/** D-13 / PDF-01: hybrid-embed — PDF/A-3b carries factur-x.xml */
+/** D-13 / PDF-01: hybrid-embed — PDF/A-3b carries factur-x.xml from @clared/e-invoice */
 describe("hybrid-embed Factur-X packaging", () => {
   it("returns %PDF- bytes whose latin1 payload contains factur-x.xml", async () => {
     const result = await renderInvoice({
       locale: "de",
       vatLine: "omit",
-      ciiXml: GOLDEN_CII_XML,
+      ciiXml: ciiComfortS,
       model: { ...FIXTURE_1_MODEL, items: [...FIXTURE_1_MODEL.items] },
       tax: { ...TAX_DE_B2B_19 },
     });
@@ -195,6 +202,7 @@ describe("hybrid-embed Factur-X packaging", () => {
     expect(result.contentType).toBe("application/pdf");
     assertPdfMagic(result.bytes);
     assertHasFacturXFilename(result.bytes);
+    // CII body is Flate-compressed in the EmbeddedFile stream; filename is catalog plaintext.
 
     const src = readFileSync(
       path.join(__dirname, "render-invoice.ts"),
@@ -217,7 +225,7 @@ describe("D-23 fixture 1 — DE B2B 19%", () => {
     const result = await renderInvoice({
       locale: "de",
       vatLine: "omit",
-      ciiXml: GOLDEN_CII_XML,
+      ciiXml: ciiComfortS,
       model: { ...FIXTURE_1_MODEL, items: [...FIXTURE_1_MODEL.items] },
       tax: { ...TAX_DE_B2B_19 },
     });
@@ -242,7 +250,7 @@ describe("D-23 fixture 2 — EN same facts", () => {
     const result = await renderInvoice({
       locale: "en",
       vatLine: "omit",
-      ciiXml: GOLDEN_CII_XML,
+      ciiXml: ciiComfortS,
       model: { ...FIXTURE_1_MODEL, items: [...FIXTURE_1_MODEL.items] },
       tax: { ...TAX_DE_B2B_19 },
     });
@@ -297,7 +305,7 @@ describe("D-23 fixture 3 — DE reverse-charge", () => {
     const result = await renderInvoice({
       locale: "de",
       vatLine: "omit",
-      ciiXml: GOLDEN_CII_XML,
+      ciiXml: ciiComfortAe,
       model: {
         entity: {
           name: "Nordlicht Handel GmbH",

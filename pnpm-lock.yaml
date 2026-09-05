@@ -289,6 +289,9 @@ importers:
 
   packages/pdf-templates:
     dependencies:
+      '@clared/e-invoice':
+        specifier: workspace:*
+        version: link:../e-invoice
       '@takumi-rs/helpers':
         specifier: 2.13.6
         version: 2.13.6(react@19.1.0)
