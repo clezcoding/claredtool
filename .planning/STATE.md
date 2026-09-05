@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.6
 current_phase_name: Takumi+pdfcn PDF Engine Cutover
 status: executing
-stopped_at: Completed 04.6-04-PLAN.md
-last_updated: "2026-09-05T17:15:41.690Z"
+stopped_at: Completed 04.6-05-PLAN.md
+last_updated: "2026-09-05T17:27:02.967Z"
 last_activity: 2026-09-05
-last_activity_desc: Completed 04.6-04 API-only image + CI cutover
-state_head: e14e2191f946e46866ae385dd9edd8bcaadd85d7
+last_activity_desc: Completed 04.6-05 Coolify/Kuma one-way Chromium cutover
+state_head: 1a2b410ab8189cda76fa3daebbb6fa89c2152bb1
 progress:
   total_phases: 14
   completed_phases: 9
   total_plans: 65
-  completed_plans: 64
+  completed_plans: 65
 milestone_name: milestone
 ---
 
@@ -28,13 +28,13 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Executing Phase 04.6 — Plan 04 complete; next 04.6-05
+Status: Executing Phase 04.6 — Plan 05 complete (all 5 plans executed; await phase verify)
 Phase: 04.6 (Takumi+pdfcn PDF Engine Cutover) — EXECUTING
-Plan: 04/05 complete (API-only Dockerfile/GHA/Coolify deploy; worker stage gone D-09)
+Plan: 05/05 complete (compose/env drop; Coolify/Kuma deletes D-24)
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 stitch-build; 4.2 desktop; 4.3 infra; 4.4 GHA; 4.5 hardening; 4.6 Takumi+pdfcn cutover (no Gotenberg); 5.1 catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-05 — Completed 04.6-04 (pdf-templates in API image; GHA/deploy API-only; /health/ready poll)
+Last activity: 2026-09-05 — Completed 04.6-05 (compose/env cut; Coolify gotenberg+worker deleted; Kuma monitor 12 deleted)
 
 Progress: [█████████░] 75%
 
@@ -120,6 +120,7 @@ Progress: [█████████░] 75%
 | Phase 04.6 P02 | 4min | 2 tasks | 8 files |
 | Phase 04.6 P03 | 5min | 3 tasks | 19 files |
 | Phase 04.6 P04 | 4min | 3 tasks | 5 files |
+| Phase 04.6 P05 | 7min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -280,6 +281,8 @@ Recent decisions affecting current work:
 - [Phase 04.6]: API image owns Takumi wasm via node_modules; no worker stage/tag (D-09)
 - [Phase 04.6]: Deploy polls /health/ready build sha after API pin (D-25)
 - [Phase 04.6]: Mock tests fail closed if WORKER_UUID / COOLIFY_APP_WORKER / -worker reappear
+- [Phase 04.6]: 04.6-05 proceed-delete: removed Coolify gotenberg+worker and Kuma monitor; rollback=API image pin
+- [Phase 04.6]: 04.6-05 live UUIDs: worker mwdbgkc8grcth77wx0cseom8, API ucmhsb0srwr7ewt9wxejc4e9 (plan UUIDs stale)
 
 ### Pending Todos
 
@@ -331,8 +334,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-05T17:15:41.482Z
-Stopped at: Completed 04.6-04-PLAN.md
+Last session: 2026-09-05T17:27:02.771Z
+Stopped at: Completed 04.6-05-PLAN.md
 Resume file: None
 
 ## Rebuild Log
