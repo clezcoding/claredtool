@@ -49,5 +49,6 @@ describe("Health (e2e)", () => {
     const body = JSON.stringify(res.body).toLowerCase();
     expect(body).toMatch(/postgres/);
     expect(body).toMatch(/redis/);
+    expect(body).not.toMatch(/gotenberg/);
   });
 });
