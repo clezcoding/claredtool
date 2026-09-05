@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.7
 current_phase_name: Factur-X / ZUGFeRD / XRechnung e-invoice XML
 status: executing
-stopped_at: Completed 04.7-03-PLAN.md
-last_updated: "2026-09-05T23:32:41.072Z"
+stopped_at: Completed 04.7-04-PLAN.md
+last_updated: "2026-09-05T23:41:45.338Z"
 last_activity: 2026-09-06
 last_activity_desc: Phase 04.7 execution started
-state_head: c6011edbe91a09f37d398b0e5bd3d773426ebd4d
+state_head: 153f429fe54a6f82b1784c6eb40cc1f415d6d441
 progress:
   total_phases: 14
   completed_phases: 10
   total_plans: 72
-  completed_plans: 70
+  completed_plans: 71
 milestone_name: milestone
 ---
 
@@ -30,14 +30,14 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 Status: Ready to execute
 Phase: 04.7 (Factur-X / ZUGFeRD / XRechnung e-invoice XML) — EXECUTING
-Plan: next 04.7-04 (5/7 plans complete; remaining 04, 06)
+Plan: next 04.7-06 (6/7 plans complete; remaining 06)
 Phase 04.6 (Takumi+pdfcn PDF Engine Cutover) — complete 2026-09-05 (verification 10/10)
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 stitch-build; 4.2 desktop; 4.3 infra; 4.4 GHA; 4.5 hardening; 4.6 Takumi+pdfcn cutover (no Gotenberg); 5.1 catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-06 — Completed 04.7-03 Takumi Factur-X packaging
+Last activity: 2026-09-06 — Completed 04.7-04 Nest InvoicePdfService EInvoiceArtifacts
 
-Progress: [█████████░] 75%
+Progress: [█████████░] 86%
 
 ## Performance Metrics
 
@@ -128,6 +128,7 @@ Progress: [█████████░] 75%
 | Phase 04.7 P01b | 4min | 2 tasks | 12 files |
 | Phase 04.7 P05 | 5min | 3 tasks | 9 files |
 | Phase 04.7 P03 | 7min | 2 tasks | 6 files |
+| Phase 04.7 P04 | 7min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -301,6 +302,8 @@ Recent decisions affecting current work:
 - [Phase 04.7]: Invoice-level supplyType only; mixed hard-reject via allowlist + scrubbed banner
 - [Phase 04.7]: XMP Version locked to 1.0 pending Mustang 2.26.0 in 04.7-06
 - [Phase 04.7]: Nest empty ciiXml fail-closed until 04.7-04 wires serializeCiiComfort
+- [Phase 04.7]: Nest builds En16931Facts via toFacts(); fixture buildFacts stays package-local
+- [Phase 04.7]: Leitweg-ID preferred over buyerReference for XRechnung BT-10
 
 ### Pending Todos
 
@@ -352,8 +355,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-05T23:32:40.876Z
-Stopped at: Completed 04.7-03-PLAN.md
+Last session: 2026-09-05T23:41:45.130Z
+Stopped at: Completed 04.7-04-PLAN.md
 Resume file: None
 Next: `/gsd-execute-phase 04.7`
 
