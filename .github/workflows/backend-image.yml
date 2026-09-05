@@ -42,15 +42,16 @@ env:
 permissions:
   contents: read
 
+concurrency:
+  group: backend-image-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # REL-04 / D-13: push-api and push-worker run in parallel (was sequential in build).
   # Rollback: restore sequential push steps in a single job (04.5-PATTERNS.md).
   push-api:
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 45
-    concurrency:
-      group: backend-image-build-${{ github.ref }}
-      cancel-in-progress: true
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -117,9 +118,6 @@ jobs:
   push-worker:
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 45
-    concurrency:
-      group: backend-image-build-${{ github.ref }}
-      cancel-in-progress: true
     runs-on: ubuntu-latest
     permissions:
       contents: read
