@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4.3: Infra & Prep for PDF, Offline & Audit** (INSERTED) - Gotenberg, monitoring, OTel, desktop/backend scaffolding before Phase 5 (completed 2026-08-30)
 - [x] **Phase 4.4: GitHub Actions Optimization** (INSERTED) - CI fan-out, security workflows, desktop-release, Dependabot (`docs/claredtool-github-actions-optimierungsauftrag.md`) (completed 2026-09-04)
 - [x] **Phase 4.5: Repository Reliability, Performance & Maintainability Hardening** (INSERTED) - close measurable tech-debt before Phase 5 product work (`docs/CURSOR_GSD_PHASE_04.5_HANDOFF.md`) (completed 2026-09-05)
-- [ ] **Phase 4.6: Takumi+pdfcn PDF Engine Cutover** (INSERTED) - complete Gotenberg removal; Takumi/pdfcn in-process Nest API (`docs/clared-takumi-pdfcn-report.md`, `.planning/phases/04.6-takumi-pdfcn-pdf-engine-cutover/04.6-RESEARCH.md`)
+- [x] **Phase 4.6: Takumi+pdfcn PDF Engine Cutover** (INSERTED) - complete Gotenberg removal; Takumi/pdfcn in-process Nest API (`docs/clared-takumi-pdfcn-report.md`, `.planning/phases/04.6-takumi-pdfcn-pdf-engine-cutover/04.6-RESEARCH.md`) (completed 2026-09-05)
 - [ ] **Phase 4.7: Factur-X / ZUGFeRD / XRechnung e-invoice XML** (INSERTED) - Comfort CII + PDF/A-3b embed + XRechnung on the Takumi engine
 - [ ] **Phase 5: PDF, Audit & Offline Sync** - Download PDF, inspect tax audit trail, work offline and sync
 - [ ] **Phase 5.1: Stitch→React extended catalog** (INSERTED) - remaining Stitch screens after PDF loop ships
@@ -274,7 +274,7 @@ Plans:
   9. Fonts vendored in the image (Inter + Instrument Serif WOFF2). No `googleFonts()` network fetch at Coolify render time
   10. Ops addendum (do not rewrite 04.3 PLAN/SUMMARY): 04.3-PDF-OPS / MONITOR-OPS + `.env.example` without `GOTENBERG_*`. Fixture: Invoice+TaxDecision → `%PDF-` bytes, no Chrome, no XML attachment
 
-**Plans:** 5/5 plans executed
+**Plans:** 5/5 plans complete
 **UI hint**: no (engine/infra; JSX templates are not desktop UI)
 
 Plans:
@@ -468,7 +468,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 4.1 → 4.2 → 4.3 →
 | 4.3 Infra & Prep for PDF/Offline/Audit | 8/8 | Complete    | 2026-08-30 |
 | 4.4 GitHub Actions Optimization | 7/7 | Complete | 2026-09-04 |
 | 4.5 Repository Reliability, Performance & Maintainability Hardening | 6/6 | Complete | 2026-09-05 |
-| 4.6 Takumi+pdfcn PDF Engine Cutover | 5/5 | In Progress|  |
+| 4.6 Takumi+pdfcn PDF Engine Cutover | 5/5 | Complete    | 2026-09-05 |
 | 4.7 Factur-X / ZUGFeRD / XRechnung e-invoice XML | 0/? | Not started | - |
 | 5. PDF, Audit & Offline Sync | 0/? | Not started | - |
 | 5.1 Stitch→React extended catalog | 0/? | Not started | - |

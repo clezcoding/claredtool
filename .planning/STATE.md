@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 04.6
-current_phase_name: Takumi+pdfcn PDF Engine Cutover
-status: executing
-stopped_at: Completed 04.6-05-PLAN.md
-last_updated: "2026-09-05T17:27:02.967Z"
+current_phase: 04.7
+current_phase_name: Factur-X / ZUGFeRD / XRechnung e-invoice XML
+status: planning
+stopped_at: Phase 04.6 complete, ready to plan Phase 04.7
+last_updated: "2026-09-05T17:34:13.496Z"
 last_activity: 2026-09-05
-last_activity_desc: Completed 04.6-05 Coolify/Kuma one-way Chromium cutover
-state_head: 1a2b410ab8189cda76fa3daebbb6fa89c2152bb1
+last_activity_desc: Phase 04.6 complete, transitioned to Phase 04.7
+state_head: afed7f1ba1792cd94068f15feac274ad57a6a566
 progress:
   total_phases: 14
-  completed_phases: 9
+  completed_phases: 10
   total_plans: 65
   completed_plans: 65
 milestone_name: milestone
@@ -28,13 +28,13 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Executing Phase 04.6 — Plan 05 complete (all 5 plans executed; await phase verify)
-Phase: 04.6 (Takumi+pdfcn PDF Engine Cutover) — EXECUTING
-Plan: 05/05 complete (compose/env drop; Coolify/Kuma deletes D-24)
+Status: Ready to plan
+Phase: 04.7 — Factur-X / ZUGFeRD / XRechnung e-invoice XML
+Plan: Not started
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 stitch-build; 4.2 desktop; 4.3 infra; 4.4 GHA; 4.5 hardening; 4.6 Takumi+pdfcn cutover (no Gotenberg); 5.1 catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-05 — Completed 04.6-05 (compose/env cut; Coolify gotenberg+worker deleted; Kuma monitor 12 deleted)
+Last activity: 2026-09-05 — Phase 04.6 complete, transitioned to Phase 04.7
 
 Progress: [█████████░] 75%
 
@@ -42,7 +42,7 @@ Progress: [█████████░] 75%
 
 **Velocity:**
 
-- Total plans completed: 54
+- Total plans completed: 59
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -59,6 +59,7 @@ Progress: [█████████░] 75%
 | 04.2 | 8 | - | - |
 | 04.3 | 8 | - | - |
 | 04.4 | 7 | - | - |
+| 04.6 | 5 | - | - |
 
 **Recent Trend:**
 
@@ -335,7 +336,7 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-09-05T17:27:02.771Z
-Stopped at: Completed 04.6-05-PLAN.md
+Stopped at: Phase 04.6 complete, ready to plan Phase 04.7
 Resume file: None
 
 ## Rebuild Log
