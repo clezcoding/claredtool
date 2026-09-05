@@ -4,7 +4,7 @@ milestone: v1.0
 current_phase: 04.7
 current_phase_name: Factur-X / ZUGFeRD / XRechnung e-invoice XML
 status: "Phase 04.6 shipped — PR #124"
-stopped_at: Phase 04.7 context gathered
+stopped_at: Phase 04.7 UI-SPEC drafted
 last_updated: "2026-09-05T21:36:30.814Z"
 last_activity: 2026-09-05
 state_head: e635953677771f86f89767cc33d8742231a7378e
@@ -336,8 +336,8 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-09-05T21:36:30.531Z
-Stopped at: Phase 04.7 context gathered
-Resume file: .planning/phases/04.7-factur-x-zugferd-xrechnung-e-invoice-xml/04.7-CONTEXT.md
+Stopped at: Phase 04.7 UI-SPEC drafted
+Resume file: .planning/phases/04.7-factur-x-zugferd-xrechnung-e-invoice-xml/04.7-UI-SPEC.md
 
 ## Rebuild Log
 
