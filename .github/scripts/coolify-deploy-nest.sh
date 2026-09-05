@@ -225,8 +225,8 @@ for _ in $(seq 1 12); do
       fi
       ;;
     running:unknown)
-      # A background worker has no HTTP endpoint. Coolify reports
-      # `running:unknown` when health checks are intentionally off.
+      # Worker exposes loopback GET /health (Dockerfile HEALTHCHECK). Deploy
+      # still verifies Coolify application status — no public worker FQDN.
       if [ "$HEALTH_ENABLED" != "true" ]; then
         poll_ok=1
         break
