@@ -60,7 +60,25 @@
     "sendOptions": "Senden Optionen",
     "numberSettings": "Rechnungsnummer Einstellungen",
     "pickInvoice": "Rechnung wählen",
-    "services": "Leistungen"
+    "services": "Leistungen",
+    "supplyType": "Leistungsart",
+    "supplyTypeGoods": "Ware",
+    "supplyTypeService": "Leistung",
+    "unit": "Einheit",
+    "units": {
+      "C62": "Stück (C62)",
+      "HUR": "Stunde (HUR)",
+      "DAY": "Tag (DAY)",
+      "MON": "Monat (MON)",
+      "KGM": "kg (KGM)",
+      "MTR": "m (MTR)",
+      "H87": "Stück (H87)"
+    },
+    "errors": {
+      "mixedSupplyType": "Waren und Leistungen können in einer Rechnung nicht gemischt werden. Bitte eine Leistungsart wählen.",
+      "failClosed": "E-Rechnung kann nicht erzeugt werden. Pflichtangaben fehlen oder sind ungültig. Angaben prüfen und erneut speichern.",
+      "taxMapping": "Steuerzuordnung für E-Rechnung fehlgeschlagen. Kombination wird nicht unterstützt."
+    }
   },
   "taxRail": {
     "summary": "Zusammenfassung",
