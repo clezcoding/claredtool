@@ -4,16 +4,16 @@ milestone: v1.0
 current_phase: 04.6
 current_phase_name: Takumi+pdfcn PDF Engine Cutover
 status: executing
-stopped_at: Completed 04.6-03-PLAN.md
-last_updated: "2026-09-05T17:09:22.923Z"
+stopped_at: Completed 04.6-04-PLAN.md
+last_updated: "2026-09-05T17:15:41.690Z"
 last_activity: 2026-09-05
-last_activity_desc: Completed 04.6-03 Nest InvoicePdfService cutover
-state_head: 75032c2380521e907b186a5e5db09965ecce32ac
+last_activity_desc: Completed 04.6-04 API-only image + CI cutover
+state_head: e14e2191f946e46866ae385dd9edd8bcaadd85d7
 progress:
   total_phases: 14
   completed_phases: 9
   total_plans: 65
-  completed_plans: 63
+  completed_plans: 64
 milestone_name: milestone
 ---
 
@@ -28,13 +28,13 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Executing Phase 04.6 — Plan 03 complete; next 04.6-04
+Status: Executing Phase 04.6 — Plan 04 complete; next 04.6-05
 Phase: 04.6 (Takumi+pdfcn PDF Engine Cutover) — EXECUTING
-Plan: 03/05 complete (Nest InvoicePdfService + drop queue/worker; Ready D-25)
+Plan: 04/05 complete (API-only Dockerfile/GHA/Coolify deploy; worker stage gone D-09)
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 stitch-build; 4.2 desktop; 4.3 infra; 4.4 GHA; 4.5 hardening; 4.6 Takumi+pdfcn cutover (no Gotenberg); 5.1 catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-05 — Completed 04.6-03 (InvoicePdfService sync; BullMQ/Gotenberg/worker gone; Ready postgres+redis+build)
+Last activity: 2026-09-05 — Completed 04.6-04 (pdf-templates in API image; GHA/deploy API-only; /health/ready poll)
 
 Progress: [█████████░] 75%
 
@@ -119,6 +119,7 @@ Progress: [█████████░] 75%
 | Phase 04.4-github-actions-optimization-ci-fan-out-security-workflows-de P07 | 8 min | 3 tasks | 7 files |
 | Phase 04.6 P02 | 4min | 2 tasks | 8 files |
 | Phase 04.6 P03 | 5min | 3 tasks | 19 files |
+| Phase 04.6 P04 | 4min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -276,6 +277,9 @@ Recent decisions affecting current work:
 - [Phase 04.6]: InvoicePdfService maps Entity/Customer/Invoice + TaxDecision + knobs to renderInvoice sync (D-02)
 - [Phase 04.6]: Fail-closed RenderFailedError; Ready is postgres+redis+build only (D-25, D-26)
 - [Phase 04.6]: BullMQ/Gotenberg/worker bootstrap removed from Nest API path (D-03)
+- [Phase 04.6]: API image owns Takumi wasm via node_modules; no worker stage/tag (D-09)
+- [Phase 04.6]: Deploy polls /health/ready build sha after API pin (D-25)
+- [Phase 04.6]: Mock tests fail closed if WORKER_UUID / COOLIFY_APP_WORKER / -worker reappear
 
 ### Pending Todos
 
@@ -327,8 +331,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-05T17:09:22.723Z
-Stopped at: Completed 04.6-03-PLAN.md
+Last session: 2026-09-05T17:15:41.482Z
+Stopped at: Completed 04.6-04-PLAN.md
 Resume file: None
 
 ## Rebuild Log
