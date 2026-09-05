@@ -1,8 +1,21 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
-import { renderInvoice } from "./render-invoice";
+import { renderInvoice, roundEur } from "./render-invoice";
 import { formatMoney } from "./format-money";
 import { readFileSync } from "node:fs";
+
+/** Half-cent VAT must round tax first, then add — printed rows must add. */
+describe("EUR commercial rounding for printed VAT", () => {
+  it("45.50 @ 19% formats tax 8,65 and total 54,15 (not 54,14)", () => {
+    const subtotal = roundEur(45.5);
+    const taxAmount = roundEur(subtotal * (19 / 100));
+    const total = roundEur(subtotal + taxAmount);
+    expect(formatMoney(taxAmount, "de")).toContain("8,65");
+    expect(formatMoney(total, "de")).toContain("54,15");
+    // Unrounded path formats total as 54,14 — proves the bug this guards.
+    expect(formatMoney(45.5 + 45.5 * 0.19, "de")).toContain("54,14");
+  });
+});
 
 const FIXTURE_1_MODEL = {
   entity: {

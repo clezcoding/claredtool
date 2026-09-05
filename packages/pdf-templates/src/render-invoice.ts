@@ -124,6 +124,11 @@ function assertPdfMagic(bytes: Uint8Array): void {
   }
 }
 
+/** Round to EUR cents so printed net + tax equals printed total. */
+export function roundEur(n: number): number {
+  return Math.round((n + Number.EPSILON) * 100) / 100;
+}
+
 /**
  * Render InvoiceModel + TaxDecision to PDF bytes via Takumi + Crafted Invoice Minimal.
  * Fail-closed: never returns empty PdfBytes (D-26).
@@ -139,14 +144,13 @@ export async function renderInvoice(
   const { model, tax, locale, vatLine } = input;
   const labels = labelsFor(locale);
 
-  const subtotal = model.items.reduce(
-    (sum, line) => sum + Number(line.netto),
-    0
+  const subtotal = roundEur(
+    model.items.reduce((sum, line) => sum + Number(line.netto), 0)
   );
   const rate = Number(tax.invoice_tax_rate) || 0;
   const showTax = tax.invoice_tax_shown === true;
-  const taxAmount = showTax ? subtotal * (rate / 100) : 0;
-  const total = showTax ? subtotal + taxAmount : subtotal;
+  const taxAmount = showTax ? roundEur(subtotal * (rate / 100)) : 0;
+  const total = roundEur(subtotal + taxAmount);
 
   let taxLabel: string | null = null;
   let taxAmountStr: string | null = null;
