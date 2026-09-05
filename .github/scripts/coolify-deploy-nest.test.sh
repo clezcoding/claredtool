@@ -38,11 +38,11 @@ joined="$*"
 PIN_LOG="${MOCK_PIN_LOG:-/dev/null}"
 scenario="${MOCK_SCENARIO:-}"
 
-if [[ "$joined" == *"health/ready"* ]]; then
+if [[ "$joined" == *"health/build"* ]]; then
   if [[ "$joined" == *"%{http_code}"* ]]; then
     if [ "${MOCK_HEALTH_CODE:-200}" = "200" ]; then
       printf '%s\n%s' \
-        "{\"status\":\"ok\",\"details\":{\"build\":{\"status\":\"up\",\"sha\":\"${SHA_TAG}\"}}}" \
+        "{\"status\":\"ok\",\"sha\":\"${SHA_TAG}\"}" \
         "200"
     else
       printf '%s\n%s' '{"status":"error"}' "${MOCK_HEALTH_CODE:-503}"

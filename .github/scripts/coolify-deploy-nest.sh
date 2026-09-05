@@ -155,9 +155,9 @@ if ! wait_for_deployment "API" "$API_DEPLOYMENT_UUID" 60; then
 fi
 
 # F-B5 / audit 6.2: after the exact deployment has finished, verify
-# the configured tag and the public readiness endpoint.
-# Live GET https://clared-api.puzzlessdev.online/health/ready was HTTP 200
-# on 2026-09-04. A fail-deploy drill stays human (phasenplan 4b).
+# the configured tag and the public build SHA endpoint (not /health/ready —
+# Gotenberg/PDF must not veto an otherwise good API pin).
+# A fail-deploy drill stays human (phasenplan 4b).
 # Do not add a simulate-fail input that would roll back production.
 poll_ok=0
 consecutive_ok=0
@@ -165,10 +165,10 @@ for _ in $(seq 1 24); do
   API_POLL_JSON=$(coolify_get "$API_UUID" || true)
   LIVE_TAG=$(printf '%s' "${API_POLL_JSON:-}" | jq -r '.docker_registry_image_tag // empty' 2>/dev/null || true)
   http_response=$(curl -sS -w "\n%{http_code}" \
-    "https://clared-api.puzzlessdev.online/health/ready" 2>/dev/null || true)
+    "https://clared-api.puzzlessdev.online/health/build" 2>/dev/null || true)
   code=$(printf '%s' "$http_response" | tail -1)
   ready_body=$(printf '%s' "$http_response" | sed '$d')
-  ready_sha=$(printf '%s' "$ready_body" | jq -r '.details.build.sha // empty' 2>/dev/null || true)
+  ready_sha=$(printf '%s' "$ready_body" | jq -r '.sha // empty' 2>/dev/null || true)
   if [ "$LIVE_TAG" = "$SHA_TAG" ] && [ "$code" = "200" ] && [ "$ready_sha" = "$SHA_TAG" ]; then
     consecutive_ok=$((consecutive_ok + 1))
     if [ "$consecutive_ok" -ge 2 ]; then

@@ -21,6 +21,13 @@ export class HealthController {
   }
 
   @Public()
+  @Get("build")
+  getBuild() {
+    const sha = process.env.GIT_SHA?.trim() || "unknown";
+    return { status: "ok", sha };
+  }
+
+  @Public()
   @Get("ready")
   @HealthCheck()
   ready() {
