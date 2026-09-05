@@ -219,4 +219,117 @@ describe("InvoicePdfService", () => {
     expect(message).not.toContain(SELLER_NAME);
     expect(message).not.toContain(LINE_BEZEICHNUNG);
   });
+
+  describe("fail-closed gates (D-11, D-12, D-18, D-25, D-31, Q1, Q2)", () => {
+    async function expectScrubbedFail(input: ReturnType<typeof validInput>) {
+      let message = "";
+      try {
+        await service.render(input);
+        throw new Error("expected render to throw");
+      } catch (err) {
+        expect(err).toBeInstanceOf(RenderFailedError);
+        message = (err as Error).message;
+      }
+      expect(message).toBe("Render fehlgeschlagen");
+      expect(message).not.toContain(SELLER_STREET);
+      expect(message).not.toContain(SELLER_NAME);
+      expect(message).not.toContain("DE123456789");
+      expect(message).not.toContain("DE89370400440532013000");
+      expect(renderInvoiceMock).not.toHaveBeenCalled();
+    }
+
+    it("missing street / postalCode / city → RenderFailedError; no PDF (D-12)", async () => {
+      await expectScrubbedFail({
+        ...validInput(),
+        entity: { ...validInput().entity, street: "" },
+      });
+      await expectScrubbedFail({
+        ...validInput(),
+        customer: { ...validInput().customer, postalCode: "  " },
+      });
+      await expectScrubbedFail({
+        ...validInput(),
+        customer: { ...validInput().customer, city: "" },
+      });
+    });
+
+    it("missing seller email or phone → RenderFailedError (Q1 BG-6); no PDF", async () => {
+      await expectScrubbedFail({
+        ...validInput(),
+        entity: { ...validInput().entity, email: "" },
+      });
+      await expectScrubbedFail({
+        ...validInput(),
+        entity: { ...validInput().entity, phone: "" },
+      });
+    });
+
+    it("unknown tax combination → RenderFailedError (D-25); no PDF", async () => {
+      await expectScrubbedFail({
+        ...validInput(),
+        tax: {
+          ...validInput().tax,
+          invoice_tax_rate: 7,
+          invoice_tax_shown: true,
+          reverse_charge_flag: false,
+        },
+      });
+    });
+
+    it("supplyType outside goods|service or mixed → RenderFailedError (D-31); no PII", async () => {
+      await expectScrubbedFail({
+        ...validInput(),
+        invoice: {
+          ...validInput().invoice,
+          supplyType: "mixed" as "service",
+        },
+      });
+      await expectScrubbedFail({
+        ...validInput(),
+        invoice: {
+          ...validInput().invoice,
+          supplyType: "consulting" as "service",
+        },
+      });
+    });
+
+    it("empty IBAN on live path OK — omit payment means; do not invent IBAN (D-18)", async () => {
+      const pdfBytes = new TextEncoder().encode("%PDF-1.4 factur-x.xml mock");
+      renderInvoiceMock.mockResolvedValue({
+        bytes: pdfBytes,
+        contentType: "application/pdf",
+      });
+
+      const input = {
+        ...validInput(),
+        entity: { ...validInput().entity, iban: undefined, bic: undefined },
+      };
+      expect(input.entity.iban).toBeUndefined();
+      const result = await service.render(input);
+      expect(result.pdf.contentType).toBe("application/pdf");
+      expect(result.xrechnungXml.bytes.byteLength).toBeGreaterThan(0);
+    });
+
+    // Q2: HRB / Geschäftsführer optional — absence alone does not fail-closed
+    // unless a validator marks fatal (document gate for Nest specs).
+    it("empty HRB/GF alone does not fail-closed (Q2 optional)", async () => {
+      const pdfBytes = new TextEncoder().encode("%PDF-1.4 factur-x.xml mock");
+      renderInvoiceMock.mockResolvedValue({
+        bytes: pdfBytes,
+        contentType: "application/pdf",
+      });
+
+      const input = {
+        ...validInput(),
+        entity: {
+          ...validInput().entity,
+          hrb: null,
+          managingDirector: null,
+        },
+      };
+      const result = await service.render(input);
+      expect(result.pdf.contentType).toBe("application/pdf");
+      expect(result.xrechnungXml.contentType).toBe("application/xml");
+    });
+  });
 });
