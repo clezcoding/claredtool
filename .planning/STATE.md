@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04.7
 current_phase_name: Factur-X / ZUGFeRD / XRechnung e-invoice XML
-status: planning_gaps
-stopped_at: Gap-closure plan 04.7-07 created (verifier gaps_found → --gaps run)
-last_updated: "2026-09-06T00:28:00.000Z"
+status: human_verification
+stopped_at: Gap closure 04.7-07 complete — 5/5 automated truths; 3 human UAT items pending
+last_updated: "2026-09-06T00:36:00.000Z"
 last_activity: 2026-09-06
-last_activity_desc: Phase 04.7 gap-closure plan 04.7-07 created via /gsd-plan-phase 04.7 --gaps — awaiting /gsd-execute-phase 04.7 --gaps-only
-state_head: 5e7cc6627f4f5e6a3e3a5c5e5d4b3a2c1d0e9f8a
+last_activity_desc: Gap closure 04.7-07 executed; re-verification human_needed (5/5 automated)
+state_head: 6f299c8gap-closure-complete
 progress:
   total_phases: 14
   completed_phases: 10
   total_plans: 73
-  completed_plans: 72
+  completed_plans: 73
 milestone_name: milestone
 ---
 
@@ -28,16 +28,16 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Gap-closure plan 04.7-07 created — ready for `/gsd-execute-phase 04.7 --gaps-only`
-Phase: 04.7 (Factur-X / ZUGFeRD / XRechnung e-invoice XML) — GAP-CLOSURE PLANNED
-Plan: 04.7-07 gap-closure (1 plan, 3 tasks) — closes 2 failed truths from VERIFICATION.md (hybrid PDF fixture not a git artifact)
+Status: Human verification needed — gap closure complete
+Phase: 04.7 (Factur-X / ZUGFeRD / XRechnung e-invoice XML) — HUMAN UAT PENDING
+Plan: 04.7-07 gap closure complete (8/8 plans summarized); automated verification 5/5
 Phase 04.6 (Takumi+pdfcn PDF Engine Cutover) — complete 2026-09-05 (verification 10/10)
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 stitch-build; 4.2 desktop; 4.3 infra; 4.4 GHA; 4.5 hardening; 4.6 Takumi+pdfcn cutover (no Gotenberg); 5.1 catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-06 — /gsd-plan-phase 04.7 --gaps created 04.7-07 (commit hybrid PDF fixture + repoint config + SUMMARY correction)
+Last activity: 2026-09-06 — /gsd-execute-phase 04.7 --gaps-only closed SC4/SC5; re-verify human_needed
 
-Progress: [██████████] 100% (phase 04.7 plans) + gap-closure plan ready
+Progress: [██████████] 100% (8/8 plans) — awaiting /gsd-verify-work 04.7
 
 ## Performance Metrics
 
