@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04.7
 current_phase_name: Factur-X / ZUGFeRD / XRechnung e-invoice XML
-status: complete
-stopped_at: UAT 04.7 automated complete — 3/3 human checkpoints passed via probes
-last_updated: "2026-09-06T01:17:00.000Z"
+status: Phase 04.7 shipped — PR #126
+stopped_at: /gsd-ship 04.7 — PR #126 open, Kodiak automerge queued
+last_updated: "2026-09-06T03:25:00.000Z"
 last_activity: 2026-09-06
-last_activity_desc: /gsd-verify-work 04.7 automated (Tauri MCP + vitest/jest); UAT 3/3 pass
+last_activity_desc: /gsd-ship 04.7 — PR #126 created, automerge label applied
 state_head: 6f299c8gap-closure-complete
 progress:
   total_phases: 14
