@@ -3,16 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.0
 current_phase: 04.7
 current_phase_name: Factur-X / ZUGFeRD / XRechnung e-invoice XML
-status: "Phase 04.6 shipped — PR #124"
-stopped_at: Phase 04.6 complete, ready to plan Phase 04.7
-last_updated: "2026-09-05T19:13:10.814Z"
-last_activity: 2026-09-05
-state_head: 8682009693d1e6cd27bce02f25bfa8203df44ae1
+status: Phase 04.7 shipped — PR #126
+stopped_at: /gsd-ship 04.7 — PR #126 open, Kodiak automerge queued
+last_updated: "2026-09-06T03:25:00.000Z"
+last_activity: 2026-09-06
+last_activity_desc: /gsd-ship 04.7 — PR #126 created, automerge label applied
+state_head: 6f299c8gap-closure-complete
 progress:
   total_phases: 14
   completed_phases: 10
-  total_plans: 65
-  completed_plans: 65
+  total_plans: 73
+  completed_plans: 73
 milestone_name: milestone
 ---
 
@@ -27,16 +28,16 @@ See: .planning/PROJECT.md (updated 2026-08-30)
 
 ## Current Position
 
-Status: Phase 04.6 shipped — PR #124
-Phase: 04.7 — Factur-X / ZUGFeRD / XRechnung e-invoice XML
-Plan: Not started
+Status: UAT complete — ready for ship/transition
+Phase: 04.7 (Factur-X / ZUGFeRD / XRechnung e-invoice XML) — UAT 3/3 PASS (automated)
+Plan: 04.7-07 gap closure complete (8/8 plans summarized); automated verification 5/5
 Phase 04.6 (Takumi+pdfcn PDF Engine Cutover) — complete 2026-09-05 (verification 10/10)
 Phase 04.5 (Repository Reliability, Performance & Maintainability Hardening) — complete 2026-09-05 (PR #118 + PR #120)
 Phase 05.1 (Stitch→React extended catalog) — after Phase 5
 Decided: Option A — 4.1 stitch-build; 4.2 desktop; 4.3 infra; 4.4 GHA; 4.5 hardening; 4.6 Takumi+pdfcn cutover (no Gotenberg); 5.1 catalog after Phase 5; Crafted Minimal
-Last activity: 2026-09-05
+Last activity: 2026-09-06 — /gsd-execute-phase 04.7 --gaps-only closed SC4/SC5; re-verify human_needed
 
-Progress: [█████████░] 75%
+Progress: [██████████] 100% (8/8 plans) — UAT complete 2026-09-06
 
 ## Performance Metrics
 
@@ -122,6 +123,13 @@ Progress: [█████████░] 75%
 | Phase 04.6 P03 | 5min | 3 tasks | 19 files |
 | Phase 04.6 P04 | 4min | 3 tasks | 5 files |
 | Phase 04.6 P05 | 7min | 3 tasks | 4 files |
+| Phase 04.7 P01 | 5min | 2 tasks | 16 files |
+| Phase 04.7 P02 | 5min | 3 tasks | 15 files |
+| Phase 04.7 P01b | 4min | 2 tasks | 12 files |
+| Phase 04.7 P05 | 5min | 3 tasks | 9 files |
+| Phase 04.7 P03 | 7min | 2 tasks | 6 files |
+| Phase 04.7 P04 | 7min | 3 tasks | 6 files |
+| Phase 04.7 P06 | 11min | 3 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -284,6 +292,21 @@ Recent decisions affecting current work:
 - [Phase 04.6]: Mock tests fail closed if WORKER_UUID / COOLIFY_APP_WORKER / -worker reappear
 - [Phase 04.6]: 04.6-05 proceed-delete: removed Coolify gotenberg+worker and Kuma monitor; rollback=API image pin
 - [Phase 04.6]: 04.6-05 live UUIDs: worker mwdbgkc8grcth77wx0cseom8, API ucmhsb0srwr7ewt9wxejc4e9 (plan UUIDs stale)
+- [Phase 04.7]: node-zugferd EN16931 toXML with strict:false; xsd-schema-validator allowBuilds false (Mustang/KoSIT owns Schematron in CI)
+- [Phase 04.7]: Wave 1 mapVatCategory returns S only; AE deferred to 04.7-01b
+- [Phase 04.7]: embedInPdf string split in Jest guard so package-wide grep stays clean
+- [Phase 04.7]: Local SCHEMA_PUSH used force-reset after accept-data-loss alone failed on existing rows; Coolify host never targeted
+- [Phase 04.7]: Stammdaten DTOs: structured address + optional IBAN/BIC/email/phone/HRB/GF/Leitweg; InvoiceItem.unit defaults C62
+- [Phase 04.7]: AE exemption text from TaxDecision.legal_reference; CII emits VATEX-EU-AE
+- [Phase 04.7]: XMP Version locked to 1.0 in tooling/e-invoice/versions.lock.json (A4)
+- [Phase 04.7]: Detail address = newline-stacked lines + whitespace-pre-line (E5)
+- [Phase 04.7]: Invoice-level supplyType only; mixed hard-reject via allowlist + scrubbed banner
+- [Phase 04.7]: XMP Version locked to 1.0 pending Mustang 2.26.0 in 04.7-06
+- [Phase 04.7]: Nest empty ciiXml fail-closed until 04.7-04 wires serializeCiiComfort
+- [Phase 04.7]: Nest builds En16931Facts via toFacts(); fixture buildFacts stays package-local
+- [Phase 04.7]: Leitweg-ID preferred over buyerReference for XRechnung BT-10
+- [Phase 04.7]: Mustang Comfort CI uses --no-notices; KoSIT gates XRechnung UBL
+- [Phase 04.7]: UBL requires EndpointID+Contact Name+PaymentMeans for KoSIT; no invented IBAN
 
 ### Pending Todos
 
@@ -335,9 +358,10 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-05T17:27:02.771Z
-Stopped at: Phase 04.6 complete, ready to plan Phase 04.7
+Last session: 2026-09-05T23:55:46.873Z
+Stopped at: Completed 04.7-06-PLAN.md
 Resume file: None
+Next: `/gsd-execute-phase 04.7`
 
 ## Rebuild Log
 

@@ -50,7 +50,9 @@ describe("phase03-product", () => {
         .send({
           name: "Orphan Kunde",
           country: "DE",
-          address: "Hauptstraße 1, 10115 Berlin",
+          street: "Hauptstraße 1",
+          postalCode: "10115",
+          city: "Berlin",
           vatId: "DE123456789",
         })
         .expect(400);
@@ -64,7 +66,9 @@ describe("phase03-product", () => {
           name: "Parent Entity GmbH",
           country: "DE",
           legalForm: "GmbH",
-          address: "Teststraße 1, 10115 Berlin",
+          street: "Teststraße 1",
+          postalCode: "10115",
+          city: "Berlin",
           vatId: "DE123456789",
         })
         .expect(201);
@@ -76,7 +80,9 @@ describe("phase03-product", () => {
           entityId: entity.body.id,
           name: "Buyer DE GmbH",
           country: "DE",
-          address: "Hauptstraße 1, 10115 Berlin",
+          street: "Hauptstraße 1",
+          postalCode: "10115",
+          city: "Berlin",
           vatId: "DE987654321",
         })
         .expect(201);

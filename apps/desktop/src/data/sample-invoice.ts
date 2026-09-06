@@ -15,6 +15,7 @@ export interface LineItem {
   menge: number;
   einzelpreis: number;
   netto: number;
+  unit?: string;
 }
 
 export interface SampleInvoice {
@@ -49,12 +50,14 @@ export const SAMPLE_INVOICE: SampleInvoice = {
       menge: 8,
       einzelpreis: 180,
       netto: 1440,
+      unit: "C62",
     },
     {
       bezeichnung: "Invoice workspace UX review",
       menge: 4,
       einzelpreis: 160,
       netto: 640,
+      unit: "C62",
     },
   ],
   taxDecision: {

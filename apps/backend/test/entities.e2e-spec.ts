@@ -29,14 +29,18 @@ const ENTITY_BODY = {
   name: "Acme AT GmbH",
   country: "AT",
   legalForm: "GmbH",
-  address: "Mariahilfer Straße 1, 1060 Wien",
+  street: "Mariahilfer Straße 1",
+  postalCode: "1060",
+  city: "Wien",
   vatId: "ATU12345678",
 };
 
 const CUSTOMER_BODY = {
   name: "Buyer DE GmbH",
   country: "DE",
-  address: "Hauptstraße 1, 10115 Berlin",
+  street: "Hauptstraße 1",
+  postalCode: "10115",
+  city: "Berlin",
   vatId: "DE123456789",
 };
 
@@ -89,7 +93,9 @@ describe("phase03-product", () => {
       expect(res.body.name).toBe(ENTITY_BODY.name);
       expect(res.body.country).toBe(ENTITY_BODY.country);
       expect(res.body.legalForm).toBe(ENTITY_BODY.legalForm);
-      expect(res.body.address).toBe(ENTITY_BODY.address);
+      expect(res.body.street).toBe(ENTITY_BODY.street);
+      expect(res.body.postalCode).toBe(ENTITY_BODY.postalCode);
+      expect(res.body.city).toBe(ENTITY_BODY.city);
     });
 
     it("owner GET /api/entities returns 200 array including created entity (entity.read)", async () => {
@@ -176,7 +182,9 @@ describe("phase03-product", () => {
           name: "Missing VAT GmbH",
           country: "DE",
           legalForm: "GmbH",
-          address: "Teststraße 1, 10115 Berlin",
+          street: "Teststraße 1",
+          postalCode: "10115",
+          city: "Berlin",
         })
         .expect(400);
     });
@@ -189,7 +197,9 @@ describe("phase03-product", () => {
           name: "US Corp",
           country: "US",
           legalForm: "LLC",
-          address: "1 Main St, Wilmington, DE",
+          street: "1 Main St",
+          postalCode: "19801",
+          city: "Wilmington",
         })
         .expect(201);
 
@@ -205,7 +215,9 @@ describe("phase03-product", () => {
           name: "Invalid Form GmbH",
           country: "DE",
           legalForm: "LLC",
-          address: "Teststraße 1, 10115 Berlin",
+          street: "Teststraße 1",
+          postalCode: "10115",
+          city: "Berlin",
           vatId: "DE123456789",
         })
         .expect(422);

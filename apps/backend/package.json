@@ -12,6 +12,7 @@
     "test:e2e": "prisma generate && jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@clared/e-invoice": "workspace:*",
     "@clared/pdf-templates": "workspace:*",
     "@clared/tax-engine": "workspace:*",
     "@nestjs/common": "12.0.1",

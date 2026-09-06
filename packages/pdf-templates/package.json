@@ -18,6 +18,7 @@
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "dependencies": {
+    "@clared/e-invoice": "workspace:*",
     "@takumi-rs/helpers": "2.13.6",
     "react": "19.1.0",
     "takumi-pdf": "0.14.2"

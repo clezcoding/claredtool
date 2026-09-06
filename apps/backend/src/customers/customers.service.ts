@@ -12,8 +12,13 @@ export class CustomersService {
         entityId: dto.entityId,
         name: dto.name,
         country: dto.country,
-        address: dto.address,
+        street: dto.street,
+        addressLine2: dto.addressLine2,
+        postalCode: dto.postalCode,
+        city: dto.city,
         vatId: dto.vatId,
+        leitwegId: dto.leitwegId,
+        buyerReference: dto.buyerReference,
       },
     });
   }

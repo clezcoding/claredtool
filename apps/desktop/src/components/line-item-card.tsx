@@ -6,6 +6,7 @@ import {
   SelectTrigger,
 } from "@clared/ui";
 import { Code2, GripVertical, Pencil, Star, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { LineItem } from "../data/sample-invoice";
 
 const CATEGORIES = {
@@ -35,6 +36,14 @@ const CATEGORIES = {
   },
 } as const;
 
+const UNECE_UNITS = ["C62", "HUR", "DAY", "MON", "KGM", "MTR", "H87"] as const;
+const UNECE_UNIT_SET = new Set<string>(UNECE_UNITS);
+
+export function normalizeLineUnit(unit?: string | null): string {
+  if (unit && UNECE_UNIT_SET.has(unit)) return unit;
+  return "C62";
+}
+
 type CategoryId = keyof typeof CATEGORIES;
 
 function splitBezeichnung(value: string): [string, string | null] {
@@ -62,11 +71,13 @@ export function LineItemCard({
   onDelete: () => void;
   readOnly?: boolean;
 }) {
+  const { t } = useTranslation();
   const netto = item.menge * item.einzelpreis;
   const category = CATEGORIES[kategorie] ?? CATEGORIES.beratung;
   const CategoryIcon = category.Icon;
   const [title, inlineSubtitle] = splitBezeichnung(item.bezeichnung);
   const subtitle = inlineSubtitle ?? category.subtitle;
+  const unit = normalizeLineUnit(item.unit);
 
   return (
     <tr data-testid="line-item-card" className="border-b border-border/80">
@@ -104,6 +115,7 @@ export function LineItemCard({
                 onChange?.({
                   ...item,
                   bezeichnung: nextBezeichnung,
+                  unit,
                   netto: item.menge * item.einzelpreis,
                 });
               }}
@@ -167,6 +179,7 @@ export function LineItemCard({
               onChange?.({
                 ...item,
                 menge,
+                unit,
                 netto: menge * item.einzelpreis,
               });
             }}
@@ -174,7 +187,42 @@ export function LineItemCard({
           />
         )}
       </td>
-      <td className="py-3 pr-2 text-sm text-muted-foreground">Stk</td>
+      <td className="py-3 pr-2">
+        <span className="sr-only">{t("invoice.unit")}</span>
+        {readOnly ? (
+          <span className="text-sm text-muted-foreground">
+            {t(`invoice.units.${unit}`, { defaultValue: unit })}
+          </span>
+        ) : (
+          <Select
+            value={unit}
+            onValueChange={(value) => {
+              const nextUnit = normalizeLineUnit(value);
+              onChange?.({
+                ...item,
+                unit: nextUnit,
+                netto: item.menge * item.einzelpreis,
+              });
+            }}
+          >
+            <SelectTrigger
+              className="h-8 w-[7.5rem] border-0 bg-transparent px-0 shadow-none"
+              aria-label={t("invoice.unit")}
+            >
+              <span className="truncate text-sm text-muted-foreground">
+                {t(`invoice.units.${unit}`, { defaultValue: unit })}
+              </span>
+            </SelectTrigger>
+            <SelectContent>
+              {UNECE_UNITS.map((code) => (
+                <SelectItem key={code} value={code}>
+                  {t(`invoice.units.${code}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </td>
       <td className="py-3 pr-2">
         <span className="sr-only">Einzelpreis</span>
         {readOnly ? (
@@ -190,6 +238,7 @@ export function LineItemCard({
               onChange?.({
                 ...item,
                 einzelpreis,
+                unit,
                 netto: item.menge * einzelpreis,
               });
             }}

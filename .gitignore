@@ -51,3 +51,6 @@ __pycache__/
 *.py[cod]
 *.pyo
 .Python
+
+# E-invoice validator jars (D-08 CI cache)
+tooling/e-invoice/.cache/

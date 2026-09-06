@@ -89,7 +89,9 @@ describe("phase03-product", () => {
           name: "Invoice Seller GmbH",
           country: "AT",
           legalForm: "GmbH",
-          address: "Teststraße 1",
+          street: "Teststraße 1",
+          postalCode: "1010",
+          city: "Wien",
           vatId: "ATU12345678",
         })
         .expect(201);

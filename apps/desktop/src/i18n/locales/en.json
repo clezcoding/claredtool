@@ -60,7 +60,25 @@
     "sendOptions": "Send options",
     "numberSettings": "Invoice number settings",
     "pickInvoice": "Choose invoice",
-    "services": "Services"
+    "services": "Services",
+    "supplyType": "Supply type",
+    "supplyTypeGoods": "Goods",
+    "supplyTypeService": "Service",
+    "unit": "Unit",
+    "units": {
+      "C62": "Piece (C62)",
+      "HUR": "Hour (HUR)",
+      "DAY": "Day (DAY)",
+      "MON": "Month (MON)",
+      "KGM": "kg (KGM)",
+      "MTR": "m (MTR)",
+      "H87": "Piece (H87)"
+    },
+    "errors": {
+      "mixedSupplyType": "Goods and services cannot be mixed on one invoice. Choose a single supply type.",
+      "failClosed": "E-invoice cannot be produced. Required data is missing or invalid. Check the details and save again.",
+      "taxMapping": "E-invoice tax mapping failed. This combination is not supported."
+    }
   },
   "taxRail": {
     "summary": "Summary",
@@ -155,6 +173,16 @@
     "entity": "Entity",
     "legalName": "Legal name",
     "address": "Address",
+    "street": "Street",
+    "addressLine2": "Address line 2",
+    "postalCode": "Postal code",
+    "city": "City",
+    "email": "Email",
+    "phone": "Phone",
+    "hrb": "Commercial register / HRB",
+    "managingDirector": "Managing director",
+    "leitwegId": "Leitweg-ID",
+    "buyerReference": "Buyer reference",
     "vatId": "VAT ID",
     "taxNumber": "Tax number",
     "accountHolder": "Account holder",
@@ -173,6 +201,9 @@
     "entityRequired": "Please choose an entity.",
     "entityModalBody": "Name, country, and legal form for the business entity.",
     "kundeModalBody": "Company and master data for the customer.",
+    "errors": {
+      "incompleteAddress": "Address incomplete. Street, postal code, and city are required."
+    },
     "tabs": {
       "master": "Master data",
       "tax": "Tax",

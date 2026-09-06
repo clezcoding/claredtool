@@ -2,7 +2,7 @@ import { Type } from "class-transformer";
 import {
   IsArray,
   IsDateString,
-  IsNumber,
+  IsIn,
   IsOptional,
   IsString,
   IsUUID,
@@ -32,8 +32,8 @@ export class UpdateInvoiceDto {
   currency?: string;
 
   @IsOptional()
-  @IsString()
-  supplyType?: string;
+  @IsIn(["goods", "service"])
+  supplyType?: "goods" | "service";
 
   @IsOptional()
   @IsArray()

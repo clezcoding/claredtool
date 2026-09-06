@@ -1,11 +1,22 @@
 import { Injectable } from "@nestjs/common";
 import {
+  assertAmountsEqual,
+  mapVatCategory,
+  normalizeUnitCode,
+  roundEur,
+  serializeCiiComfort,
+  serializeUblXRechnung,
+  type En16931Facts,
+  type MoneyTotals,
+  EInvoiceError,
+} from "@clared/e-invoice";
+import {
   defaultsFromCountry,
   renderInvoice,
   type InvoiceModel,
 } from "@clared/pdf-templates";
 import type { TaxDecision } from "@clared/tax-engine";
-import type { PdfBytes } from "./pdf.contract";
+import type { EInvoiceArtifacts } from "./pdf.contract";
 import { RenderFailedError } from "./render-failed.error";
 
 export type InvoicePdfKnobs = {
@@ -13,11 +24,51 @@ export type InvoicePdfKnobs = {
   vatLine: "omit" | "zero";
 };
 
+export type StructuredPartyBase = {
+  name: string;
+  street: string;
+  addressLine2?: string | null;
+  postalCode: string;
+  city: string;
+  country: string;
+  vatId?: string | null;
+};
+
+export type InvoicePdfEntity = StructuredPartyBase & {
+  legalForm: string;
+  email: string;
+  phone: string;
+  iban?: string | null;
+  bic?: string | null;
+  hrb?: string | null;
+  managingDirector?: string | null;
+};
+
+export type InvoicePdfCustomer = StructuredPartyBase & {
+  leitwegId?: string | null;
+  buyerReference?: string | null;
+  /** Optional BT-49 buyer EndpointID (scheme EM) when known at generate. */
+  email?: string | null;
+};
+
+export type InvoicePdfLine = {
+  bezeichnung: string;
+  menge: number;
+  einzelpreis: number;
+  netto: number;
+  unit?: string | null;
+};
+
 export type InvoicePdfInput = {
-  entity: InvoiceModel["entity"];
-  customer: InvoiceModel["customer"];
-  invoice: InvoiceModel["invoice"];
-  items: InvoiceModel["items"];
+  entity: InvoicePdfEntity;
+  customer: InvoicePdfCustomer;
+  invoice: {
+    number: string;
+    date: string;
+    dueDate: string;
+    supplyType: "goods" | "service";
+  };
+  items: InvoicePdfLine[];
   tax: TaxDecision;
   knobs?: InvoicePdfKnobs;
 };
@@ -63,19 +114,52 @@ function normalizeNumericFields(input: InvoicePdfInput): InvoicePdfInput {
   };
 }
 
+function formatDisplayAddress(party: StructuredPartyBase): string {
+  const parts = [party.street.trim()];
+  if (isNonEmptyString(party.addressLine2)) {
+    parts.push(party.addressLine2.trim());
+  }
+  parts.push(`${party.postalCode.trim()} ${party.city.trim()}`);
+  return parts.join(", ");
+}
+
+function validatePartyAddress(party: StructuredPartyBase | undefined): void {
+  if (
+    !party ||
+    !isNonEmptyString(party.name) ||
+    !isNonEmptyString(party.street) ||
+    !isNonEmptyString(party.postalCode) ||
+    !isNonEmptyString(party.city) ||
+    !isNonEmptyString(party.country)
+  ) {
+    throw new RenderFailedError();
+  }
+}
+
+/**
+ * Fail-closed gates for e-invoice generate (D-11, D-12, D-25, D-31, Q1, Q2).
+ * Q2: HRB / Geschäftsführer optional — absence alone does not fail-closed.
+ */
 function validateInput(input: InvoicePdfInput): void {
   if (!input?.entity || !input.customer || !input.invoice || !input.tax) {
     throw new RenderFailedError();
   }
   const { entity, customer, invoice, items, tax } = input;
+  validatePartyAddress(entity);
+  validatePartyAddress(customer);
+
+  // Q1 BG-6: seller email + phone required on generate
+  if (!isNonEmptyString(entity.email) || !isNonEmptyString(entity.phone)) {
+    throw new RenderFailedError();
+  }
+
+  // XRechnung CIUS: BG-16 PaymentMeans + buyer EndpointID (do not invent IBAN — D-18)
+  if (!isNonEmptyString(entity.iban) || !isNonEmptyString(customer.email)) {
+    throw new RenderFailedError();
+  }
+
   if (
-    !isNonEmptyString(entity.name) ||
-    !isNonEmptyString(entity.address) ||
-    !isNonEmptyString(entity.country) ||
     !isNonEmptyString(entity.legalForm) ||
-    !isNonEmptyString(customer.name) ||
-    !isNonEmptyString(customer.address) ||
-    !isNonEmptyString(customer.country) ||
     !isNonEmptyString(invoice.number) ||
     !isNonEmptyString(invoice.date) ||
     !isNonEmptyString(invoice.dueDate) ||
@@ -89,6 +173,12 @@ function validateInput(input: InvoicePdfInput): void {
   ) {
     throw new RenderFailedError();
   }
+
+  // D-31: one supplyType per invoice; reject unknown / mixed
+  if (invoice.supplyType !== "goods" && invoice.supplyType !== "service") {
+    throw new RenderFailedError();
+  }
+
   for (const item of items) {
     if (
       !isNonEmptyString(item?.bezeichnung) ||
@@ -104,24 +194,145 @@ function validateInput(input: InvoicePdfInput): void {
   }
 }
 
+function visualTotals(input: InvoicePdfInput, rate: number): MoneyTotals {
+  const lineTotal = roundEur(
+    input.items.reduce((sum, item) => sum + item.netto, 0),
+  );
+  const taxTotal = roundEur(lineTotal * (rate / 100));
+  return {
+    lineTotal,
+    taxBasis: lineTotal,
+    taxTotal,
+    grandTotal: roundEur(lineTotal + taxTotal),
+  };
+}
+
+function toFacts(input: InvoicePdfInput): En16931Facts {
+  const category = mapVatCategory(input.tax);
+  const rate = category === "AE" ? 0 : Number(input.tax.invoice_tax_rate);
+  const exemptionReason =
+    category === "AE" ? input.tax.legal_reference.trim() : undefined;
+  if (category === "AE" && !exemptionReason) {
+    throw new EInvoiceError("TAX_MAPPING");
+  }
+
+  const totals = visualTotals(input, rate);
+  const buyerRef =
+    (isNonEmptyString(input.customer.leitwegId)
+      ? input.customer.leitwegId.trim()
+      : undefined) ??
+    (isNonEmptyString(input.customer.buyerReference)
+      ? input.customer.buyerReference.trim()
+      : undefined);
+
+  return {
+    number: input.invoice.number.trim(),
+    issueDate: new Date(`${input.invoice.date.trim()}T00:00:00.000Z`),
+    dueDate: new Date(`${input.invoice.dueDate.trim()}T00:00:00.000Z`),
+    currency: "EUR",
+    typeCode: "380",
+    supplyType: input.invoice.supplyType,
+    seller: {
+      name: input.entity.name.trim(),
+      line1: input.entity.street.trim(),
+      postCode: input.entity.postalCode.trim(),
+      city: input.entity.city.trim(),
+      countryCode: input.entity.country.trim(),
+      vatId: (input.entity.vatId ?? "").trim(),
+      email: input.entity.email.trim(),
+      phone: input.entity.phone.trim(),
+      ...(isNonEmptyString(input.entity.iban)
+        ? { iban: input.entity.iban.trim() }
+        : {}),
+    },
+    buyer: {
+      name: input.customer.name.trim(),
+      line1: input.customer.street.trim(),
+      postCode: input.customer.postalCode.trim(),
+      city: input.customer.city.trim(),
+      countryCode: input.customer.country.trim(),
+      vatId: (input.customer.vatId ?? "").trim(),
+      ...(isNonEmptyString(input.customer.email)
+        ? { email: input.customer.email.trim() }
+        : {}),
+    },
+    ...(buyerRef ? { buyerReference: buyerRef } : {}),
+    lines: input.items.map((item, index) => ({
+      id: String(index + 1),
+      name: item.bezeichnung.trim(),
+      quantity: item.menge,
+      unitCode: normalizeUnitCode(item.unit?.trim() || "C62"),
+      netAmount: roundEur(item.netto),
+    })),
+    vat: {
+      category,
+      rate,
+      ...(exemptionReason ? { exemptionReason } : {}),
+    },
+    totals,
+    tax: input.tax,
+  };
+}
+
+function toVisualModel(input: InvoicePdfInput): InvoiceModel {
+  return {
+    entity: {
+      name: input.entity.name,
+      address: formatDisplayAddress(input.entity),
+      vatId: input.entity.vatId,
+      country: input.entity.country,
+      legalForm: input.entity.legalForm,
+    },
+    customer: {
+      name: input.customer.name,
+      address: formatDisplayAddress(input.customer),
+      vatId: input.customer.vatId,
+      country: input.customer.country,
+    },
+    invoice: {
+      number: input.invoice.number,
+      date: input.invoice.date,
+      dueDate: input.invoice.dueDate,
+    },
+    items: input.items.map((item) => ({
+      bezeichnung: item.bezeichnung,
+      menge: item.menge,
+      einzelpreis: item.einzelpreis,
+      netto: item.netto,
+    })),
+  };
+}
+
 @Injectable()
 export class InvoicePdfService {
-  async render(input: InvoicePdfInput): Promise<PdfBytes> {
+  async render(input: InvoicePdfInput): Promise<EInvoiceArtifacts> {
     const normalized = normalizeNumericFields(input);
     validateInput(normalized);
 
     const knobs =
       normalized.knobs ?? defaultsFromCountry(normalized.entity.country);
 
-    let result: PdfBytes;
+    let ciiXml: string;
+    let ublXml: string;
     try {
-      result = await renderInvoice({
-        model: {
-          entity: normalized.entity,
-          customer: normalized.customer,
-          invoice: normalized.invoice,
-          items: normalized.items,
-        },
+      const facts = toFacts(normalized);
+      assertAmountsEqual(
+        visualTotals(
+          normalized,
+          facts.vat.category === "AE" ? 0 : Number(normalized.tax.invoice_tax_rate),
+        ),
+        facts.totals,
+      );
+      ciiXml = await serializeCiiComfort(facts);
+      ublXml = serializeUblXRechnung(facts);
+    } catch {
+      throw new RenderFailedError();
+    }
+
+    let pdfResult: { bytes: Uint8Array; contentType: string };
+    try {
+      pdfResult = await renderInvoice({
+        model: toVisualModel(normalized),
         tax: {
           invoice_tax_rate: normalized.tax.invoice_tax_rate,
           invoice_tax_shown: normalized.tax.invoice_tax_shown,
@@ -130,15 +341,24 @@ export class InvoicePdfService {
         },
         locale: knobs.locale,
         vatLine: knobs.vatLine,
+        ciiXml,
       });
     } catch {
       throw new RenderFailedError();
     }
 
-    if (!result || result.contentType !== "application/pdf") {
+    if (!pdfResult || pdfResult.contentType !== "application/pdf") {
       throw new RenderFailedError();
     }
-    assertPdfMagic(result.bytes);
-    return { bytes: result.bytes, contentType: "application/pdf" };
+    assertPdfMagic(pdfResult.bytes);
+
+    return {
+      pdf: { bytes: pdfResult.bytes, contentType: "application/pdf" },
+      xrechnungXml: {
+        bytes: new TextEncoder().encode(ublXml),
+        contentType: "application/xml",
+      },
+      ciiXml,
+    };
   }
 }

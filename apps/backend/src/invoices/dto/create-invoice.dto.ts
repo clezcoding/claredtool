@@ -1,6 +1,7 @@
 import { Type } from "class-transformer";
 import {
   IsArray,
+  IsIn,
   IsNumber,
   IsOptional,
   IsString,
@@ -17,6 +18,10 @@ export class InvoiceItemDto {
 
   @IsNumber()
   einzelpreis!: number;
+
+  @IsOptional()
+  @IsString()
+  unit?: string;
 }
 
 export class CreateInvoiceDto {
@@ -32,8 +37,8 @@ export class CreateInvoiceDto {
   currency?: string;
 
   @IsOptional()
-  @IsString()
-  supplyType?: string;
+  @IsIn(["goods", "service"])
+  supplyType?: "goods" | "service";
 
   @IsArray()
   @ValidateNested({ each: true })

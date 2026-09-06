@@ -18,7 +18,10 @@ const mockEntities: Array<{
   name: string;
   country: string;
   legalForm: string;
-  address: string;
+  street: string;
+  postalCode: string;
+  city: string;
+  addressLine2?: string | null;
   vatId: string | null;
 }> = [];
 
@@ -75,7 +78,10 @@ describe("phase03-product", () => {
           name: string;
           country: string;
           legalForm: string;
-          address: string;
+          street: string;
+          postalCode: string;
+          city: string;
+          addressLine2?: string;
           vatId?: string;
         };
         const created = {

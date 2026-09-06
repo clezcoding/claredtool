@@ -1,0 +1,29 @@
+{
+  "$schema_comment": "D-08 Spec / CI pins for Phase 04.7 e-invoice. Jars downloaded via tooling/e-invoice/download-pins.sh — do not commit .cache/",
+  "nodeZugferd": "0.1.1-beta.1",
+  "xrechnung": "3.0.2",
+  "xrechnungBt24": "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0",
+  "mustangCli": "2.26.0",
+  "kositValidator": "1.6.3",
+  "kositConfig": "2026-08-31",
+  "downloads": {
+    "mustangCli": "https://github.com/ZUGFeRD/mustangproject/releases/download/core-2.26.0/Mustang-CLI-2.26.0.jar",
+    "kositValidator": "https://github.com/itplr-kosit/validator/releases/download/v1.6.3/validator-1.6.3-standalone.jar",
+    "kositConfig": "https://github.com/itplr-kosit/validator-configuration-xrechnung/releases/download/v2026-08-31/xrechnung-3.0.2-validator-configuration-2026-08-31.zip"
+  },
+  "fixtures": {
+    "hybridPdf": "packages/e-invoice/fixtures/fixture-1-de-b2b.pdf",
+    "xrechnungUbl": "packages/e-invoice/fixtures/fixture-xrechnung-b2g-leitweg.xml"
+  },
+  "facturX": {
+    "profile": "EN 16931 Comfort",
+    "guideline": "urn:cen.eu:en16931:2017",
+    "attachmentFilename": "factur-x.xml",
+    "xmp": {
+      "ConformanceLevel": "EN 16931",
+      "Version": "1.0",
+      "DocumentFileName": "factur-x.xml",
+      "DocumentType": "INVOICE"
+    }
+  }
+}

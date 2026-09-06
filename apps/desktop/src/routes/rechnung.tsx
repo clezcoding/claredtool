@@ -31,7 +31,7 @@ import { useSession } from "../auth/session-provider";
 import { useAppShellFeedback } from "../components/app-shell";
 import { ErrorState } from "../components/error-state";
 import { InvoiceEmptyState } from "../components/invoice-empty-state";
-import { LineItemCard } from "../components/line-item-card";
+import { LineItemCard, normalizeLineUnit } from "../components/line-item-card";
 import { MaterialIcon } from "../components/material-icon";
 import { Skeleton } from "../components/skeleton";
 import { Spinner } from "../components/spinner";
@@ -49,7 +49,10 @@ type EntityRow = {
   name: string;
   country: string;
   legalForm: string;
-  address: string;
+  street: string;
+  addressLine2?: string | null;
+  postalCode: string;
+  city: string;
   vatId: string | null;
   currencyDefault: string;
 };
@@ -59,7 +62,10 @@ type CustomerRow = {
   entityId: string;
   name: string;
   country: string;
-  address: string;
+  street: string;
+  addressLine2?: string | null;
+  postalCode: string;
+  city: string;
   vatId: string | null;
 };
 
@@ -70,6 +76,7 @@ type InvoiceItemRow = {
   einzelpreis: number;
   netto: number;
   position: number;
+  unit?: string | null;
 };
 
 type InvoiceRow = {
@@ -80,18 +87,54 @@ type InvoiceRow = {
   currency: string;
   date: string | null;
   dueDate: string | null;
+  supplyType?: "goods" | "service";
   items: InvoiceItemRow[];
   updatedAt: string;
 };
 
+type SupplyType = "goods" | "service";
 type AutosaveStatus = "hidden" | "idle" | "saving" | "saved" | "error";
+type EinvoiceBanner = "mixed" | "failClosed" | "taxMapping" | null;
 
 const BLANK_LINE: LineItem = {
   bezeichnung: "",
   menge: 0,
   einzelpreis: 0,
   netto: 0,
+  unit: "C62",
 };
+
+function formatStackedAddress(row: {
+  street?: string | null;
+  addressLine2?: string | null;
+  postalCode?: string | null;
+  city?: string | null;
+  country: string;
+}): string {
+  const lines = [
+    row.street?.trim(),
+    row.addressLine2?.trim(),
+    [row.postalCode, row.city].filter(Boolean).join(" ").trim(),
+    row.country,
+  ].filter(Boolean);
+  return lines.join("\n");
+}
+
+function mapEinvoiceBanner(message: string): EinvoiceBanner {
+  const lower = message.toLowerCase();
+  if (lower.includes("mixed") || lower.includes("gemischt")) return "mixed";
+  if (lower.includes("tax") || lower.includes("steuer")) return "taxMapping";
+  if (
+    lower.includes("e-invoice") ||
+    lower.includes("e-rechnung") ||
+    lower.includes("fail") ||
+    lower.includes("incomplete") ||
+    lower.includes("bg-6")
+  ) {
+    return "failClosed";
+  }
+  return "failClosed";
+}
 
 const AUTOSAVE_DELAY_MS = 600;
 const SEND_CTA =
@@ -202,6 +245,7 @@ function mapItemsFromApi(items: InvoiceItemRow[]): LineItem[] {
     menge: decimalToNumber(row.menge),
     einzelpreis: decimalToNumber(row.einzelpreis),
     netto: decimalToNumber(row.netto),
+    unit: normalizeLineUnit(row.unit),
   }));
 }
 
@@ -232,6 +276,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
   const [datum, setDatum] = useState(todayIso);
   const [faellig, setFaellig] = useState(() => addDaysIso(30));
   const [currency, setCurrency] = useState("EUR");
+  const [supplyType, setSupplyType] = useState<SupplyType>("service");
   const [lineItems, setLineItems] = useState<LineItem[]>([{ ...BLANK_LINE }]);
   const [betreff, setBetreff] = useState("");
   const [notiz, setNotiz] = useState("");
@@ -244,6 +289,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
   const [draftId, setDraftId] = useState<string | null>(null);
   const [isUnnumberedDraft, setIsUnnumberedDraft] = useState(false);
   const [autosaveStatus, setAutosaveStatus] = useState<AutosaveStatus>("hidden");
+  const [einvoiceBanner, setEinvoiceBanner] = useState<EinvoiceBanner>(null);
   const [taxEvaluateError, setTaxEvaluateError] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
@@ -306,7 +352,9 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
         ),
       );
       setCurrency(invoice.currency);
+      setSupplyType(invoice.supplyType === "goods" ? "goods" : "service");
       setLineItems(mapItemsFromApi(invoice.items));
+      setEinvoiceBanner(null);
       resetLocalInvoiceFields();
       setShowHero(false);
       const entity = entityRows.find((row) => row.id === invoice.entityId);
@@ -351,7 +399,9 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
             ? (entityRows[0].currencyDefault ?? "EUR")
             : "EUR",
         );
+        setSupplyType("service");
         setLineItems([{ ...BLANK_LINE }]);
+        setEinvoiceBanner(null);
         resetLocalInvoiceFields();
         if (entityRows.length === 1) {
           entityDefaultRef.current = entityRows[0].currencyDefault ?? "EUR";
@@ -394,6 +444,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
         bezeichnung: item.bezeichnung,
         menge: item.menge,
         einzelpreis: item.einzelpreis,
+        unit: normalizeLineUnit(item.unit),
       }));
 
     return {
@@ -402,10 +453,10 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
       currency,
       date: datum,
       dueDate: faellig,
-      supplyType: "service",
+      supplyType,
       items,
     };
-  }, [currency, customerId, datum, entityId, faellig, lineItems]);
+  }, [currency, customerId, datum, entityId, faellig, lineItems, supplyType]);
 
   const evaluateDraft = useCallback(async () => {
     if (!canEvaluate || !selectedEntity || !selectedCustomer) return;
@@ -427,11 +478,12 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
         vatId: selectedCustomer.vatId ?? undefined,
       },
       currency,
-      supplyType: "service",
+      supplyType,
       items: filledItems.map((item) => ({
         bezeichnung: item.bezeichnung,
         menge: item.menge,
         einzelpreis: item.einzelpreis,
+        unit: normalizeLineUnit(item.unit),
       })),
     };
 
@@ -452,9 +504,21 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
       });
       setTaxLiveState(decision, null);
       setTaxEvaluateError(null);
+      setEinvoiceBanner(null);
       return;
     }
 
+    let banner: EinvoiceBanner = "failClosed";
+    try {
+      const errBody = (await res.json()) as { message?: string | string[] };
+      const message = Array.isArray(errBody.message)
+        ? errBody.message.join(" ")
+        : String(errBody.message ?? "");
+      banner = mapEinvoiceBanner(message);
+    } catch {
+      banner = "failClosed";
+    }
+    setEinvoiceBanner(banner);
     setTaxEvaluateError("evaluate_failed");
     setTaxLiveState(lastGoodTaxRef.current, "evaluate_failed");
   }, [
@@ -463,6 +527,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
     lineItems,
     selectedCustomer,
     selectedEntity,
+    supplyType,
   ]);
 
   const copyInvoiceNumber = useCallback(async () => {
@@ -494,6 +559,17 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
 
       if (!res.ok) {
         setAutosaveStatus("error");
+        let banner: EinvoiceBanner = "failClosed";
+        try {
+          const errBody = (await res.json()) as { message?: string | string[] };
+          const message = Array.isArray(errBody.message)
+            ? errBody.message.join(" ")
+            : String(errBody.message ?? "");
+          banner = mapEinvoiceBanner(message);
+        } catch {
+          banner = "failClosed";
+        }
+        setEinvoiceBanner(banner);
         return;
       }
 
@@ -502,6 +578,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
       setIsUnnumberedDraft(false);
       setRechnungsnummer(invoice.number);
       setShowHero(false);
+      setEinvoiceBanner(null);
       setDrafts((current) => {
         const without = current.filter((row) => row.id !== invoice.id);
         return [invoice, ...without].sort(
@@ -537,7 +614,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
     }, AUTOSAVE_DELAY_MS);
 
     return () => window.clearTimeout(timer);
-  }, [canWrite, currency, customerId, datum, entityId, faellig, lineItems, showHero]);
+  }, [canWrite, currency, customerId, datum, entityId, faellig, lineItems, showHero, supplyType]);
 
   function handleEntityChange(nextEntityId: string) {
     const entity = entities.find((row) => row.id === nextEntityId);
@@ -583,11 +660,13 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
     setDatum(todayIso());
     setFaellig(addDaysIso(30));
     setZahlungsbedingung("30");
+    setSupplyType("service");
     setLineItems([{ ...BLANK_LINE }]);
     resetLocalInvoiceFields();
     setCustomerId("");
     setShowHero(false);
     setAutosaveStatus("hidden");
+    setEinvoiceBanner(null);
     focusEntityRef.current = true;
     resetTaxLiveState();
     lastGoodTaxRef.current = null;
@@ -658,7 +737,9 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
             ? (entities[0].currencyDefault ?? "EUR")
             : "EUR",
         );
+        setSupplyType("service");
         setLineItems([{ ...BLANK_LINE }]);
+        setEinvoiceBanner(null);
         resetLocalInvoiceFields();
         if (entities.length === 1) {
           entityDefaultRef.current = entities[0].currencyDefault ?? "EUR";
@@ -900,8 +981,8 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
               </Select>
               {selectedEntity ? (
                 <>
-                  <p className="mt-1 whitespace-normal break-words text-xs text-muted-foreground">
-                    {selectedEntity.address}
+                  <p className="mt-1 whitespace-pre-line break-words text-xs text-muted-foreground">
+                    {formatStackedAddress(selectedEntity)}
                   </p>
                   <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
                     <span>
@@ -955,8 +1036,8 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
               </Select>
               {selectedCustomer ? (
                 <>
-                  <p className="mt-1 whitespace-normal break-words text-xs text-muted-foreground">
-                    {selectedCustomer.address}
+                  <p className="mt-1 whitespace-pre-line break-words text-xs text-muted-foreground">
+                    {formatStackedAddress(selectedCustomer)}
                   </p>
                   {selectedCustomer.vatId ? (
                     <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -969,7 +1050,7 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <div className="flex flex-col gap-2">
               <Label htmlFor="rechnungsnummer" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                 {t("invoice.number")}
@@ -1078,7 +1159,50 @@ export function RechnungScreen(_props: RechnungScreenProps = {}) {
                 </SelectContent>
               </Select>
             </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="supply-type" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                {t("invoice.supplyType")}
+              </Label>
+              <Select
+                value={supplyType}
+                onValueChange={(value) => {
+                  if (value !== "goods" && value !== "service") {
+                    setEinvoiceBanner("mixed");
+                    return;
+                  }
+                  setSupplyType(value);
+                  setEinvoiceBanner(null);
+                  if (canWrite) setAutosaveStatus("saving");
+                }}
+                disabled={!canWrite}
+              >
+                <SelectTrigger
+                  id="supply-type"
+                  className="h-11 w-full bg-card font-normal"
+                  aria-invalid={einvoiceBanner === "mixed"}
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="goods">{t("invoice.supplyTypeGoods")}</SelectItem>
+                  <SelectItem value="service">{t("invoice.supplyTypeService")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
+          {einvoiceBanner ? (
+            <p
+              role="alert"
+              className="whitespace-normal break-words text-sm text-destructive"
+            >
+              {einvoiceBanner === "mixed"
+                ? t("invoice.errors.mixedSupplyType")
+                : einvoiceBanner === "taxMapping"
+                  ? t("invoice.errors.taxMapping")
+                  : t("invoice.errors.failClosed")}
+            </p>
+          ) : null}
 
           <div className="flex flex-col gap-2 border-b border-border/70 pb-8">
             <Label htmlFor="betreff" className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
