@@ -12,7 +12,7 @@
     "kositConfig": "https://github.com/itplr-kosit/validator-configuration-xrechnung/releases/download/v2026-08-31/xrechnung-3.0.2-validator-configuration-2026-08-31.zip"
   },
   "fixtures": {
-    "hybridPdf": "packages/pdf-templates/tmp/fixture-1-de-b2b.pdf",
+    "hybridPdf": "packages/e-invoice/fixtures/fixture-1-de-b2b.pdf",
     "xrechnungUbl": "packages/e-invoice/fixtures/fixture-xrechnung-b2g-leitweg.xml"
   },
   "facturX": {

@@ -17,7 +17,7 @@ KOSIT_JAR="$CACHE/validator-${KOSIT_VER}-standalone.jar"
 KOSIT_REPO="$CACHE/kosit-config-${KOSIT_CFG}"
 KOSIT_SCENARIOS="$KOSIT_REPO/scenarios.xml"
 
-HYBRID_PDF="${E_INVOICE_HYBRID_PDF:-$ROOT/packages/pdf-templates/tmp/fixture-1-de-b2b.pdf}"
+HYBRID_PDF="${E_INVOICE_HYBRID_PDF:-$ROOT/packages/e-invoice/fixtures/fixture-1-de-b2b.pdf}"
 XR_XML="${E_INVOICE_XR_XML:-$ROOT/packages/e-invoice/fixtures/fixture-xrechnung-b2g-leitweg.xml}"
 
 java_major() {
