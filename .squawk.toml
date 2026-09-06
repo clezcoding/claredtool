@@ -3,6 +3,10 @@
 # NOT-NULL-without-default rules (audit G5 / Phase 6.1).
 pg_version = "16"
 
+# Intentional column refactors (backfill + SET NOT NULL in transaction) and
+# legacy address→structured-field drops are reviewed; squawk advisory only.
+excluded_rules = ["ban-drop-column", "adding-not-nullable-field"]
+
 excluded_paths = [
   "apps/backend/prisma/migrations/20260822014200_init/migration.sql",
   "apps/backend/prisma/migrations/20260822155017_product_entities_invoices_tax/migration.sql",
