@@ -10,17 +10,17 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
-    "@types/node": "^26.4.0",
-    "@types/react": "^19.1.0",
+    "@types/node": "^26.6.3",
+    "@types/react": "^19.3.0",
     "@typescript/native": "npm:typescript@^7.0.2",
-    "jest": "^30.4.2",
-    "ts-jest": "^29.2.5",
+    "jest": "^30.5.2",
+    "ts-jest": "^29.4.14",
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "dependencies": {
     "@clared/e-invoice": "workspace:*",
-    "@takumi-rs/helpers": "2.13.6",
-    "react": "19.1.0",
-    "takumi-pdf": "0.14.2"
+    "@takumi-rs/helpers": "2.14.0",
+    "react": "19.3.0",
+    "takumi-pdf": "0.15.0"
   }
 }
